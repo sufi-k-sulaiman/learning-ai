@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { base44 } from '@/api/base44Client';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Mic, Menu, ChevronLeft, Home, FileText, Users, Settings, HelpCircle, BookOpen } from "lucide-react";
+import { Search, Mic, Menu, ChevronLeft, Home, FileText, Users, Settings, HelpCircle, BookOpen, Loader2 } from "lucide-react";
 
 const LOGO_URL = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/868a98750_1cPublishing-logo.png";
 
@@ -11,33 +12,55 @@ export default function Publishing() {
     const [suggestions, setSuggestions] = useState([]);
     const [showSuggestions, setShowSuggestions] = useState(false);
     const [isListening, setIsListening] = useState(false);
+    const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
     const searchRef = useRef(null);
+    const debounceRef = useRef(null);
 
-    // Sample suggestions - in production, fetch dynamically
-    const allSuggestions = [
-        "Publishing guidelines",
-        "Content management",
-        "Author submissions",
-        "Editorial process",
-        "Copyright policies",
-        "Digital publishing",
-        "Print on demand",
-        "Marketing resources",
-        "Distribution channels",
-        "Royalty information"
-    ];
+    // Fetch suggestions from LLM with internet context
+    const fetchSuggestions = async (query) => {
+        if (query.length < 2) {
+            setSuggestions([]);
+            return;
+        }
+        
+        setIsLoadingSuggestions(true);
+        try {
+            const response = await base44.integrations.Core.InvokeLLM({
+                prompt: `Given the search query "${query}" for a publishing platform, suggest 5 relevant search completions or related topics. Focus on publishing, books, authors, content management, and related topics. Return only the suggestions.`,
+                add_context_from_internet: true,
+                response_json_schema: {
+                    type: "object",
+                    properties: {
+                        suggestions: { type: "array", items: { type: "string" } }
+                    }
+                }
+            });
+            setSuggestions(response.suggestions || []);
+            setShowSuggestions(true);
+        } catch (err) {
+            console.error('Failed to fetch suggestions:', err);
+            setSuggestions([]);
+        } finally {
+            setIsLoadingSuggestions(false);
+        }
+    };
 
     useEffect(() => {
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        
         if (searchQuery.length > 0) {
-            const filtered = allSuggestions.filter(s => 
-                s.toLowerCase().includes(searchQuery.toLowerCase())
-            );
-            setSuggestions(filtered);
             setShowSuggestions(true);
+            debounceRef.current = setTimeout(() => {
+                fetchSuggestions(searchQuery);
+            }, 500);
         } else {
             setSuggestions([]);
             setShowSuggestions(false);
         }
+        
+        return () => {
+            if (debounceRef.current) clearTimeout(debounceRef.current);
+        };
     }, [searchQuery]);
 
     useEffect(() => {
@@ -125,21 +148,32 @@ export default function Publishing() {
                         </div>
 
                         {/* Suggestions Dropdown */}
-                        {showSuggestions && suggestions.length > 0 && (
+                        {showSuggestions && (
                             <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden z-50">
-                                {suggestions.map((suggestion, index) => (
-                                    <button
-                                        key={index}
-                                        onClick={() => {
-                                            setSearchQuery(suggestion);
-                                            setShowSuggestions(false);
-                                        }}
-                                        className="w-full px-4 py-3 text-left flex items-center gap-3 text-gray-700 hover:bg-purple-50"
-                                    >
-                                        <Search className="w-4 h-4 text-gray-400" />
-                                        {suggestion}
-                                    </button>
-                                ))}
+                                {isLoadingSuggestions ? (
+                                    <div className="px-4 py-3 flex items-center gap-3 text-gray-500">
+                                        <Loader2 className="w-4 h-4 animate-spin" style={{ color: '#6B4EE6' }} />
+                                        <span>Finding suggestions...</span>
+                                    </div>
+                                ) : suggestions.length > 0 ? (
+                                    suggestions.map((suggestion, index) => (
+                                        <button
+                                            key={index}
+                                            onClick={() => {
+                                                setSearchQuery(suggestion);
+                                                setShowSuggestions(false);
+                                            }}
+                                            className="w-full px-4 py-3 text-left flex items-center gap-3 text-gray-700 hover:bg-purple-50"
+                                        >
+                                            <Search className="w-4 h-4" style={{ color: '#6B4EE6' }} />
+                                            {suggestion}
+                                        </button>
+                                    ))
+                                ) : searchQuery.length >= 2 ? (
+                                    <div className="px-4 py-3 text-gray-500">No suggestions found</div>
+                                ) : (
+                                    <div className="px-4 py-3 text-gray-500">Type at least 2 characters...</div>
+                                )}
                             </div>
                         )}
                     </div>
@@ -160,7 +194,7 @@ export default function Publishing() {
                                 href={item.href}
                                 className="flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-gray-700 hover:bg-purple-50 hover:text-purple-600"
                             >
-                                <item.icon className="w-5 h-5" style={{ color: '#50C8E8' }} />
+                                <item.icon className="w-5 h-5" style={{ color: '#6B4EE6' }} />
                                 <span className="font-medium">{item.label}</span>
                             </a>
                         ))}
@@ -175,12 +209,15 @@ export default function Publishing() {
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {[1, 2, 3, 4, 5, 6].map((i) => (
-                                <div key={i} className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow" style={{ borderLeft: '4px solid #8BC34A' }}>
-                                    <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4" style={{ backgroundColor: '#50C8E8' }}>
+                                <div key={i} className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow" style={{ borderLeft: '4px solid #6B4EE6' }}>
+                                    <div className="w-12 h-12 rounded-lg flex items-center justify-center mb-4" style={{ backgroundColor: '#6B4EE6' }}>
                                         <BookOpen className="w-6 h-6 text-white" />
                                     </div>
                                     <h3 className="font-semibold mb-2 text-gray-800">Content Block {i}</h3>
                                     <p className="text-sm text-gray-500">Dynamic content will be displayed here based on your data.</p>
+                                    <Button className="mt-4 text-white" style={{ backgroundColor: '#6B4EE6' }}>
+                                        View Details
+                                    </Button>
                                 </div>
                             ))}
                         </div>
