@@ -183,6 +183,111 @@ const STOCK_DATA = [
     { ticker: 'MCK', name: 'McKesson Corporation', sector: 'Healthcare', industry: 'Healthcare Distribution', marketCap: '70' }
 ];
 
+// Additional 100 stocks
+const STOCK_DATA_EXTENDED = [
+    { ticker: 'ENPH', name: 'Enphase Energy', sector: 'Energy', industry: 'Solar', marketCap: '25' },
+    { ticker: 'FSLR', name: 'First Solar Inc.', sector: 'Energy', industry: 'Solar', marketCap: '20' },
+    { ticker: 'SEDG', name: 'SolarEdge Technologies', sector: 'Energy', industry: 'Solar', marketCap: '8' },
+    { ticker: 'RUN', name: 'Sunrun Inc.', sector: 'Energy', industry: 'Solar', marketCap: '5' },
+    { ticker: 'PLUG', name: 'Plug Power Inc.', sector: 'Energy', industry: 'Hydrogen', marketCap: '3' },
+    { ticker: 'BE', name: 'Bloom Energy', sector: 'Energy', industry: 'Fuel Cells', marketCap: '4' },
+    { ticker: 'CHPT', name: 'ChargePoint Holdings', sector: 'Energy', industry: 'EV Charging', marketCap: '2' },
+    { ticker: 'ZIM', name: 'ZIM Integrated Shipping', sector: 'Industrials', industry: 'Shipping', marketCap: '2' },
+    { ticker: 'DAL', name: 'Delta Air Lines', sector: 'Industrials', industry: 'Airlines', marketCap: '32' },
+    { ticker: 'UAL', name: 'United Airlines', sector: 'Industrials', industry: 'Airlines', marketCap: '22' },
+    { ticker: 'AAL', name: 'American Airlines', sector: 'Industrials', industry: 'Airlines', marketCap: '10' },
+    { ticker: 'LUV', name: 'Southwest Airlines', sector: 'Industrials', industry: 'Airlines', marketCap: '18' },
+    { ticker: 'JBLU', name: 'JetBlue Airways', sector: 'Industrials', industry: 'Airlines', marketCap: '2' },
+    { ticker: 'ALK', name: 'Alaska Air Group', sector: 'Industrials', industry: 'Airlines', marketCap: '6' },
+    { ticker: 'CCL', name: 'Carnival Corporation', sector: 'Consumer', industry: 'Cruise Lines', marketCap: '25' },
+    { ticker: 'RCL', name: 'Royal Caribbean', sector: 'Consumer', industry: 'Cruise Lines', marketCap: '40' },
+    { ticker: 'NCLH', name: 'Norwegian Cruise Line', sector: 'Consumer', industry: 'Cruise Lines', marketCap: '10' },
+    { ticker: 'EXPE', name: 'Expedia Group', sector: 'Consumer', industry: 'Travel', marketCap: '20' },
+    { ticker: 'TRIP', name: 'TripAdvisor Inc.', sector: 'Consumer', industry: 'Travel', marketCap: '3' },
+    { ticker: 'MTN', name: 'Vail Resorts', sector: 'Consumer', industry: 'Leisure', marketCap: '8' },
+    { ticker: 'WYNN', name: 'Wynn Resorts', sector: 'Consumer', industry: 'Casinos', marketCap: '10' },
+    { ticker: 'LVS', name: 'Las Vegas Sands', sector: 'Consumer', industry: 'Casinos', marketCap: '35' },
+    { ticker: 'MGM', name: 'MGM Resorts', sector: 'Consumer', industry: 'Casinos', marketCap: '15' },
+    { ticker: 'PENN', name: 'Penn Entertainment', sector: 'Consumer', industry: 'Gaming', marketCap: '4' },
+    { ticker: 'DKNG', name: 'DraftKings Inc.', sector: 'Consumer', industry: 'Sports Betting', marketCap: '18' },
+    { ticker: 'GNOG', name: 'Golden Nugget Online', sector: 'Consumer', industry: 'Online Gaming', marketCap: '1' },
+    { ticker: 'ROKU', name: 'Roku Inc.', sector: 'Media', industry: 'Streaming Devices', marketCap: '10' },
+    { ticker: 'PARA', name: 'Paramount Global', sector: 'Media', industry: 'Entertainment', marketCap: '8' },
+    { ticker: 'WBD', name: 'Warner Bros Discovery', sector: 'Media', industry: 'Entertainment', marketCap: '25' },
+    { ticker: 'FOXA', name: 'Fox Corporation', sector: 'Media', industry: 'Broadcasting', marketCap: '18' },
+    { ticker: 'VIAC', name: 'ViacomCBS Inc.', sector: 'Media', industry: 'Entertainment', marketCap: '12' },
+    { ticker: 'CMCSA', name: 'Comcast Corporation', sector: 'Media', industry: 'Cable', marketCap: '160' },
+    { ticker: 'CHTR', name: 'Charter Communications', sector: 'Media', industry: 'Cable', marketCap: '55' },
+    { ticker: 'DISH', name: 'DISH Network', sector: 'Media', industry: 'Satellite TV', marketCap: '3' },
+    { ticker: 'SIRI', name: 'Sirius XM Holdings', sector: 'Media', industry: 'Radio', marketCap: '15' },
+    { ticker: 'LYV', name: 'Live Nation Entertainment', sector: 'Media', industry: 'Live Events', marketCap: '25' },
+    { ticker: 'MTCH', name: 'Match Group Inc.', sector: 'Technology', industry: 'Dating Apps', marketCap: '10' },
+    { ticker: 'PINS', name: 'Pinterest Inc.', sector: 'Technology', industry: 'Social Media', marketCap: '22' },
+    { ticker: 'SNAP', name: 'Snap Inc.', sector: 'Technology', industry: 'Social Media', marketCap: '18' },
+    { ticker: 'TWTR', name: 'Twitter Inc.', sector: 'Technology', industry: 'Social Media', marketCap: '44' },
+    { ticker: 'GDDY', name: 'GoDaddy Inc.', sector: 'Technology', industry: 'Web Services', marketCap: '18' },
+    { ticker: 'WIX', name: 'Wix.com Ltd.', sector: 'Technology', industry: 'Web Services', marketCap: '8' },
+    { ticker: 'SQSP', name: 'Squarespace Inc.', sector: 'Technology', industry: 'Web Services', marketCap: '5' },
+    { ticker: 'HUBS', name: 'HubSpot Inc.', sector: 'Technology', industry: 'Marketing Software', marketCap: '28' },
+    { ticker: 'VEEV', name: 'Veeva Systems', sector: 'Technology', industry: 'Life Sciences Software', marketCap: '32' },
+    { ticker: 'BILL', name: 'Bill Holdings Inc.', sector: 'Technology', industry: 'Fintech', marketCap: '8' },
+    { ticker: 'FOUR', name: 'Shift4 Payments', sector: 'Finance', industry: 'Payments', marketCap: '6' },
+    { ticker: 'AFRM', name: 'Affirm Holdings', sector: 'Finance', industry: 'Buy Now Pay Later', marketCap: '15' },
+    { ticker: 'UPST', name: 'Upstart Holdings', sector: 'Finance', industry: 'AI Lending', marketCap: '5' },
+    { ticker: 'SOFI', name: 'SoFi Technologies', sector: 'Finance', industry: 'Digital Banking', marketCap: '12' },
+    { ticker: 'LC', name: 'LendingClub Corp.', sector: 'Finance', industry: 'P2P Lending', marketCap: '1.5' },
+    { ticker: 'ALLY', name: 'Ally Financial', sector: 'Finance', industry: 'Auto Lending', marketCap: '10' },
+    { ticker: 'SYF', name: 'Synchrony Financial', sector: 'Finance', industry: 'Consumer Finance', marketCap: '18' },
+    { ticker: 'DFS', name: 'Discover Financial', sector: 'Finance', industry: 'Credit Cards', marketCap: '30' },
+    { ticker: 'NDAQ', name: 'Nasdaq Inc.', sector: 'Finance', industry: 'Exchanges', marketCap: '35' },
+    { ticker: 'CBOE', name: 'Cboe Global Markets', sector: 'Finance', industry: 'Exchanges', marketCap: '18' },
+    { ticker: 'MKTX', name: 'MarketAxess Holdings', sector: 'Finance', industry: 'Trading Platform', marketCap: '10' },
+    { ticker: 'TW', name: 'Tradeweb Markets', sector: 'Finance', industry: 'Trading Platform', marketCap: '22' },
+    { ticker: 'VIRT', name: 'Virtu Financial', sector: 'Finance', industry: 'Market Making', marketCap: '5' },
+    { ticker: 'HIG', name: 'Hartford Financial', sector: 'Finance', industry: 'Insurance', marketCap: '28' },
+    { ticker: 'TRV', name: 'Travelers Companies', sector: 'Finance', industry: 'Insurance', marketCap: '50' },
+    { ticker: 'ALL', name: 'Allstate Corporation', sector: 'Finance', industry: 'Insurance', marketCap: '45' },
+    { ticker: 'PGR', name: 'Progressive Corp.', sector: 'Finance', industry: 'Insurance', marketCap: '130' },
+    { ticker: 'CB', name: 'Chubb Limited', sector: 'Finance', industry: 'Insurance', marketCap: '100' },
+    { ticker: 'MET', name: 'MetLife Inc.', sector: 'Finance', industry: 'Insurance', marketCap: '55' },
+    { ticker: 'PRU', name: 'Prudential Financial', sector: 'Finance', industry: 'Insurance', marketCap: '42' },
+    { ticker: 'AIG', name: 'American International', sector: 'Finance', industry: 'Insurance', marketCap: '48' },
+    { ticker: 'AFL', name: 'Aflac Incorporated', sector: 'Finance', industry: 'Insurance', marketCap: '55' },
+    { ticker: 'MMC', name: 'Marsh McLennan', sector: 'Finance', industry: 'Insurance Brokerage', marketCap: '100' },
+    { ticker: 'AON', name: 'Aon plc', sector: 'Finance', industry: 'Insurance Brokerage', marketCap: '72' },
+    { ticker: 'WTW', name: 'Willis Towers Watson', sector: 'Finance', industry: 'Insurance Brokerage', marketCap: '28' },
+    { ticker: 'BRO', name: 'Brown & Brown Inc.', sector: 'Finance', industry: 'Insurance Brokerage', marketCap: '28' },
+    { ticker: 'AJG', name: 'Arthur J Gallagher', sector: 'Finance', industry: 'Insurance Brokerage', marketCap: '55' },
+    { ticker: 'ELV', name: 'Elevance Health', sector: 'Healthcare', industry: 'Health Insurance', marketCap: '115' },
+    { ticker: 'CNC', name: 'Centene Corporation', sector: 'Healthcare', industry: 'Managed Care', marketCap: '40' },
+    { ticker: 'MOH', name: 'Molina Healthcare', sector: 'Healthcare', industry: 'Managed Care', marketCap: '22' },
+    { ticker: 'HCA', name: 'HCA Healthcare', sector: 'Healthcare', industry: 'Hospitals', marketCap: '85' },
+    { ticker: 'UHS', name: 'Universal Health Services', sector: 'Healthcare', industry: 'Hospitals', marketCap: '12' },
+    { ticker: 'THC', name: 'Tenet Healthcare', sector: 'Healthcare', industry: 'Hospitals', marketCap: '14' },
+    { ticker: 'CYH', name: 'Community Health Systems', sector: 'Healthcare', industry: 'Hospitals', marketCap: '1' },
+    { ticker: 'DVA', name: 'DaVita Inc.', sector: 'Healthcare', industry: 'Dialysis', marketCap: '12' },
+    { ticker: 'FMS', name: 'Fresenius Medical Care', sector: 'Healthcare', industry: 'Dialysis', marketCap: '14' },
+    { ticker: 'CAH', name: 'Cardinal Health', sector: 'Healthcare', industry: 'Distribution', marketCap: '28' },
+    { ticker: 'ABC', name: 'AmerisourceBergen', sector: 'Healthcare', industry: 'Distribution', marketCap: '42' },
+    { ticker: 'HSIC', name: 'Henry Schein Inc.', sector: 'Healthcare', industry: 'Distribution', marketCap: '10' },
+    { ticker: 'HOLX', name: 'Hologic Inc.', sector: 'Healthcare', industry: 'Diagnostics', marketCap: '18' },
+    { ticker: 'DGX', name: 'Quest Diagnostics', sector: 'Healthcare', industry: 'Diagnostics', marketCap: '16' },
+    { ticker: 'LH', name: 'Labcorp Holdings', sector: 'Healthcare', industry: 'Diagnostics', marketCap: '20' },
+    { ticker: 'IQV', name: 'IQVIA Holdings', sector: 'Healthcare', industry: 'CRO', marketCap: '42' },
+    { ticker: 'CRL', name: 'Charles River Labs', sector: 'Healthcare', industry: 'CRO', marketCap: '12' },
+    { ticker: 'WST', name: 'West Pharmaceutical', sector: 'Healthcare', industry: 'Packaging', marketCap: '25' },
+    { ticker: 'PKI', name: 'PerkinElmer Inc.', sector: 'Healthcare', industry: 'Life Sciences', marketCap: '15' },
+    { ticker: 'MTD', name: 'Mettler-Toledo', sector: 'Healthcare', industry: 'Lab Equipment', marketCap: '28' },
+    { ticker: 'WAT', name: 'Waters Corporation', sector: 'Healthcare', industry: 'Analytical Instruments', marketCap: '18' },
+    { ticker: 'BIO', name: 'Bio-Rad Laboratories', sector: 'Healthcare', industry: 'Life Sciences', marketCap: '12' },
+    { ticker: 'TECH', name: 'Bio-Techne Corp.', sector: 'Healthcare', industry: 'Life Sciences', marketCap: '10' },
+    { ticker: 'ALGN', name: 'Align Technology', sector: 'Healthcare', industry: 'Dental', marketCap: '18' },
+    { ticker: 'XRAY', name: 'Dentsply Sirona', sector: 'Healthcare', industry: 'Dental', marketCap: '6' }
+];
+
+// Combine all stocks
+const ALL_STOCK_DATA = [...STOCK_DATA, ...STOCK_DATA_EXTENDED];
+
 // Generate realistic stock metrics
 function generateStockData(stockInfo) {
     const basePrice = 50 + Math.random() * 450;
@@ -253,9 +358,14 @@ export default function Markets() {
 
     // Generate all stocks immediately on mount
     useEffect(() => {
-        const generatedStocks = STOCK_DATA.map(generateStockData);
+        const generatedStocks = ALL_STOCK_DATA.map(generateStockData);
         setStocks(generatedStocks);
     }, []);
+
+    const refreshStocks = () => {
+        const refreshedStocks = ALL_STOCK_DATA.map(generateStockData);
+        setStocks(refreshedStocks);
+    };
 
     const handleStockClick = (stock) => {
         setSelectedStock(stock);
@@ -368,8 +478,12 @@ export default function Markets() {
                         </div>
                     </div>
 
-                    <div className="text-sm text-gray-500 hidden md:block">
-                        {stocks.length} stocks
+                    <div className="flex items-center gap-3">
+                        <Button onClick={refreshStocks} variant="outline" size="sm" className="gap-2">
+                            <RefreshCw className="w-4 h-4" />
+                            <span className="hidden md:inline">Refresh</span>
+                        </Button>
+                        <span className="text-sm text-gray-500 hidden md:block">{stocks.length} stocks</span>
                     </div>
                 </div>
 

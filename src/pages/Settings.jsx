@@ -1,148 +1,173 @@
 import React, { useState, useEffect } from 'react';
-import { Moon, Sun, Type, EyeOff, Eye, Volume2, VolumeX, Contrast } from 'lucide-react';
-import { Switch } from "@/components/ui/switch";
-import { Slider } from "@/components/ui/slider";
 import PageLayout from '../components/PageLayout';
-
-const speakText = (text) => {
-    if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = 1;
-        window.speechSynthesis.speak(utterance);
-    }
-};
+import { 
+    Smartphone, Monitor, Laptop, 
+    Sun, Moon, CloudSun,
+    BookOpen, ZoomIn, Volume2,
+    Type
+} from 'lucide-react';
 
 export default function Settings() {
-    const [darkMode, setDarkMode] = useState(() => localStorage.getItem('theme') === 'dark');
-    const [fontSize, setFontSize] = useState(() => parseInt(localStorage.getItem('fontSize') || '16'));
-    const [hideIcons, setHideIcons] = useState(() => localStorage.getItem('hideIcons') === 'true');
-    const [blackWhiteMode, setBlackWhiteMode] = useState(() => localStorage.getItem('blackWhiteMode') === 'true');
-    const [voicePrompts, setVoicePrompts] = useState(() => localStorage.getItem('voicePrompts') === 'true');
+    const [device, setDevice] = useState(() => localStorage.getItem('deviceMode') || 'laptop');
+    const [resolution, setResolution] = useState(() => localStorage.getItem('resolution') || '1920x1080');
+    const [fontSize, setFontSize] = useState(() => localStorage.getItem('fontSize') || 'medium');
+    const [cognitiveMode, setCognitiveMode] = useState(() => localStorage.getItem('cognitiveMode') || 'audible');
+    const [theme, setTheme] = useState(() => localStorage.getItem('theme') || 'light');
+    const [uiStyle, setUiStyle] = useState(() => localStorage.getItem('uiStyle') || 'rounded');
 
     useEffect(() => {
-        localStorage.setItem('theme', darkMode ? 'dark' : 'light');
-    }, [darkMode]);
+        localStorage.setItem('deviceMode', device);
+        localStorage.setItem('resolution', resolution);
+        localStorage.setItem('fontSize', fontSize);
+        localStorage.setItem('cognitiveMode', cognitiveMode);
+        localStorage.setItem('theme', theme);
+        localStorage.setItem('uiStyle', uiStyle);
 
-    useEffect(() => {
-        localStorage.setItem('fontSize', fontSize.toString());
-        document.documentElement.style.fontSize = `${fontSize}px`;
-    }, [fontSize]);
+        // Apply font size
+        const sizes = { small: '14px', medium: '16px', large: '20px' };
+        document.documentElement.style.fontSize = sizes[fontSize] || '16px';
 
-    useEffect(() => {
-        localStorage.setItem('hideIcons', hideIcons.toString());
-    }, [hideIcons]);
+        // Apply theme
+        if (theme === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+    }, [device, resolution, fontSize, cognitiveMode, theme, uiStyle]);
 
-    useEffect(() => {
-        localStorage.setItem('blackWhiteMode', blackWhiteMode.toString());
-    }, [blackWhiteMode]);
+    const OptionCard = ({ selected, onClick, children, className = '' }) => (
+        <button
+            onClick={onClick}
+            className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 min-w-[100px] ${
+                selected 
+                    ? 'border-purple-500 bg-purple-50 text-purple-700' 
+                    : 'border-gray-200 bg-white hover:border-purple-300 text-gray-600 hover:text-purple-600'
+            } ${className}`}
+        >
+            {children}
+        </button>
+    );
 
-    useEffect(() => {
-        localStorage.setItem('voicePrompts', voicePrompts.toString());
-    }, [voicePrompts]);
-
-    const handleFocus = (text) => {
-        if (voicePrompts) speakText(text);
-    };
+    const Section = ({ title, subtitle, children }) => (
+        <div className="mb-8">
+            <h3 className="text-lg font-semibold text-gray-800 mb-1">{title}</h3>
+            <p className="text-sm text-gray-500 mb-4">{subtitle}</p>
+            <div className="flex flex-wrap gap-3">
+                {children}
+            </div>
+        </div>
+    );
 
     return (
-        <PageLayout activePage="Settings" showSearch={true}>
-            <div className="p-4 md:p-8 max-w-2xl mx-auto">
-                <h1 className="text-3xl font-bold mb-8 text-gray-800">Settings</h1>
+        <PageLayout activePage="Settings" showSearch={false}>
+            <div className="p-4 md:p-8 max-w-4xl mx-auto">
+                <h1 className="text-2xl md:text-3xl font-bold text-gray-800 mb-2">Settings</h1>
+                <p className="text-gray-600 mb-8">Customize your experience</p>
 
-                <div className="space-y-6">
-                    {/* Dark Mode */}
-                    <div 
-                        className="p-6 rounded-2xl border bg-white border-gray-200"
-                        onMouseEnter={() => handleFocus('Dark mode toggle')}
-                        tabIndex={0}
-                    >
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                                {darkMode ? <Moon className="w-6 h-6 text-purple-500" /> : <Sun className="w-6 h-6 text-yellow-500" />}
-                                <div>
-                                    <h3 className="font-semibold text-gray-800">Dark Mode</h3>
-                                    <p className="text-sm text-gray-500">Switch between light and dark themes</p>
-                                </div>
-                            </div>
-                            <Switch checked={darkMode} onCheckedChange={setDarkMode} />
-                        </div>
-                    </div>
+                {/* Compatibility */}
+                <Section title="Compatibility" subtitle="Make it work">
+                    <OptionCard selected={device === 'mobile'} onClick={() => setDevice('mobile')}>
+                        <Smartphone className="w-8 h-8" />
+                        <span className="text-sm font-medium">Mobile</span>
+                    </OptionCard>
+                    <OptionCard selected={device === 'laptop'} onClick={() => setDevice('laptop')}>
+                        <Laptop className="w-8 h-8" />
+                        <span className="text-sm font-medium">Laptop</span>
+                    </OptionCard>
+                    <OptionCard selected={device === 'desktop'} onClick={() => setDevice('desktop')}>
+                        <Monitor className="w-8 h-8" />
+                        <span className="text-sm font-medium">Desktop</span>
+                    </OptionCard>
+                </Section>
 
-                    {/* Black & White Mode */}
-                    <div 
-                        className="p-6 rounded-2xl border bg-white border-gray-200"
-                        onMouseEnter={() => handleFocus('Black and white mode')}
-                        tabIndex={0}
-                    >
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                                <Contrast className="w-6 h-6 text-purple-500" />
-                                <div>
-                                    <h3 className="font-semibold text-gray-800">Black & White Mode</h3>
-                                    <p className="text-sm text-gray-500">For users with color vision difficulties</p>
-                                </div>
-                            </div>
-                            <Switch checked={blackWhiteMode} onCheckedChange={setBlackWhiteMode} />
-                        </div>
-                    </div>
+                {/* Usability */}
+                <Section title="Usability" subtitle="Fit my screen">
+                    <OptionCard selected={resolution === '1920x1080'} onClick={() => setResolution('1920x1080')}>
+                        <div className="w-10 h-6 border-2 border-current rounded flex items-center justify-center text-[10px] font-bold">1080p</div>
+                        <span className="text-sm font-medium">1920×1080</span>
+                    </OptionCard>
+                    <OptionCard selected={resolution === '2560x1440'} onClick={() => setResolution('2560x1440')}>
+                        <div className="w-10 h-6 border-2 border-current rounded flex items-center justify-center text-[10px] font-bold">2K</div>
+                        <span className="text-sm font-medium">2560×1440</span>
+                    </OptionCard>
+                    <OptionCard selected={resolution === '3840x2160'} onClick={() => setResolution('3840x2160')}>
+                        <div className="w-10 h-6 border-2 border-current rounded flex items-center justify-center text-[10px] font-bold">4K</div>
+                        <span className="text-sm font-medium">3840×2160</span>
+                    </OptionCard>
+                </Section>
 
-                    {/* Voice Prompts */}
-                    <div 
-                        className="p-6 rounded-2xl border bg-white border-gray-200"
-                        onMouseEnter={() => handleFocus('Voice prompts setting')}
-                        tabIndex={0}
-                    >
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                                {voicePrompts ? <Volume2 className="w-6 h-6 text-purple-500" /> : <VolumeX className="w-6 h-6 text-gray-400" />}
-                                <div>
-                                    <h3 className="font-semibold text-gray-800">Voice Prompts</h3>
-                                    <p className="text-sm text-gray-500">Speak button names on hover/focus</p>
-                                </div>
-                            </div>
-                            <Switch checked={voicePrompts} onCheckedChange={setVoicePrompts} />
+                {/* Vision */}
+                <Section title="Vision" subtitle="Help me read">
+                    <OptionCard selected={fontSize === 'small'} onClick={() => setFontSize('small')}>
+                        <div className="flex flex-col items-center">
+                            <span className="text-xs font-semibold text-purple-600">Sample</span>
+                            <span className="text-[10px]">Text</span>
                         </div>
-                    </div>
+                        <span className="text-sm font-medium text-purple-600">Small 12pt</span>
+                    </OptionCard>
+                    <OptionCard selected={fontSize === 'medium'} onClick={() => setFontSize('medium')}>
+                        <div className="flex flex-col items-center">
+                            <span className="text-sm font-semibold">Sample</span>
+                            <span className="text-xs">Text</span>
+                        </div>
+                        <span className="text-sm font-medium">Medium 16pt</span>
+                    </OptionCard>
+                    <OptionCard selected={fontSize === 'large'} onClick={() => setFontSize('large')}>
+                        <div className="flex flex-col items-center">
+                            <span className="text-lg font-semibold">Sample</span>
+                            <span className="text-sm">Text</span>
+                        </div>
+                        <span className="text-sm font-medium">Large 20pt</span>
+                    </OptionCard>
+                </Section>
 
-                    {/* Font Size */}
-                    <div 
-                        className="p-6 rounded-2xl border bg-white border-gray-200"
-                        onMouseEnter={() => handleFocus('Font size adjustment')}
-                        tabIndex={0}
-                    >
-                        <div className="flex items-center gap-4 mb-4">
-                            <Type className="w-6 h-6 text-purple-500" />
-                            <div>
-                                <h3 className="font-semibold text-gray-800">Font Size</h3>
-                                <p className="text-sm text-gray-500">Adjust base font size ({fontSize}px)</p>
-                            </div>
-                        </div>
-                        <div className="flex items-center gap-4">
-                            <span className="text-sm text-gray-500">A</span>
-                            <Slider value={[fontSize]} min={12} max={24} step={1} onValueChange={([val]) => setFontSize(val)} className="flex-1" />
-                            <span className="text-lg font-bold text-gray-500">A</span>
-                        </div>
-                    </div>
+                {/* Cognitive */}
+                <Section title="Cognitive" subtitle="Make me understand">
+                    <OptionCard selected={cognitiveMode === 'reader'} onClick={() => setCognitiveMode('reader')}>
+                        <BookOpen className="w-8 h-8" />
+                        <span className="text-sm font-medium">Reader mode</span>
+                    </OptionCard>
+                    <OptionCard selected={cognitiveMode === 'magnification'} onClick={() => setCognitiveMode('magnification')}>
+                        <ZoomIn className="w-8 h-8" />
+                        <span className="text-sm font-medium">Magnification</span>
+                    </OptionCard>
+                    <OptionCard selected={cognitiveMode === 'audible'} onClick={() => setCognitiveMode('audible')}>
+                        <Volume2 className="w-8 h-8" />
+                        <span className="text-sm font-medium">Audible</span>
+                    </OptionCard>
+                </Section>
 
-                    {/* Hide Icons */}
-                    <div 
-                        className="p-6 rounded-2xl border bg-white border-gray-200"
-                        onMouseEnter={() => handleFocus('Hide icons toggle')}
-                        tabIndex={0}
-                    >
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-4">
-                                {hideIcons ? <EyeOff className="w-6 h-6 text-purple-500" /> : <Eye className="w-6 h-6 text-purple-500" />}
-                                <div>
-                                    <h3 className="font-semibold text-gray-800">Hide Icons</h3>
-                                    <p className="text-sm text-gray-500">Hide icons in navigation menus</p>
-                                </div>
-                            </div>
-                            <Switch checked={hideIcons} onCheckedChange={setHideIcons} />
-                        </div>
-                    </div>
-                </div>
+                {/* Theme */}
+                <Section title="Personalize" subtitle="Select your theme">
+                    <OptionCard selected={theme === 'light'} onClick={() => setTheme('light')}>
+                        <Sun className="w-8 h-8" />
+                        <span className="text-sm font-medium">Light & White</span>
+                    </OptionCard>
+                    <OptionCard selected={theme === 'dark'} onClick={() => setTheme('dark')}>
+                        <Moon className="w-8 h-8" />
+                        <span className="text-sm font-medium">Dark & Black</span>
+                    </OptionCard>
+                    <OptionCard selected={theme === 'hybrid'} onClick={() => setTheme('hybrid')}>
+                        <CloudSun className="w-8 h-8" />
+                        <span className="text-sm font-medium">Hybrid</span>
+                    </OptionCard>
+                </Section>
+
+                {/* UI Style */}
+                <Section title="Design" subtitle="User interface">
+                    <OptionCard selected={uiStyle === 'rounded'} onClick={() => setUiStyle('rounded')} className="min-w-[120px]">
+                        <div className="w-16 h-6 bg-gray-200 rounded-full flex items-center justify-center text-[10px] text-gray-500">Button</div>
+                        <span className="text-sm font-medium">Rounded</span>
+                    </OptionCard>
+                    <OptionCard selected={uiStyle === 'square'} onClick={() => setUiStyle('square')} className="min-w-[120px]">
+                        <div className="w-16 h-6 bg-gray-200 rounded-none flex items-center justify-center text-[10px] text-gray-500">Button</div>
+                        <span className="text-sm font-medium">Square</span>
+                    </OptionCard>
+                    <OptionCard selected={uiStyle === 'oldschool'} onClick={() => setUiStyle('oldschool')} className="min-w-[120px]">
+                        <div className="w-16 h-6 border-2 border-purple-500 rounded flex items-center justify-center text-[10px] text-purple-500">Button</div>
+                        <span className="text-sm font-medium">Old school</span>
+                    </OptionCard>
+                </Section>
             </div>
         </PageLayout>
     );
