@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Mic, Menu, ChevronLeft, Home, FileText, Users, Settings, HelpCircle, BookOpen, Loader2 } from "lucide-react";
+import { Search, Mic, MicOff, Menu, ChevronLeft, Home, FileText, Users, Settings, HelpCircle, BookOpen, Loader2 } from "lucide-react";
 
 const LOGO_URL = "https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/868a98750_1cPublishing-logo.png";
 
@@ -16,18 +16,23 @@ export default function Publishing() {
     const searchRef = useRef(null);
     const debounceRef = useRef(null);
 
+    // Local suggestions for instant typeahead
+    const localSuggestions = [
+        "Publishing guidelines", "Content management", "Author submissions",
+        "Editorial process", "Copyright policies", "Digital publishing",
+        "Print on demand", "Marketing resources", "Distribution channels",
+        "Royalty information", "Book formatting", "ISBN registration",
+        "Self publishing", "Traditional publishing", "E-book creation"
+    ];
+
     // Fetch suggestions from LLM with internet context
     const fetchSuggestions = async (query) => {
-        if (query.length < 2) {
-            setSuggestions([]);
-            return;
-        }
+        if (query.length < 2) return;
         
         setIsLoadingSuggestions(true);
         try {
             const response = await base44.integrations.Core.InvokeLLM({
-                prompt: `Given the search query "${query}" for a publishing platform, suggest 5 relevant search completions or related topics. Focus on publishing, books, authors, content management, and related topics. Return only the suggestions.`,
-                add_context_from_internet: true,
+                prompt: `Given the search query "${query}" for a publishing platform, suggest 5 relevant search completions. Focus on publishing, books, authors. Return only suggestions.`,
                 response_json_schema: {
                     type: "object",
                     properties: {
@@ -35,11 +40,11 @@ export default function Publishing() {
                     }
                 }
             });
-            setSuggestions(response.suggestions || []);
-            setShowSuggestions(true);
+            if (response.suggestions?.length) {
+                setSuggestions(response.suggestions);
+            }
         } catch (err) {
             console.error('Failed to fetch suggestions:', err);
-            setSuggestions([]);
         } finally {
             setIsLoadingSuggestions(false);
         }
@@ -49,10 +54,19 @@ export default function Publishing() {
         if (debounceRef.current) clearTimeout(debounceRef.current);
         
         if (searchQuery.length > 0) {
+            // Instant local filtering
+            const filtered = localSuggestions.filter(s => 
+                s.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+            setSuggestions(filtered.slice(0, 5));
             setShowSuggestions(true);
-            debounceRef.current = setTimeout(() => {
-                fetchSuggestions(searchQuery);
-            }, 500);
+            
+            // Delayed LLM fetch for better suggestions
+            if (searchQuery.length >= 3) {
+                debounceRef.current = setTimeout(() => {
+                    fetchSuggestions(searchQuery);
+                }, 800);
+            }
         } else {
             setSuggestions([]);
             setShowSuggestions(false);
@@ -73,25 +87,51 @@ export default function Publishing() {
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
 
+    const recognitionRef = useRef(null);
+
     const handleVoiceSearch = () => {
-        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            const recognition = new SpeechRecognition();
-            recognition.continuous = false;
-            recognition.interimResults = false;
-
-            recognition.onstart = () => setIsListening(true);
-            recognition.onend = () => setIsListening(false);
-            recognition.onresult = (event) => {
-                const transcript = event.results[0][0].transcript;
-                setSearchQuery(transcript);
-            };
-            recognition.onerror = () => setIsListening(false);
-
-            recognition.start();
-        } else {
-            alert('Voice search is not supported in this browser.');
+        // Stop if already listening
+        if (isListening && recognitionRef.current) {
+            recognitionRef.current.stop();
+            setIsListening(false);
+            return;
         }
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+            alert('Voice search is not supported in this browser. Please use Chrome or Edge.');
+            return;
+        }
+
+        const recognition = new SpeechRecognition();
+        recognitionRef.current = recognition;
+        recognition.continuous = false;
+        recognition.interimResults = true;
+        recognition.lang = 'en-US';
+
+        recognition.onstart = () => setIsListening(true);
+        
+        recognition.onresult = (event) => {
+            const transcript = Array.from(event.results)
+                .map(result => result[0].transcript)
+                .join('');
+            setSearchQuery(transcript);
+        };
+
+        recognition.onerror = (event) => {
+            console.error('Speech recognition error:', event.error);
+            setIsListening(false);
+            if (event.error === 'not-allowed') {
+                alert('Microphone access denied. Please allow microphone access in your browser settings.');
+            }
+        };
+
+        recognition.onend = () => {
+            setIsListening(false);
+            recognitionRef.current = null;
+        };
+
+        recognition.start();
     };
 
     const menuItems = [
@@ -140,10 +180,11 @@ export default function Publishing() {
                                 variant="ghost"
                                 size="icon"
                                 onClick={handleVoiceSearch}
-                                className={`absolute right-2 rounded-full ${isListening ? 'text-red-500 animate-pulse' : ''}`}
-                                style={{ color: isListening ? undefined : '#6B4EE6' }}
+                                className={`absolute right-2 rounded-full transition-all ${isListening ? 'bg-red-100 text-red-500 animate-pulse' : 'hover:bg-purple-100'}`}
+                                style={{ color: isListening ? '#EF4444' : '#6B4EE6' }}
+                                title={isListening ? 'Stop listening' : 'Start voice search'}
                             >
-                                <Mic className="w-5 h-5" />
+                                {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
                             </Button>
                         </div>
 
