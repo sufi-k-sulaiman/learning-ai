@@ -305,8 +305,8 @@ export default function AIHub() {
                         <div className="flex items-center gap-3">
                             <img src={LOGO_URL} alt="1cPublishing" className="h-10 w-10 object-contain" />
                             <div>
-                                <span className="text-xl font-bold" style={{ color: '#6B4EE6' }}>1cPublishing</span>
-                                <p className="text-xs text-gray-500">AI Powered</p>
+                                <span className="text-xl font-bold text-black">1cPublishing</span>
+                                <p className="text-xs font-medium" style={{ color: '#6B4EE6' }}>AI Powered</p>
                             </div>
                         </div>
                     </div>
@@ -616,8 +616,7 @@ export default function AIHub() {
                 <div className="max-w-6xl mx-auto px-4">
                     <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                         <div className="flex items-center gap-3">
-                            <img src={LOGO_URL} alt="1cPublishing" className="h-8 w-8 object-contain" />
-                            <span className="font-semibold" style={{ color: '#6B4EE6' }}>1cPublishing</span>
+                            <img src={LOGO_URL} alt="1cPublishing" className="h-8 w-8 object-contain grayscale" />
                         </div>
                         
                         <nav className="flex flex-wrap justify-center gap-6 text-sm">
@@ -629,7 +628,7 @@ export default function AIHub() {
                     </div>
                     
                     <div className="mt-4 pt-4 border-t border-gray-200 text-center text-sm text-gray-500">
-                        © {new Date().getFullYear()} 1cPublishing. All rights reserved.
+                        © 2025 1cPublishing.com
                     </div>
                 </div>
             </footer>

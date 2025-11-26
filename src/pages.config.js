@@ -3,6 +3,7 @@ import Publishing from './pages/Publishing';
 import DashboardComponents from './pages/DashboardComponents';
 import AIHub from './pages/AIHub';
 import Home from './pages/Home';
+import SearchPods from './pages/SearchPods';
 
 
 export const PAGES = {
@@ -11,6 +12,7 @@ export const PAGES = {
     "DashboardComponents": DashboardComponents,
     "AIHub": AIHub,
     "Home": Home,
+    "SearchPods": SearchPods,
 }
 
 export const pagesConfig = {
