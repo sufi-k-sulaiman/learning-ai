@@ -11,6 +11,12 @@ import StatsRow from '../components/dashboard/StatsRow';
 import AnalyticsChart from '../components/dashboard/AnalyticsChart';
 import MiniStatCard from '../components/dashboard/MiniStatCard';
 import ColoredMetricCard from '../components/dashboard/ColoredMetricCard';
+import RadialProgressCard from '../components/dashboard/RadialProgressCard';
+import HorizontalBarChart from '../components/dashboard/HorizontalBarChart';
+import LineChartWithMarkers from '../components/dashboard/LineChartWithMarkers';
+import PieChartCard from '../components/dashboard/PieChartCard';
+import RankingPodium from '../components/dashboard/RankingPodium';
+import InfoCard from '../components/dashboard/InfoCard';
 
 export default function DashboardComponents() {
     return (
@@ -147,6 +153,117 @@ export default function DashboardComponents() {
                     <h2 className="text-xl font-semibold text-gray-700 mb-4">Sales Distribution</h2>
                     <div className="max-w-md">
                         <SalesPieCard />
+                    </div>
+                </section>
+
+                {/* Radial Progress */}
+                <section>
+                    <h2 className="text-xl font-semibold text-gray-700 mb-4">Radial Progress</h2>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                        <RadialProgressCard percentage={50} size="large" title="Overall" />
+                        <RadialProgressCard percentage={25} size="medium" color="#A78BFA" title="Progress" />
+                        <RadialProgressCard percentage={75} size="medium" color="#50C8E8" title="Complete" />
+                        <RadialProgressCard percentage={90} size="small" color="#8BC34A" title="Goal" />
+                    </div>
+                </section>
+
+                {/* Horizontal Bar Chart */}
+                <section>
+                    <h2 className="text-xl font-semibold text-gray-700 mb-4">Horizontal Bar Charts</h2>
+                    <HorizontalBarChart 
+                        title="Category Performance"
+                        data={[
+                            { name: 'Books', value1: 80, value2: 40 },
+                            { name: 'Articles', value1: 65, value2: 55 },
+                            { name: 'Reports', value1: 90, value2: 30 },
+                            { name: 'Journals', value1: 50, value2: 60 },
+                            { name: 'Magazines', value1: 70, value2: 45 }
+                        ]}
+                    />
+                </section>
+
+                {/* Line Chart with Markers */}
+                <section>
+                    <h2 className="text-xl font-semibold text-gray-700 mb-4">Trend Analysis</h2>
+                    <LineChartWithMarkers 
+                        title="Growth Over Time"
+                        data={[
+                            { name: '1990', value: 20 },
+                            { name: '2000', value: 45 },
+                            { name: '2010', value: 30 },
+                            { name: '2020', value: 60 },
+                            { name: '2030', value: 75 }
+                        ]}
+                    />
+                </section>
+
+                {/* Pie Charts */}
+                <section>
+                    <h2 className="text-xl font-semibold text-gray-700 mb-4">Pie & Donut Charts</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <PieChartCard 
+                            title="Market Share"
+                            variant="pie"
+                            data={[
+                                { name: 'Digital', value: 45 },
+                                { name: 'Print', value: 30 },
+                                { name: 'Audio', value: 25 }
+                            ]}
+                        />
+                        <PieChartCard 
+                            title="Revenue Split"
+                            variant="donut"
+                            data={[
+                                { name: 'Sales', value: 55 },
+                                { name: 'Subscriptions', value: 30 },
+                                { name: 'Licensing', value: 15 }
+                            ]}
+                            colors={['#6B4EE6', '#50C8E8', '#8BC34A']}
+                        />
+                        <PieChartCard 
+                            title="User Types"
+                            variant="pie"
+                            data={[
+                                { name: 'Authors', value: 40 },
+                                { name: 'Readers', value: 35 },
+                                { name: 'Publishers', value: 25 }
+                            ]}
+                            colors={['#EC4899', '#A78BFA', '#6B4EE6']}
+                        />
+                    </div>
+                </section>
+
+                {/* Ranking Podium */}
+                <section>
+                    <h2 className="text-xl font-semibold text-gray-700 mb-4">Rankings</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <RankingPodium 
+                            title="Top Authors"
+                            data={[
+                                { name: '1ST', value: 15420, position: 1 },
+                                { name: '2ND', value: 12350, position: 2 },
+                                { name: '3RD', value: 9800, position: 3 }
+                            ]}
+                        />
+                        <RankingPodium 
+                            title="Best Sellers"
+                            data={[
+                                { name: '1ST', value: 8500, position: 1 },
+                                { name: '2ND', value: 6200, position: 2 },
+                                { name: '3RD', value: 4100, position: 3 }
+                            ]}
+                            colors={['#50C8E8', '#8BC34A', '#F59E0B']}
+                        />
+                    </div>
+                </section>
+
+                {/* Info Cards */}
+                <section>
+                    <h2 className="text-xl font-semibold text-gray-700 mb-4">Info Cards</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <InfoCard content="Publishing insights and analytics help track your content performance across all channels." />
+                        <InfoCard content="Monitor your author sales, commissions, and reader engagement in real-time." bgColor="#6B4EE6" />
+                        <InfoCard content="Stay updated with the latest trends in digital publishing and content distribution." bgColor="#50C8E8" />
                     </div>
                 </section>
             </div>
