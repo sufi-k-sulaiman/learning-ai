@@ -14,6 +14,7 @@ import Tasks from './pages/Tasks';
 import Intelligence from './pages/Intelligence';
 import Notes from './pages/Notes';
 import Comms from './pages/Comms';
+import Games from './pages/Games';
 
 
 export const PAGES = {
@@ -33,6 +34,7 @@ export const PAGES = {
     "Intelligence": Intelligence,
     "Notes": Notes,
     "Comms": Comms,
+    "Games": Games,
 }
 
 export const pagesConfig = {

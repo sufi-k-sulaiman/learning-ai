@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { Sparkles, Radio, Settings, Brain, FileText, BarChart3, GraduationCap, ListTodo, Lightbulb, StickyNote, MessageCircle } from "lucide-react";
+import { Sparkles, Radio, Settings, Brain, FileText, BarChart3, GraduationCap, ListTodo, Lightbulb, StickyNote, MessageCircle, Gamepad2 } from "lucide-react";
 import PageLayout from '../components/PageLayout';
 
 const pages = [
@@ -74,6 +74,13 @@ const pages = [
         icon: MessageCircle, 
         description: 'Calls, SMS, email & team collaboration',
         color: 'from-cyan-600 to-blue-600'
+    },
+    { 
+        name: 'Games', 
+        href: createPageUrl('Games'), 
+        icon: Gamepad2, 
+        description: 'Learn while you play with Word Shooter',
+        color: 'from-purple-600 to-pink-600'
     },
     { 
         name: 'Settings', 
