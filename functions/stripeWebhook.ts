@@ -3,7 +3,7 @@ import Stripe from 'npm:stripe';
 
 Deno.serve(async (req) => {
     try {
-        const stripe = new Stripe(Deno.env.get("STRIPE_API_KEY"));
+        const stripe = new Stripe(Deno.env.get("Stripe"));
         const base44 = createClientFromRequest(req);
         
         const signature = req.headers.get('stripe-signature');
