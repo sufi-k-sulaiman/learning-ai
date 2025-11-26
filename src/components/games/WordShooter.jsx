@@ -461,18 +461,19 @@ export default function WordShooter({ onExit }) {
           </div>
 
           <div className="grid grid-cols-3 gap-4">
-            {activeTab === 'trending' && (loadingTrending ? (
+            {activeTab === 'trending' && loadingTrending && (
               <div className="col-span-3 text-center py-12"><Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-blue-500" /><p className="text-gray-500">Loading trending topics...</p></div>
-            ) : filteredDecks(trendingTopics).map(deck => (
+            )}
+            {activeTab === 'trending' && !loadingTrending && filteredDecks(trendingTopics).map(deck => (
               <Button key={deck.id} onClick={() => handleStartGame(deck)} className="h-24 text-left justify-start p-6 bg-gradient-to-r from-purple-600 to-purple-700 text-white">
                 <div><div className="text-xl mb-1">{deck.label}</div><div className="text-xs opacity-80">{deck.topic?.slice(0, 40)}...</div></div>
               </Button>
-            )))}
-            { activeTab !== 'trending' && filteredDecks(PRESET_DECKS[activeTab] || []).map(deck => (
+            ))}
+            {activeTab !== 'trending' && filteredDecks(PRESET_DECKS[activeTab] || []).map(deck => (
                 <Button key={deck.id} onClick={() => handleStartGame(deck)} className={`h-24 text-left justify-start p-6 text-white bg-gradient-to-r ${activeTab === 'education' ? 'from-blue-500 to-blue-600' : activeTab === 'planet' ? 'from-green-500 to-green-600' : 'from-purple-500 to-purple-600'}`}>
                     <div><div className="text-xl mb-1">{deck.label}</div><div className="text-xs opacity-80">{deck.topic?.slice(0, 40)}...</div></div>
                 </Button>
-            )))}
+            ))}
           </div>
         </Card>
 
