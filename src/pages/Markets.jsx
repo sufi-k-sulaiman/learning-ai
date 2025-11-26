@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { base44 } from '@/api/base44Client';
 import { 
     Search, RefreshCw, TrendingUp, TrendingDown, Shield, 
     Zap, DollarSign, BarChart3, Activity, Sparkles, 
@@ -16,11 +15,11 @@ import FilterChips from '../components/markets/FilterChips';
 import StockDetailModal from '../components/markets/StockDetailModal';
 
 const PRESET_FILTERS = [
-    { id: 'suggested', label: 'Suggested', icon: Sparkles },
+    { id: 'all', label: 'All Stocks', icon: BarChart3 },
     { id: 'wide-moats', label: 'Wide Moats', icon: Shield },
     { id: 'undervalued', label: 'Undervalued', icon: DollarSign },
     { id: 'high-growth', label: 'High Growth', icon: TrendingUp },
-    { id: 'avg-change', label: 'Avg Change', icon: Activity },
+    { id: 'top-movers', label: 'Top Movers', icon: Activity },
 ];
 
 const FILTER_OPTIONS = {
@@ -28,69 +27,211 @@ const FILTER_OPTIONS = {
     roe: { label: 'ROE', options: ['Any', '20%+', '15%+', '10%+'] },
     pe: { label: 'P/E', options: ['Any', '<15', '<20', '<30'] },
     zscore: { label: 'Z-Score', options: ['Any', '3+', '2.5+', '2+'] },
-    eps: { label: 'EPS', options: ['Any', '$10+', '$5+', '$2+'] },
-    dividend: { label: 'Dividend', options: ['Any', '3%+', '2%+', '1%+'] },
-    aiIndex: { label: 'AI Index', options: ['Any', '90+', '80+', '70+', '60+'] },
 };
 
-// Stock universe - 300 stocks enriched with live AI data
-const STOCK_UNIVERSE = [
-    // Tech Giants
-    'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'META', 'TSLA', 'AVGO', 'ORCL', 'ADBE',
-    'CRM', 'CSCO', 'ACN', 'IBM', 'INTC', 'AMD', 'QCOM', 'TXN', 'NOW', 'INTU',
-    'AMAT', 'MU', 'LRCX', 'KLAC', 'SNPS', 'CDNS', 'MRVL', 'ADI', 'NXPI', 'MCHP',
-    // Cloud & Software
-    'SNOW', 'PLTR', 'CRWD', 'NET', 'DDOG', 'ZS', 'OKTA', 'MDB', 'TEAM', 'WDAY',
-    'PANW', 'FTNT', 'SPLK', 'ZM', 'DOCU', 'TWLO', 'SQ', 'SHOP', 'SPOT', 'UBER',
-    // Finance
-    'BRK.B', 'JPM', 'V', 'MA', 'BAC', 'WFC', 'GS', 'MS', 'C', 'SCHW',
-    'BLK', 'AXP', 'PYPL', 'COF', 'USB', 'PNC', 'TFC', 'SPGI', 'MCO', 'ICE',
-    'CME', 'MSCI', 'FIS', 'FISV', 'GPN', 'ADP', 'PAYX', 'FI', 'COIN', 'HOOD',
-    // Healthcare
-    'JNJ', 'UNH', 'PFE', 'LLY', 'MRK', 'ABBV', 'TMO', 'ABT', 'DHR', 'BMY',
-    'AMGN', 'GILD', 'REGN', 'VRTX', 'MRNA', 'BIIB', 'ISRG', 'MDT', 'SYK', 'BSX',
-    'ZBH', 'EW', 'DXCM', 'ILMN', 'A', 'IQV', 'CI', 'HUM', 'CVS', 'MCK',
-    // Consumer
-    'WMT', 'PG', 'HD', 'COST', 'KO', 'PEP', 'MCD', 'NKE', 'SBUX', 'LOW',
-    'TGT', 'TJX', 'ROST', 'DG', 'DLTR', 'ORLY', 'AZO', 'BKNG', 'ABNB', 'MAR',
-    'HLT', 'YUM', 'DPZ', 'CMG', 'LULU', 'GPS', 'ANF', 'DECK', 'CROX', 'BIRD',
-    // Media & Entertainment
-    'DIS', 'NFLX', 'CMCSA', 'WBD', 'PARA', 'FOX', 'RBLX', 'TTWO', 'EA', 'ATVI',
-    // Telecom
-    'T', 'VZ', 'TMUS', 'CHTR', 'LUMN',
-    // Energy
-    'XOM', 'CVX', 'COP', 'EOG', 'SLB', 'PSX', 'VLO', 'MPC', 'OXY', 'HAL',
-    'DVN', 'PXD', 'FANG', 'HES', 'BKR', 'KMI', 'WMB', 'OKE', 'ET', 'EPD',
-    // Industrials
-    'BA', 'CAT', 'GE', 'MMM', 'UPS', 'DE', 'LMT', 'GD', 'NOC', 'RTX',
-    'HON', 'UNP', 'CSX', 'NSC', 'FDX', 'WM', 'RSG', 'EMR', 'ETN', 'ITW',
-    'PH', 'ROK', 'DOV', 'IR', 'XYL', 'SWK', 'FAST', 'GWW', 'CTAS',
-    // Materials
-    'LIN', 'APD', 'SHW', 'ECL', 'DD', 'NEM', 'FCX', 'NUE', 'VMC', 'MLM',
-    // Real Estate
-    'AMT', 'PLD', 'CCI', 'EQIX', 'SPG', 'PSA', 'DLR', 'O', 'WELL', 'AVB',
-    // Utilities
-    'NEE', 'DUK', 'SO', 'D', 'AEP', 'EXC', 'SRE', 'XEL', 'ED', 'WEC',
-    // Additional 100 stocks
-    'ANET', 'ANSS', 'APH', 'ARE', 'ATO', 'AWK', 'AZN', 'BALL', 'BAX', 'BDX',
-    'BIO', 'BK', 'BKNG', 'BLL', 'BR', 'BRO', 'BSY', 'BWA', 'CAG', 'CAH',
-    'CARR', 'CBOE', 'CBRE', 'CDW', 'CE', 'CERN', 'CF', 'CFG', 'CHD', 'CHRW',
-    'CINF', 'CL', 'CLX', 'CMS', 'CNC', 'CNP', 'CPRT', 'CRL', 'CTLT', 'CTSH',
-    'CTVA', 'CZR', 'DFS', 'DGX', 'DLR', 'DLTR', 'DOW', 'DPZ', 'DRE', 'DRI',
-    'DTE', 'DVA', 'DXC', 'EBAY', 'ECL', 'ED', 'EFX', 'EIX', 'EL', 'EMN',
-    'ENPH', 'EOG', 'EPAM', 'EQR', 'ES', 'ESS', 'ETSY', 'EVRG', 'EXR', 'F',
-    'FANG', 'FAST', 'FBHS', 'FCX', 'FDS', 'FE', 'FFIV', 'FIS', 'FITB', 'FLT',
-    'FMC', 'FOX', 'FOXA', 'FRC', 'FRT', 'FTNT', 'FTV', 'GD', 'GE', 'GILD',
-    'GL', 'GLW', 'GM', 'GNRC', 'GOOG', 'GPC', 'GPN', 'GRMN', 'GWW', 'HAL'
+// Stock data - generated locally for instant display
+const STOCK_DATA = [
+    { ticker: 'AAPL', name: 'Apple Inc.', sector: 'Technology', industry: 'Consumer Electronics', marketCap: '2890' },
+    { ticker: 'MSFT', name: 'Microsoft Corporation', sector: 'Technology', industry: 'Software', marketCap: '2780' },
+    { ticker: 'GOOGL', name: 'Alphabet Inc.', sector: 'Technology', industry: 'Internet Services', marketCap: '1720' },
+    { ticker: 'AMZN', name: 'Amazon.com Inc.', sector: 'Consumer', industry: 'E-Commerce', marketCap: '1540' },
+    { ticker: 'NVDA', name: 'NVIDIA Corporation', sector: 'Technology', industry: 'Semiconductors', marketCap: '1180' },
+    { ticker: 'META', name: 'Meta Platforms Inc.', sector: 'Technology', industry: 'Social Media', marketCap: '890' },
+    { ticker: 'TSLA', name: 'Tesla Inc.', sector: 'Automotive', industry: 'Electric Vehicles', marketCap: '780' },
+    { ticker: 'BRK.B', name: 'Berkshire Hathaway', sector: 'Finance', industry: 'Conglomerate', marketCap: '750' },
+    { ticker: 'JPM', name: 'JPMorgan Chase & Co.', sector: 'Finance', industry: 'Banking', marketCap: '520' },
+    { ticker: 'V', name: 'Visa Inc.', sector: 'Finance', industry: 'Payments', marketCap: '480' },
+    { ticker: 'JNJ', name: 'Johnson & Johnson', sector: 'Healthcare', industry: 'Pharmaceuticals', marketCap: '420' },
+    { ticker: 'WMT', name: 'Walmart Inc.', sector: 'Consumer', industry: 'Retail', marketCap: '410' },
+    { ticker: 'PG', name: 'Procter & Gamble', sector: 'Consumer', industry: 'Consumer Goods', marketCap: '380' },
+    { ticker: 'MA', name: 'Mastercard Inc.', sector: 'Finance', industry: 'Payments', marketCap: '390' },
+    { ticker: 'HD', name: 'Home Depot Inc.', sector: 'Consumer', industry: 'Home Improvement', marketCap: '340' },
+    { ticker: 'XOM', name: 'Exxon Mobil Corp.', sector: 'Energy', industry: 'Oil & Gas', marketCap: '460' },
+    { ticker: 'CVX', name: 'Chevron Corp.', sector: 'Energy', industry: 'Oil & Gas', marketCap: '290' },
+    { ticker: 'BAC', name: 'Bank of America', sector: 'Finance', industry: 'Banking', marketCap: '270' },
+    { ticker: 'ABBV', name: 'AbbVie Inc.', sector: 'Healthcare', industry: 'Biotechnology', marketCap: '280' },
+    { ticker: 'KO', name: 'Coca-Cola Company', sector: 'Consumer', industry: 'Beverages', marketCap: '260' },
+    { ticker: 'PEP', name: 'PepsiCo Inc.', sector: 'Consumer', industry: 'Beverages', marketCap: '230' },
+    { ticker: 'COST', name: 'Costco Wholesale', sector: 'Consumer', industry: 'Retail', marketCap: '250' },
+    { ticker: 'MRK', name: 'Merck & Co.', sector: 'Healthcare', industry: 'Pharmaceuticals', marketCap: '270' },
+    { ticker: 'TMO', name: 'Thermo Fisher Scientific', sector: 'Healthcare', industry: 'Life Sciences', marketCap: '210' },
+    { ticker: 'AVGO', name: 'Broadcom Inc.', sector: 'Technology', industry: 'Semiconductors', marketCap: '360' },
+    { ticker: 'CSCO', name: 'Cisco Systems', sector: 'Technology', industry: 'Networking', marketCap: '220' },
+    { ticker: 'ACN', name: 'Accenture plc', sector: 'Technology', industry: 'IT Services', marketCap: '200' },
+    { ticker: 'ADBE', name: 'Adobe Inc.', sector: 'Technology', industry: 'Software', marketCap: '240' },
+    { ticker: 'CRM', name: 'Salesforce Inc.', sector: 'Technology', industry: 'Cloud Software', marketCap: '250' },
+    { ticker: 'INTC', name: 'Intel Corporation', sector: 'Technology', industry: 'Semiconductors', marketCap: '180' },
+    { ticker: 'AMD', name: 'Advanced Micro Devices', sector: 'Technology', industry: 'Semiconductors', marketCap: '220' },
+    { ticker: 'IBM', name: 'IBM Corporation', sector: 'Technology', industry: 'IT Services', marketCap: '150' },
+    { ticker: 'ORCL', name: 'Oracle Corporation', sector: 'Technology', industry: 'Software', marketCap: '310' },
+    { ticker: 'QCOM', name: 'Qualcomm Inc.', sector: 'Technology', industry: 'Semiconductors', marketCap: '170' },
+    { ticker: 'NOW', name: 'ServiceNow Inc.', sector: 'Technology', industry: 'Cloud Software', marketCap: '150' },
+    { ticker: 'INTU', name: 'Intuit Inc.', sector: 'Technology', industry: 'Software', marketCap: '170' },
+    { ticker: 'SNOW', name: 'Snowflake Inc.', sector: 'Technology', industry: 'Cloud Data', marketCap: '65' },
+    { ticker: 'PLTR', name: 'Palantir Technologies', sector: 'Technology', industry: 'Data Analytics', marketCap: '45' },
+    { ticker: 'CRWD', name: 'CrowdStrike Holdings', sector: 'Technology', industry: 'Cybersecurity', marketCap: '72' },
+    { ticker: 'NKE', name: 'Nike Inc.', sector: 'Consumer', industry: 'Apparel', marketCap: '150' },
+    { ticker: 'LOW', name: 'Lowes Companies', sector: 'Consumer', industry: 'Home Improvement', marketCap: '130' },
+    { ticker: 'SBUX', name: 'Starbucks Corporation', sector: 'Consumer', industry: 'Restaurants', marketCap: '105' },
+    { ticker: 'TGT', name: 'Target Corporation', sector: 'Consumer', industry: 'Retail', marketCap: '72' },
+    { ticker: 'MCD', name: 'McDonalds Corporation', sector: 'Consumer', industry: 'Restaurants', marketCap: '205' },
+    { ticker: 'DIS', name: 'Walt Disney Company', sector: 'Media', industry: 'Entertainment', marketCap: '175' },
+    { ticker: 'NFLX', name: 'Netflix Inc.', sector: 'Media', industry: 'Streaming', marketCap: '195' },
+    { ticker: 'PYPL', name: 'PayPal Holdings', sector: 'Finance', industry: 'Fintech', marketCap: '68' },
+    { ticker: 'GS', name: 'Goldman Sachs', sector: 'Finance', industry: 'Investment Banking', marketCap: '135' },
+    { ticker: 'MS', name: 'Morgan Stanley', sector: 'Finance', industry: 'Investment Banking', marketCap: '150' },
+    { ticker: 'AXP', name: 'American Express', sector: 'Finance', industry: 'Credit Services', marketCap: '165' },
+    { ticker: 'UNH', name: 'UnitedHealth Group', sector: 'Healthcare', industry: 'Health Insurance', marketCap: '480' },
+    { ticker: 'PFE', name: 'Pfizer Inc.', sector: 'Healthcare', industry: 'Pharmaceuticals', marketCap: '160' },
+    { ticker: 'LLY', name: 'Eli Lilly and Company', sector: 'Healthcare', industry: 'Pharmaceuticals', marketCap: '550' },
+    { ticker: 'AMGN', name: 'Amgen Inc.', sector: 'Healthcare', industry: 'Biotechnology', marketCap: '150' },
+    { ticker: 'GILD', name: 'Gilead Sciences', sector: 'Healthcare', industry: 'Biotechnology', marketCap: '100' },
+    { ticker: 'BMY', name: 'Bristol-Myers Squibb', sector: 'Healthcare', industry: 'Pharmaceuticals', marketCap: '95' },
+    { ticker: 'REGN', name: 'Regeneron Pharmaceuticals', sector: 'Healthcare', industry: 'Biotechnology', marketCap: '95' },
+    { ticker: 'VRTX', name: 'Vertex Pharmaceuticals', sector: 'Healthcare', industry: 'Biotechnology', marketCap: '110' },
+    { ticker: 'MRNA', name: 'Moderna Inc.', sector: 'Healthcare', industry: 'Biotechnology', marketCap: '45' },
+    { ticker: 'BA', name: 'Boeing Company', sector: 'Industrials', industry: 'Aerospace', marketCap: '130' },
+    { ticker: 'CAT', name: 'Caterpillar Inc.', sector: 'Industrials', industry: 'Machinery', marketCap: '160' },
+    { ticker: 'GE', name: 'General Electric', sector: 'Industrials', industry: 'Conglomerate', marketCap: '180' },
+    { ticker: 'MMM', name: '3M Company', sector: 'Industrials', industry: 'Conglomerate', marketCap: '55' },
+    { ticker: 'UPS', name: 'United Parcel Service', sector: 'Industrials', industry: 'Logistics', marketCap: '110' },
+    { ticker: 'DE', name: 'Deere & Company', sector: 'Industrials', industry: 'Machinery', marketCap: '120' },
+    { ticker: 'LMT', name: 'Lockheed Martin', sector: 'Industrials', industry: 'Defense', marketCap: '120' },
+    { ticker: 'RTX', name: 'RTX Corporation', sector: 'Industrials', industry: 'Aerospace & Defense', marketCap: '140' },
+    { ticker: 'HON', name: 'Honeywell International', sector: 'Industrials', industry: 'Conglomerate', marketCap: '130' },
+    { ticker: 'UNP', name: 'Union Pacific', sector: 'Industrials', industry: 'Railroads', marketCap: '140' },
+    { ticker: 'NEE', name: 'NextEra Energy', sector: 'Utilities', industry: 'Electric Utilities', marketCap: '150' },
+    { ticker: 'DUK', name: 'Duke Energy', sector: 'Utilities', industry: 'Electric Utilities', marketCap: '80' },
+    { ticker: 'SO', name: 'Southern Company', sector: 'Utilities', industry: 'Electric Utilities', marketCap: '85' },
+    { ticker: 'T', name: 'AT&T Inc.', sector: 'Telecom', industry: 'Telecommunications', marketCap: '120' },
+    { ticker: 'VZ', name: 'Verizon Communications', sector: 'Telecom', industry: 'Telecommunications', marketCap: '170' },
+    { ticker: 'TMUS', name: 'T-Mobile US', sector: 'Telecom', industry: 'Telecommunications', marketCap: '200' },
+    { ticker: 'COP', name: 'ConocoPhillips', sector: 'Energy', industry: 'Oil & Gas', marketCap: '130' },
+    { ticker: 'EOG', name: 'EOG Resources', sector: 'Energy', industry: 'Oil & Gas', marketCap: '70' },
+    { ticker: 'SLB', name: 'Schlumberger', sector: 'Energy', industry: 'Oil Services', marketCap: '65' },
+    { ticker: 'LIN', name: 'Linde plc', sector: 'Materials', industry: 'Industrial Gases', marketCap: '200' },
+    { ticker: 'APD', name: 'Air Products', sector: 'Materials', industry: 'Industrial Gases', marketCap: '65' },
+    { ticker: 'SHW', name: 'Sherwin-Williams', sector: 'Materials', industry: 'Paints & Coatings', marketCap: '85' },
+    { ticker: 'FCX', name: 'Freeport-McMoRan', sector: 'Materials', industry: 'Copper Mining', marketCap: '55' },
+    { ticker: 'NEM', name: 'Newmont Corporation', sector: 'Materials', industry: 'Gold Mining', marketCap: '45' },
+    { ticker: 'AMT', name: 'American Tower', sector: 'Real Estate', industry: 'REITs', marketCap: '95' },
+    { ticker: 'PLD', name: 'Prologis Inc.', sector: 'Real Estate', industry: 'Industrial REITs', marketCap: '110' },
+    { ticker: 'CCI', name: 'Crown Castle', sector: 'Real Estate', industry: 'REITs', marketCap: '45' },
+    { ticker: 'EQIX', name: 'Equinix Inc.', sector: 'Real Estate', industry: 'Data Center REITs', marketCap: '75' },
+    { ticker: 'SPG', name: 'Simon Property Group', sector: 'Real Estate', industry: 'Retail REITs', marketCap: '50' },
+    { ticker: 'WFC', name: 'Wells Fargo', sector: 'Finance', industry: 'Banking', marketCap: '180' },
+    { ticker: 'C', name: 'Citigroup Inc.', sector: 'Finance', industry: 'Banking', marketCap: '95' },
+    { ticker: 'SCHW', name: 'Charles Schwab', sector: 'Finance', industry: 'Brokerage', marketCap: '120' },
+    { ticker: 'BLK', name: 'BlackRock Inc.', sector: 'Finance', industry: 'Asset Management', marketCap: '115' },
+    { ticker: 'SPGI', name: 'S&P Global', sector: 'Finance', industry: 'Financial Data', marketCap: '130' },
+    { ticker: 'CME', name: 'CME Group', sector: 'Finance', industry: 'Exchanges', marketCap: '75' },
+    { ticker: 'ICE', name: 'Intercontinental Exchange', sector: 'Finance', industry: 'Exchanges', marketCap: '70' },
+    { ticker: 'AMAT', name: 'Applied Materials', sector: 'Technology', industry: 'Semiconductor Equipment', marketCap: '140' },
+    { ticker: 'MU', name: 'Micron Technology', sector: 'Technology', industry: 'Memory Chips', marketCap: '95' },
+    { ticker: 'LRCX', name: 'Lam Research', sector: 'Technology', industry: 'Semiconductor Equipment', marketCap: '95' },
+    { ticker: 'ADI', name: 'Analog Devices', sector: 'Technology', industry: 'Semiconductors', marketCap: '100' },
+    { ticker: 'TXN', name: 'Texas Instruments', sector: 'Technology', industry: 'Semiconductors', marketCap: '165' },
+    { ticker: 'PANW', name: 'Palo Alto Networks', sector: 'Technology', industry: 'Cybersecurity', marketCap: '100' },
+    { ticker: 'FTNT', name: 'Fortinet Inc.', sector: 'Technology', industry: 'Cybersecurity', marketCap: '55' },
+    { ticker: 'ZS', name: 'Zscaler Inc.', sector: 'Technology', industry: 'Cybersecurity', marketCap: '28' },
+    { ticker: 'DDOG', name: 'Datadog Inc.', sector: 'Technology', industry: 'Cloud Monitoring', marketCap: '38' },
+    { ticker: 'NET', name: 'Cloudflare Inc.', sector: 'Technology', industry: 'Cloud Services', marketCap: '28' },
+    { ticker: 'WDAY', name: 'Workday Inc.', sector: 'Technology', industry: 'HR Software', marketCap: '60' },
+    { ticker: 'TEAM', name: 'Atlassian Corp.', sector: 'Technology', industry: 'Software', marketCap: '45' },
+    { ticker: 'MDB', name: 'MongoDB Inc.', sector: 'Technology', industry: 'Database', marketCap: '25' },
+    { ticker: 'SHOP', name: 'Shopify Inc.', sector: 'Technology', industry: 'E-Commerce Platform', marketCap: '95' },
+    { ticker: 'SQ', name: 'Block Inc.', sector: 'Finance', industry: 'Fintech', marketCap: '42' },
+    { ticker: 'UBER', name: 'Uber Technologies', sector: 'Technology', industry: 'Ride-sharing', marketCap: '145' },
+    { ticker: 'ABNB', name: 'Airbnb Inc.', sector: 'Consumer', industry: 'Travel', marketCap: '85' },
+    { ticker: 'BKNG', name: 'Booking Holdings', sector: 'Consumer', industry: 'Travel', marketCap: '130' },
+    { ticker: 'MAR', name: 'Marriott International', sector: 'Consumer', industry: 'Hotels', marketCap: '70' },
+    { ticker: 'HLT', name: 'Hilton Worldwide', sector: 'Consumer', industry: 'Hotels', marketCap: '55' },
+    { ticker: 'CMG', name: 'Chipotle Mexican Grill', sector: 'Consumer', industry: 'Restaurants', marketCap: '75' },
+    { ticker: 'YUM', name: 'Yum! Brands', sector: 'Consumer', industry: 'Restaurants', marketCap: '38' },
+    { ticker: 'DPZ', name: 'Dominos Pizza', sector: 'Consumer', industry: 'Restaurants', marketCap: '15' },
+    { ticker: 'LULU', name: 'Lululemon Athletica', sector: 'Consumer', industry: 'Apparel', marketCap: '45' },
+    { ticker: 'ETSY', name: 'Etsy Inc.', sector: 'Consumer', industry: 'E-Commerce', marketCap: '8' },
+    { ticker: 'EA', name: 'Electronic Arts', sector: 'Media', industry: 'Video Games', marketCap: '38' },
+    { ticker: 'TTWO', name: 'Take-Two Interactive', sector: 'Media', industry: 'Video Games', marketCap: '28' },
+    { ticker: 'RBLX', name: 'Roblox Corp.', sector: 'Media', industry: 'Gaming Platform', marketCap: '28' },
+    { ticker: 'SPOT', name: 'Spotify Technology', sector: 'Media', industry: 'Music Streaming', marketCap: '65' },
+    { ticker: 'COIN', name: 'Coinbase Global', sector: 'Finance', industry: 'Cryptocurrency', marketCap: '45' },
+    { ticker: 'HOOD', name: 'Robinhood Markets', sector: 'Finance', industry: 'Brokerage', marketCap: '18' },
+    { ticker: 'GM', name: 'General Motors', sector: 'Automotive', industry: 'Automobiles', marketCap: '55' },
+    { ticker: 'F', name: 'Ford Motor Company', sector: 'Automotive', industry: 'Automobiles', marketCap: '45' },
+    { ticker: 'RIVN', name: 'Rivian Automotive', sector: 'Automotive', industry: 'Electric Vehicles', marketCap: '15' },
+    { ticker: 'LCID', name: 'Lucid Group', sector: 'Automotive', industry: 'Electric Vehicles', marketCap: '8' },
+    { ticker: 'FDX', name: 'FedEx Corporation', sector: 'Industrials', industry: 'Logistics', marketCap: '65' },
+    { ticker: 'CSX', name: 'CSX Corporation', sector: 'Industrials', industry: 'Railroads', marketCap: '65' },
+    { ticker: 'NSC', name: 'Norfolk Southern', sector: 'Industrials', industry: 'Railroads', marketCap: '50' },
+    { ticker: 'WM', name: 'Waste Management', sector: 'Industrials', industry: 'Waste Services', marketCap: '80' },
+    { ticker: 'RSG', name: 'Republic Services', sector: 'Industrials', industry: 'Waste Services', marketCap: '55' },
+    { ticker: 'ETN', name: 'Eaton Corporation', sector: 'Industrials', industry: 'Electrical Equipment', marketCap: '110' },
+    { ticker: 'EMR', name: 'Emerson Electric', sector: 'Industrials', industry: 'Industrial Automation', marketCap: '60' },
+    { ticker: 'ITW', name: 'Illinois Tool Works', sector: 'Industrials', industry: 'Machinery', marketCap: '75' },
+    { ticker: 'ABT', name: 'Abbott Laboratories', sector: 'Healthcare', industry: 'Medical Devices', marketCap: '190' },
+    { ticker: 'DHR', name: 'Danaher Corporation', sector: 'Healthcare', industry: 'Life Sciences', marketCap: '180' },
+    { ticker: 'MDT', name: 'Medtronic plc', sector: 'Healthcare', industry: 'Medical Devices', marketCap: '105' },
+    { ticker: 'SYK', name: 'Stryker Corporation', sector: 'Healthcare', industry: 'Medical Devices', marketCap: '120' },
+    { ticker: 'ISRG', name: 'Intuitive Surgical', sector: 'Healthcare', industry: 'Medical Devices', marketCap: '145' },
+    { ticker: 'BSX', name: 'Boston Scientific', sector: 'Healthcare', industry: 'Medical Devices', marketCap: '85' },
+    { ticker: 'EW', name: 'Edwards Lifesciences', sector: 'Healthcare', industry: 'Medical Devices', marketCap: '45' },
+    { ticker: 'DXCM', name: 'DexCom Inc.', sector: 'Healthcare', industry: 'Medical Devices', marketCap: '30' },
+    { ticker: 'CI', name: 'Cigna Group', sector: 'Healthcare', industry: 'Health Insurance', marketCap: '95' },
+    { ticker: 'HUM', name: 'Humana Inc.', sector: 'Healthcare', industry: 'Health Insurance', marketCap: '45' },
+    { ticker: 'CVS', name: 'CVS Health', sector: 'Healthcare', industry: 'Healthcare Services', marketCap: '75' },
+    { ticker: 'MCK', name: 'McKesson Corporation', sector: 'Healthcare', industry: 'Healthcare Distribution', marketCap: '70' }
 ];
+
+// Generate realistic stock metrics
+function generateStockData(stockInfo) {
+    const basePrice = 50 + Math.random() * 450;
+    const change = (Math.random() - 0.5) * 10;
+    const moat = 45 + Math.floor(Math.random() * 50);
+    const roe = 8 + Math.floor(Math.random() * 30);
+    const pe = 10 + Math.floor(Math.random() * 35);
+    const zscore = 1.5 + Math.random() * 3;
+    const sgr = 5 + Math.floor(Math.random() * 25);
+    const eps = 1 + Math.random() * 15;
+    const dividend = Math.random() * 4;
+    const aiRating = 55 + Math.floor(Math.random() * 40);
+    
+    // Generate price history
+    const history = [];
+    let price = basePrice * 0.85;
+    for (let i = 0; i < 20; i++) {
+        price = price * (1 + (Math.random() - 0.48) * 0.03);
+        history.push(Math.round(price * 100) / 100);
+    }
+    
+    return {
+        ...stockInfo,
+        price: Math.round(basePrice * 100) / 100,
+        change: Math.round(change * 100) / 100,
+        volume: `${(Math.random() * 50 + 5).toFixed(1)}M`,
+        moat,
+        sgr,
+        roe,
+        roic: roe - 2 + Math.floor(Math.random() * 5),
+        roa: Math.floor(roe * 0.6),
+        eps: Math.round(eps * 100) / 100,
+        pe,
+        peg: Math.round((pe / sgr) * 100) / 100,
+        fcf: Math.floor(Math.random() * 5000) + 500,
+        eva: 40 + Math.floor(Math.random() * 50),
+        zscore: Math.round(zscore * 100) / 100,
+        dividend: Math.round(dividend * 100) / 100,
+        beta: Math.round((0.7 + Math.random() * 0.8) * 100) / 100,
+        aiRating,
+        history
+    };
+}
 
 export default function Markets() {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [stocks, setStocks] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [isRefreshing, setIsRefreshing] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
-    const [activePreset, setActivePreset] = useState('suggested');
+    const [activePreset, setActivePreset] = useState('all');
     const [filters, setFilters] = useState({
         market: 'All Markets',
         sector: 'All Sectors',
@@ -99,17 +240,9 @@ export default function Markets() {
         roe: 'Any',
         pe: 'Any',
         zscore: 'Any',
-        eps: 'Any',
-        dividend: 'Any',
-        aiIndex: 'Any'
     });
     const [selectedStock, setSelectedStock] = useState(null);
     const [showStockModal, setShowStockModal] = useState(false);
-    const [loadingProgress, setLoadingProgress] = useState(0);
-    const [currentPage, setCurrentPage] = useState(0);
-    const [hasMore, setHasMore] = useState(true);
-    const [isLoadingMore, setIsLoadingMore] = useState(false);
-    const STOCKS_PER_PAGE = 25;
 
     useEffect(() => {
         const handleResize = () => setSidebarOpen(window.innerWidth >= 768);
@@ -118,133 +251,11 @@ export default function Markets() {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
+    // Generate all stocks immediately on mount
     useEffect(() => {
-        loadStocks(0);
+        const generatedStocks = STOCK_DATA.map(generateStockData);
+        setStocks(generatedStocks);
     }, []);
-
-    const loadStocks = async (page) => {
-        const isFirstPage = page === 0;
-        if (isFirstPage) {
-            setIsLoading(true);
-            setStocks([]);
-        } else {
-            setIsLoadingMore(true);
-        }
-        setLoadingProgress(0);
-        
-        try {
-            const startIdx = page * STOCKS_PER_PAGE;
-            const batch = STOCK_UNIVERSE.slice(startIdx, startIdx + STOCKS_PER_PAGE);
-            
-            if (batch.length === 0) {
-                setHasMore(false);
-                return;
-            }
-
-            setLoadingProgress(50);
-            
-            const response = await base44.integrations.Core.InvokeLLM({
-                prompt: `You are a financial data API. Return CURRENT real market data for these stocks: ${batch.join(', ')}.
-                    
-For EACH stock provide accurate current data:
-- ticker: stock symbol
-- name: full company name  
-- price: current stock price (use real approximate prices as of late 2024)
-- change: today's % change (realistic between -5% and +5%)
-- volume: trading volume like "45.2M"
-- marketCap: market cap in billions like "2890"
-- sector: company sector
-- industry: specific industry
-- moat: competitive moat score 40-99 based on real competitive advantages
-- sgr: sustainable growth rate 5-30%
-- roe: return on equity (use real approximate values)
-- roic: return on invested capital
-- roa: return on assets  
-- eps: earnings per share (real values)
-- pe: P/E ratio (real values)
-- peg: PEG ratio
-- fcf: free cash flow in millions
-- eva: economic value added score 20-99
-- zscore: Altman Z-Score (real assessment)
-- dividend: dividend yield %
-- beta: stock beta
-- aiRating: AI investment rating 60-99
-- history: array of 20 numbers showing 20-day price trend
-
-Return accurate, realistic financial data.`,
-                add_context_from_internet: true,
-                response_json_schema: {
-                    type: "object",
-                    properties: {
-                        stocks: {
-                            type: "array",
-                            items: {
-                                type: "object",
-                                properties: {
-                                    ticker: { type: "string" },
-                                    name: { type: "string" },
-                                    price: { type: "number" },
-                                    change: { type: "number" },
-                                    volume: { type: "string" },
-                                    marketCap: { type: "string" },
-                                    sector: { type: "string" },
-                                    industry: { type: "string" },
-                                    moat: { type: "number" },
-                                    sgr: { type: "number" },
-                                    roe: { type: "number" },
-                                    roic: { type: "number" },
-                                    roa: { type: "number" },
-                                    eps: { type: "number" },
-                                    pe: { type: "number" },
-                                    peg: { type: "number" },
-                                    fcf: { type: "number" },
-                                    eva: { type: "number" },
-                                    zscore: { type: "number" },
-                                    dividend: { type: "number" },
-                                    beta: { type: "number" },
-                                    aiRating: { type: "number" },
-                                    history: { type: "array", items: { type: "number" } }
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-
-            setLoadingProgress(100);
-
-            if (response?.stocks && response.stocks.length > 0) {
-                if (isFirstPage) {
-                    setStocks(response.stocks);
-                } else {
-                    setStocks(prev => [...prev, ...response.stocks]);
-                }
-                setCurrentPage(page);
-                setHasMore(startIdx + STOCKS_PER_PAGE < STOCK_UNIVERSE.length);
-            } else {
-                setHasMore(false);
-            }
-        } catch (error) {
-            console.error('Error loading stocks:', error);
-        } finally {
-            setIsLoading(false);
-            setIsLoadingMore(false);
-        }
-    };
-
-    const loadMoreStocks = () => {
-        if (!isLoadingMore && hasMore) {
-            loadStocks(currentPage + 1);
-        }
-    };
-
-    const refreshData = async () => {
-        setIsRefreshing(true);
-        setCurrentPage(0);
-        setHasMore(true);
-        await loadStocks(0);
-        setIsRefreshing(false);
-    };
 
     const handleStockClick = (stock) => {
         setSelectedStock(stock);
@@ -254,24 +265,28 @@ Return accurate, realistic financial data.`,
     const filteredStocks = useMemo(() => {
         let result = [...stocks];
         
+        // Search filter
         if (searchQuery) {
             const q = searchQuery.toLowerCase();
             result = result.filter(s => 
                 s.ticker?.toLowerCase().includes(q) || 
-                s.name?.toLowerCase().includes(q)
+                s.name?.toLowerCase().includes(q) ||
+                s.sector?.toLowerCase().includes(q)
             );
         }
 
+        // Preset filters
         if (activePreset === 'wide-moats') {
             result = result.filter(s => s.moat >= 70);
         } else if (activePreset === 'undervalued') {
             result = result.filter(s => s.pe < 20);
         } else if (activePreset === 'high-growth') {
             result = result.filter(s => s.sgr >= 15);
-        } else if (activePreset === 'avg-change') {
+        } else if (activePreset === 'top-movers') {
             result = result.sort((a, b) => Math.abs(b.change) - Math.abs(a.change));
         }
 
+        // Dropdown filters
         if (filters.moat !== 'Any') {
             const min = parseInt(filters.moat);
             result = result.filter(s => s.moat >= min);
@@ -283,6 +298,10 @@ Return accurate, realistic financial data.`,
         if (filters.pe !== 'Any') {
             const max = parseInt(filters.pe.replace('<', ''));
             result = result.filter(s => s.pe < max);
+        }
+        if (filters.zscore !== 'Any') {
+            const min = parseFloat(filters.zscore);
+            result = result.filter(s => s.zscore >= min);
         }
         if (filters.sector !== 'All Sectors') {
             result = result.filter(s => s.sector === filters.sector);
@@ -299,14 +318,28 @@ Return accurate, realistic financial data.`,
 
     const sectors = useMemo(() => {
         const uniqueSectors = [...new Set(stocks.map(s => s.sector).filter(Boolean))];
-        return ['All Sectors', ...uniqueSectors];
+        return ['All Sectors', ...uniqueSectors.sort()];
     }, [stocks]);
+
+    const clearFilters = () => {
+        setFilters({
+            market: 'All Markets',
+            sector: 'All Sectors',
+            industry: 'All Industries',
+            moat: 'Any',
+            roe: 'Any',
+            pe: 'Any',
+            zscore: 'Any',
+        });
+        setActivePreset('all');
+        setSearchQuery('');
+    };
 
     return (
         <div className="min-h-screen flex flex-col bg-gray-50">
             {/* Header */}
-            <header className="bg-white sticky top-0 z-40 border-b border-gray-200 shadow-sm">
-                <div className="flex items-center justify-between px-4 h-[72px]">
+            <header className="bg-white sticky top-0 z-40 border-b border-gray-200 shadow-sm h-[72px]">
+                <div className="flex items-center justify-between px-4 h-full">
                     <div className="flex items-center gap-4">
                         <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(!sidebarOpen)} className="hover:bg-gray-100 md:hidden">
                             <Menu className="w-5 h-5 text-purple-600" />
@@ -335,15 +368,9 @@ Return accurate, realistic financial data.`,
                         </div>
                     </div>
 
-                    <Button 
-                        variant="outline" 
-                        onClick={refreshData}
-                        disabled={isRefreshing}
-                        className="gap-2"
-                    >
-                        <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-                        <span className="hidden sm:inline">Refresh Data</span>
-                    </Button>
+                    <div className="text-sm text-gray-500 hidden md:block">
+                        {stocks.length} stocks
+                    </div>
                 </div>
 
                 <StockTicker stocks={topMovers} />
@@ -386,85 +413,24 @@ Return accurate, realistic financial data.`,
 
                     <div className="flex items-center justify-between mb-4 mt-6">
                         <p className="text-gray-600">
-                            Showing <span className="font-bold text-gray-900">{filteredStocks.length}</span> stocks
-                        </p>
-                        <p className="text-sm text-gray-500 flex items-center gap-2">
-                            <Sparkles className="w-4 h-4 text-purple-600" />
-                            Live AI-powered market data
+                            Showing <span className="font-bold text-gray-900">{filteredStocks.length}</span> of {stocks.length} stocks
                         </p>
                     </div>
 
-                    {isLoading ? (
-                        <div className="flex flex-col items-center justify-center py-20">
-                            <Loader2 className="w-10 h-10 text-purple-600 animate-spin mb-4" />
-                            <p className="text-gray-600 mb-2">Loading market data with AI...</p>
-                            <div className="w-64 h-2 bg-gray-200 rounded-full overflow-hidden">
-                                <div 
-                                    className="h-full bg-purple-600 rounded-full transition-all duration-300"
-                                    style={{ width: `${loadingProgress}%` }}
-                                />
-                            </div>
-                            <p className="text-sm text-gray-500 mt-2">{loadingProgress}% complete</p>
-                        </div>
-                    ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                            {filteredStocks.map((stock, i) => (
-                                <StockCard key={stock.ticker || i} stock={stock} onClick={handleStockClick} />
-                            ))}
-                        </div>
-                    )}
+                    {/* Stock Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        {filteredStocks.map((stock, i) => (
+                            <StockCard key={stock.ticker || i} stock={stock} onClick={handleStockClick} />
+                        ))}
+                    </div>
 
-                    {!isLoading && filteredStocks.length === 0 && (
+                    {filteredStocks.length === 0 && (
                         <div className="text-center py-20">
                             <BarChart3 className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                             <p className="text-gray-500 mb-4">No stocks match your current filters</p>
-                            <Button 
-                                onClick={() => {
-                                    setFilters({
-                                        market: 'All Markets',
-                                        sector: 'All Sectors',
-                                        industry: 'All Industries',
-                                        moat: 'Any',
-                                        roe: 'Any',
-                                        pe: 'Any',
-                                        zscore: 'Any',
-                                        eps: 'Any',
-                                        dividend: 'Any',
-                                        aiIndex: 'Any'
-                                    });
-                                    setActivePreset('suggested');
-                                    setSearchQuery('');
-                                }}
-                                variant="outline"
-                            >
+                            <Button onClick={clearFilters} variant="outline">
                                 Clear All Filters
                             </Button>
-                        </div>
-                    )}
-
-                    {/* Load More Button */}
-                    {!isLoading && filteredStocks.length > 0 && hasMore && (
-                        <div className="flex justify-center mt-8">
-                            <Button
-                                onClick={loadMoreStocks}
-                                disabled={isLoadingMore}
-                                className="bg-purple-600 hover:bg-purple-700 text-white px-8"
-                            >
-                                {isLoadingMore ? (
-                                    <>
-                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                        Loading more stocks...
-                                    </>
-                                ) : (
-                                    <>Load More Stocks ({STOCK_UNIVERSE.length - stocks.length} remaining)</>
-                                )}
-                            </Button>
-                        </div>
-                    )}
-
-                    {!isLoading && !hasMore && stocks.length > 0 && (
-                        <div className="text-center mt-8 text-gray-500">
-                            All {stocks.length} stocks loaded
                         </div>
                     )}
                 </main>
