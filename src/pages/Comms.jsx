@@ -377,6 +377,40 @@ export default function Comms() {
                         </div>
                     )}
                 </div>
+
+                {/* Online Users Panel */}
+                <div className={`${showUsersPanel ? 'w-64' : 'w-0'} bg-white border-l border-gray-200 transition-all overflow-hidden`}>
+                    <div className="p-4 border-b border-gray-100">
+                        <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+                            <Users className="w-4 h-4 text-green-500" />
+                            App Users ({appUsers.length})
+                        </h3>
+                    </div>
+                    <div className="p-2 overflow-y-auto max-h-[calc(100vh-200px)]">
+                        {appUsers.map(user => (
+                            <div key={user.id} onClick={() => {
+                                const existingContact = contacts.find(c => c.email === user.email);
+                                if (existingContact) {
+                                    setSelectedContact(existingContact);
+                                } else {
+                                    setSelectedContact({ id: user.id, name: user.full_name, email: user.email, avatar_color: AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)] });
+                                }
+                            }} className="flex items-center gap-3 p-3 rounded-xl cursor-pointer hover:bg-gray-50">
+                                <div className="relative">
+                                    <Avatar name={user.full_name} color={AVATAR_COLORS[user.id?.charCodeAt(0) % AVATAR_COLORS.length]} size="sm" />
+                                    <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-medium text-gray-900 truncate">{user.full_name}</p>
+                                    <p className="text-xs text-green-500">Online</p>
+                                </div>
+                            </div>
+                        ))}
+                        {appUsers.length === 0 && (
+                            <p className="text-sm text-gray-400 text-center py-4">No other users yet</p>
+                        )}
+                    </div>
+                </div>
             </div>
 
             {/* Add Contact Modal */}
