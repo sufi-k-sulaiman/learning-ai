@@ -21,6 +21,15 @@ import StackedBarChart from '../components/dashboard/StackedBarChart';
 import SemiCircleProgress from '../components/dashboard/SemiCircleProgress';
 import AreaChartWithMarkers from '../components/dashboard/AreaChartWithMarkers';
 import StepCards from '../components/dashboard/StepCards';
+import RadarChartCard from '../components/dashboard/RadarChart';
+import { LiquidGaugeRow } from '../components/dashboard/LiquidGauge';
+import ProcessSteps from '../components/dashboard/ProcessSteps';
+import OptionCards from '../components/dashboard/OptionCards';
+import VerticalBarGauge from '../components/dashboard/VerticalBarGauge';
+import UserProfileCard from '../components/dashboard/UserProfileCard';
+import UserReviewCard from '../components/dashboard/UserReviewCard';
+import WeekCalendar from '../components/dashboard/WeekCalendar';
+import HighlightAvatars from '../components/dashboard/HighlightAvatars';
 
 export default function DashboardComponents() {
     return (
@@ -327,6 +336,94 @@ export default function DashboardComponents() {
                             { id: 'C', step: '03', label: 'Publish', color: '#8BC34A', size: 'small' }
                         ]}
                     />
+                </section>
+
+                {/* Radar Chart */}
+                <section>
+                    <h2 className="text-xl font-semibold text-gray-700 mb-4">Radar Chart</h2>
+                    <RadarChartCard 
+                        title="Performance Comparison"
+                        data={[
+                            { subject: 'Marketing', A: 120, B: 110 },
+                            { subject: 'Sales', A: 98, B: 130 },
+                            { subject: 'Development', A: 86, B: 130 },
+                            { subject: 'Support', A: 99, B: 100 },
+                            { subject: 'Admin', A: 85, B: 90 },
+                            { subject: 'IT', A: 65, B: 85 }
+                        ]}
+                    />
+                </section>
+
+                {/* Liquid Gauges */}
+                <section>
+                    <h2 className="text-xl font-semibold text-gray-700 mb-4">Liquid Gauges</h2>
+                    <LiquidGaugeRow 
+                        title="Task Completion"
+                        gauges={[
+                            { percentage: 90, color: '#0D4F5C', label: 'Project A' },
+                            { percentage: 60, color: '#0D4F5C', label: 'Project B' },
+                            { percentage: 35, color: '#0D4F5C', label: 'Project C' },
+                            { percentage: 90, color: '#50C8E8', label: 'Project D' },
+                            { percentage: 60, color: '#50C8E8', label: 'Project E' },
+                            { percentage: 35, color: '#9CA3AF', label: 'Project F' }
+                        ]}
+                    />
+                </section>
+
+                {/* Process Steps */}
+                <section>
+                    <h2 className="text-xl font-semibold text-gray-700 mb-4">Process Steps</h2>
+                    <ProcessSteps 
+                        title="Workflow Options"
+                        steps={[
+                            { icon: 'monitor', title: 'OPTION 01', description: 'Design and prototype your content layout.', color: '#6B4EE6' },
+                            { icon: 'rocket', title: 'OPTION 02', description: 'Launch and deploy your publications.', color: '#3B82F6' },
+                            { icon: 'chart', title: 'OPTION 03', description: 'Track performance and analytics.', color: '#10B981' },
+                            { icon: 'search', title: 'OPTION 04', description: 'Optimize and improve reach.', color: '#F59E0B' }
+                        ]}
+                    />
+                </section>
+
+                {/* Option Cards */}
+                <section>
+                    <h2 className="text-xl font-semibold text-gray-700 mb-4">Option Cards</h2>
+                    <OptionCards 
+                        title="Choose Your Path"
+                        options={[
+                            { icon: 'monitor', title: 'OPTION 01', description: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit.', color: '#EC4899' },
+                            { icon: 'rocket', title: 'OPTION 02', description: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit.', color: '#F59E0B' },
+                            { icon: 'chart', title: 'OPTION 03', description: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit.', color: '#10B981' },
+                            { icon: 'search', title: 'OPTION 04', description: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit.', color: '#3B82F6' }
+                        ]}
+                    />
+                </section>
+
+                {/* Vertical Bar Gauges */}
+                <section>
+                    <h2 className="text-xl font-semibold text-gray-700 mb-4">Vertical Bar Gauges</h2>
+                    <VerticalBarGauge 
+                        title="Category Performance"
+                        gauges={[
+                            { percentage: 70, icon: 'user', color: '#6B4EE6' },
+                            { percentage: 40, icon: 'package', color: '#6B4EE6' },
+                            { percentage: 90, icon: 'factory', color: '#6B4EE6' },
+                            { percentage: 20, icon: 'recycle', color: '#6B4EE6' },
+                            { percentage: 60, icon: 'health', color: '#6B4EE6' }
+                        ]}
+                    />
+                </section>
+
+                {/* User Components */}
+                <section>
+                    <h2 className="text-xl font-semibold text-gray-700 mb-4">User Components</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <UserProfileCard />
+                        <UserReviewCard />
+                        <div className="space-y-4">
+                            <HighlightAvatars />
+                            <WeekCalendar />
+                        </div>
+                    </div>
                 </section>
             </div>
         </div>
