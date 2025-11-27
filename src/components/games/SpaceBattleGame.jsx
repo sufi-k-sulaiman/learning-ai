@@ -689,11 +689,23 @@ export default function SpaceBattleGame({ onExit }) {
                 }
             });
 
+            // Bombs display (bottom right)
+            ctx.fillStyle = '#fff';
+            ctx.font = 'bold 14px monospace';
+            ctx.textAlign = 'right';
+            ctx.fillText('BOMBS', canvas.width - 30, canvas.height - 60);
+            for (let i = 0; i < 3; i++) {
+                ctx.fillStyle = i < state.bombs ? '#fbbf24' : 'rgba(255,255,255,0.2)';
+                ctx.beginPath();
+                ctx.arc(canvas.width - 30 - i * 30, canvas.height - 35, 10, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
             // Controls hint
             ctx.fillStyle = 'rgba(255,255,255,0.4)';
             ctx.font = '12px monospace';
             ctx.textAlign = 'center';
-            ctx.fillText('← → or A/D to aim • SPACE to fire', canvas.width / 2, canvas.height - 20);
+            ctx.fillText('MOUSE/ARROWS to aim • SPACE to fire • B for bomb', canvas.width / 2, canvas.height - 20);
         };
 
         gameLoop();
