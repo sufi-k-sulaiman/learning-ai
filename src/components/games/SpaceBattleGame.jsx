@@ -314,9 +314,9 @@ export default function SpaceBattleGame({ onExit }) {
                 return;
             }
             
-            // Update time and floor animation
+            // Update time and floor animation (reversed - moving away from player)
             state.time += 1;
-            state.floorOffset = (state.floorOffset + 2) % 150;
+            state.floorOffset = (state.floorOffset - 2 + 500) % 500;
 
             // Check level completion - must kill at least 10 aliens
             if (state.aliensKilled >= state.minAliensToKill && !state.levelComplete) {
@@ -509,15 +509,34 @@ export default function SpaceBattleGame({ onExit }) {
             if (keys.a) state.viewAngle -= 3;
             if (keys.d) state.viewAngle += 3;
 
-            // Spawn enemies randomly from everywhere on screen
+            // Spawn enemies from mountains, stars, and everywhere on screen
             state.enemySpawnTimer--;
             if (state.enemySpawnTimer <= 0) {
                 const alienType = state.alienTypes[Math.floor(Math.random() * state.alienTypes.length)];
                 const alienColor = ALIEN_COLORS[Math.floor(Math.random() * ALIEN_COLORS.length)];
-                // Random spawn position across entire visible area
-                const startX = (Math.random() - 0.5) * 800;
-                const startZ = 0.02 + Math.random() * 0.15; // Start very small/far away
-                const startVx = (Math.random() - 0.5) * 3;
+                
+                // Random spawn location type: mountains (40%), stars (30%), random (30%)
+                const spawnType = Math.random();
+                let startX, startZ, startVx;
+                
+                if (spawnType < 0.4) {
+                    // Spawn from mountains (near horizon, left or right)
+                    const fromLeft = Math.random() > 0.5;
+                    startX = fromLeft ? -400 - Math.random() * 200 : 400 + Math.random() * 200;
+                    startZ = 0.03 + Math.random() * 0.08;
+                    startVx = fromLeft ? 2 + Math.random() * 2 : -2 - Math.random() * 2;
+                } else if (spawnType < 0.7) {
+                    // Spawn from stars (top area, very small/far)
+                    startX = (Math.random() - 0.5) * 1000;
+                    startZ = 0.01 + Math.random() * 0.04; // Very far away
+                    startVx = (Math.random() - 0.5) * 1;
+                } else {
+                    // Random spawn across visible area
+                    startX = (Math.random() - 0.5) * 800;
+                    startZ = 0.02 + Math.random() * 0.15;
+                    startVx = (Math.random() - 0.5) * 3;
+                }
+                
                 state.enemies.push({
                     x: startX,
                     z: startZ,
@@ -527,7 +546,7 @@ export default function SpaceBattleGame({ onExit }) {
                     wobble: Math.random() * Math.PI * 2,
                     vx: startVx
                 });
-                state.enemySpawnTimer = Math.max(30, 120 - state.score / 50);
+                state.enemySpawnTimer = Math.max(25, 100 - state.score / 50);
             }
 
             // Update and draw enemies with 3D perspective
