@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { Sparkles, Radio, Settings, Brain, FileText, BarChart3, GraduationCap, ListTodo, Lightbulb, StickyNote, MessageCircle, Gamepad2, Globe } from "lucide-react";
+import { Sparkles, Radio, Settings, Brain, FileText, BarChart3, GraduationCap, ListTodo, Lightbulb, StickyNote, Newspaper, Gamepad2, Globe } from "lucide-react";
 
 const pages = [
     { name: 'Geospatial', page: 'Geospatial', icon: Globe, description: 'Global data intelligence across 18 domains', color: 'from-indigo-600 to-purple-600' },
@@ -14,7 +14,7 @@ const pages = [
     { name: 'Learning', page: 'Learning', icon: GraduationCap, description: 'Navigate knowledge islands with progress tracking', color: 'from-emerald-600 to-teal-600' },
     { name: 'Tasks', page: 'Tasks', icon: ListTodo, description: 'Track initiatives across all departments', color: 'from-violet-600 to-purple-600' },
     { name: 'Notes', page: 'Notes', icon: StickyNote, description: 'Rich text notes with AI assistance', color: 'from-pink-600 to-rose-600' },
-    { name: 'Comms', page: 'Comms', icon: MessageCircle, description: 'Calls, SMS, email & team collaboration', color: 'from-cyan-600 to-blue-600' },
+    { name: 'News', page: 'News', icon: Newspaper, description: 'AI-powered news aggregator across topics', color: 'from-red-600 to-orange-600' },
     { name: 'Games', page: 'Games', icon: Gamepad2, description: 'Learn while you play with Word Shooter', color: 'from-purple-600 to-pink-600' },
     { name: 'Settings', page: 'Settings', icon: Settings, description: 'Customize your experience with accessibility options', color: 'from-gray-600 to-slate-600' },
 ];
@@ -23,8 +23,8 @@ export default function HomePage() {
     return (
         <div className="p-4 md:p-8">
             <div className="max-w-5xl mx-auto">
-                <h1 className="text-2xl md:text-3xl font-bold mb-2 text-gray-800">Welcome to 1cPublishing</h1>
-                <p className="mb-6 md:mb-8 text-gray-600">AI Powered Platform. Choose where to go:</p>
+                <h1 className="text-2xl md:text-3xl font-bold mb-2 text-gray-800">Welcome</h1>
+                <p className="mb-6 md:mb-8 text-gray-600">AI Powered Platform to boost productivity and make you smarter.</p>
                 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                     {pages.map((page) => (
