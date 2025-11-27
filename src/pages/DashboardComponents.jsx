@@ -1,36 +1,41 @@
 import React from 'react';
-import PageLayout from '../components/PageLayout';
-import MetricCard from '../components/dashboard/MetricCard';
-import SalesDetailsCard from '../components/dashboard/SalesDetailsCard';
-import SocialMediaCard from '../components/dashboard/SocialMediaCard';
-import BrowserVisitorsCard from '../components/dashboard/BrowserVisitorsCard';
-import CountryVisitorsCard from '../components/dashboard/CountryVisitorsCard';
-import BudgetDonutCard from '../components/dashboard/BudgetDonutCard';
-import RevenueCard from '../components/dashboard/RevenueCard';
-import SalesPieCard from '../components/dashboard/SalesPieCard';
-import StatsRow from '../components/dashboard/StatsRow';
-import AnalyticsChart from '../components/dashboard/AnalyticsChart';
-import MiniStatCard from '../components/dashboard/MiniStatCard';
-import ColoredMetricCard from '../components/dashboard/ColoredMetricCard';
-import RadialProgressCard from '../components/dashboard/RadialProgressCard';
-import HorizontalBarChart from '../components/dashboard/HorizontalBarChart';
-import LineChartWithMarkers from '../components/dashboard/LineChartWithMarkers';
-import PieChartCard from '../components/dashboard/PieChartCard';
-import RankingPodium from '../components/dashboard/RankingPodium';
-import InfoCard from '../components/dashboard/InfoCard';
-import StackedBarChart from '../components/dashboard/StackedBarChart';
-import SemiCircleProgress from '../components/dashboard/SemiCircleProgress';
-import AreaChartWithMarkers from '../components/dashboard/AreaChartWithMarkers';
-import StepCards from '../components/dashboard/StepCards';
-import RadarChartCard from '../components/dashboard/RadarChart';
-import { LiquidGaugeRow } from '../components/dashboard/LiquidGauge';
-import ProcessSteps from '../components/dashboard/ProcessSteps';
-import OptionCards from '../components/dashboard/OptionCards';
-import VerticalBarGauge from '../components/dashboard/VerticalBarGauge';
-import UserProfileCard from '../components/dashboard/UserProfileCard';
-import UserReviewCard from '../components/dashboard/UserReviewCard';
-import WeekCalendar from '../components/dashboard/WeekCalendar';
-import HighlightAvatars from '../components/dashboard/HighlightAvatars';
+import PageLayout from '@/components/PageLayout';
+import MetricCard from '@/components/dashboard/MetricCard';
+import SalesDetailsCard from '@/components/dashboard/SalesDetailsCard';
+import SocialMediaCard from '@/components/dashboard/SocialMediaCard';
+import BrowserVisitorsCard from '@/components/dashboard/BrowserVisitorsCard';
+import CountryVisitorsCard from '@/components/dashboard/CountryVisitorsCard';
+import BudgetDonutCard from '@/components/dashboard/BudgetDonutCard';
+import RevenueCard from '@/components/dashboard/RevenueCard';
+import SalesPieCard from '@/components/dashboard/SalesPieCard';
+import StatsRow from '@/components/dashboard/StatsRow';
+import AnalyticsChart from '@/components/dashboard/AnalyticsChart';
+import MiniStatCard from '@/components/dashboard/MiniStatCard';
+import ColoredMetricCard from '@/components/dashboard/ColoredMetricCard';
+import RadialProgressCard from '@/components/dashboard/RadialProgressCard';
+import HorizontalBarChart from '@/components/dashboard/HorizontalBarChart';
+import LineChartWithMarkers from '@/components/dashboard/LineChartWithMarkers';
+import PieChartCard from '@/components/dashboard/PieChartCard';
+import RankingPodium from '@/components/dashboard/RankingPodium';
+import InfoCard from '@/components/dashboard/InfoCard';
+import StackedBarChart from '@/components/dashboard/StackedBarChart';
+import SemiCircleProgress from '@/components/dashboard/SemiCircleProgress';
+import AreaChartWithMarkers from '@/components/dashboard/AreaChartWithMarkers';
+import StepCards from '@/components/dashboard/StepCards';
+import RadarChartCard from '@/components/dashboard/RadarChart';
+import { LiquidGaugeRow } from '@/components/dashboard/LiquidGauge';
+import ProcessSteps from '@/components/dashboard/ProcessSteps';
+import OptionCards from '@/components/dashboard/OptionCards';
+import VerticalBarGauge from '@/components/dashboard/VerticalBarGauge';
+import UserProfileCard from '@/components/dashboard/UserProfileCard';
+import UserReviewCard from '@/components/dashboard/UserReviewCard';
+import WeekCalendar from '@/components/dashboard/WeekCalendar';
+import HighlightAvatars from '@/components/dashboard/HighlightAvatars';
+import TimelineCard from '@/components/dashboard/TimelineCard';
+import ComparisonTable from '@/components/dashboard/ComparisonTable';
+import ProgressListCard from '@/components/dashboard/ProgressListCard';
+import NotificationList from '@/components/dashboard/NotificationList';
+import KPIGridCard from '@/components/dashboard/KPIGridCard';
 
 export default function DashboardComponents() {
     return (
@@ -154,6 +159,23 @@ export default function DashboardComponents() {
                                 <HighlightAvatars />
                                 <WeekCalendar />
                             </div>
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2 className="text-xl font-semibold text-gray-700 mb-4">KPI & Metrics</h2>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <KPIGridCard />
+                            <ComparisonTable />
+                        </div>
+                    </section>
+
+                    <section>
+                        <h2 className="text-xl font-semibold text-gray-700 mb-4">Activity & Progress</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <TimelineCard />
+                            <ProgressListCard />
+                            <NotificationList />
                         </div>
                     </section>
                 </div>
