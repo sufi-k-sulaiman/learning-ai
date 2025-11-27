@@ -16,6 +16,7 @@ import Geospatial from './pages/Geospatial';
 import Tasks from './pages/Tasks';
 import MindMap from './pages/MindMap';
 import Qwirey from './pages/Qwirey';
+import Search from './pages/Search';
 import __Layout from './Layout.jsx';
 
 
@@ -38,6 +39,7 @@ export const PAGES = {
     "Tasks": Tasks,
     "MindMap": MindMap,
     "Qwirey": Qwirey,
+    "Search": Search,
 }
 
 export const pagesConfig = {
