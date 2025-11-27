@@ -124,22 +124,22 @@ export default function Settings() {
     const OptionCard = ({ selected, onClick, children, label = '' }) => (
         <button onClick={() => { onClick(); if (voicePrompts && label) speakText(`Selected ${label}`); }}
             className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 min-w-[100px] ${
-                selected ? 'border-purple-500 bg-purple-50 text-purple-700' : 'border-gray-200 bg-white hover:border-purple-300 text-gray-600'
+                selected ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 bg-white hover:border-blue-300 text-gray-600'
             }`}>
             {children}
         </button>
     );
 
     const ToggleCard = ({ enabled, onToggle, icon: Icon, title, description }) => (
-        <div className={`bg-white rounded-xl border-2 p-4 transition-all ${enabled ? 'border-purple-500 bg-purple-50' : 'border-gray-200'}`}>
+        <div className={`bg-white rounded-xl border-2 p-4 transition-all ${enabled ? 'border-blue-500 bg-blue-50' : 'border-gray-200'}`}>
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${enabled ? 'bg-purple-100' : 'bg-gray-100'}`}>
-                        <Icon className={`w-5 h-5 ${enabled ? 'text-purple-600' : 'text-gray-500'}`} />
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${enabled ? 'bg-blue-100' : 'bg-gray-100'}`}>
+                        <Icon className={`w-5 h-5 ${enabled ? 'text-blue-600' : 'text-gray-500'}`} />
                     </div>
                     <div>
-                        <h3 className="font-medium text-gray-800 text-sm">{title}</h3>
-                        <p className="text-xs text-gray-500">{description}</p>
+                        <h3 className="font-medium text-white text-sm">{title}</h3>
+                        <p className="text-xs text-gray-300">{description}</p>
                     </div>
                 </div>
                 <Switch checked={enabled} onCheckedChange={onToggle} />
@@ -149,13 +149,13 @@ export default function Settings() {
 
     return (
         <div className="p-4 md:p-8 max-w-3xl mx-auto">
-            <h1 className="text-2xl font-bold text-gray-800 mb-1">Settings</h1>
-            <p className="text-gray-500 mb-8">Preferences</p>
+            <h1 className="text-2xl font-bold text-white mb-1">Settings</h1>
+            <p className="text-gray-300 mb-8">Preferences</p>
 
             {/* Theme */}
             <div className="mb-8">
-                <h2 className="text-lg font-semibold text-gray-800 mb-1">Theme</h2>
-                <p className="text-sm text-gray-500 mb-4">Choose your color scheme</p>
+                <h2 className="text-lg font-semibold text-white mb-1">Theme</h2>
+                <p className="text-sm text-gray-300 mb-4">Choose your color scheme</p>
                 <div className="flex flex-wrap gap-3">
                     <OptionCard selected={theme === 'light'} onClick={() => setTheme('light')} label="Light theme">
                         <Sun className="w-7 h-7" />
@@ -174,8 +174,8 @@ export default function Settings() {
 
             {/* Text Size */}
             <div className="mb-8">
-                <h2 className="text-lg font-semibold text-gray-800 mb-1">Text Size</h2>
-                <p className="text-sm text-gray-500 mb-4">Adjust text for readability</p>
+                <h2 className="text-lg font-semibold text-white mb-1">Text Size</h2>
+                <p className="text-sm text-gray-300 mb-4">Adjust text for readability</p>
                 <div className="flex flex-wrap gap-3 mb-4">
                     <OptionCard selected={fontSize === 'small'} onClick={() => setFontSize('small')} label="Small text">
                         <span className="text-xs font-semibold">Aa</span>
@@ -193,7 +193,7 @@ export default function Settings() {
                 <div className="bg-white rounded-xl border border-gray-200 p-4">
                     <div className="flex items-center justify-between mb-3">
                         <span className="text-sm font-medium text-gray-700">Fine adjustment</span>
-                        <span className="text-sm text-purple-600 font-medium">{fontSizeSlider}px</span>
+                        <span className="text-sm text-blue-600 font-medium">{fontSizeSlider}px</span>
                     </div>
                     <Slider value={[fontSizeSlider]} onValueChange={([v]) => { setFontSizeSlider(v); document.documentElement.style.fontSize = `${v}px`; }} min={12} max={24} step={1} />
                 </div>
@@ -201,8 +201,8 @@ export default function Settings() {
 
             {/* UI Style */}
             <div className="mb-8">
-                <h2 className="text-lg font-semibold text-gray-800 mb-1">UI Style</h2>
-                <p className="text-sm text-gray-500 mb-4">Button and element appearance</p>
+                <h2 className="text-lg font-semibold text-white mb-1">UI Style</h2>
+                <p className="text-sm text-gray-300 mb-4">Button and element appearance</p>
                 <div className="flex flex-wrap gap-3">
                     <OptionCard selected={uiStyle === 'rounded'} onClick={() => setUiStyle('rounded')} label="Rounded style">
                         <div className="w-14 h-5 bg-gray-200 rounded-full" />
@@ -213,7 +213,7 @@ export default function Settings() {
                         <span className="text-sm font-medium">Square</span>
                     </OptionCard>
                     <OptionCard selected={uiStyle === 'classic'} onClick={() => setUiStyle('classic')} label="Classic style">
-                        <span className="text-purple-600 underline text-sm">Link</span>
+                        <span className="text-blue-600 underline text-sm">Link</span>
                         <span className="text-sm font-medium">Classic</span>
                     </OptionCard>
                 </div>
@@ -221,8 +221,8 @@ export default function Settings() {
 
             {/* Cognitive Assistance */}
             <div className="mb-8">
-                <h2 className="text-lg font-semibold text-gray-800 mb-1">Cognitive Assistance</h2>
-                <p className="text-sm text-gray-500 mb-4">Aids for content comprehension</p>
+                <h2 className="text-lg font-semibold text-white mb-1">Cognitive Assistance</h2>
+                <p className="text-sm text-gray-300 mb-4">Aids for content comprehension</p>
                 <div className="flex flex-wrap gap-3">
                     <OptionCard selected={cognitiveMode === 'none'} onClick={() => setCognitiveMode('none')} label="No assistance">
                         <Palette className="w-7 h-7" />
@@ -245,8 +245,8 @@ export default function Settings() {
 
             {/* Accessibility Toggles */}
             <div className="mb-8">
-                <h2 className="text-lg font-semibold text-gray-800 mb-1">Accessibility</h2>
-                <p className="text-sm text-gray-500 mb-4">Additional accessibility options</p>
+                <h2 className="text-lg font-semibold text-white mb-1">Accessibility</h2>
+                <p className="text-sm text-gray-300 mb-4">Additional accessibility options</p>
                 <div className="space-y-3">
                     <ToggleCard enabled={blackWhiteMode} onToggle={(v) => { setBlackWhiteMode(v); if (voicePrompts) speakText(v ? 'Grayscale enabled' : 'Grayscale disabled'); }}
                         icon={Eye} title="Grayscale Mode" description="High contrast black & white display" />
@@ -262,7 +262,7 @@ export default function Settings() {
                 setFontSize('medium'); setCognitiveMode('none'); setTheme('light'); setUiStyle('rounded');
                 setBlackWhiteMode(false); setHideIcons(false); setVoicePrompts(false); setFontSizeSlider(16);
             }} className={uiStyle === 'classic' 
-                ? "text-purple-600 underline font-medium" 
+                ? "text-blue-600 underline font-medium" 
                 : "flex items-center gap-2 px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium transition-colors"}>
                 {uiStyle !== 'classic' && <RotateCcw className="w-4 h-4" />} Reset to Defaults
             </button>
