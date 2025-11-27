@@ -19,13 +19,22 @@ const NODE_COLORS = [
     { bg: 'bg-teal-500' },
 ];
 
-function TreeNode({ node, colorIndex = 0, onExplore, onLearn, depth = 0 }) {
+function TreeNode({ node, colorIndex = 0, onExplore, onLearn, depth = 0, nodeRef = null }) {
     const [isExpanding, setIsExpanding] = useState(false);
     const [children, setChildren] = useState(node.children || []);
     const [isExpanded, setIsExpanded] = useState(node.children && node.children.length > 0);
+    const selfRef = useRef(null);
     
     const color = NODE_COLORS[colorIndex % NODE_COLORS.length];
     const hasChildren = children && children.length > 0;
+
+    const scrollToCenter = () => {
+        setTimeout(() => {
+            if (selfRef.current) {
+                selfRef.current.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+            }
+        }, 100);
+    };
 
     const handleExplore = async () => {
         if (isExpanded && hasChildren) {
@@ -57,6 +66,7 @@ function TreeNode({ node, colorIndex = 0, onExplore, onLearn, depth = 0 }) {
             
             setChildren(response.subtopics || []);
             setIsExpanded(true);
+            scrollToCenter();
         } catch (error) {
             console.error('Failed to expand:', error);
         } finally {
@@ -73,7 +83,7 @@ function TreeNode({ node, colorIndex = 0, onExplore, onLearn, depth = 0 }) {
     };
 
     return (
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center" ref={selfRef}>
             {/* Node Card */}
             <div className={`${color.bg} text-white rounded-xl px-5 py-4 shadow-lg min-w-[175px] max-w-[250px] text-center transition-all hover:scale-105 hover:shadow-xl`}>
                 <p className="font-semibold text-sm leading-tight mb-2 break-words">{node.name}</p>
