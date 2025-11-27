@@ -34,12 +34,15 @@ const NewsCard = ({ article, index }) => {
             <div className="aspect-video bg-gray-100 relative overflow-hidden">
                 {imageLoading ? (
                     <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
-                        <div className="flex flex-col items-center gap-2">
-                            <img 
-                                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/622024f26_image-loading-logo.png" 
-                                alt="Loading" 
-                                className="w-8 h-8 object-contain opacity-50 animate-pulse"
-                            />
+                        <div className="flex flex-col items-center gap-3">
+                            <div className="relative">
+                                <img 
+                                    src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/622024f26_image-loading-logo.png" 
+                                    alt="Loading" 
+                                    className="w-10 h-10 object-contain"
+                                    style={{ animation: 'pulse 1.5s ease-in-out infinite' }}
+                                />
+                            </div>
                             <span className="text-xs text-gray-400">Loading...</span>
                         </div>
                     </div>
