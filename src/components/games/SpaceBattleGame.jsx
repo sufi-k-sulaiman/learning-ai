@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { base44 } from "@/api/base44Client";
-import { X, Loader2, Award, Trophy, Target, Sparkles, Play, Search, Rocket, Crosshair, Zap, Compass, Radio } from 'lucide-react';
+import { X, Loader2, Award, Trophy, Target, Sparkles, Play, Search, Rocket, Crosshair, Zap, Compass, Radio, Shield, Cpu, Globe, Atom, Code, TrendingUp, Brain, Lightbulb } from 'lucide-react';
 
 export default function SpaceBattleGame({ onExit }) {
     const [screen, setScreen] = useState('menu');
@@ -824,16 +824,18 @@ export default function SpaceBattleGame({ onExit }) {
                         </div>
                     ) : (
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                            {filteredTopics(generatedTopics[activeCategory] || []).slice(0, 6).map((topic, i) => (
-                                <Button key={topic.id || i} onClick={() => startGame(topic)}
-                                    variant="outline"
-                                    className="h-auto py-4 px-4 bg-white hover:bg-purple-50 hover:border-purple-300 border-gray-200 text-left justify-start rounded-xl">
-                                    <div>
-                                        <p className="font-medium text-gray-900 text-sm">{topic.label}</p>
-                                        <p className="text-xs text-gray-500 line-clamp-1 mt-1">{topic.description}</p>
-                                    </div>
-                                </Button>
-                            ))}
+                            {filteredTopics(generatedTopics[activeCategory] || []).slice(0, 6).map((topic, i) => {
+                                const icons = [Shield, Cpu, Globe, Atom, Code, TrendingUp, Brain, Lightbulb];
+                                const TopicIcon = icons[i % icons.length];
+                                return (
+                                    <button key={topic.id || i} onClick={() => startGame(topic)}
+                                        className="h-auto py-6 px-5 bg-gradient-to-br from-purple-600 to-violet-700 hover:from-purple-700 hover:to-violet-800 text-left rounded-2xl transition-all hover:scale-[1.02] hover:shadow-lg">
+                                        <TopicIcon className="w-6 h-6 text-white/70 mb-3" />
+                                        <p className="font-semibold text-white text-base leading-tight">{topic.label}</p>
+                                        <p className="text-sm text-white/70 line-clamp-2 mt-2">{topic.description}</p>
+                                    </button>
+                                );
+                            })}
                         </div>
                     )}
                 </div>
