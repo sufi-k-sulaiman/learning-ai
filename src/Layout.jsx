@@ -52,8 +52,8 @@ export default function Layout({ children, currentPageName }) {
       document.body.style.color = '#ffffff';
     } else if (savedTheme === 'hybrid') {
       document.documentElement.classList.add('hybrid');
-      document.body.style.backgroundColor = '#f0f0f0';
-      document.body.style.color = '#333333';
+      document.body.style.backgroundColor = '#d1d5db';
+      document.body.style.color = '#1f2937';
     } else {
       document.body.style.backgroundColor = '#ffffff';
       document.body.style.color = '#000000';
