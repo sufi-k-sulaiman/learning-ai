@@ -172,15 +172,37 @@ export default function SpaceBattleGame({ onExit }) {
             keys[e.key.toLowerCase()] = true;
             if (e.code === 'Space') {
                 e.preventDefault();
-                // Fire from center (FPS style)
+                // Fire from crosshair position
                 state.bullets.push({ 
-                    x: 0, 
-                    y: canvas.height * 0.6, 
+                    x: state.mouseX - canvas.width / 2, 
+                    y: state.mouseY, 
                     z: 1,
                     speed: 0.15,
-                    scale: 1
+                    scale: 1,
+                    targetX: state.mouseX,
+                    targetY: state.mouseY
                 });
                 state.cameraShake = 3;
+            }
+            if (e.key.toLowerCase() === 'b' && state.bombs > 0) {
+                e.preventDefault();
+                state.bombs--;
+                // Bomb destroys all enemies
+                state.enemies.forEach(enemy => {
+                    for (let j = 0; j < 30; j++) {
+                        state.particles.push({
+                            x: canvas.width / 2 + (enemy.x - state.viewAngle * 2) * enemy.z * 3,
+                            y: canvas.height * 0.45 + (canvas.height - canvas.height * 0.45) * enemy.z * 0.8,
+                            vx: (Math.random() - 0.5) * 20,
+                            vy: (Math.random() - 0.5) * 20 - 5,
+                            life: 60, maxLife: 60,
+                            color: ['#ff6b35', '#ffaa00', '#ff4444'][Math.floor(Math.random() * 3)]
+                        });
+                    }
+                    state.score += 100;
+                });
+                state.enemies = [];
+                state.cameraShake = 15;
             }
         };
         const handleKeyUp = (e) => { keys[e.key.toLowerCase()] = false; };
@@ -189,9 +211,9 @@ export default function SpaceBattleGame({ onExit }) {
         window.addEventListener('keyup', handleKeyUp);
 
         // Mouse tracking for aiming
-        let mouseX = canvas.width / 2;
         const handleMouseMove = (e) => {
-            mouseX = e.clientX;
+            state.mouseX = e.clientX;
+            state.mouseY = e.clientY;
         };
         window.addEventListener('mousemove', handleMouseMove);
 
