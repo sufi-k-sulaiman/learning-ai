@@ -6,9 +6,10 @@ import { base44 } from '@/api/base44Client';
 import { 
     X, Loader2, BookOpen, Briefcase, Clock, BarChart3, FileText,
     User, MapPin, Calendar, Target, Award, Users, GraduationCap,
-    TrendingUp, Lightbulb, ExternalLink, Building
+    TrendingUp, Lightbulb, ExternalLink, Building, ImageIcon
 } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
+import RadialProgressCard from '@/components/dashboard/RadialProgressCard';
 
 const CHART_COLORS = ['#8b5cf6', '#6366f1', '#3b82f6', '#06b6d4', '#10b981', '#f59e0b'];
 
@@ -16,12 +17,30 @@ export default function LearnMoreModal({ keyword, isOpen, onClose }) {
     const [activeTab, setActiveTab] = useState('overview');
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [generatedImage, setGeneratedImage] = useState(null);
+    const [imageLoading, setImageLoading] = useState(false);
 
     useEffect(() => {
         if (isOpen && keyword) {
             fetchData();
+            generateImage();
         }
     }, [isOpen, keyword]);
+
+    const generateImage = async () => {
+        setImageLoading(true);
+        setGeneratedImage(null);
+        try {
+            const result = await base44.integrations.Core.GenerateImage({
+                prompt: `Professional, detailed illustration representing "${keyword.name}". Modern, clean design with vibrant colors, suitable for an educational knowledge platform. High quality, conceptual artwork.`
+            });
+            setGeneratedImage(result?.url);
+        } catch (error) {
+            console.error('Failed to generate image:', error);
+        } finally {
+            setImageLoading(false);
+        }
+    };
 
     const fetchData = async () => {
         setLoading(true);
@@ -159,6 +178,24 @@ export default function LearnMoreModal({ keyword, isOpen, onClose }) {
                                     {/* Overview Tab */}
                                     <TabsContent value="overview" className="m-0">
                                         <div className="space-y-6">
+                                            {/* Generated Image */}
+                                            <div className="relative rounded-xl overflow-hidden bg-gradient-to-br from-purple-100 to-indigo-100 h-48">
+                                                {imageLoading ? (
+                                                    <div className="absolute inset-0 flex items-center justify-center">
+                                                        <div className="text-center">
+                                                            <Loader2 className="w-8 h-8 animate-spin text-purple-600 mx-auto mb-2" />
+                                                            <p className="text-sm text-purple-600">Generating image...</p>
+                                                        </div>
+                                                    </div>
+                                                ) : generatedImage ? (
+                                                    <img src={generatedImage} alt={keyword.name} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <div className="absolute inset-0 flex items-center justify-center">
+                                                        <ImageIcon className="w-12 h-12 text-purple-300" />
+                                                    </div>
+                                                )}
+                                            </div>
+
                                             <p className="text-gray-700 text-lg leading-relaxed">{data.overview?.description}</p>
                                             
                                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -301,11 +338,20 @@ export default function LearnMoreModal({ keyword, isOpen, onClose }) {
                                     {/* Deep Insights Tab */}
                                     <TabsContent value="insights" className="m-0">
                                         <div className="space-y-6">
-                                            {/* Key Stats */}
+                                            {/* Key Stats with Radial Progress Cards */}
                                             {data.insights?.keyStats && (
                                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                                    {data.insights.keyStats.map((stat, i) => (
-                                                        <div key={i} className="bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl p-4 text-white">
+                                                    {data.insights.keyStats.slice(0, 2).map((stat, i) => (
+                                                        <RadialProgressCard 
+                                                            key={i}
+                                                            percentage={parseInt(stat.value) || (i + 1) * 25}
+                                                            title={stat.label}
+                                                            size="medium"
+                                                            color={CHART_COLORS[i]}
+                                                        />
+                                                    ))}
+                                                    {data.insights.keyStats.slice(2).map((stat, i) => (
+                                                        <div key={i + 2} className="bg-gradient-to-br from-purple-500 to-indigo-600 rounded-xl p-4 text-white flex flex-col justify-center">
                                                             <p className="text-white/70 text-sm">{stat.label}</p>
                                                             <p className="text-2xl font-bold">{stat.value}</p>
                                                         </div>
@@ -314,37 +360,49 @@ export default function LearnMoreModal({ keyword, isOpen, onClose }) {
                                             )}
 
                                             <div className="grid md:grid-cols-2 gap-6">
-                                                {/* Bar Chart */}
+                                                {/* Stacked Bar Chart */}
                                                 {data.insights?.barChartData && (
                                                     <div className="bg-white rounded-xl border p-5">
                                                         <h3 className="font-semibold text-gray-900 mb-4">{data.insights.barChartTitle}</h3>
                                                         <div className="h-64">
                                                             <ResponsiveContainer width="100%" height="100%">
-                                                                <BarChart data={data.insights.barChartData}>
-                                                                    <CartesianGrid strokeDasharray="3 3" />
-                                                                    <XAxis dataKey="name" tick={{ fontSize: 11 }} />
-                                                                    <YAxis tick={{ fontSize: 11 }} />
+                                                                <BarChart data={data.insights.barChartData} layout="vertical">
+                                                                    <CartesianGrid strokeDasharray="3 3" horizontal={true} vertical={false} />
+                                                                    <XAxis type="number" tick={{ fontSize: 11 }} />
+                                                                    <YAxis dataKey="name" type="category" tick={{ fontSize: 11 }} width={80} />
                                                                     <Tooltip />
-                                                                    <Bar dataKey="value" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+                                                                    <Bar dataKey="value" stackId="a" fill="#8b5cf6" radius={[0, 4, 4, 0]} />
+                                                                    <Bar dataKey="value2" stackId="a" fill="#c4b5fd" radius={[0, 4, 4, 0]} />
                                                                 </BarChart>
                                                             </ResponsiveContainer>
                                                         </div>
                                                     </div>
                                                 )}
 
-                                                {/* Line Chart */}
+                                                {/* Area Chart */}
                                                 {data.insights?.lineChartData && (
                                                     <div className="bg-white rounded-xl border p-5">
                                                         <h3 className="font-semibold text-gray-900 mb-4">{data.insights.lineChartTitle}</h3>
                                                         <div className="h-64">
                                                             <ResponsiveContainer width="100%" height="100%">
-                                                                <LineChart data={data.insights.lineChartData}>
-                                                                    <CartesianGrid strokeDasharray="3 3" />
+                                                                <AreaChart data={data.insights.lineChartData}>
+                                                                    <defs>
+                                                                        <linearGradient id="areaGradient" x1="0" y1="0" x2="0" y2="1">
+                                                                            <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.8}/>
+                                                                            <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0.1}/>
+                                                                        </linearGradient>
+                                                                        <linearGradient id="areaGradient2" x1="0" y1="0" x2="0" y2="1">
+                                                                            <stop offset="5%" stopColor="#06b6d4" stopOpacity={0.6}/>
+                                                                            <stop offset="95%" stopColor="#06b6d4" stopOpacity={0.1}/>
+                                                                        </linearGradient>
+                                                                    </defs>
+                                                                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
                                                                     <XAxis dataKey="year" tick={{ fontSize: 11 }} />
                                                                     <YAxis tick={{ fontSize: 11 }} />
                                                                     <Tooltip />
-                                                                    <Line type="monotone" dataKey="value" stroke="#8b5cf6" strokeWidth={2} dot={{ fill: '#8b5cf6' }} />
-                                                                </LineChart>
+                                                                    <Area type="monotone" dataKey="value" stroke="#8b5cf6" strokeWidth={2} fill="url(#areaGradient)" />
+                                                                    <Area type="monotone" dataKey="value2" stroke="#06b6d4" strokeWidth={2} fill="url(#areaGradient2)" />
+                                                                </AreaChart>
                                                             </ResponsiveContainer>
                                                         </div>
                                                     </div>

@@ -248,7 +248,7 @@ export default function MindMapPage() {
                 </div>
 
                 {/* Mind Map Content */}
-                <div className={`bg-white rounded-2xl border border-gray-200 ${isFullscreen ? 'min-h-[calc(100vh-100px)]' : 'min-h-[600px]'} overflow-auto p-8`}>
+                <div className={`bg-white rounded-2xl border border-gray-200 ${isFullscreen ? 'min-h-[calc(100vh-100px)]' : 'min-h-[calc(100vh-160px)]'} overflow-auto p-8`}>
                     {!treeData && !loading ? (
                         <div className="h-full flex flex-col items-center justify-center py-20">
                             <div className="w-20 h-20 rounded-2xl bg-purple-100 flex items-center justify-center mb-4">
@@ -305,7 +305,7 @@ export default function MindMapPage() {
                             onRetry={() => handleSearch(searchTerm || 'Technology')}
                         />
                     ) : (
-                        <div className="flex justify-center py-8 overflow-x-auto">
+                        <div className="flex justify-center overflow-x-auto pt-4">
                             <div className="min-w-max px-8">
                                 <TreeNode
                                     node={treeData}
