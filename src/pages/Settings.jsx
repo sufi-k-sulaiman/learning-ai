@@ -54,25 +54,53 @@ export default function Settings() {
 
         document.documentElement.style.filter = blackWhiteMode ? 'grayscale(100%)' : 'none';
 
+        // UI Style
+        document.documentElement.setAttribute('data-ui-style', uiStyle);
         if (uiStyle === 'rounded') {
             document.documentElement.style.setProperty('--radius', '0.75rem');
         } else if (uiStyle === 'square') {
             document.documentElement.style.setProperty('--radius', '0');
-        } else if (uiStyle === 'oldschool') {
-            document.documentElement.style.setProperty('--radius', '0.25rem');
+        } else if (uiStyle === 'classic') {
+            document.documentElement.style.setProperty('--radius', '0');
         }
 
+        // Cognitive modes
         document.documentElement.setAttribute('data-cognitive', cognitiveMode);
 
         if (cognitiveMode === 'magnification') {
-            document.documentElement.style.transform = 'scale(1.15)';
+            document.documentElement.style.transform = 'scale(1.25)';
             document.documentElement.style.transformOrigin = 'top left';
-            document.documentElement.style.width = '87%';
+            document.documentElement.style.width = '80%';
         } else {
             document.documentElement.style.transform = 'none';
             document.documentElement.style.width = '100%';
         }
+
+        // Reader mode - minimal styling
+        if (cognitiveMode === 'reader') {
+            document.body.style.fontFamily = 'Georgia, serif';
+            document.body.style.lineHeight = '1.8';
+        } else {
+            document.body.style.fontFamily = '';
+            document.body.style.lineHeight = '';
+        }
     }, [fontSize, cognitiveMode, theme, uiStyle, blackWhiteMode, hideIcons, voicePrompts, fontSizeSlider]);
+
+    // Audible mode - read on hover
+    useEffect(() => {
+        if (cognitiveMode !== 'audible') return;
+        
+        const handleMouseOver = (e) => {
+            const target = e.target;
+            const text = target.innerText || target.getAttribute('aria-label') || target.alt || '';
+            if (text && text.trim().length > 0 && text.length < 500) {
+                speakText(text.trim());
+            }
+        };
+
+        document.addEventListener('mouseover', handleMouseOver);
+        return () => document.removeEventListener('mouseover', handleMouseOver);
+    }, [cognitiveMode]);
 
     useEffect(() => {
         if (cognitiveMode === 'audible' && voicePrompts) {
@@ -171,8 +199,8 @@ export default function Settings() {
                         <div className="w-14 h-5 bg-gray-200 rounded-none" />
                         <span className="text-sm font-medium">Square</span>
                     </OptionCard>
-                    <OptionCard selected={uiStyle === 'oldschool'} onClick={() => setUiStyle('oldschool')} label="Old school style">
-                        <div className="w-14 h-5 border-2 border-purple-400 rounded" />
+                    <OptionCard selected={uiStyle === 'classic'} onClick={() => setUiStyle('classic')} label="Classic style">
+                        <span className="text-purple-600 underline text-sm">Link</span>
                         <span className="text-sm font-medium">Classic</span>
                     </OptionCard>
                 </div>
@@ -220,8 +248,10 @@ export default function Settings() {
             <button onClick={() => {
                 setFontSize('medium'); setCognitiveMode('none'); setTheme('light'); setUiStyle('rounded');
                 setBlackWhiteMode(false); setHideIcons(false); setVoicePrompts(false); setFontSizeSlider(16);
-            }} className="flex items-center gap-2 px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium transition-colors">
-                <RotateCcw className="w-4 h-4" /> Reset to Defaults
+            }} className={uiStyle === 'classic' 
+                ? "text-purple-600 underline font-medium" 
+                : "flex items-center gap-2 px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium transition-colors"}>
+                {uiStyle !== 'classic' && <RotateCcw className="w-4 h-4" />} Reset to Defaults
             </button>
         </div>
     );
