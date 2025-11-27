@@ -60,7 +60,7 @@ const ContactCard = ({ icon: Icon, title, description, email, buttonText, color,
                     <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-4`} style={{ backgroundColor: `${color}20` }}>
                         <Icon className="w-7 h-7" style={{ color }} />
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900 mb-2">{title}</h3>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2 min-h-[56px] flex items-center">{title}</h3>
                     <a 
                         href={`mailto:${email}?subject=${encodeURIComponent(defaultSubject)}`}
                         className="text-lg font-semibold mb-3 block hover:underline transition-all"
