@@ -1,5 +1,5 @@
 import React from 'react';
-import { Shield, Users, Database, Globe, Mail, AlertTriangle, FileText, Eye, Server, UserCheck, Brain, Baby, Fingerprint, Scale, ShieldCheck, BarChart3, LogOut, ClipboardCheck, Cloud, GraduationCap, Building2, Heart, DollarSign, Share2, HardDrive, Key, Link2, RefreshCw } from 'lucide-react';
+import { Shield, Users, Database, Globe, Mail, AlertTriangle, FileText, Eye, Server, UserCheck, Brain, User, Fingerprint, Scale, ShieldCheck, BarChart3, LogOut, ClipboardCheck, Cloud, GraduationCap, Building2, Heart, DollarSign, Share2, HardDrive, Key, Link2, RefreshCw } from 'lucide-react';
 
 const Section = ({ number, title, icon: Icon, children }) => (
     <div className="mb-8">
@@ -155,7 +155,7 @@ export default function PrivacyPolicy() {
                         <p>The company avoids using AI in ways that could compromise participant privacy or lead to biased outcomes. Transparency is key, and participants are informed about how AI is used in the research process, fostering trust and accountability.</p>
                     </Section>
 
-                    <Section number="10" title="Children's Data Protection" icon={Baby}>
+                    <Section number="10" title="Children's Data Protection" icon={User}>
                         <p>1cPublishing.com implements special measures to protect the data of underage participants, including obtaining parental consent and using age-appropriate language in communications.</p>
                         <p>The company also limits the collection of sensitive data from children and ensures compliance with regulations like COPPA.</p>
                     </Section>
@@ -259,7 +259,7 @@ export default function PrivacyPolicy() {
 
                         <div>
                             <div className="flex items-center gap-3 mb-3">
-                                <Baby className="w-5 h-5 text-purple-600" />
+                                <User className="w-5 h-5 text-purple-600" />
                                 <h3 className="font-bold text-gray-800">Children's Privacy</h3>
                             </div>
                             <p className="text-gray-600 ml-8">
