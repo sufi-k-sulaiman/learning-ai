@@ -509,26 +509,30 @@ export default function SpaceBattleGame({ onExit }) {
             if (keys.a) state.viewAngle -= 3;
             if (keys.d) state.viewAngle += 3;
 
-            // Spawn enemies randomly from all over the screen
+            // Spawn enemies from above horizon, left and right sides
             state.enemySpawnTimer--;
             if (state.enemySpawnTimer <= 0) {
                 const alienType = state.alienTypes[Math.floor(Math.random() * state.alienTypes.length)];
                 const alienColor = ALIEN_COLORS[Math.floor(Math.random() * ALIEN_COLORS.length)];
-                // Random spawn from edges: top, left, right, or random position
-                const spawnSide = Math.floor(Math.random() * 4);
-                let startX, startZ;
-                if (spawnSide === 0) { // Top center area
+                // Random spawn from: top center, top left, top right
+                const spawnSide = Math.floor(Math.random() * 5);
+                let startX, startZ, startVx;
+                if (spawnSide === 0 || spawnSide === 1) { // Top center - most common
+                    startX = (Math.random() - 0.5) * 400;
+                    startZ = 0.05 + Math.random() * 0.05;
+                    startVx = (Math.random() - 0.5) * 1;
+                } else if (spawnSide === 2) { // From left side of horizon
+                    startX = -350 - Math.random() * 100;
+                    startZ = 0.08 + Math.random() * 0.1;
+                    startVx = 1 + Math.random() * 2; // Move right
+                } else if (spawnSide === 3) { // From right side of horizon
+                    startX = 350 + Math.random() * 100;
+                    startZ = 0.08 + Math.random() * 0.1;
+                    startVx = -1 - Math.random() * 2; // Move left
+                } else { // Top area spread out
                     startX = (Math.random() - 0.5) * 600;
-                    startZ = 0.05;
-                } else if (spawnSide === 1) { // Left side
-                    startX = -300 - Math.random() * 100;
-                    startZ = 0.2 + Math.random() * 0.3;
-                } else if (spawnSide === 2) { // Right side
-                    startX = 300 + Math.random() * 100;
-                    startZ = 0.2 + Math.random() * 0.3;
-                } else { // Random position across screen
-                    startX = (Math.random() - 0.5) * 800;
-                    startZ = 0.1 + Math.random() * 0.2;
+                    startZ = 0.03 + Math.random() * 0.05;
+                    startVx = (Math.random() - 0.5) * 1.5;
                 }
                 state.enemies.push({
                     x: startX,
@@ -537,7 +541,7 @@ export default function SpaceBattleGame({ onExit }) {
                     color: alienColor,
                     health: 1,
                     wobble: Math.random() * Math.PI * 2,
-                    vx: (Math.random() - 0.5) * 2 // Add horizontal velocity
+                    vx: startVx
                 });
                 state.enemySpawnTimer = Math.max(30, 120 - state.score / 50);
             }
