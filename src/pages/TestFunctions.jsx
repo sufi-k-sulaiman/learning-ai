@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
     MessageSquare, CreditCard, Phone, FileText, Download, Webhook,
-    Loader2, Check, Copy, Send, Image, Bot, Database, UserPlus, Users
+    Loader2, Check, Copy, Send, Image, Bot, Database, UserPlus, Users, Mail
 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
@@ -31,6 +31,11 @@ export default function TestFunctions() {
     const [inviteEmail, setInviteEmail] = useState('');
     const [inviteFullName, setInviteFullName] = useState('');
     const [inviteRole, setInviteRole] = useState('user');
+    
+    // Email test
+    const [emailTo, setEmailTo] = useState('');
+    const [emailSubject, setEmailSubject] = useState('');
+    const [emailBody, setEmailBody] = useState('');
 
     const runTest = async (testName, fn) => {
         setLoading(testName);
@@ -59,10 +64,11 @@ export default function TestFunctions() {
             </div>
 
             <Tabs defaultValue="openai" className="space-y-6">
-                <TabsList className="grid grid-cols-7 w-full">
+                <TabsList className="grid grid-cols-8 w-full">
                     <TabsTrigger value="openai" className="gap-2"><Bot className="w-4 h-4" /> OpenAI</TabsTrigger>
                     <TabsTrigger value="stripe" className="gap-2"><CreditCard className="w-4 h-4" /> Stripe</TabsTrigger>
                     <TabsTrigger value="twilio" className="gap-2"><Phone className="w-4 h-4" /> Twilio</TabsTrigger>
+                    <TabsTrigger value="email" className="gap-2"><Mail className="w-4 h-4" /> Email</TabsTrigger>
                     <TabsTrigger value="pdf" className="gap-2"><FileText className="w-4 h-4" /> PDF</TabsTrigger>
                     <TabsTrigger value="export" className="gap-2"><Download className="w-4 h-4" /> Export</TabsTrigger>
                     <TabsTrigger value="webhook" className="gap-2"><Webhook className="w-4 h-4" /> Webhooks</TabsTrigger>
@@ -219,6 +225,61 @@ export default function TestFunctions() {
                             <p className="text-sm text-gray-500">
                                 Use twilioWhatsapp function with same format as SMS
                             </p>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+
+                {/* Email Tab */}
+                <TabsContent value="email" className="space-y-4">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <Mail className="w-5 h-5 text-purple-600" />
+                                Send Email
+                            </CardTitle>
+                            <CardDescription>Send transactional emails using the built-in SendEmail integration</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <Input
+                                value={emailTo}
+                                onChange={(e) => setEmailTo(e.target.value)}
+                                placeholder="Recipient email address"
+                                type="email"
+                            />
+                            <Input
+                                value={emailSubject}
+                                onChange={(e) => setEmailSubject(e.target.value)}
+                                placeholder="Email subject"
+                            />
+                            <Textarea
+                                value={emailBody}
+                                onChange={(e) => setEmailBody(e.target.value)}
+                                placeholder="Email body..."
+                                className="min-h-[100px]"
+                            />
+                            <Button
+                                onClick={async () => {
+                                    setLoading('email');
+                                    setResult(null);
+                                    try {
+                                        const response = await base44.integrations.Core.SendEmail({
+                                            to: emailTo,
+                                            subject: emailSubject,
+                                            body: emailBody
+                                        });
+                                        setResult({ success: true, data: response });
+                                    } catch (error) {
+                                        setResult({ success: false, error: error.message });
+                                    } finally {
+                                        setLoading('');
+                                    }
+                                }}
+                                disabled={loading === 'email' || !emailTo || !emailSubject || !emailBody}
+                                className="bg-purple-600 hover:bg-purple-700"
+                            >
+                                {loading === 'email' ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Send className="w-4 h-4 mr-2" />}
+                                Send Email
+                            </Button>
                         </CardContent>
                     </Card>
                 </TabsContent>
