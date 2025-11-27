@@ -20,6 +20,7 @@ const ContactCard = ({ icon: Icon, title, description, email, buttonText, color,
         }
         setSending(true);
         try {
+            // Save to database
             await base44.entities.ContactMessage.create({
                 type: contactType,
                 to_email: email,
@@ -27,6 +28,14 @@ const ContactCard = ({ icon: Icon, title, description, email, buttonText, color,
                 message: message,
                 status: 'new'
             });
+
+            // Send actual email using SendEmail integration
+            await base44.integrations.Core.SendEmail({
+                to: email,
+                subject: `[${contactType.toUpperCase()}] ${subject}`,
+                body: `New ${contactType} message from 1cPublishing Contact Form:\n\n${message}\n\n---\nSent via 1cPublishing Contact Form`
+            });
+
             setShowSuccess(true);
             setSubject('');
             setMessage('');
