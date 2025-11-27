@@ -2,17 +2,18 @@ import React, { useState } from 'react';
 import { 
     Brain, TrendingUp, Globe, Target, Sparkles, Play, Loader2,
     BarChart3, PieChart, Activity, Lightbulb, Zap, Clock, ChevronRight,
-    LineChart, GitBranch, Shield, AlertTriangle, CheckCircle2
+    LineChart, GitBranch, Shield, AlertTriangle, CheckCircle2, MapPin, X,
+    Maximize2, Minimize2, Database, FileText, Copy
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Maximize2, Minimize2 } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import { base44 } from '@/api/base44Client';
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart as RechartsPC, Pie, Cell } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart as RechartsLC, Line, Legend, PieChart as RechartsPC, Pie, Cell } from 'recharts';
 
 const ANALYSIS_TYPES = [
     { id: 'forecast', name: 'Forecast', icon: TrendingUp, description: '5-year predictions across sectors', color: '#8B5CF6', tags: ['GDP Growth', 'Employment', 'Trade Balance'] },
@@ -24,6 +25,31 @@ const ANALYSIS_TYPES = [
 ];
 
 const SECTORS = ['Economy', 'Trade', 'Health', 'Defense', 'Citizenship', 'Environment', 'Education', 'Technology'];
+
+const COUNTRIES = ['United States', 'United Kingdom', 'Germany', 'France', 'Japan', 'China', 'India', 'Brazil', 'Canada', 'Australia'];
+
+const SCENARIO_FRAMEWORKS = [
+    'Counterfactual Analysis', 'Thought Experiment', 'Possible World Model', 'Speculative Vignette',
+    'Conjectural Paradigm', 'Notional Case Study', 'Prospective Tableau', 'Envisaged Contingency',
+    'Uchronia', 'Phantasmatic Projection'
+];
+
+const ANOMALY_DETECTION = [
+    'Heteroclite Patterns', 'Aberration Detection', 'Parergon Analysis', 'Ectopia Mapping', 'Apophasis Framework'
+];
+
+const SCENARIOS = [
+    'Economic Recession 2025', 'Trade War Escalation', 'Pandemic Response', 'Climate Policy Shift',
+    'Technology Disruption', 'Immigration Reform', 'Defense Spending Increase', 'Healthcare Overhaul'
+];
+
+const ECONOMY_DATASETS = [
+    { label: 'GDP Growth Rates', desc: 'Quarterly & annual, segmented by sector' },
+    { label: 'Unemployment Metrics', desc: 'Labor force participation, underemployment, youth unemployment' },
+    { label: 'Fiscal Policy Indicators', desc: 'Government spending, deficits, debt-to-GDP' },
+    { label: 'Inflation Indexes', desc: 'CPI, PPI, core inflation' },
+    { label: 'Consumer Spending', desc: 'Retail sales, e-commerce penetration, household debt ratios' },
+];
 
 const SAMPLE_CHART_DATA = [
     { name: 'Q1', value: 65 }, { name: 'Q2', value: 72 }, { name: 'Q3', value: 68 }, { name: 'Q4', value: 78 },
@@ -39,6 +65,22 @@ export default function Intelligence() {
     const [results, setResults] = useState(null);
     const [showResultModal, setShowResultModal] = useState(false);
     const [isFullscreen, setIsFullscreen] = useState(false);
+    const [selectedCountry, setSelectedCountry] = useState('United States');
+    const [scenarioFramework, setScenarioFramework] = useState('Envisaged Contingency');
+    const [anomalyDetection, setAnomalyDetection] = useState('Heteroclite Patterns');
+    const [selectedScenario, setSelectedScenario] = useState('');
+    const [simulationRunning, setSimulationRunning] = useState(false);
+    const [trendData, setTrendData] = useState([
+        { name: 'Q1', primary: 65, secondary: 55, tertiary: 45 },
+        { name: 'Q2', primary: 72, secondary: 62, tertiary: 52 },
+        { name: 'Q3', primary: 68, secondary: 58, tertiary: 48 },
+        { name: 'Q4', primary: 78, secondary: 68, tertiary: 58 },
+        { name: 'Q5', primary: 82, secondary: 72, tertiary: 62 },
+        { name: 'Q6', primary: 75, secondary: 65, tertiary: 55 },
+        { name: 'Q7', primary: 88, secondary: 78, tertiary: 68 },
+        { name: 'Q8', primary: 92, secondary: 82, tertiary: 72 },
+    ]);
+    const [activeTrendLines, setActiveTrendLines] = useState(['primary', 'secondary', 'tertiary']);
 
     const stats = [
         { label: 'AI Models Active', value: '12', icon: Brain },
@@ -46,6 +88,46 @@ export default function Intelligence() {
         { label: 'Scenarios Analyzed', value: '1,247', icon: Globe },
         { label: 'Accuracy Rate', value: '94.2%', change: '+2.1%', icon: Target },
     ];
+
+    const runSimulation = async () => {
+        if (!selectedScenario) return;
+        setSimulationRunning(true);
+        try {
+            const response = await base44.integrations.Core.InvokeLLM({
+                prompt: `Run an AI scenario simulation for "${selectedScenario}" in ${selectedCountry} focusing on ${selectedSector}. 
+                Use the ${scenarioFramework} framework and ${anomalyDetection} for anomaly detection.
+                Provide detailed analysis with quantitative projections.`,
+                add_context_from_internet: true,
+                response_json_schema: {
+                    type: "object",
+                    properties: {
+                        summary: { type: "string" },
+                        findings: { type: "array", items: { type: "string" } },
+                        riskLevel: { type: "string" },
+                        riskExplanation: { type: "string" },
+                        recommendations: { type: "array", items: { type: "string" } },
+                        projectedImpact: { type: "string" },
+                        confidenceScore: { type: "number" },
+                        anomaliesDetected: { type: "number" },
+                        timelineMonths: { type: "number" }
+                    }
+                }
+            });
+            setResults(response);
+            setSelectedAnalysis({ name: selectedScenario, color: '#8B5CF6' });
+            setShowResultModal(true);
+        } catch (error) {
+            console.error('Simulation failed:', error);
+        } finally {
+            setSimulationRunning(false);
+        }
+    };
+
+    const toggleTrendLine = (line) => {
+        setActiveTrendLines(prev => 
+            prev.includes(line) ? prev.filter(l => l !== line) : [...prev, line]
+        );
+    };
 
     const runAnalysis = async (type) => {
         setLoading(true);
@@ -151,43 +233,54 @@ export default function Intelligence() {
                     ))}
                 </div>
 
-                {/* Tabs */}
-                <div className="flex gap-2 mb-6">
-                    {[
-                        { id: 'generator', label: 'AI Generator', icon: Sparkles },
-                        { id: 'results', label: 'Analysis Results', icon: BarChart3 },
-                        { id: 'library', label: 'Intelligence Library', icon: Brain },
-                    ].map(tab => (
-                        <button
-                            key={tab.id}
-                            onClick={() => setActiveTab(tab.id)}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
-                                activeTab === tab.id 
-                                    ? 'bg-purple-600 text-white' 
-                                    : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'
-                            }`}
-                        >
-                            <tab.icon className="w-4 h-4" />
-                            {tab.label}
-                        </button>
-                    ))}
-                </div>
+                {/* Main Tabs */}
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
+                    <TabsList className="bg-white border border-gray-200">
+                        <TabsTrigger value="generator" className="gap-1.5 data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+                            <Sparkles className="w-4 h-4" /> AI Generator
+                        </TabsTrigger>
+                        <TabsTrigger value="scenario" className="gap-1.5 data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+                            <GitBranch className="w-4 h-4" /> Scenario Planning
+                        </TabsTrigger>
+                        <TabsTrigger value="results" className="gap-1.5 data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+                            <BarChart3 className="w-4 h-4" /> Analysis Results
+                        </TabsTrigger>
+                        <TabsTrigger value="library" className="gap-1.5 data-[state=active]:bg-purple-600 data-[state=active]:text-white">
+                            <Brain className="w-4 h-4" /> Intelligence Library
+                        </TabsTrigger>
+                    </TabsList>
+                </Tabs>
 
-                {/* Sector Selector */}
-                <div className="flex flex-wrap gap-2 mb-6">
-                    {SECTORS.map(sector => (
-                        <button
-                            key={sector}
-                            onClick={() => setSelectedSector(sector)}
-                            className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                                selectedSector === sector
-                                    ? 'bg-purple-600 text-white'
-                                    : 'bg-white text-gray-700 border border-gray-200 hover:border-purple-300'
-                            }`}
-                        >
-                            {sector}
-                        </button>
-                    ))}
+                {/* Country & Sector Selectors */}
+                <div className="flex flex-wrap items-center gap-4 mb-6">
+                    <Select value={selectedCountry} onValueChange={setSelectedCountry}>
+                        <SelectTrigger className="w-48 bg-white">
+                            <div className="flex items-center gap-2">
+                                <Globe className="w-4 h-4 text-purple-600" />
+                                <SelectValue />
+                            </div>
+                        </SelectTrigger>
+                        <SelectContent>
+                            {COUNTRIES.map(country => (
+                                <SelectItem key={country} value={country}>{country}</SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                    <div className="flex flex-wrap gap-2">
+                        {SECTORS.map(sector => (
+                            <button
+                                key={sector}
+                                onClick={() => setSelectedSector(sector)}
+                                className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                                    selectedSector === sector
+                                        ? 'bg-purple-600 text-white'
+                                        : 'bg-white text-gray-700 border border-gray-200 hover:border-purple-300'
+                                }`}
+                            >
+                                {sector}
+                            </button>
+                        ))}
+                    </div>
                 </div>
 
                 {activeTab === 'generator' && (
@@ -249,6 +342,151 @@ export default function Intelligence() {
                                 {loading && !selectedAnalysis ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
                                 Generate Analysis
                             </Button>
+                        </div>
+                    </>
+                )}
+
+                {activeTab === 'scenario' && (
+                    <>
+                        {/* Header */}
+                        <div className="mb-6">
+                            <h2 className="text-xl font-bold text-gray-900">AI Scenario Planning Framework</h2>
+                            <p className="text-gray-500">{selectedCountry} - Advanced Predictive Policy Simulation & Cross-Country Analysis</p>
+                        </div>
+
+                        {/* Dataset Toggles */}
+                        <div className="bg-white rounded-xl border border-gray-200 p-5 mb-6">
+                            <div className="flex items-center gap-2 mb-4">
+                                <Database className="w-5 h-5 text-purple-600" />
+                                <h3 className="font-semibold text-gray-900">{selectedSector} Datasets (Dynamic Toggles)</h3>
+                                <Button variant="ghost" size="icon" className="ml-2"><Copy className="w-4 h-4" /></Button>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {ECONOMY_DATASETS.map((ds, i) => (
+                                    <div key={i}>
+                                        <span className="text-sm font-medium text-purple-600">{ds.label}:</span>
+                                        <span className="text-sm text-gray-500 ml-1">{ds.desc}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Scenario Simulator */}
+                        <div className="bg-white rounded-xl border border-gray-200 p-5 mb-6">
+                            <div className="flex items-center gap-2 mb-4">
+                                <Sparkles className="w-5 h-5 text-purple-600" />
+                                <h3 className="font-semibold text-gray-900">AI Scenario Simulator - {selectedCountry} Predictive Impact Analysis</h3>
+                            </div>
+                            <div className="flex gap-4">
+                                <Select value={selectedScenario} onValueChange={setSelectedScenario}>
+                                    <SelectTrigger className="flex-1">
+                                        <SelectValue placeholder="Select scenario..." />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {SCENARIOS.map(s => (
+                                            <SelectItem key={s} value={s}>{s}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                                <Button onClick={runSimulation} disabled={simulationRunning || !selectedScenario} className="bg-purple-600 hover:bg-purple-700">
+                                    {simulationRunning ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Play className="w-4 h-4 mr-2" />}
+                                    Run Simulation
+                                </Button>
+                            </div>
+                        </div>
+
+                        {/* Framework Selectors */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <div className="bg-white rounded-xl border border-gray-200 p-4">
+                                <label className="text-sm font-semibold text-purple-600 mb-2 block">Scenario Framework</label>
+                                <Select value={scenarioFramework} onValueChange={setScenarioFramework}>
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {SCENARIO_FRAMEWORKS.map(f => (
+                                            <SelectItem key={f} value={f}>{f}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className="bg-white rounded-xl border border-gray-200 p-4">
+                                <label className="text-sm font-semibold text-purple-600 mb-2 block">Anomaly Detection</label>
+                                <Select value={anomalyDetection} onValueChange={setAnomalyDetection}>
+                                    <SelectTrigger className="w-full">
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {ANOMALY_DETECTION.map(a => (
+                                            <SelectItem key={a} value={a}>{a}</SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                        </div>
+
+                        {/* Charts Row */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                            <div className="bg-white rounded-xl border border-gray-200 p-5">
+                                <h3 className="font-semibold text-gray-900 mb-4">Trend Analysis</h3>
+                                <ResponsiveContainer width="100%" height={250}>
+                                    <RechartsLC data={trendData}>
+                                        <XAxis dataKey="name" axisLine={false} tickLine={false} />
+                                        <YAxis axisLine={false} tickLine={false} />
+                                        <Tooltip />
+                                        <Legend />
+                                        {activeTrendLines.includes('primary') && <Line type="monotone" dataKey="primary" stroke="#8B5CF6" strokeWidth={2} dot={false} />}
+                                        {activeTrendLines.includes('secondary') && <Line type="monotone" dataKey="secondary" stroke="#22C55E" strokeWidth={2} dot={false} />}
+                                        {activeTrendLines.includes('tertiary') && <Line type="monotone" dataKey="tertiary" stroke="#F59E0B" strokeWidth={2} dot={false} />}
+                                    </RechartsLC>
+                                </ResponsiveContainer>
+                                <div className="flex gap-2 mt-4">
+                                    {['primary', 'secondary', 'tertiary'].map(line => (
+                                        <button key={line} onClick={() => toggleTrendLine(line)}
+                                            className={`px-3 py-1 rounded-lg text-sm font-medium transition-all ${activeTrendLines.includes(line) ? 'text-white' : 'bg-gray-100 text-gray-600'}`}
+                                            style={{ backgroundColor: activeTrendLines.includes(line) ? (line === 'primary' ? '#8B5CF6' : line === 'secondary' ? '#22C55E' : '#F59E0B') : undefined }}>
+                                            {line.charAt(0).toUpperCase() + line.slice(1)}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                            <div className="bg-white rounded-xl border border-gray-200 p-5">
+                                <h3 className="font-semibold text-gray-900 mb-4">Performance Metrics</h3>
+                                <div className="grid grid-cols-3 gap-4">
+                                    <div className="text-center p-4 bg-purple-50 rounded-xl border-2 border-purple-200">
+                                        <p className="text-3xl font-bold text-purple-600">36.9K</p>
+                                        <p className="text-sm text-gray-500">Initiated</p>
+                                    </div>
+                                    <div className="text-center p-4 bg-emerald-50 rounded-xl border-2 border-emerald-200">
+                                        <p className="text-3xl font-bold text-emerald-600">56%</p>
+                                        <p className="text-sm text-gray-500">Engaged</p>
+                                    </div>
+                                    <div className="text-center p-4 bg-amber-50 rounded-xl border-2 border-amber-200">
+                                        <p className="text-3xl font-bold text-amber-600">17%</p>
+                                        <p className="text-sm text-gray-500">Completed</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Detection Metrics */}
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
+                                <div className="text-3xl font-bold text-purple-600">24%</div>
+                                <div className="text-sm text-gray-500">Detection Rate</div>
+                            </div>
+                            <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
+                                <div className="text-3xl font-bold text-emerald-600">82%</div>
+                                <div className="text-sm text-gray-500">Confidence</div>
+                            </div>
+                            <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
+                                <div className="text-3xl font-bold text-blue-600">96%</div>
+                                <div className="text-sm text-gray-500">Coverage</div>
+                            </div>
+                            <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
+                                <div className="text-3xl font-bold text-amber-600">12</div>
+                                <div className="text-sm text-gray-500">Alerts</div>
+                            </div>
                         </div>
                     </>
                 )}
