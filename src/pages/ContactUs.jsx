@@ -187,7 +187,7 @@ export default function ContactUs() {
                     <ContactCard
                       icon={Headphones}
                       title="Contact Support"
-                      description="If you need assistance using the 1cPublishing application or the Portal, our support team is ready to help you."
+                      description="If you need extra assistance using the 1cPublishing application or the Portal, our support team is ready to help you."
                       email="help@1cPublishing.com"
                       buttonText="Contact Support"
                       color="#3B82F6"
