@@ -4,21 +4,19 @@ Deno.serve(async (req) => {
     try {
         const base44 = createClientFromRequest(req);
         
-        // Get webhook data
+        // Get webhook secret from query params for validation
         const url = new URL(req.url);
-        const source = url.searchParams.get('source') || 'unknown';
         const secret = url.searchParams.get('secret');
-        
-        // Optional: Verify webhook secret
         const expectedSecret = Deno.env.get("WEBHOOK_SECRET");
+        
+        // Validate secret if configured
         if (expectedSecret && secret !== expectedSecret) {
             return Response.json({ error: 'Invalid webhook secret' }, { status: 401 });
         }
 
-        // Parse the incoming payload
-        let payload;
         const contentType = req.headers.get('content-type') || '';
-        
+        let payload;
+
         if (contentType.includes('application/json')) {
             payload = await req.json();
         } else if (contentType.includes('application/x-www-form-urlencoded')) {
@@ -28,42 +26,57 @@ Deno.serve(async (req) => {
             payload = await req.text();
         }
 
-        // Log the webhook (you can store this in an entity if needed)
-        console.log(`Webhook received from ${source}:`, JSON.stringify(payload));
+        // Log webhook for debugging
+        console.log('Webhook received:', {
+            method: req.method,
+            headers: Object.fromEntries(req.headers),
+            payload
+        });
 
-        // Get useful headers
-        const headers = {
-            'content-type': contentType,
-            'user-agent': req.headers.get('user-agent'),
-            'x-forwarded-for': req.headers.get('x-forwarded-for'),
-        };
+        // Get webhook type from headers or payload
+        const webhookType = req.headers.get('x-webhook-type') || 
+                           payload?.type || 
+                           payload?.event || 
+                           'generic';
 
-        // You can add custom logic here based on source
-        switch (source) {
-            case 'github':
-                // Handle GitHub webhooks
-                const event = req.headers.get('x-github-event');
-                console.log(`GitHub event: ${event}`);
+        // Process based on webhook type
+        switch (webhookType) {
+            case 'order.created':
+                // Handle new order
+                console.log('New order:', payload);
                 break;
 
-            case 'zapier':
-                // Handle Zapier webhooks
+            case 'user.created':
+                // Handle new user
+                console.log('New user:', payload);
                 break;
 
-            case 'custom':
-                // Handle custom webhooks
+            case 'payment.received':
+                // Handle payment
+                console.log('Payment received:', payload);
+                break;
+
+            case 'form.submitted':
+                // Handle form submission
+                console.log('Form submitted:', payload);
                 break;
 
             default:
-                // Generic handler
-                break;
+                // Generic webhook handling
+                console.log('Generic webhook:', webhookType, payload);
         }
 
-        // Return success
+        // You can store webhook data in an entity
+        // await base44.asServiceRole.entities.WebhookLog.create({
+        //     type: webhookType,
+        //     payload: JSON.stringify(payload),
+        //     received_at: new Date().toISOString()
+        // });
+
         return Response.json({ 
             success: true, 
-            message: 'Webhook received',
-            source,
+            received: true,
+            type: webhookType,
             timestamp: new Date().toISOString()
         });
     } catch (error) {

@@ -1,74 +1,74 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
 import Stripe from 'npm:stripe';
 
+const stripe = new Stripe(Deno.env.get("STRIPE_API_KEY"));
+const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
+
 Deno.serve(async (req) => {
     try {
-        const stripe = new Stripe(Deno.env.get("Stripe"));
         const base44 = createClientFromRequest(req);
         
-        const signature = req.headers.get('stripe-signature');
         const body = await req.text();
-        
+        const signature = req.headers.get('stripe-signature');
+
         let event;
-        try {
-            event = stripe.webhooks.constructEvent(
-                body,
-                signature,
-                Deno.env.get("STRIPE_WEBHOOK_SECRET")
-            );
-        } catch (err) {
-            return Response.json({ error: `Webhook signature verification failed: ${err.message}` }, { status: 400 });
+        
+        if (webhookSecret && signature) {
+            event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
+        } else {
+            event = JSON.parse(body);
         }
 
-        // Handle different event types
-        switch (event.type) {
+        const { type, data } = event;
+
+        switch (type) {
             case 'checkout.session.completed':
-                const session = event.data.object;
-                console.log('Checkout completed:', session.id);
-                // Add your logic here - e.g., update user subscription status
+                console.log('Checkout completed:', data.object.id);
+                // Handle successful checkout
                 break;
 
             case 'payment_intent.succeeded':
-                const paymentIntent = event.data.object;
-                console.log('Payment succeeded:', paymentIntent.id);
+                console.log('Payment succeeded:', data.object.id);
+                // Handle successful payment
                 break;
 
             case 'payment_intent.payment_failed':
-                const failedPayment = event.data.object;
-                console.log('Payment failed:', failedPayment.id);
+                console.log('Payment failed:', data.object.id);
+                // Handle failed payment
                 break;
 
             case 'customer.subscription.created':
-                const newSubscription = event.data.object;
-                console.log('Subscription created:', newSubscription.id);
+                console.log('Subscription created:', data.object.id);
+                // Handle new subscription
                 break;
 
             case 'customer.subscription.updated':
-                const updatedSubscription = event.data.object;
-                console.log('Subscription updated:', updatedSubscription.id);
+                console.log('Subscription updated:', data.object.id);
+                // Handle subscription update
                 break;
 
             case 'customer.subscription.deleted':
-                const canceledSubscription = event.data.object;
-                console.log('Subscription canceled:', canceledSubscription.id);
+                console.log('Subscription cancelled:', data.object.id);
+                // Handle subscription cancellation
                 break;
 
             case 'invoice.paid':
-                const paidInvoice = event.data.object;
-                console.log('Invoice paid:', paidInvoice.id);
+                console.log('Invoice paid:', data.object.id);
+                // Handle paid invoice
                 break;
 
             case 'invoice.payment_failed':
-                const failedInvoice = event.data.object;
-                console.log('Invoice payment failed:', failedInvoice.id);
+                console.log('Invoice payment failed:', data.object.id);
+                // Handle failed invoice payment
                 break;
 
             default:
-                console.log(`Unhandled event type: ${event.type}`);
+                console.log('Unhandled event type:', type);
         }
 
-        return Response.json({ received: true });
+        return Response.json({ received: true, type });
     } catch (error) {
-        return Response.json({ error: error.message }, { status: 500 });
+        console.error('Webhook error:', error.message);
+        return Response.json({ error: error.message }, { status: 400 });
     }
 });

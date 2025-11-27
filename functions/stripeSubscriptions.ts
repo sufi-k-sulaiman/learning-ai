@@ -1,9 +1,10 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
 import Stripe from 'npm:stripe';
 
+const stripe = new Stripe(Deno.env.get("STRIPE_API_KEY"));
+
 Deno.serve(async (req) => {
     try {
-        const stripe = new Stripe(Deno.env.get("Stripe"));
         const base44 = createClientFromRequest(req);
         const user = await base44.auth.me();
         
@@ -11,70 +12,88 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { action, customer_id, price_id, subscription_id, success_url, cancel_url } = await req.json();
+        const { action, customerId, priceId, subscriptionId, trialDays, metadata } = await req.json();
+
+        if (!action) {
+            return Response.json({ error: 'Action is required' }, { status: 400 });
+        }
 
         let result;
 
         switch (action) {
-            case 'create_subscription':
+            case 'createProduct':
+                const { productName, productDescription, prices } = await req.json();
+                const product = await stripe.products.create({
+                    name: productName,
+                    description: productDescription
+                });
+                
+                const createdPrices = [];
+                if (prices && Array.isArray(prices)) {
+                    for (const p of prices) {
+                        const price = await stripe.prices.create({
+                            product: product.id,
+                            unit_amount: Math.round(p.amount * 100),
+                            currency: p.currency || 'usd',
+                            recurring: p.interval ? { interval: p.interval } : undefined
+                        });
+                        createdPrices.push(price);
+                    }
+                }
+                return Response.json({ success: true, product, prices: createdPrices });
+
+            case 'createSubscription':
+                if (!customerId || !priceId) {
+                    return Response.json({ error: 'customerId and priceId are required' }, { status: 400 });
+                }
                 result = await stripe.subscriptions.create({
-                    customer: customer_id,
-                    items: [{ price: price_id }],
-                    metadata: { user_id: user.id },
+                    customer: customerId,
+                    items: [{ price: priceId }],
+                    trial_period_days: trialDays,
+                    metadata: { userId: user.id, ...metadata }
                 });
-                break;
+                return Response.json({ success: true, subscription: result });
 
-            case 'create_subscription_checkout':
-                result = await stripe.checkout.sessions.create({
-                    payment_method_types: ['card'],
-                    line_items: [{ price: price_id, quantity: 1 }],
-                    mode: 'subscription',
-                    success_url,
-                    cancel_url,
-                    customer_email: user.email,
-                    metadata: { user_id: user.id },
+            case 'cancelSubscription':
+                if (!subscriptionId) {
+                    return Response.json({ error: 'subscriptionId is required' }, { status: 400 });
+                }
+                result = await stripe.subscriptions.cancel(subscriptionId);
+                return Response.json({ success: true, subscription: result });
+
+            case 'updateSubscription':
+                if (!subscriptionId || !priceId) {
+                    return Response.json({ error: 'subscriptionId and priceId are required' }, { status: 400 });
+                }
+                const sub = await stripe.subscriptions.retrieve(subscriptionId);
+                result = await stripe.subscriptions.update(subscriptionId, {
+                    items: [{
+                        id: sub.items.data[0].id,
+                        price: priceId
+                    }]
                 });
-                break;
+                return Response.json({ success: true, subscription: result });
 
-            case 'cancel_subscription':
-                result = await stripe.subscriptions.cancel(subscription_id);
-                break;
-
-            case 'pause_subscription':
-                result = await stripe.subscriptions.update(subscription_id, {
-                    pause_collection: { behavior: 'mark_uncollectible' },
-                });
-                break;
-
-            case 'resume_subscription':
-                result = await stripe.subscriptions.update(subscription_id, {
-                    pause_collection: '',
-                });
-                break;
-
-            case 'get_subscription':
-                result = await stripe.subscriptions.retrieve(subscription_id);
-                break;
-
-            case 'list_subscriptions':
+            case 'listSubscriptions':
                 result = await stripe.subscriptions.list({
-                    customer: customer_id,
-                    limit: 100,
+                    customer: customerId,
+                    status: 'all'
                 });
-                break;
+                return Response.json({ success: true, subscriptions: result.data });
 
-            case 'create_billing_portal':
+            case 'createBillingPortal':
+                if (!customerId) {
+                    return Response.json({ error: 'customerId is required' }, { status: 400 });
+                }
                 result = await stripe.billingPortal.sessions.create({
-                    customer: customer_id,
-                    return_url: success_url,
+                    customer: customerId,
+                    return_url: `${req.headers.get('origin')}/settings`
                 });
-                break;
+                return Response.json({ success: true, url: result.url });
 
             default:
                 return Response.json({ error: 'Invalid action' }, { status: 400 });
         }
-
-        return Response.json(result);
     } catch (error) {
         return Response.json({ error: error.message }, { status: 500 });
     }
