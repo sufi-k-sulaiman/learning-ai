@@ -21,6 +21,20 @@ export default function Layout({ children, currentPageName }) {
       document.getElementsByTagName('head')[0].appendChild(appleLink);
     }
     appleLink.href = LOGO_URL;
+
+    // Create meta tags if they don't exist
+    if (!document.querySelector('meta[name="description"]')) {
+      const descMeta = document.createElement('meta');
+      descMeta.name = 'description';
+      descMeta.content = '';
+      document.head.appendChild(descMeta);
+    }
+    if (!document.querySelector('meta[name="keywords"]')) {
+      const keyMeta = document.createElement('meta');
+      keyMeta.name = 'keywords';
+      keyMeta.content = '';
+      document.head.appendChild(keyMeta);
+    }
   }, []);
 
   return (
