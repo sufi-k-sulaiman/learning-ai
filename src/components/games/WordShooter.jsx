@@ -2,33 +2,8 @@ import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Maximize2, Minimize2, Loader2, Zap, Book, Layers, Play, Pause, Search, X } from "lucide-react";
+import { Maximize2, Minimize2, Loader2, Zap, Book, Layers, Play, Search, X } from "lucide-react";
 import { base44 } from "@/api/base44Client";
-
-const PRESET_DECKS = {
-  trending: [],
-  education: [
-    { id: 'math', label: 'Mathematics', topic: 'Mathematics concepts and terminology' },
-    { id: 'science', label: 'Science', topic: 'Scientific concepts and research terms' },
-    { id: 'history', label: 'History', topic: 'Historical events and terminology' },
-    { id: 'literature', label: 'Literature', topic: 'Literary terms and concepts' },
-    { id: 'geography', label: 'Geography', topic: 'Geographical terms and concepts' },
-  ],
-  planet: [
-    { id: 'climate', label: 'Climate Change', topic: 'Climate change and global warming terms' },
-    { id: 'co2', label: 'CO2 & Emissions', topic: 'Carbon emissions and greenhouse gases' },
-    { id: 'water', label: 'Water Issues', topic: 'Water pollution, conservation, and management' },
-    { id: 'air', label: 'Air Quality', topic: 'Air pollution and atmospheric science' },
-    { id: 'biodiversity', label: 'Biodiversity', topic: 'Species conservation and ecosystems' },
-  ],
-  enhance: [
-    { id: 'critical', label: 'Critical Thinking', topic: 'Critical thinking and logic concepts' },
-    { id: 'philosophy', label: 'Philosophy', topic: 'Philosophical concepts and terminology' },
-    { id: 'psychology', label: 'Psychology', topic: 'Psychology and human behavior terms' },
-    { id: 'tech', label: 'Technology', topic: 'Technology and innovation terminology' },
-    { id: 'ai', label: 'Artificial Intelligence', topic: 'AI and machine learning concepts' },
-  ]
-};
 
 export default function WordShooter({ onExit }) {
   const [screen, setScreen] = useState('title');
@@ -37,8 +12,8 @@ export default function WordShooter({ onExit }) {
   const [fullscreen, setFullscreen] = useState(false);
   const [activeTab, setActiveTab] = useState('trending');
   const [searchQuery, setSearchQuery] = useState('');
-  const [trendingTopics, setTrendingTopics] = useState([]);
-  const [loadingTrending, setLoadingTrending] = useState(false);
+  const [generatedTopics, setGeneratedTopics] = useState({});
+  const [loadingTopics, setLoadingTopics] = useState(true);
   const [currentLevel, setCurrentLevel] = useState(1);
   const [currentTopic, setCurrentTopic] = useState(null);
   const [subLevels, setSubLevels] = useState([]);
@@ -46,36 +21,67 @@ export default function WordShooter({ onExit }) {
   const [totalScore, setTotalScore] = useState(0);
   const canvasRef = useRef(null);
 
+  const TABS = [
+    { id: 'trending', label: 'Trending', color: 'from-purple-600 to-purple-700' },
+    { id: 'education', label: 'Education', color: 'from-blue-600 to-blue-700' },
+    { id: 'planet', label: 'Planet', color: 'from-green-600 to-green-700' },
+    { id: 'enhance', label: 'Enhance', color: 'from-amber-600 to-amber-700' },
+  ];
+
   useEffect(() => {
-    const fetchTrending = async () => {
-      setLoadingTrending(true);
+    generateAllTopics();
+  }, []);
+
+  const generateAllTopics = async () => {
+    setLoadingTopics(true);
+    const allTopics = {};
+    
+    const prompts = {
+      trending: 'Generate 6 trending educational topics people should learn about right now. Include technology, AI, current events, and emerging fields.',
+      education: 'Generate 6 core educational topics across mathematics, science, history, literature, geography, and languages.',
+      planet: 'Generate 6 environmental and planetary topics including climate change, sustainability, conservation, renewable energy, and ecosystems.',
+      enhance: 'Generate 6 self-improvement and cognitive enhancement topics including critical thinking, philosophy, psychology, creativity, and productivity.'
+    };
+
+    for (const tab of TABS) {
       try {
         const result = await base44.integrations.Core.InvokeLLM({
-          prompt: `List 6 trending educational topics people should learn about right now. Include tech, science, culture, and current events. Return as JSON array with format: [{"id": "topic-id", "label": "Topic Name", "topic": "description"}]`,
-          add_context_from_internet: true,
+          prompt: `${prompts[tab.id]} Return as JSON: { "topics": [{ "id": "topic-id", "label": "Topic Name", "description": "Brief compelling description" }] }`,
+          add_context_from_internet: tab.id === 'trending',
           response_json_schema: {
             type: "object",
             properties: {
-              topics: { type: "array", items: { type: "object", properties: { id: { type: "string" }, label: { type: "string" }, topic: { type: "string" } } } }
+              topics: { 
+                type: "array", 
+                items: { 
+                  type: "object", 
+                  properties: { 
+                    id: { type: "string" }, 
+                    label: { type: "string" }, 
+                    description: { type: "string" } 
+                  } 
+                } 
+              }
             }
           }
         });
-        setTrendingTopics(result?.topics || []);
+        allTopics[tab.id] = result?.topics || [];
       } catch (error) {
-        console.error('Failed to load trending:', error);
-      } finally {
-        setLoadingTrending(false);
+        console.error(`Failed to generate ${tab.id} topics:`, error);
+        allTopics[tab.id] = [];
       }
-    };
-    fetchTrending();
-  }, []);
+    }
+    
+    setGeneratedTopics(allTopics);
+    setLoadingTopics(false);
+  };
 
   const generateSubLevels = async (topic) => {
     setLoading(true);
     setScreen('loading');
     try {
       const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `Generate 5 sub-topics/levels for learning about "${topic}". Each level should be progressively more advanced. Return as JSON: { "levels": [{ "id": 1, "name": "Level Name", "description": "What you'll learn", "difficulty": "Beginner/Intermediate/Advanced" }] }`,
+        prompt: `Generate 5 progressive learning levels for "${topic}". Each level should build on the previous. Return as JSON: { "levels": [{ "id": 1, "name": "Level Name", "description": "What you'll learn", "difficulty": "Beginner/Intermediate/Advanced" }] }`,
         response_json_schema: {
           type: "object",
           properties: {
@@ -99,7 +105,7 @@ export default function WordShooter({ onExit }) {
     setScreen('loading');
     try {
       const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `Generate a learning dataset for: "${currentTopic} - ${levelName}". Return 20 primary concepts/terms with their related terms and definitions. Format as JSON: { "words": [{ "primary": "term", "frequency": 50-100, "related": ["term1", "term2"], "definition": "short definition" }] }`,
+        prompt: `Generate vocabulary data for: "${currentTopic} - ${levelName}". Return 20 terms with related words and definitions. Format: { "words": [{ "primary": "term", "frequency": 50-100, "related": ["term1", "term2"], "definition": "short definition" }] }`,
         response_json_schema: {
           type: "object",
           properties: {
@@ -111,21 +117,18 @@ export default function WordShooter({ onExit }) {
       setScreen('game');
     } catch (error) {
       console.error('Failed to generate words:', error);
-      alert('Failed to generate word data. Please try again.');
       setScreen('levels');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleStartGame = (deck) => {
-    if (deck === 'custom') {
+  const handleStartGame = (topic) => {
+    if (topic === 'custom') {
       if (!searchQuery.trim()) return;
-      setCurrentTopic(searchQuery);
       generateSubLevels(searchQuery);
     } else {
-      setCurrentTopic(deck.topic);
-      generateSubLevels(deck.topic);
+      generateSubLevels(topic.label);
     }
   };
 
@@ -142,17 +145,20 @@ export default function WordShooter({ onExit }) {
     setScreen('levels');
   };
 
-  const filteredDecks = (decks) => {
-    if (!searchQuery.trim()) return decks;
-    return decks.filter(d => d.label.toLowerCase().includes(searchQuery.toLowerCase()) || d.topic.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredTopics = (topics) => {
+    if (!searchQuery.trim()) return topics;
+    return topics.filter(t => 
+      t.label.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      t.description?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
   };
 
+  // Game canvas effect
   useEffect(() => {
     if (screen !== 'game' || !canvasRef.current || wordData.length === 0) return;
 
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
-    
     let animationFrameId;
 
     function resize() {
@@ -168,7 +174,6 @@ export default function WordShooter({ onExit }) {
       score: 0, combo: 0, maxCombo: 0, wordsCompleted: 0, totalWords: wordData.length, bombs: 3,
       paused: false, gameOver: false, shockwave: null, flash: 0, shake: 0,
       spawnTimer: 0, spawnRate: 120, wordQueue: [...wordData].sort(() => Math.random() - 0.5),
-      factTimer: 0, currentFact: null
     };
 
     for(let i=0; i<300; i++) {
@@ -189,9 +194,9 @@ export default function WordShooter({ onExit }) {
     window.addEventListener('keyup', handleKeyUp);
 
     function shootBullet() {
-      state.bullets.push({ x: state.playerX, y: state.playerY - 40, speed: 15, width: 4, height: 25, color: '#3b82f6' });
+      state.bullets.push({ x: state.playerX, y: state.playerY - 40, speed: 15, width: 4, height: 25, color: '#8b5cf6' });
       for(let i=0; i<5; i++) {
-        state.particles.push({ x: state.playerX, y: state.playerY - 40, vx: (Math.random() - 0.5) * 4, vy: -Math.random() * 3 - 1, life: 20, maxLife: 20, size: 3, color: '#60a5fa' });
+        state.particles.push({ x: state.playerX, y: state.playerY - 40, vx: (Math.random() - 0.5) * 4, vy: -Math.random() * 3 - 1, life: 20, maxLife: 20, size: 3, color: '#a78bfa' });
       }
     }
 
@@ -209,10 +214,10 @@ export default function WordShooter({ onExit }) {
       const word = state.wordQueue.shift();
       ctx.font = 'bold 16px Inter';
       const textWidth = ctx.measureText(word.primary.toUpperCase()).width + 30;
-      const colors = ['#8b5cf6', '#3b82f6', '#22c55e', '#f59e0b', '#ef4444', '#ec4899', '#06b6d4'];
+      const colors = ['#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#3b82f6', '#ec4899', '#06b6d4'];
       state.asteroids.push({
         id: Math.random(), x: Math.random() * (canvas.width - 200) + 100, y: -100,
-        vx: (Math.random() - 0.5) * 2, vy: 1 + Math.random() * 1, rotation: 0, rotSpeed: 0,
+        vx: (Math.random() - 0.5) * 2, vy: 1 + Math.random() * 1, rotation: 0,
         width: textWidth, height: 50, stage: 1, text: word.primary, wordData: word,
         color: colors[Math.floor(Math.random() * colors.length)], health: 1
       });
@@ -229,7 +234,7 @@ export default function WordShooter({ onExit }) {
       if (!isBomb && asteroid.wordData?.definition) {
         const definition = asteroid.wordData.definition.split(' ').slice(0, 5).join(' ');
         const baseBonus = 100 * (state.combo + 1);
-        state.floatingTexts.push({ x: asteroid.x, y: asteroid.y, vy: -2, text: definition.toUpperCase(), life: 120, maxLife: 120, color: '#22c55e', bonus: baseBonus, size: 22, isKnowledge: false });
+        state.floatingTexts.push({ x: asteroid.x, y: asteroid.y, vy: -2, text: definition.toUpperCase(), life: 120, maxLife: 120, color: '#22c55e', bonus: baseBonus, size: 22 });
         state.combo++;
         state.score += baseBonus;
         state.wordsCompleted++;
@@ -243,9 +248,9 @@ export default function WordShooter({ onExit }) {
     function drawShip() {
       ctx.save();
       ctx.translate(state.playerX, state.playerY);
-      ctx.fillStyle = '#3b82f6';
+      ctx.fillStyle = '#8b5cf6';
       ctx.shadowBlur = 20;
-      ctx.shadowColor = '#3b82f6';
+      ctx.shadowColor = '#8b5cf6';
       ctx.beginPath();
       ctx.moveTo(0, -30);
       ctx.lineTo(-25, 20);
@@ -253,12 +258,12 @@ export default function WordShooter({ onExit }) {
       ctx.lineTo(25, 20);
       ctx.closePath();
       ctx.fill();
-      ctx.fillStyle = '#60a5fa';
+      ctx.fillStyle = '#a78bfa';
       ctx.beginPath();
       ctx.arc(0, -5, 12, 0, Math.PI * 2);
       ctx.fill();
-      ctx.fillStyle = '#ef4444';
-      ctx.shadowColor = '#ef4444';
+      ctx.fillStyle = '#22c55e';
+      ctx.shadowColor = '#22c55e';
       ctx.beginPath();
       ctx.arc(-15, 15, 5, 0, Math.PI * 2);
       ctx.arc(15, 15, 5, 0, Math.PI * 2);
@@ -275,7 +280,6 @@ export default function WordShooter({ onExit }) {
       ctx.shadowBlur = 15;
       ctx.shadowColor = ast.color;
       ctx.beginPath();
-            ctx.beginPath();
       ctx.moveTo(-w/2 + r, -h/2);
       ctx.lineTo(w/2 - r, -h/2);
       ctx.quadraticCurveTo(w/2, -h/2, w/2, -h/2 + r);
@@ -305,7 +309,7 @@ export default function WordShooter({ onExit }) {
       
       ctx.save();
       ctx.translate(shakeX, shakeY);
-      ctx.fillStyle = '#0a0a0a';
+      ctx.fillStyle = '#0f0f23';
       ctx.fillRect(0, 0, w, h);
       
       if (state.flash > 0) { ctx.fillStyle = `rgba(255, 255, 255, ${state.flash / 30 * 0.6})`; ctx.fillRect(0, 0, w, h); state.flash--; }
@@ -337,11 +341,11 @@ export default function WordShooter({ onExit }) {
       state.bullets = state.bullets.filter(b => {
         b.y -= b.speed;
         const gradient = ctx.createLinearGradient(b.x, b.y, b.x, b.y + b.height);
-        gradient.addColorStop(0, '#60a5fa');
-        gradient.addColorStop(1, 'rgba(59, 130, 246, 0)');
+        gradient.addColorStop(0, '#a78bfa');
+        gradient.addColorStop(1, 'rgba(139, 92, 246, 0)');
         ctx.fillStyle = gradient;
         ctx.shadowBlur = 10;
-        ctx.shadowColor = '#3b82f6';
+        ctx.shadowColor = '#8b5cf6';
         ctx.fillRect(b.x - b.width/2, b.y, b.width, b.height);
         ctx.shadowBlur = 0;
         return b.y > -50;
@@ -387,8 +391,8 @@ export default function WordShooter({ onExit }) {
         sw.radius += sw.maxRadius / sw.maxLife; sw.life--;
         for(let i=0; i<3; i++) {
           ctx.beginPath(); ctx.arc(sw.x, sw.y, Math.max(0, sw.radius - i * 50), 0, Math.PI * 2);
-          ctx.strokeStyle = `rgba(245, 158, 11, ${sw.life / sw.maxLife * 0.8})`; ctx.lineWidth = Math.max(1, 8 - i * 2);
-          ctx.shadowBlur = 30; ctx.shadowColor = '#f59e0b'; ctx.stroke();
+          ctx.strokeStyle = `rgba(139, 92, 246, ${sw.life / sw.maxLife * 0.8})`; ctx.lineWidth = Math.max(1, 8 - i * 2);
+          ctx.shadowBlur = 30; ctx.shadowColor = '#8b5cf6'; ctx.stroke();
         }
         ctx.shadowBlur = 0;
         if (sw.life <= 0) state.shockwave = null;
@@ -400,26 +404,23 @@ export default function WordShooter({ onExit }) {
       ctx.fillText(`WORDS: ${state.wordsCompleted}/${state.totalWords}`, 30, 120);
       ctx.textAlign = 'right'; ctx.fillStyle = '#ef4444'; ctx.font = '32px Inter';
       for(let i=0; i<state.playerHealth; i++) ctx.fillText('❤️', w - 30 - i * 45, 45);
-      ctx.fillStyle = '#f59e0b'; ctx.font = 'bold 24px Inter'; ctx.fillText(`💣 x${state.bombs}`, w - 30, 90);
+      ctx.fillStyle = '#8b5cf6'; ctx.font = 'bold 24px Inter'; ctx.fillText(`💣 x${state.bombs}`, w - 30, 90);
       ctx.shadowBlur = 0;
       
       ctx.restore();
       
       if (state.gameOver) {
         ctx.fillStyle = 'rgba(0,0,0,0.9)'; ctx.fillRect(0, 0, w, h);
-        ctx.fillStyle = '#ef4444'; ctx.font = 'bold 60px Inter'; ctx.textAlign = 'center'; ctx.shadowBlur = 30; ctx.shadowColor = '#ef4444';
+        ctx.fillStyle = '#8b5cf6'; ctx.font = 'bold 60px Inter'; ctx.textAlign = 'center'; ctx.shadowBlur = 30; ctx.shadowColor = '#8b5cf6';
         ctx.fillText('MISSION COMPLETE', w/2, h/2 - 80);
-        ctx.fillStyle = '#3b82f6'; ctx.font = 'bold 36px Inter'; ctx.shadowColor = '#3b82f6';
+        ctx.fillStyle = '#22c55e'; ctx.font = 'bold 36px Inter'; ctx.shadowColor = '#22c55e';
         ctx.fillText(`Final Score: ${state.score}`, w/2, h/2);
         ctx.fillText(`Words Mastered: ${state.wordsCompleted}/${state.totalWords}`, w/2, h/2 + 50);
         ctx.fillText(`Max Combo: x${state.maxCombo}`, w/2, h/2 + 100);
         ctx.fillStyle = '#9ca3af'; ctx.font = '24px Inter'; ctx.shadowBlur = 0;
         ctx.fillText('Click anywhere to continue', w/2, h/2 + 180);
         
-        // Listen for click to go back to levels
-        canvas.onclick = () => {
-          handleLevelComplete(state.score);
-        };
+        canvas.onclick = () => handleLevelComplete(state.score);
         return;
       }
       
@@ -445,11 +446,11 @@ export default function WordShooter({ onExit }) {
 
   if (screen === 'loading') {
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-black z-[9999]">
+      <div className="fixed inset-0 flex items-center justify-center bg-[#0f0f23] z-[9999]">
         <div className="text-center">
-          <Loader2 className="w-20 h-20 animate-spin mx-auto mb-6 text-blue-500" />
-          <h2 className="text-3xl font-bold mb-2 text-white">Generating Word Cloud...</h2>
-          <p className="text-lg text-gray-400">AI is creating your learning dataset</p>
+          <Loader2 className="w-20 h-20 animate-spin mx-auto mb-6 text-purple-500" />
+          <h2 className="text-3xl font-bold mb-2 text-white">Generating Learning Data...</h2>
+          <p className="text-lg text-gray-400">AI is creating your vocabulary mission</p>
         </div>
       </div>
     );
@@ -457,13 +458,13 @@ export default function WordShooter({ onExit }) {
 
   if (screen === 'game') {
     return (
-      <div className="fixed inset-0 bg-black z-[9999]">
+      <div className="fixed inset-0 bg-[#0f0f23] z-[9999]">
         <canvas ref={canvasRef} className="block w-full h-full" />
         <div className="absolute top-5 right-5 flex gap-2">
-          <Button onClick={toggleFullscreen} className="bg-blue-600 hover:bg-blue-700" size="sm">
+          <Button onClick={toggleFullscreen} className="bg-purple-600 hover:bg-purple-700" size="sm">
             {fullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
           </Button>
-          <Button onClick={() => setScreen('levels')} className="bg-purple-600 hover:bg-purple-700" size="sm">
+          <Button onClick={() => setScreen('levels')} className="bg-gray-600 hover:bg-gray-700" size="sm">
             <X className="w-4 h-4 mr-1" /> Back
           </Button>
         </div>
@@ -474,10 +475,9 @@ export default function WordShooter({ onExit }) {
     );
   }
 
-  // Levels screen
   if (screen === 'levels') {
     return (
-      <div className="fixed inset-0 bg-[#090b16] z-[9999] overflow-auto p-8">
+      <div className="fixed inset-0 bg-[#0f0f23] z-[9999] overflow-auto p-8">
         <Button onClick={() => setScreen('title')} className="absolute top-4 left-4 bg-gray-700 hover:bg-gray-600">
           ← Back to Topics
         </Button>
@@ -490,8 +490,8 @@ export default function WordShooter({ onExit }) {
             <h1 className="text-4xl font-black text-white mb-2">{currentTopic}</h1>
             <p className="text-xl text-gray-400">Choose a level to play</p>
             <div className="mt-4 flex justify-center gap-6">
-              <div className="bg-blue-600/20 px-4 py-2 rounded-lg">
-                <span className="text-blue-400 font-bold">Total Score: {totalScore}</span>
+              <div className="bg-purple-600/20 px-4 py-2 rounded-lg">
+                <span className="text-purple-400 font-bold">Total Score: {totalScore}</span>
               </div>
               <div className="bg-green-600/20 px-4 py-2 rounded-lg">
                 <span className="text-green-400 font-bold">Completed: {completedLevels.length}/{subLevels.length}</span>
@@ -510,7 +510,7 @@ export default function WordShooter({ onExit }) {
               };
               
               return (
-                <Card key={level.id} className={`p-6 bg-[#18181b] border-2 ${isCompleted ? 'border-green-500' : isLocked ? 'border-gray-700 opacity-50' : 'border-blue-500'}`}>
+                <Card key={level.id} className={`p-6 bg-[#1a1a2e] border-2 ${isCompleted ? 'border-green-500' : isLocked ? 'border-gray-700 opacity-50' : 'border-purple-500'}`}>
                   <div className="flex items-center justify-between mb-4">
                     <span className={`px-3 py-1 rounded-full text-xs font-bold bg-gradient-to-r ${difficultyColors[level.difficulty] || 'from-gray-500 to-gray-600'} text-white`}>
                       {level.difficulty}
@@ -523,7 +523,7 @@ export default function WordShooter({ onExit }) {
                   <Button 
                     onClick={() => !isLocked && handlePlayLevel(level)} 
                     disabled={isLocked}
-                    className={`w-full ${isLocked ? 'bg-gray-700' : isCompleted ? 'bg-green-600 hover:bg-green-700' : 'bg-gradient-to-r from-blue-500 to-purple-500'}`}
+                    className={`w-full ${isLocked ? 'bg-gray-700' : isCompleted ? 'bg-green-600 hover:bg-green-700' : 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700'}`}
                   >
                     {isLocked ? 'Locked' : isCompleted ? 'Play Again' : 'Start Level'}
                   </Button>
@@ -536,74 +536,82 @@ export default function WordShooter({ onExit }) {
     );
   }
 
+  // Title screen
   return (
-    <div className="fixed inset-0 bg-[#090b16] z-[9999] overflow-auto p-8">
+    <div className="fixed inset-0 bg-[#0f0f23] z-[9999] overflow-auto p-8">
       <Button onClick={onExit} className="absolute top-4 right-4 bg-red-600 hover:bg-red-700">
-        <X className="w-4 h-4 mr-2" /> Close
+        <X className="w-4 h-4" />
       </Button>
       
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-10">
           <div className="text-6xl mb-6">🚀</div>
-          <h1 className="text-5xl font-black text-white mb-4" style={{ textShadow: '0 0 40px rgba(59, 130, 246, 0.5)' }}>WORD SHOOTER</h1>
+          <h1 className="text-5xl font-black text-white mb-4" style={{ textShadow: '0 0 40px rgba(139, 92, 246, 0.5)' }}>WORD SHOOTER</h1>
           <p className="text-xl text-gray-400">Gamified Vocabulary Learning</p>
         </div>
 
-        <Card className="p-6 mb-8 bg-[#18181b] border-blue-500 border-2">
+        <Card className="p-6 mb-8 bg-[#1a1a2e] border-purple-500/50 border-2">
           <div className="flex gap-4">
             <div className="flex-1 relative">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
               <Input placeholder="Search decks or enter custom topic..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
                 onKeyPress={(e) => { if (e.key === 'Enter' && searchQuery.trim()) handleStartGame('custom'); }}
-                className="pl-12 h-14 text-lg bg-black border-gray-700 text-white" />
+                className="pl-12 h-14 text-lg bg-[#0f0f23] border-gray-700 text-white placeholder:text-gray-500" />
             </div>
             <Button onClick={() => searchQuery.trim() && handleStartGame('custom')} disabled={!searchQuery.trim() || loading}
-              className="h-14 px-8 text-lg font-bold bg-gradient-to-r from-green-500 to-green-600">
+              className="h-14 px-8 text-lg font-bold bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700">
               <Play className="w-5 h-5 mr-2" /> Start Game
             </Button>
           </div>
         </Card>
 
-        <Card className="p-6 mb-8 bg-[#18181b] border-gray-700">
+        <Card className="p-6 mb-8 bg-[#1a1a2e] border-gray-700/50">
           <div className="flex gap-2 mb-6 flex-wrap">
-            {['trending', 'education', 'planet', 'enhance'].map(tab => (
-              <Button key={tab} onClick={() => setActiveTab(tab)}
-                className={`px-5 py-2 ${activeTab === tab ? 'bg-gradient-to-r from-blue-500 to-purple-500' : 'bg-gray-700'} text-white`}>
-                {tab.charAt(0).toUpperCase() + tab.slice(1)}
+            {TABS.map(tab => (
+              <Button key={tab.id} onClick={() => setActiveTab(tab.id)}
+                className={`px-5 py-2 ${activeTab === tab.id ? `bg-gradient-to-r ${tab.color}` : 'bg-gray-700 hover:bg-gray-600'} text-white`}>
+                {tab.label}
               </Button>
             ))}
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
-            {activeTab === 'trending' && loadingTrending && (
-              <div className="col-span-3 text-center py-12"><Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-blue-500" /><p className="text-gray-500">Loading trending topics...</p></div>
-            )}
-            {activeTab === 'trending' && !loadingTrending && filteredDecks(trendingTopics).map(deck => (
-              <Button key={deck.id} onClick={() => handleStartGame(deck)} className="h-24 text-left justify-start p-6 bg-gradient-to-r from-purple-600 to-purple-700 text-white">
-                <div><div className="text-xl mb-1">{deck.label}</div><div className="text-xs opacity-80">{deck.topic?.slice(0, 40)}...</div></div>
-              </Button>
-            ))}
-            {activeTab !== 'trending' && filteredDecks(PRESET_DECKS[activeTab] || []).map(deck => (
-                <Button key={deck.id} onClick={() => handleStartGame(deck)} className={`h-24 text-left justify-start p-6 text-white bg-gradient-to-r ${activeTab === 'education' ? 'from-blue-500 to-blue-600' : activeTab === 'planet' ? 'from-green-500 to-green-600' : 'from-purple-500 to-purple-600'}`}>
-                    <div><div className="text-xl mb-1">{deck.label}</div><div className="text-xs opacity-80">{deck.topic?.slice(0, 40)}...</div></div>
-                </Button>
-            ))}
-          </div>
+          {loadingTopics ? (
+            <div className="text-center py-12">
+              <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-purple-500" />
+              <p className="text-gray-500">Generating topics with AI...</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {filteredTopics(generatedTopics[activeTab] || []).map((topic, i) => {
+                const tabInfo = TABS.find(t => t.id === activeTab);
+                return (
+                  <Button key={topic.id || i} onClick={() => handleStartGame(topic)} 
+                    className={`h-28 text-left justify-start p-5 bg-gradient-to-r ${tabInfo?.color || 'from-purple-600 to-purple-700'} hover:opacity-90 text-white`}>
+                    <div className="w-full">
+                      <div className="text-lg font-bold mb-1 line-clamp-1">{topic.label}</div>
+                      <div className="text-xs opacity-80 line-clamp-2">{topic.description}</div>
+                    </div>
+                  </Button>
+                );
+              })}
+            </div>
+          )}
         </Card>
 
         <div className="grid grid-cols-3 gap-6">
-          {[{ icon: Layers, title: '3-Stage Chains', desc: 'Shoot word → related terms spawn → collect definition', color: 'from-blue-500 to-blue-600' },
+          {[
+            { icon: Layers, title: '3-Stage Chains', desc: 'Shoot word → related terms spawn → collect definition', color: 'from-blue-500 to-blue-600' },
             { icon: Zap, title: 'Combo System', desc: 'Chain reactions multiply your score exponentially', color: 'from-purple-500 to-purple-600' },
             { icon: Book, title: 'Learn & Master', desc: 'Every explosion teaches you something new', color: 'from-green-500 to-green-600' }
           ].map((item, i) => (
-            <Card key={i} className="p-6 text-center bg-[#18181b] border-gray-700">
+            <Card key={i} className="p-6 text-center bg-[#1a1a2e] border-gray-700/50">
               <div className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center bg-gradient-to-r ${item.color}`}>
                 <item.icon className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-lg font-bold mb-2 text-white">{item.title}</h3>
               <p className="text-sm text-gray-400">{item.desc}</p>
             </Card>
-          )) }
+          ))}
         </div>
       </div>
     </div>
