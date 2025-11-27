@@ -358,42 +358,51 @@ Use short sentences for better pacing. Do NOT use any markdown formatting.`,
     };
 
     return (
-        <div className="min-h-screen bg-[#121318] text-white pb-24">
-            {/* Fixed Header with Search */}
-            <div className="sticky top-0 z-40 bg-[#121318]/95 backdrop-blur-sm px-4 md:px-6 py-4">
+        <div className="min-h-screen bg-gray-50 pb-8">
+            {/* Header */}
+            <div className="bg-white border-b border-gray-200 px-4 md:px-6 py-4 mb-6">
                 <div className="max-w-7xl mx-auto flex items-center gap-4">
                     <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center">
-                            <Radio className="w-4 h-4 text-white" />
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
+                            <Radio className="w-5 h-5 text-white" />
                         </div>
-                        <span className="text-white font-bold text-lg hidden md:block">wirey</span>
+                        <div>
+                            <span className="text-gray-900 font-bold text-lg">SearchPods</span>
+                            <p className="text-xs text-gray-500">AI-Generated Audio</p>
+                        </div>
                     </div>
-                    <form onSubmit={handleSearch} className="flex-1 max-w-2xl mx-auto relative">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
-                        <Input
+                    <form onSubmit={handleSearch} className="flex-1 max-w-xl mx-auto relative">
+                        <input
+                            type="text"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             placeholder="Search any topic..."
-                            className="w-full pl-12 pr-12 py-3 bg-white/5 border-white/10 text-white placeholder:text-white/40 rounded-full focus:border-emerald-500"
+                            className="w-full h-12 pl-5 pr-14 rounded-full border border-gray-200 bg-gray-50 focus:bg-white focus:border-purple-300 focus:ring-2 focus:ring-purple-100 outline-none transition-all text-gray-700 placeholder:text-gray-400"
                         />
-                        <button type="button" className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 hover:text-white">
-                            <Mic className="w-5 h-5" />
+                        <button 
+                            type="submit"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-purple-600 hover:bg-purple-700 flex items-center justify-center transition-colors"
+                        >
+                            <Search className="w-4 h-4 text-white" />
                         </button>
                     </form>
+                    <button type="button" className="text-gray-400 hover:text-purple-600 p-2">
+                        <Mic className="w-5 h-5" />
+                    </button>
                 </div>
             </div>
 
-            <main className="max-w-7xl mx-auto px-4 md:px-6 py-8 space-y-8">
+            <main className="max-w-7xl mx-auto px-4 md:px-6 space-y-8">
 
                 {/* Trending Section */}
-                <div className="bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 rounded-2xl border border-emerald-500/20 p-6">
+                <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl border border-purple-100 p-6">
                     <div className="flex items-center gap-3 mb-6">
-                        <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
-                            <TrendingUp className="w-5 h-5 text-emerald-400" />
+                        <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
+                            <TrendingUp className="w-5 h-5 text-purple-600" />
                         </div>
                         <div>
-                            <h3 className="text-white font-bold text-lg">Trending Now</h3>
-                            <p className="text-white/50 text-sm">What others are listening to</p>
+                            <h3 className="text-gray-900 font-bold text-lg">Trending Now</h3>
+                            <p className="text-gray-500 text-sm">What others are listening to</p>
                         </div>
                     </div>
                     
@@ -402,9 +411,9 @@ Use short sentences for better pacing. Do NOT use any markdown formatting.`,
                             <div
                                 key={i}
                                 onClick={() => playEpisode(item)}
-                                className="relative flex items-center gap-3 p-4 rounded-xl cursor-pointer bg-white/5 hover:bg-white/10 border border-transparent group transition-all"
+                                className="relative flex items-center gap-3 p-4 rounded-xl cursor-pointer bg-white hover:bg-purple-50 border border-gray-100 hover:border-purple-200 group transition-all shadow-sm"
                             >
-                                <div className={`absolute -top-2 -left-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${i < 3 ? 'bg-emerald-500 text-white' : 'bg-white/10 text-white/70'}`}>
+                                <div className={`absolute -top-2 -left-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${i < 3 ? 'bg-purple-600 text-white' : 'bg-gray-200 text-gray-600'}`}>
                                     {i + 1}
                                 </div>
                                 <div className="relative w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
@@ -414,14 +423,14 @@ Use short sentences for better pacing. Do NOT use any markdown formatting.`,
                                     </div>
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <h4 className="text-white text-sm font-medium truncate">{item.title}</h4>
-                                    <p className="text-white/50 text-xs capitalize">{item.category}</p>
-                                    <div className="flex items-center gap-2 mt-1 text-emerald-400/70 text-xs">
+                                    <h4 className="text-gray-900 text-sm font-medium truncate">{item.title}</h4>
+                                    <p className="text-gray-500 text-xs capitalize">{item.category}</p>
+                                    <div className="flex items-center gap-2 mt-1 text-purple-600 text-xs">
                                         <Users className="w-3 h-3" />
                                         {item.plays.toLocaleString()} plays
                                     </div>
                                 </div>
-                                <AnimatedBars isPlaying={true} color="#10B981" />
+                                <AnimatedBars isPlaying={true} color="#7c3aed" />
                             </div>
                         ))}
                     </div>
@@ -429,12 +438,12 @@ Use short sentences for better pacing. Do NOT use any markdown formatting.`,
 
                 {/* Quick Generate */}
                 <div className="flex items-center gap-3 flex-wrap">
-                    <span className="text-white/50 text-sm">Quick Generate:</span>
+                    <span className="text-gray-500 text-sm">Quick Generate:</span>
                     {QUICK_TOPICS.map((topic) => (
                         <button
                             key={topic}
                             onClick={() => playEpisode({ title: topic, category: 'Quick' })}
-                            className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 hover:bg-emerald-500/20 text-white/70 hover:text-emerald-400 border border-white/10 hover:border-emerald-500/30 transition-all text-sm"
+                            className="flex items-center gap-2 px-4 py-2 rounded-full bg-white hover:bg-purple-50 text-gray-700 hover:text-purple-600 border border-gray-200 hover:border-purple-300 transition-all text-sm shadow-sm"
                         >
                             <Sparkles className="w-4 h-4" />
                             {topic}
@@ -445,10 +454,10 @@ Use short sentences for better pacing. Do NOT use any markdown formatting.`,
                 {/* Categories Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {CATEGORIES.map((cat) => (
-                        <div key={cat.id} className="rounded-2xl border border-white/10 overflow-hidden bg-white/5">
+                        <div key={cat.id} className="rounded-2xl border border-gray-200 overflow-hidden bg-white shadow-sm">
                             {/* Category Header */}
                             <div
-                                className="p-4 flex items-center justify-between cursor-pointer hover:bg-white/5"
+                                className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50"
                                 onClick={() => loadCategory(cat.id)}
                                 style={{ borderLeft: `4px solid ${cat.color}` }}
                             >
@@ -460,11 +469,11 @@ Use short sentences for better pacing. Do NOT use any markdown formatting.`,
                                         <Radio className="w-6 h-6" style={{ color: cat.color }} />
                                     </div>
                                     <div>
-                                        <h3 className="text-white font-bold">{cat.name}</h3>
-                                        <p className="text-white/50 text-sm">{cat.episodes} episodes</p>
+                                        <h3 className="text-gray-900 font-bold">{cat.name}</h3>
+                                        <p className="text-gray-500 text-sm">{cat.episodes} episodes</p>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-2 text-white/50 hover:text-emerald-400">
+                                <div className="flex items-center gap-2 text-gray-500 hover:text-purple-600">
                                     {loadingCategory === cat.id ? (
                                         <Loader2 className="w-5 h-5 animate-spin" />
                                     ) : (
@@ -482,17 +491,17 @@ Use short sentences for better pacing. Do NOT use any markdown formatting.`,
                                     {/* Subtopic Filters */}
                                     {categoryData[cat.id].subtopics?.length > 0 && (
                                         <div className="flex flex-wrap gap-2 py-2">
-                                            <span className="px-3 py-1 rounded-full text-xs bg-emerald-500/20 text-emerald-400">All</span>
+                                            <span className="px-3 py-1 rounded-full text-xs bg-purple-100 text-purple-600">All</span>
                                             {categoryData[cat.id].subtopics.slice(0, 3).map((sub, i) => (
                                                 <button
                                                     key={i}
                                                     onClick={(e) => { e.stopPropagation(); playEpisode({ title: sub, category: cat.name }); }}
-                                                    className="px-3 py-1 rounded-full text-xs bg-white/10 text-white/60 hover:bg-emerald-500/20 hover:text-emerald-400 transition-all"
+                                                    className="px-3 py-1 rounded-full text-xs bg-gray-100 text-gray-600 hover:bg-purple-100 hover:text-purple-600 transition-all"
                                                 >
                                                     {sub}
                                                 </button>
                                             ))}
-                                            <button className="px-3 py-1 rounded-full text-xs bg-white/10 text-white/60 hover:text-white flex items-center gap-1">
+                                            <button className="px-3 py-1 rounded-full text-xs bg-gray-100 text-gray-600 hover:text-gray-900 flex items-center gap-1">
                                                 <Plus className="w-3 h-3" /> Subtopics
                                             </button>
                                         </div>
@@ -503,27 +512,19 @@ Use short sentences for better pacing. Do NOT use any markdown formatting.`,
                                         <div
                                             key={i}
                                             onClick={() => playEpisode({ ...ep, category: cat.name })}
-                                            className="flex items-center gap-3 p-3 rounded-xl bg-white/5 hover:bg-emerald-500/10 cursor-pointer group transition-all"
+                                            className="flex items-center gap-3 p-3 rounded-xl bg-gray-50 hover:bg-purple-50 cursor-pointer group transition-all"
                                         >
-                                            <div className="w-10 h-10 rounded-lg bg-white/10 overflow-hidden flex items-center justify-center flex-shrink-0">
-                                                <img 
-                                                    src={`https://images.unsplash.com/photo-${1500000000000 + i * 1000}?w=80&h=80&fit=crop`}
-                                                    alt=""
-                                                    className="w-full h-full object-cover"
-                                                    onError={(e) => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
-                                                />
-                                                <div className="hidden w-full h-full items-center justify-center" style={{ display: 'flex' }}>
-                                                    <Radio className="w-4 h-4 text-white/50 group-hover:hidden" />
-                                                    <Play className="w-4 h-4 text-emerald-400 hidden group-hover:block" fill="currentColor" />
-                                                </div>
+                                            <div className="w-10 h-10 rounded-lg bg-gray-200 overflow-hidden flex items-center justify-center flex-shrink-0">
+                                                <Radio className="w-4 h-4 text-gray-400 group-hover:hidden" />
+                                                <Play className="w-4 h-4 text-purple-600 hidden group-hover:block" fill="currentColor" />
                                             </div>
                                             <div className="flex-1 min-w-0">
-                                                <h4 className="text-white text-sm font-medium truncate">{ep.title}</h4>
+                                                <h4 className="text-gray-900 text-sm font-medium truncate">{ep.title}</h4>
                                                 {ep.description && (
-                                                    <p className="text-white/50 text-xs truncate">{ep.description}</p>
+                                                    <p className="text-gray-500 text-xs truncate">{ep.description}</p>
                                                 )}
                                             </div>
-                                            <span className="text-white/30 text-xs flex items-center gap-1">
+                                            <span className="text-gray-400 text-xs flex items-center gap-1">
                                                 <Clock className="w-3 h-3" /> 2m
                                             </span>
                                         </div>
@@ -532,7 +533,7 @@ Use short sentences for better pacing. Do NOT use any markdown formatting.`,
                                     {/* Generate More */}
                                     <button
                                         onClick={() => playEpisode({ title: `Latest in ${cat.name}`, category: cat.name })}
-                                        className="w-full py-3 rounded-xl border border-dashed border-white/20 text-white/50 hover:border-emerald-500/50 hover:text-emerald-400 flex items-center justify-center gap-2 text-sm transition-all"
+                                        className="w-full py-3 rounded-xl border border-dashed border-gray-300 text-gray-500 hover:border-purple-300 hover:text-purple-600 flex items-center justify-center gap-2 text-sm transition-all"
                                     >
                                         <Sparkles className="w-4 h-4" />
                                         Generate New Episode
@@ -544,27 +545,9 @@ Use short sentences for better pacing. Do NOT use any markdown formatting.`,
                 </div>
             </main>
 
-            {/* Bottom Navigation */}
-            <div className="fixed bottom-0 left-0 right-0 bg-[#1a1b21] border-t border-white/10 z-50">
-                <div className="max-w-md mx-auto flex items-center justify-around py-3">
-                    <button className="flex flex-col items-center gap-1 text-emerald-400">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
-                        <span className="text-xs">Home</span>
-                    </button>
-                    <button className="flex flex-col items-center gap-1 text-white/50 hover:text-white">
-                        <Search className="w-5 h-5" />
-                        <span className="text-xs">Explore</span>
-                    </button>
-                    <button className="flex flex-col items-center gap-1 text-white/50 hover:text-white">
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
-                        <span className="text-xs">Library</span>
-                    </button>
-                </div>
-            </div>
-
             {/* Player Modal */}
             <Dialog open={showPlayer} onOpenChange={closePlayer}>
-                <DialogContent className="max-w-lg p-0 bg-[#1a1b21] border-white/10 overflow-hidden">
+                <DialogContent className="max-w-lg p-0 bg-white border-gray-200 overflow-hidden">
                     <div className="p-6">
                         {/* Header */}
                         <div className="flex justify-between items-center mb-6">

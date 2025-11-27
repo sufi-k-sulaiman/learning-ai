@@ -223,47 +223,24 @@ export default function MindMapPage() {
                         <h1 className="text-xl font-bold text-gray-900">Neural Topic Network</h1>
                     </div>
 
-                    <div className="flex items-center gap-3 flex-wrap">
-                        {/* Search */}
-                        <div className="flex gap-2">
-                            <div className="relative">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                                <Input
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    placeholder="AI-Powered search..."
-                                    className="pl-9 w-64 bg-white"
-                                    onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(searchTerm); }}
-                                />
-                            </div>
-                            <Button
-                                onClick={() => handleSearch(searchTerm)}
-                                disabled={loading || !searchTerm.trim()}
-                                className="bg-purple-600 hover:bg-purple-700"
-                            >
-                                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-                            </Button>
-                        </div>
-
-                        {/* Fullscreen toggle */}
-                        <Button
-                            variant="outline"
-                            onClick={toggleFullscreen}
-                            className="gap-2"
-                        >
-                            {isFullscreen ? (
-                                <>
-                                    <Minimize2 className="w-4 h-4" />
-                                    Exit Fullscreen
-                                </>
-                            ) : (
-                                <>
-                                    <Maximize2 className="w-4 h-4" />
-                                    Fullscreen
-                                </>
-                            )}
-                        </Button>
-                    </div>
+                    {/* Fullscreen toggle */}
+                    <Button
+                        variant="outline"
+                        onClick={toggleFullscreen}
+                        className="gap-2"
+                    >
+                        {isFullscreen ? (
+                            <>
+                                <Minimize2 className="w-4 h-4" />
+                                Exit Fullscreen
+                            </>
+                        ) : (
+                            <>
+                                <Maximize2 className="w-4 h-4" />
+                                Fullscreen
+                            </>
+                        )}
+                    </Button>
                 </div>
 
                 {/* Mind Map Content */}
@@ -277,6 +254,27 @@ export default function MindMapPage() {
                             <p className="text-gray-500 max-w-md text-center mb-6">
                                 Search for any topic to generate an interactive knowledge tree. Click Explore to dive deeper or Learn for detailed insights.
                             </p>
+                            {/* Search Bar */}
+                            <div className="max-w-xl mx-auto mb-6">
+                                <div className="relative">
+                                    <input
+                                        type="text"
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(searchTerm); }}
+                                        placeholder="Search any topic to explore..."
+                                        className="w-full h-12 pl-5 pr-14 rounded-full border border-gray-200 bg-white focus:border-purple-300 focus:ring-2 focus:ring-purple-100 outline-none transition-all text-gray-700 placeholder:text-gray-400"
+                                    />
+                                    <button
+                                        onClick={() => handleSearch(searchTerm)}
+                                        disabled={loading || !searchTerm.trim()}
+                                        className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-purple-600 hover:bg-purple-700 disabled:opacity-50 flex items-center justify-center transition-colors"
+                                    >
+                                        {loading ? <Loader2 className="w-4 h-4 text-white animate-spin" /> : <Search className="w-4 h-4 text-white" />}
+                                    </button>
+                                </div>
+                            </div>
+                            
                             <div className="flex flex-wrap justify-center gap-2">
                                 {['Technology', 'Science', 'History', 'Business', 'Art'].map(topic => (
                                     <Button

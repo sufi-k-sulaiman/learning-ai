@@ -25,7 +25,8 @@ export default function PageLayout({ children, activePage }) {
             <Header 
                 title={activePage} 
                 sidebarOpen={sidebarOpen} 
-                setSidebarOpen={setSidebarOpen} 
+                setSidebarOpen={setSidebarOpen}
+                currentPage={activePage}
             />
             
             <div className="flex flex-1 overflow-hidden">

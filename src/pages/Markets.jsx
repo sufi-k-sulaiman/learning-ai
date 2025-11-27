@@ -866,11 +866,22 @@ export default function Markets() {
             <div className="mb-4"><StockTicker stocks={topMovers} /></div>
 
             <div className="flex flex-wrap items-center gap-4 mb-6">
-                <div className="relative flex-1 max-w-md">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <Input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search stocks..." className="pl-12 h-12 rounded-full" />
+                <div className="relative flex-1 max-w-xl">
+                    <input 
+                        type="text"
+                        value={searchQuery} 
+                        onChange={(e) => setSearchQuery(e.target.value)} 
+                        placeholder="Search stocks by ticker, name, or sector..." 
+                        className="w-full h-12 pl-5 pr-14 rounded-full border border-gray-200 bg-gray-50 focus:bg-white focus:border-purple-300 focus:ring-2 focus:ring-purple-100 outline-none transition-all text-gray-700 placeholder:text-gray-400"
+                    />
+                    <button
+                        type="button"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-purple-600 hover:bg-purple-700 flex items-center justify-center transition-colors"
+                    >
+                        <Search className="w-4 h-4 text-white" />
+                    </button>
                 </div>
-                <Button onClick={refreshStocks} variant="outline" size="sm" className="gap-2"><RefreshCw className="w-4 h-4" /> Refresh</Button>
+                <Button onClick={refreshStocks} variant="outline" size="sm" className="gap-2 h-10"><RefreshCw className="w-4 h-4" /> Refresh</Button>
                 <span className="text-sm text-gray-500">{stocks.length} stocks</span>
             </div>
 
