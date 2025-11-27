@@ -1180,21 +1180,21 @@ export default function SpaceBattleGame({ onExit }) {
 
     // Menu screen - light theme matching WordShooter
     return (
-        <div className="fixed inset-0 bg-gray-50 z-[9999] overflow-auto p-8">
-            <Button onClick={onExit} variant="ghost" className="absolute top-4 right-4 text-gray-500 hover:text-red-500 hover:bg-red-50">
+        <div className="fixed inset-0 bg-gray-50 z-[9999] overflow-auto p-4">
+            <Button onClick={onExit} variant="ghost" className="absolute top-2 right-2 text-gray-500 hover:text-red-500 hover:bg-red-50">
                 <X className="w-5 h-5" />
             </Button>
 
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-6xl mx-auto">
                 {/* Header */}
-                <div className="text-center mb-8">
-                    <img src={LOGO_URL} alt="1cPublishing" className="w-16 h-16 mx-auto mb-3 rounded-xl" />
-                    <h1 className="text-4xl font-black text-gray-900 mb-2">SPACE BATTLE</h1>
-                    <p className="text-gray-500">FPS Combat Learning Game</p>
+                <div className="text-center mb-4">
+                    <img src={LOGO_URL} alt="1cPublishing" className="w-12 h-12 mx-auto mb-2 rounded-xl" />
+                    <h1 className="text-3xl font-black text-gray-900 mb-1">SPACE BATTLE</h1>
+                    <p className="text-gray-500 text-sm">FPS Combat Learning Game</p>
                 </div>
 
                 {/* Search bar */}
-                <div className="bg-white rounded-2xl border border-purple-200 p-4 mb-6 shadow-sm">
+                <div className="bg-white rounded-xl border border-purple-200 p-3 mb-4 shadow-sm">
                     <div className="flex gap-3">
                         <div className="relative flex-1">
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -1211,9 +1211,9 @@ export default function SpaceBattleGame({ onExit }) {
                 </div>
 
                 {/* Categories and Topics */}
-                <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-6 shadow-sm">
+                <div className="bg-white rounded-xl border border-gray-200 p-4 mb-4 shadow-sm">
                     {/* Category tabs */}
-                    <div className="flex flex-wrap gap-2 mb-6">
+                    <div className="flex flex-wrap gap-2 mb-4">
                         {TABS.map(tab => (
                             <Button key={tab.id} onClick={() => setActiveCategory(tab.id)}
                                 className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
@@ -1251,18 +1251,18 @@ export default function SpaceBattleGame({ onExit }) {
                 </div>
 
                 {/* Feature cards */}
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-3 gap-3">
                     {[
                         { icon: Crosshair, title: 'FPS Combat', desc: 'First-person perspective with parallax depth', bgColor: 'bg-blue-100', iconColor: 'text-blue-600' },
                         { icon: Sparkles, title: 'Knowledge Quiz', desc: 'Answer questions after battle', bgColor: 'bg-purple-100', iconColor: 'text-purple-600' },
                         { icon: Trophy, title: 'Earn Awards', desc: 'Collect medals and achievements', bgColor: 'bg-emerald-100', iconColor: 'text-emerald-600' }
                     ].map((item, i) => (
-                        <div key={i} className="bg-white border border-gray-200 rounded-xl p-5 text-center shadow-sm">
-                            <div className={`w-12 h-12 ${item.bgColor} rounded-xl mx-auto mb-3 flex items-center justify-center`}>
-                                <item.icon className={`w-6 h-6 ${item.iconColor}`} />
+                        <div key={i} className="bg-white border border-gray-200 rounded-lg p-3 text-center shadow-sm">
+                            <div className={`w-10 h-10 ${item.bgColor} rounded-lg mx-auto mb-2 flex items-center justify-center`}>
+                                <item.icon className={`w-5 h-5 ${item.iconColor}`} />
                             </div>
-                            <h3 className="text-gray-900 font-semibold mb-1">{item.title}</h3>
-                            <p className="text-gray-500 text-sm">{item.desc}</p>
+                            <h3 className="text-gray-900 font-semibold text-sm mb-1">{item.title}</h3>
+                            <p className="text-gray-500 text-xs">{item.desc}</p>
                         </div>
                     ))}
                 </div>
