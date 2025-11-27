@@ -4,7 +4,7 @@ import { createPageUrl } from '@/utils';
 import { Menu, ChevronLeft } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import GlobalSearchBar from './GlobalSearchBar';
-import { LOGO_URL, menuItems, footerLinks } from './NavigationConfig.js';
+import { LOGO_URL, menuItems, footerLinks } from './NavigationConfig';
 
 export default function PageLayout({ children, activePage, onSearch, searchPlaceholder = "Search anything...", showSearch = true }) {
     const [sidebarOpen, setSidebarOpen] = useState(false);
