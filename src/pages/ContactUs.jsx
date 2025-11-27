@@ -158,7 +158,7 @@ export default function ContactUs() {
                 <div className="bg-white rounded-2xl border border-gray-200 p-8 mb-8 text-center">
                     <p className="text-lg text-gray-700 leading-relaxed max-w-3xl mx-auto">
                         At <strong>1cPublishing</strong>, we are dedicated to providing exceptional customer support. 
-                        Whether you need help troubleshooting, reporting an issue, or sharing feedback, our team is here to help you.
+                        Whether you need help troubleshooting, reporting an issue, or sharing feedback, our team is here to help.
                     </p>
                 </div>
 
@@ -187,7 +187,7 @@ export default function ContactUs() {
                     <ContactCard
                       icon={Headphones}
                       title="Contact Support"
-                      description="If you need assistance using the 1cPublishing application or the Portal, our support team is ready to help."
+                      description="If you need assistance using the 1cPublishing application or the Portal, our support team is ready to help you."
                       email="help@1cPublishing.com"
                       buttonText="Contact Support"
                       color="#3B82F6"
