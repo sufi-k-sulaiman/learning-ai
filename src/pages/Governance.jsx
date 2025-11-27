@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Shield, Users, Scale, FileCheck, Eye, Lock, Loader2, CheckCircle2 } from 'lucide-react';
 import { Card } from "@/components/ui/card";
 import { base44 } from '@/api/base44Client';
-import SemiCircleProgress from '../components/dashboard/SemiCircleProgress';
-import BudgetDonutCard from '../components/dashboard/BudgetDonutCard';
+import SemiCircleProgress from '@/components/dashboard/SemiCircleProgress';
+import BudgetDonutCard from '@/components/dashboard/BudgetDonutCard';
 
 export default function Governance() {
     const [bannerUrl, setBannerUrl] = useState('');
