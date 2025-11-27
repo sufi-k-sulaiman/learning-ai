@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FileText, CheckCircle2, AlertTriangle, Scale, Loader2 } from 'lucide-react';
 import { Card } from "@/components/ui/card";
 import { base44 } from '@/api/base44Client';
-import AreaChartWithMarkers from '../components/dashboard/AreaChartWithMarkers';
+import AreaChartWithMarkers from '@/components/dashboard/AreaChartWithMarkers';
 
 export default function TermsOfUse() {
     const [bannerUrl, setBannerUrl] = useState('');

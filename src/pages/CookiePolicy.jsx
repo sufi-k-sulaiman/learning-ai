@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import { Button } from "@/components/ui/button";
 import { base44 } from '@/api/base44Client';
-import StackedBarChart from '../components/dashboard/StackedBarChart';
+import StackedBarChart from '@/components/dashboard/StackedBarChart';
 
 export default function CookiePolicy() {
     const [bannerUrl, setBannerUrl] = useState('');

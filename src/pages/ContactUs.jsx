@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { base44 } from '@/api/base44Client';
-import ColoredMetricCard from '../components/dashboard/ColoredMetricCard';
+import ColoredMetricCard from '@/components/dashboard/ColoredMetricCard';
 
 export default function ContactUs() {
     const [bannerUrl, setBannerUrl] = useState('');

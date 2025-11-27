@@ -3,8 +3,8 @@ import { Users, Mail, Linkedin, Twitter, Star, Award, Briefcase, Loader2 } from 
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { base44 } from '@/api/base44Client';
-import ColoredMetricCard from '../components/dashboard/ColoredMetricCard';
-import CountryVisitorsCard from '../components/dashboard/CountryVisitorsCard';
+import ColoredMetricCard from '@/components/dashboard/ColoredMetricCard';
+import CountryVisitorsCard from '@/components/dashboard/CountryVisitorsCard';
 
 export default function Teams() {
     const [bannerUrl, setBannerUrl] = useState('');
