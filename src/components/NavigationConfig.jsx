@@ -26,4 +26,7 @@ export const NAVIGATION_ITEMS = menuItems.map(item => ({
     page: item.label,
 }));
 
-export const footerLinks = [];
+export const footerLinks = [
+    { label: 'Terms of Use', href: '/TermsOfUse' },
+    { label: 'Contact Us', href: '/ContactUs' },
+];

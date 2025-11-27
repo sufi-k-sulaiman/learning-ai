@@ -18,6 +18,7 @@ import MindMap from './pages/MindMap';
 import Qwirey from './pages/Qwirey';
 import Search from './pages/Search';
 import TermsOfUse from './pages/TermsOfUse';
+import ContactUs from './pages/ContactUs';
 import __Layout from './Layout.jsx';
 
 
@@ -42,6 +43,7 @@ export const PAGES = {
     "Qwirey": Qwirey,
     "Search": Search,
     "TermsOfUse": TermsOfUse,
+    "ContactUs": ContactUs,
 }
 
 export const pagesConfig = {
