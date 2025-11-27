@@ -81,6 +81,12 @@ function NoteCard({ note, onClick, formatDate }) {
 }
 
 export default function Notes() {
+    useEffect(() => {
+        document.title = 'Smarter Writing with AI Powered Notes';
+        document.querySelector('meta[name="description"]')?.setAttribute('content', 'Notes helps organize ideas, streamline writing, and boost productivity effectively.');
+        document.querySelector('meta[name="keywords"]')?.setAttribute('content', 'Ai notes, Notes');
+    }, []);
+
     const [selectedNote, setSelectedNote] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [showEditor, setShowEditor] = useState(false);
