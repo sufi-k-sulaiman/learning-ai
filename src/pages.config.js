@@ -16,6 +16,11 @@ import Notes from './pages/Notes';
 import Comms from './pages/Comms';
 import Games from './pages/Games';
 import Geospatial from './pages/Geospatial';
+import ContactUs from './pages/ContactUs';
+import Governance from './pages/Governance';
+import CookiePolicy from './pages/CookiePolicy';
+import TermsOfUse from './pages/TermsOfUse';
+import Teams from './pages/Teams';
 import __Layout from './Layout.jsx';
 
 
@@ -38,6 +43,11 @@ export const PAGES = {
     "Comms": Comms,
     "Games": Games,
     "Geospatial": Geospatial,
+    "ContactUs": ContactUs,
+    "Governance": Governance,
+    "CookiePolicy": CookiePolicy,
+    "TermsOfUse": TermsOfUse,
+    "Teams": Teams,
 }
 
 export const pagesConfig = {
