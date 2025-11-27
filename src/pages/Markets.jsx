@@ -1375,6 +1375,8 @@ export default function Markets() {
             {/* Ticker below header, not overlapping sidebar */}
             <div className="sticky top-[72px] z-30 bg-gray-100 border-b border-gray-200">
                 <StockTicker stocks={topMovers} />
+            </div>
+
             <div className="flex flex-1">
                 {sidebarOpen && <div className="fixed inset-0 bg-black/50 z-40 md:hidden" onClick={() => setSidebarOpen(false)} />}
 
