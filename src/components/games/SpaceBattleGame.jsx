@@ -714,7 +714,10 @@ export default function SpaceBattleGame({ onExit }) {
                     <div className="bg-[#0d1420] border border-gray-700 rounded-lg p-8 max-w-2xl">
                         <div className="flex justify-between items-center mb-4">
                             <span className="text-cyan-400 font-mono">Technical track</span>
-                            <span className="text-gray-400 font-mono">Federation</span>
+                            <div className="flex items-center gap-2">
+                                <img src={LOGO_URL} alt="1cPublishing" className="w-6 h-6 rounded" />
+                                <span className="text-gray-400 font-mono">1cPublishing</span>
+                            </div>
                         </div>
                         <h3 className="text-2xl text-white mb-8 leading-relaxed">{q?.question}</h3>
                         <div className="flex gap-4">
