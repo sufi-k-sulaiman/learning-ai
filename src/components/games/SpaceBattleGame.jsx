@@ -509,31 +509,15 @@ export default function SpaceBattleGame({ onExit }) {
             if (keys.a) state.viewAngle -= 3;
             if (keys.d) state.viewAngle += 3;
 
-            // Spawn enemies from above horizon, left and right sides
+            // Spawn enemies randomly from everywhere on screen
             state.enemySpawnTimer--;
             if (state.enemySpawnTimer <= 0) {
                 const alienType = state.alienTypes[Math.floor(Math.random() * state.alienTypes.length)];
                 const alienColor = ALIEN_COLORS[Math.floor(Math.random() * ALIEN_COLORS.length)];
-                // Random spawn from: top center, top left, top right
-                const spawnSide = Math.floor(Math.random() * 5);
-                let startX, startZ, startVx;
-                if (spawnSide === 0 || spawnSide === 1) { // Top center - most common
-                    startX = (Math.random() - 0.5) * 400;
-                    startZ = 0.05 + Math.random() * 0.05;
-                    startVx = (Math.random() - 0.5) * 1;
-                } else if (spawnSide === 2) { // From left side of horizon
-                    startX = -350 - Math.random() * 100;
-                    startZ = 0.08 + Math.random() * 0.1;
-                    startVx = 1 + Math.random() * 2; // Move right
-                } else if (spawnSide === 3) { // From right side of horizon
-                    startX = 350 + Math.random() * 100;
-                    startZ = 0.08 + Math.random() * 0.1;
-                    startVx = -1 - Math.random() * 2; // Move left
-                } else { // Top area spread out
-                    startX = (Math.random() - 0.5) * 600;
-                    startZ = 0.03 + Math.random() * 0.05;
-                    startVx = (Math.random() - 0.5) * 1.5;
-                }
+                // Random spawn position across entire visible area
+                const startX = (Math.random() - 0.5) * 800;
+                const startZ = 0.02 + Math.random() * 0.15; // Start very small/far away
+                const startVx = (Math.random() - 0.5) * 3;
                 state.enemies.push({
                     x: startX,
                     z: startZ,
