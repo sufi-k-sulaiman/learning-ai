@@ -1,6 +1,6 @@
 import React from 'react';
 import { Mail, Phone, MapPin, Linkedin, Globe } from 'lucide-react';
-import { RESUME_TEMPLATES } from './ResumeTemplates';
+import { RESUME_TEMPLATES } from '@/components/resume/ResumeTemplates';
 
 export default function ResumePreview({ data, templateId, className = '' }) {
     const template = RESUME_TEMPLATES.find(t => t.id === templateId) || RESUME_TEMPLATES[0];
