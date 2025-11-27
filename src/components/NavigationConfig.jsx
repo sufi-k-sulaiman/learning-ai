@@ -1,5 +1,5 @@
 
-import { Globe, Sparkles, BarChart3, Gamepad2, Settings, Radio, Brain, FileText, GraduationCap, ListTodo, StickyNote, Lightbulb, ScrollText, Newspaper, Map } from 'lucide-react';
+import { Globe, Sparkles, BarChart3, Gamepad2, Settings, Radio, Brain, FileText, GraduationCap, ListTodo, StickyNote, Lightbulb, ScrollText, Newspaper } from 'lucide-react';
 import { createPageUrl } from '@/utils';
 
 export const LOGO_URL = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/a1a505225_1cPublishing-logo.png';
@@ -19,7 +19,6 @@ export const menuItems = [
     { label: 'Games', icon: Gamepad2, href: createPageUrl('Games') },
     { label: 'Settings', icon: Settings, href: createPageUrl('Settings') },
     { label: 'Terms of Use', icon: ScrollText, href: createPageUrl('TermsOfUse') },
-    { label: 'Site Map', icon: Map, href: createPageUrl('SiteMapXml') },
 ];
 
 export const NAVIGATION_ITEMS = menuItems.map(item => ({
