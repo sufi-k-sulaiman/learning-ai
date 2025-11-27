@@ -1,6 +1,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { LOGO_URL, footerLinks } from '@/components/NavigationConfig.js';
+import { createPageUrl } from '@/utils';
+
+const LOGO_URL = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/a1a505225_1cPublishing-logo.png';
+
+const footerLinks = [
+    { label: 'Terms of Use', href: createPageUrl('TermsOfUse') },
+    { label: 'Privacy Policy', href: createPageUrl('PrivacyPolicy') },
+    { label: 'Cookie Policy', href: createPageUrl('CookiePolicyPage') },
+    { label: 'Contact Us', href: createPageUrl('ContactUs') },
+];
 
 export default function Footer() {
     return (

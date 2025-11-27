@@ -1,7 +1,8 @@
 import React, { useEffect } from 'react';
 import PageLayout from '@/components/PageLayout';
 import ErrorBoundary from '@/components/ErrorBoundary';
-import { LOGO_URL } from '@/components/NavigationConfig.js';
+
+const LOGO_URL = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/a1a505225_1cPublishing-logo.png';
 
 export default function Layout({ children, currentPageName }) {
   useEffect(() => {
