@@ -2,7 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Maximize2, Minimize2, Loader2, Search, Compass, BookOpen, Network } from 'lucide-react';
+import { Maximize2, Minimize2, Loader2, Search, Compass, BookOpen, Network, Download } from 'lucide-react';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
 import LearnMoreModal from '../components/mindmap/LearnMoreModal';
 import ErrorDisplay, { getErrorCode } from '@/components/ErrorDisplay';
 
@@ -155,7 +158,46 @@ export default function MindMapPage() {
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [selectedKeyword, setSelectedKeyword] = useState(null);
     const [showModal, setShowModal] = useState(false);
+    const [exporting, setExporting] = useState(false);
     const containerRef = useRef(null);
+    const mindmapRef = useRef(null);
+
+    const exportMindMap = async (format) => {
+        if (!mindmapRef.current) return;
+        setExporting(true);
+        try {
+            const canvas = await html2canvas(mindmapRef.current, {
+                backgroundColor: '#ffffff',
+                scale: 2,
+                useCORS: true,
+            });
+            
+            if (format === 'png') {
+                const link = document.createElement('a');
+                link.download = `mindmap-${treeData?.name || 'export'}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            } else if (format === 'jpeg') {
+                const link = document.createElement('a');
+                link.download = `mindmap-${treeData?.name || 'export'}.jpg`;
+                link.href = canvas.toDataURL('image/jpeg', 0.9);
+                link.click();
+            } else if (format === 'pdf') {
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF({
+                    orientation: canvas.width > canvas.height ? 'landscape' : 'portrait',
+                    unit: 'px',
+                    format: [canvas.width, canvas.height]
+                });
+                pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+                pdf.save(`mindmap-${treeData?.name || 'export'}.pdf`);
+            }
+        } catch (error) {
+            console.error('Export failed:', error);
+        } finally {
+            setExporting(false);
+        }
+    };
 
     const handleSearch = async (topic) => {
         if (!topic?.trim()) return;
@@ -237,24 +279,49 @@ export default function MindMapPage() {
                         <h1 className="text-xl font-bold text-gray-900">Neural MindMaps</h1>
                     </div>
 
-                    {/* Fullscreen toggle */}
-                    <Button
-                        variant="outline"
-                        onClick={toggleFullscreen}
-                        className="gap-2"
-                    >
-                        {isFullscreen ? (
-                            <>
-                                <Minimize2 className="w-4 h-4" />
-                                Exit Fullscreen
-                            </>
-                        ) : (
-                            <>
-                                <Maximize2 className="w-4 h-4" />
-                                Fullscreen
-                            </>
+                    <div className="flex gap-2">
+                        {/* Export dropdown */}
+                        {treeData && (
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="outline" className="gap-2" disabled={exporting}>
+                                        {exporting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+                                        Export
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent>
+                                    <DropdownMenuItem onClick={() => exportMindMap('pdf')}>
+                                        Export as PDF
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => exportMindMap('png')}>
+                                        Export as PNG
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem onClick={() => exportMindMap('jpeg')}>
+                                        Export as JPEG
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         )}
-                    </Button>
+
+                        {/* Fullscreen toggle */}
+                        <Button
+                            variant="outline"
+                            onClick={toggleFullscreen}
+                            className="gap-2"
+                        >
+                            {isFullscreen ? (
+                                <>
+                                    <Minimize2 className="w-4 h-4" />
+                                    Exit Fullscreen
+                                </>
+                            ) : (
+                                <>
+                                    <Maximize2 className="w-4 h-4" />
+                                    Fullscreen
+                                </>
+                            )}
+                        </Button>
+                    </div>
                 </div>
 
                 {/* Mind Map Content */}
@@ -315,7 +382,7 @@ export default function MindMapPage() {
                             onRetry={() => handleSearch(searchTerm || 'Technology')}
                         />
                     ) : (
-                        <div className="flex justify-center overflow-x-auto pt-4">
+                        <div className="flex justify-center overflow-x-auto pt-4" ref={mindmapRef}>
                             <div className="min-w-max px-8">
                                 <TreeNode
                                     node={treeData}
