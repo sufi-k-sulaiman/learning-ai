@@ -48,7 +48,7 @@ const ContactCard = ({ icon: Icon, title, description, email, buttonText, color,
     };
 
     return (
-        <div className="relative h-[320px]" style={{ perspective: '1000px' }}>
+        <div className="relative h-[360px]" style={{ perspective: '1000px' }}>
             <div 
                 className={`relative w-full h-full transition-transform duration-500`} 
                 style={{ 
