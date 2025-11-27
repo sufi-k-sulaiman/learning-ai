@@ -11,6 +11,8 @@ export default function SpaceBattleGame({ onExit }) {
     const [activeCategory, setActiveCategory] = useState('trending');
     const [generatedTopics, setGeneratedTopics] = useState({});
     const [loadingTopics, setLoadingTopics] = useState(true);
+    const [loadingProgress, setLoadingProgress] = useState(0);
+    const [currentLoadingTab, setCurrentLoadingTab] = useState('');
     const [questions, setQuestions] = useState([]);
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [score, setScore] = useState(0);
@@ -57,10 +59,7 @@ export default function SpaceBattleGame({ onExit }) {
         generateAllTopics();
     }, []);
 
-    const generateAllTopics = async () => {
-        setLoadingTopics(true);
-        const allTopics = {};
-        
+    const generateTopicsForTab = async (tabId) => {
         const prompts = {
             trending: 'Generate 9 trending tech and knowledge topics people should learn about right now. Include AI, cybersecurity, space, and emerging technologies.',
             programming: 'Generate 9 programming and software development topics including languages, frameworks, algorithms, and development practices.',
@@ -74,36 +73,46 @@ export default function SpaceBattleGame({ onExit }) {
             global: 'Generate 9 global affairs topics including geopolitics, international relations, world events, and global challenges.'
         };
 
-        for (const tab of TABS) {
-            try {
-                const result = await base44.integrations.Core.InvokeLLM({
-                    prompt: `${prompts[tab.id]} Return as JSON: { "topics": [{ "id": "topic-id", "label": "Topic Name", "description": "Brief compelling description" }] }`,
-                    add_context_from_internet: tab.id === 'trending',
-                    response_json_schema: {
-                        type: "object",
-                        properties: {
-                            topics: { 
-                                type: "array", 
-                                items: { 
-                                    type: "object", 
-                                    properties: { 
-                                        id: { type: "string" }, 
-                                        label: { type: "string" }, 
-                                        description: { type: "string" } 
-                                    } 
+        try {
+            const result = await base44.integrations.Core.InvokeLLM({
+                prompt: `${prompts[tabId]} Return as JSON: { "topics": [{ "id": "topic-id", "label": "Topic Name", "description": "Brief compelling description" }] }`,
+                add_context_from_internet: tabId === 'trending',
+                response_json_schema: {
+                    type: "object",
+                    properties: {
+                        topics: { 
+                            type: "array", 
+                            items: { 
+                                type: "object", 
+                                properties: { 
+                                    id: { type: "string" }, 
+                                    label: { type: "string" }, 
+                                    description: { type: "string" } 
                                 } 
-                            }
+                            } 
                         }
                     }
-                });
-                allTopics[tab.id] = result?.topics || [];
-            } catch (error) {
-                console.error(`Failed to generate ${tab.id} topics:`, error);
-                allTopics[tab.id] = [];
-            }
+                }
+            });
+            return result?.topics || [];
+        } catch (error) {
+            console.error(`Failed to generate ${tabId} topics:`, error);
+            return [];
+        }
+    };
+
+    const generateAllTopics = async () => {
+        setLoadingTopics(true);
+        setLoadingProgress(0);
+        
+        for (let i = 0; i < TABS.length; i++) {
+            const tab = TABS[i];
+            setCurrentLoadingTab(tab.label);
+            const topics = await generateTopicsForTab(tab.id);
+            setGeneratedTopics(prev => ({ ...prev, [tab.id]: topics }));
+            setLoadingProgress(((i + 1) / TABS.length) * 100);
         }
         
-        setGeneratedTopics(allTopics);
         setLoadingTopics(false);
     };
 
@@ -1227,10 +1236,17 @@ export default function SpaceBattleGame({ onExit }) {
                     </div>
 
                     {/* Topics grid */}
-                    {loadingTopics ? (
-                        <div className="text-center py-12">
+                    {loadingTopics && !generatedTopics[activeCategory]?.length ? (
+                        <div className="text-center py-8">
                             <Loader2 className="w-10 h-10 animate-spin mx-auto mb-3 text-purple-500" />
-                            <p className="text-gray-500">Generating topics with AI...</p>
+                            <p className="text-gray-600 font-medium mb-1">Loading {currentLoadingTab}...</p>
+                            <div className="w-64 mx-auto bg-gray-200 rounded-full h-2 mt-3">
+                                <div 
+                                    className="bg-purple-500 h-2 rounded-full transition-all duration-300" 
+                                    style={{ width: `${loadingProgress}%` }}
+                                />
+                            </div>
+                            <p className="text-gray-400 text-sm mt-2">{Math.round(loadingProgress)}% complete</p>
                         </div>
                     ) : (
                         <div className="grid grid-cols-3 gap-3">
