@@ -408,7 +408,7 @@ export default function SpaceBattleGame({ onExit }) {
 
     // Menu screen - matching WordShooter design
     return (
-        <div className="fixed inset-0 bg-[#0a0f1a] z-[9999] overflow-auto p-8">
+        <div className="fixed inset-0 bg-gray-50 z-[9999] overflow-auto p-8">
             <Button onClick={onExit} className="absolute top-4 right-4 bg-red-600 hover:bg-red-700">
                 <X className="w-4 h-4" />
             </Button>
@@ -416,19 +416,19 @@ export default function SpaceBattleGame({ onExit }) {
             <div className="max-w-5xl mx-auto">
                 <div className="text-center mb-10">
                     <div className="text-6xl mb-6">🎯</div>
-                    <h1 className="text-5xl font-black text-white mb-4" style={{ textShadow: '0 0 40px rgba(6, 182, 212, 0.5)' }}>
+                    <h1 className="text-5xl font-black text-gray-900 mb-4">
                         SPACE BATTLE
                     </h1>
-                    <p className="text-xl text-cyan-400">Combat & Knowledge Challenge</p>
+                    <p className="text-xl text-cyan-600">Combat & Knowledge Challenge</p>
                 </div>
 
-                <Card className="p-6 mb-8 bg-[#0d1a2d] border-cyan-500/50 border-2">
+                <Card className="p-6 mb-8 bg-white border-cyan-200 border-2 shadow-sm">
                     <div className="flex gap-4">
                         <div className="flex-1 relative">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" />
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                             <Input placeholder="Search topics or enter custom..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
                                 onKeyPress={(e) => { if (e.key === 'Enter' && searchQuery.trim()) startGame('custom'); }}
-                                className="pl-12 h-14 text-lg bg-[#0a0f1a] border-gray-700 text-white placeholder:text-gray-500" />
+                                className="pl-12 h-14 text-lg bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400" />
                         </div>
                         <Button onClick={() => searchQuery.trim() && startGame('custom')} disabled={!searchQuery.trim() || loading}
                             className="h-14 px-8 text-lg font-bold bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700">
@@ -437,11 +437,11 @@ export default function SpaceBattleGame({ onExit }) {
                     </div>
                 </Card>
 
-                <Card className="p-6 mb-8 bg-[#0d1a2d] border-gray-700/50">
+                <Card className="p-6 mb-8 bg-white border-gray-200 shadow-sm">
                     <div className="flex gap-2 mb-6 flex-wrap">
                         {TABS.map(tab => (
                             <Button key={tab.id} onClick={() => setActiveCategory(tab.id)}
-                                className={`px-5 py-2 ${activeCategory === tab.id ? `bg-gradient-to-r ${tab.color}` : 'bg-gray-700 hover:bg-gray-600'} text-white`}>
+                                className={`px-5 py-2 ${activeCategory === tab.id ? `bg-gradient-to-r ${tab.color}` : 'bg-gray-200 hover:bg-gray-300 text-gray-700'} ${activeCategory === tab.id ? 'text-white' : ''}`}>
                                 {tab.label}
                             </Button>
                         ))}
@@ -449,7 +449,7 @@ export default function SpaceBattleGame({ onExit }) {
 
                     {loadingTopics ? (
                         <div className="text-center py-12">
-                            <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-cyan-400" />
+                            <Loader2 className="w-12 h-12 animate-spin mx-auto mb-4 text-cyan-500" />
                             <p className="text-gray-500">Generating topics with AI...</p>
                         </div>
                     ) : (
@@ -476,12 +476,12 @@ export default function SpaceBattleGame({ onExit }) {
                         { icon: Sparkles, title: 'Knowledge Quiz', desc: 'Answer questions after battle to boost your score', color: 'from-yellow-500 to-yellow-600' },
                         { icon: Trophy, title: 'Achieve Highscore', desc: 'Combine combat and knowledge for the top rank', color: 'from-amber-500 to-amber-600' }
                     ].map((item, i) => (
-                        <Card key={i} className="p-6 text-center bg-[#0d1a2d] border-gray-700/50">
+                        <Card key={i} className="p-6 text-center bg-white border-gray-200 shadow-sm">
                             <div className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center bg-gradient-to-r ${item.color}`}>
                                 <item.icon className="w-8 h-8 text-white" />
                             </div>
-                            <h3 className="text-lg font-bold mb-2 text-white">{item.title}</h3>
-                            <p className="text-sm text-gray-400">{item.desc}</p>
+                            <h3 className="text-lg font-bold mb-2 text-gray-900">{item.title}</h3>
+                            <p className="text-sm text-gray-500">{item.desc}</p>
                         </Card>
                     ))}
                 </div>
