@@ -12,16 +12,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { base44 } from '@/api/base44Client';
-import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart as RechartLine, Line, Legend, PieChart, Pie, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, BarChart, Bar } from 'recharts';
+import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, Legend, PieChart, Pie, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, BarChart, Bar } from 'recharts';
 
 // Dashboard Components
-import MetricCard from '../components/dashboard/MetricCard';
-import PieChartCard from '../components/dashboard/PieChartCard';
-import RadialProgressCard from '../components/dashboard/RadialProgressCard';
-import HorizontalBarChart from '../components/dashboard/HorizontalBarChart';
-import RadarChartCard from '../components/dashboard/RadarChart';
-import StackedBarChart from '../components/dashboard/StackedBarChart';
-import AreaChartWithMarkers from '../components/dashboard/AreaChartWithMarkers';
+import MetricCard from '@/components/dashboard/MetricCard';
+import PieChartCard from '@/components/dashboard/PieChartCard';
+import RadialProgressCard from '@/components/dashboard/RadialProgressCard';
+import HorizontalBarChart from '@/components/dashboard/HorizontalBarChart';
+import RadarChartCard from '@/components/dashboard/RadarChart';
+import StackedBarChart from '@/components/dashboard/StackedBarChart';
+import AreaChartWithMarkers from '@/components/dashboard/AreaChartWithMarkers';
 
 const MODULES = [
     { id: 'forecast', name: 'Forecasting', icon: LineChart, color: '#8B5CF6', desc: 'Time-series predictions with ARIMA, LSTM, Transformer models' },
