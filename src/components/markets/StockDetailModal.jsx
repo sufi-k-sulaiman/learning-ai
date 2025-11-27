@@ -332,6 +332,23 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
                     };
                     break;
 
+                case 'moat':
+                    prompt = `MOAT analysis for ${stock.ticker}:
+                    - Detailed breakdown: brand power, switching costs, network effects, cost advantages, scale advantage, regulatory moat (each 0-100)
+                    - Competitive position assessment
+                    - Competitive advantages (list 5-7 key advantages)
+                    - Investment thesis summary`;
+                    schema = {
+                        type: "object",
+                        properties: {
+                            moatBreakdown: { type: "object", properties: { brandPower: { type: "number" }, switchingCosts: { type: "number" }, networkEffects: { type: "number" }, costAdvantages: { type: "number" }, scaleAdvantage: { type: "number" }, regulatoryMoat: { type: "number" } } },
+                            position: { type: "string" },
+                            advantages: { type: "array", items: { type: "string" } },
+                            thesis: { type: "string" }
+                        }
+                    };
+                    break;
+
                 case 'bullbear':
                     prompt = `Bull and Bear case analysis for ${stock.ticker}:
                     - Top 5 bull case arguments with potential upside
