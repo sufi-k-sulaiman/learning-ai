@@ -19,8 +19,26 @@ export default function SpaceBattleGame({ onExit }) {
     const [selectedTopic, setSelectedTopic] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [awards, setAwards] = useState([]);
+    const [currentLevel, setCurrentLevel] = useState(1);
+    const [levelComplete, setLevelComplete] = useState(false);
     const canvasRef = useRef(null);
     const gameStateRef = useRef(null);
+
+    // Alien colors from the image
+    const ALIEN_COLORS = [
+        '#4f46e5', // indigo (like Geospatial)
+        '#7c3aed', // purple (like Qwirey)
+        '#06b6d4', // cyan (like SearchPods)
+        '#ec4899', // pink (like MindMap)
+        '#8b5cf6', // violet (like Intelligence)
+        '#10b981', // emerald (like Resume Builder)
+        '#f97316', // orange (like Markets)
+        '#14b8a6', // teal (like Learning)
+        '#a855f7', // purple (like Tasks)
+        '#f43f5e', // rose (like Notes)
+        '#ef4444', // red (like News)
+        '#d946ef', // fuchsia (like Games)
+    ];
 
     const TABS = [
         { id: 'trending', label: 'Trending', color: 'from-cyan-600 to-cyan-700' },
