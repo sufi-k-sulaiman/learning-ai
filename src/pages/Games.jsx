@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Gamepad2, Rocket, Target } from 'lucide-react';
 
 import WordShooter from '@/components/games/WordShooter';
@@ -6,6 +6,12 @@ import SpaceBattleGame from '@/components/games/SpaceBattleGame';
 import { Button } from '@/components/ui/button';
 
 export default function Games() {
+    useEffect(() => {
+        document.title = 'AI powered Gamification Games for smarter learning';
+        document.querySelector('meta[name="description"]')?.setAttribute('content', 'Space battle and Word shooters makes education engaging, interactive, and boosts learning.');
+        document.querySelector('meta[name="keywords"]')?.setAttribute('content', 'Gamification, educational games');
+    }, []);
+
     const [activeGame, setActiveGame] = useState(null);
 
     if (activeGame === 'space-battle') {
