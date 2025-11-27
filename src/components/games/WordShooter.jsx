@@ -254,9 +254,11 @@ export default function WordShooter({ onExit }) {
       }
       
       if (!isBomb && asteroid.wordData?.definition) {
-        const definition = asteroid.wordData.definition.split(' ').slice(0, 5).join(' ');
+        const words = asteroid.wordData.definition.split(' ');
+        const line1 = words.slice(0, 4).join(' ');
+        const line2 = words.slice(4, 8).join(' ');
         const baseBonus = 100 * (state.combo + 1);
-        state.floatingTexts.push({ x: asteroid.x, y: asteroid.y, vy: -2, text: definition.toUpperCase(), life: 120, maxLife: 120, color: '#22c55e', bonus: baseBonus, size: 22 });
+        state.floatingTexts.push({ x: asteroid.x, y: asteroid.y, vy: -2, text: line1.toUpperCase(), text2: line2.toUpperCase(), life: 120, maxLife: 120, color: '#22c55e', bonus: baseBonus, size: 20 });
         state.combo++;
         state.score += baseBonus;
         state.wordsCompleted++;
@@ -297,20 +299,16 @@ export default function WordShooter({ onExit }) {
     function drawAsteroid(ast) {
       ctx.save();
       ctx.translate(ast.x, ast.y);
-      const w = ast.width, h = ast.height, r = Math.min(15, w / 2, h / 2);
+      const w = ast.width, h = ast.height, r = h / 2; // Full rounded ends (pill shape)
       ctx.fillStyle = ast.color;
       ctx.shadowBlur = 15;
       ctx.shadowColor = ast.color;
       ctx.beginPath();
       ctx.moveTo(-w/2 + r, -h/2);
       ctx.lineTo(w/2 - r, -h/2);
-      ctx.quadraticCurveTo(w/2, -h/2, w/2, -h/2 + r);
-      ctx.lineTo(w/2, h/2 - r);
-      ctx.quadraticCurveTo(w/2, h/2, w/2 - r, h/2);
+      ctx.arc(w/2 - r, 0, r, -Math.PI/2, Math.PI/2);
       ctx.lineTo(-w/2 + r, h/2);
-      ctx.quadraticCurveTo(-w/2, h/2, -w/2, h/2 - r);
-      ctx.lineTo(-w/2, -h/2 + r);
-      ctx.quadraticCurveTo(-w/2, -h/2, -w/2 + r, -h/2);
+      ctx.arc(-w/2 + r, 0, r, Math.PI/2, -Math.PI/2);
       ctx.closePath();
       ctx.fill();
       ctx.shadowBlur = 0;
@@ -400,9 +398,12 @@ export default function WordShooter({ onExit }) {
         ctx.font = `bold ${ft.size}px Inter`;
         ctx.textAlign = 'center';
         ctx.fillText(ft.text, 0, 0);
+        if (ft.text2) {
+          ctx.fillText(ft.text2, 0, ft.size + 4);
+        }
         ctx.font = 'bold 24px Inter';
         ctx.fillStyle = '#22c55e';
-        ctx.fillText(`+${ft.bonus}`, 0, ft.size + 20);
+        ctx.fillText(`+${ft.bonus}`, 0, (ft.text2 ? ft.size * 2 + 8 : ft.size) + 20);
         ctx.globalAlpha = 1;
         ctx.restore();
         return ft.life > 0;

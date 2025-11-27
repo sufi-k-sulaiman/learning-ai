@@ -509,18 +509,35 @@ export default function SpaceBattleGame({ onExit }) {
             if (keys.a) state.viewAngle -= 3;
             if (keys.d) state.viewAngle += 3;
 
-            // Spawn enemies in 3D space
+            // Spawn enemies randomly from all over the screen
             state.enemySpawnTimer--;
             if (state.enemySpawnTimer <= 0) {
                 const alienType = state.alienTypes[Math.floor(Math.random() * state.alienTypes.length)];
                 const alienColor = ALIEN_COLORS[Math.floor(Math.random() * ALIEN_COLORS.length)];
+                // Random spawn from edges: top, left, right, or random position
+                const spawnSide = Math.floor(Math.random() * 4);
+                let startX, startZ;
+                if (spawnSide === 0) { // Top center area
+                    startX = (Math.random() - 0.5) * 600;
+                    startZ = 0.05;
+                } else if (spawnSide === 1) { // Left side
+                    startX = -300 - Math.random() * 100;
+                    startZ = 0.2 + Math.random() * 0.3;
+                } else if (spawnSide === 2) { // Right side
+                    startX = 300 + Math.random() * 100;
+                    startZ = 0.2 + Math.random() * 0.3;
+                } else { // Random position across screen
+                    startX = (Math.random() - 0.5) * 800;
+                    startZ = 0.1 + Math.random() * 0.2;
+                }
                 state.enemies.push({
-                    x: (Math.random() - 0.5) * 400,
-                    z: 0.1,
+                    x: startX,
+                    z: startZ,
                     type: alienType,
                     color: alienColor,
                     health: 1,
-                    wobble: Math.random() * Math.PI * 2
+                    wobble: Math.random() * Math.PI * 2,
+                    vx: (Math.random() - 0.5) * 2 // Add horizontal velocity
                 });
                 state.enemySpawnTimer = Math.max(30, 120 - state.score / 50);
             }
@@ -529,6 +546,12 @@ export default function SpaceBattleGame({ onExit }) {
             state.enemies = state.enemies.filter((enemy) => {
                 enemy.z += 0.003;
                 enemy.wobble += 0.05;
+                // Apply horizontal movement if enemy has velocity
+                if (enemy.vx) {
+                    enemy.x += enemy.vx;
+                    // Gradually move toward center
+                    enemy.vx *= 0.995;
+                }
                 
                 // 3D to 2D projection with wobble
                 const scale = enemy.z * 3;
