@@ -166,10 +166,21 @@ export default function MindMapPage() {
         if (!mindmapRef.current) return;
         setExporting(true);
         try {
+            // Wait for any pending renders
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
             const canvas = await html2canvas(mindmapRef.current, {
                 backgroundColor: '#ffffff',
                 scale: 2,
                 useCORS: true,
+                allowTaint: true,
+                logging: false,
+                windowWidth: mindmapRef.current.scrollWidth,
+                windowHeight: mindmapRef.current.scrollHeight,
+                width: mindmapRef.current.scrollWidth,
+                height: mindmapRef.current.scrollHeight,
+                x: 0,
+                y: 0,
             });
             
             if (format === 'png') {
@@ -183,13 +194,37 @@ export default function MindMapPage() {
                 link.href = canvas.toDataURL('image/jpeg', 0.9);
                 link.click();
             } else if (format === 'pdf') {
-                const imgData = canvas.toDataURL('image/png');
+                // A4 landscape dimensions in mm
+                const a4Width = 297;
+                const a4Height = 210;
+                
                 const pdf = new jsPDF({
-                    orientation: canvas.width > canvas.height ? 'landscape' : 'portrait',
-                    unit: 'px',
-                    format: [canvas.width, canvas.height]
+                    orientation: 'landscape',
+                    unit: 'mm',
+                    format: 'a4'
                 });
-                pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+                
+                const imgData = canvas.toDataURL('image/png');
+                const imgWidth = canvas.width;
+                const imgHeight = canvas.height;
+                
+                // Calculate scale to fit content in A4 landscape with padding
+                const padding = 10;
+                const availableWidth = a4Width - (padding * 2);
+                const availableHeight = a4Height - (padding * 2);
+                
+                const scaleX = availableWidth / imgWidth;
+                const scaleY = availableHeight / imgHeight;
+                const scale = Math.min(scaleX, scaleY);
+                
+                const scaledWidth = imgWidth * scale;
+                const scaledHeight = imgHeight * scale;
+                
+                // Center the image on the page
+                const xOffset = (a4Width - scaledWidth) / 2;
+                const yOffset = (a4Height - scaledHeight) / 2;
+                
+                pdf.addImage(imgData, 'PNG', xOffset, yOffset, scaledWidth, scaledHeight);
                 pdf.save(`mindmap-${treeData?.name || 'export'}.pdf`);
             }
         } catch (error) {
