@@ -719,7 +719,7 @@ export default function SpaceBattleGame({ onExit }) {
             ctx.closePath();
             ctx.fill();
 
-            // Score display (top right, next to compass)
+            // Level progress display (top right, next to compass)
             const scoreX = canvas.width - 220;
             ctx.strokeStyle = 'rgba(100, 150, 200, 0.5)';
             ctx.lineWidth = 2;
@@ -727,17 +727,25 @@ export default function SpaceBattleGame({ onExit }) {
             ctx.arc(scoreX, compassY, 50, 0, Math.PI * 2);
             ctx.stroke();
             
+            // Level progress arc
+            const progressPercent = Math.min(1, state.levelScore / state.levelTarget);
+            ctx.strokeStyle = '#00ff88';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.arc(scoreX, compassY, 45, -Math.PI/2, -Math.PI/2 + progressPercent * Math.PI * 2);
+            ctx.stroke();
+            
             ctx.fillStyle = '#fff';
             ctx.font = '10px monospace';
-            ctx.fillText('Exam Score', scoreX, compassY - 20);
+            ctx.textAlign = 'center';
+            ctx.fillText(`LEVEL ${currentLevel}`, scoreX, compassY - 15);
             
-            const scorePercent = Math.min(100, Math.floor(state.score / 10));
             ctx.fillStyle = '#00ff88';
-            ctx.font = 'bold 18px monospace';
-            ctx.fillText(scorePercent, scoreX - 10, compassY + 8);
+            ctx.font = 'bold 16px monospace';
+            ctx.fillText(state.levelScore, scoreX, compassY + 5);
             ctx.fillStyle = 'rgba(255,255,255,0.5)';
-            ctx.font = '14px monospace';
-            ctx.fillText('/100', scoreX + 15, compassY + 8);
+            ctx.font = '10px monospace';
+            ctx.fillText(`/ ${state.levelTarget}`, scoreX, compassY + 20);
 
             // Health (hearts) top left
             ctx.fillStyle = '#fff';
