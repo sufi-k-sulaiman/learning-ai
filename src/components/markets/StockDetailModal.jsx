@@ -1035,72 +1035,111 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
                 );
 
             case 'technicals':
+                const priceActionData = stock.history?.slice(-20).map((p, i) => ({
+                    day: `D${i + 1}`,
+                    price: p,
+                    ma50: data.ma50 || stock.price * 0.95,
+                    support: stock.price * 0.92,
+                    resistance: stock.price * 1.08
+                })) || [];
                 return (
                     <div className="space-y-6">
                         <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                            <div className="flex items-center justify-between mb-6">
+                            <div className="flex items-center justify-between mb-4">
                                 <div className="flex items-center gap-2">
                                     <TrendingUp className="w-5 h-5 text-purple-600" />
-                                    <h3 className="font-semibold text-gray-900">Technical Analysis</h3>
+                                    <h3 className="font-semibold text-gray-900">Price Level Action</h3>
                                 </div>
                                 <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                                     data.trend === 'Bullish' ? 'bg-green-100 text-green-700' :
                                     data.trend === 'Bearish' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'
                                 }`}>
-                                    {data.trend || 'Bullish'}
+                                    {data.trend || 'Mixed'}
                                 </span>
                             </div>
-                            <div className="grid grid-cols-3 gap-4 mb-6">
-                                <div className="bg-gray-50 rounded-xl p-4 text-center">
-                                    <p className="text-xs text-gray-500">50-Day MA</p>
-                                    <p className="text-lg font-bold text-gray-900">${data.ma50 || (stock.price * 0.95).toFixed(2)}</p>
+                            <div className="h-64">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <ReLineChart data={priceActionData}>
+                                        <XAxis dataKey="day" tick={{ fontSize: 9 }} />
+                                        <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `$${v.toFixed(0)}`} domain={['auto', 'auto']} />
+                                        <Tooltip formatter={(v) => `$${Number(v).toFixed(2)}`} />
+                                        <Line type="monotone" dataKey="price" stroke="#8B5CF6" strokeWidth={2} dot={false} name="Price" />
+                                        <Line type="monotone" dataKey="ma50" stroke="#10B981" strokeWidth={1.5} dot={false} strokeDasharray="5 5" name="50-MA" />
+                                        <Line type="monotone" dataKey="support" stroke="#3B82F6" strokeWidth={1} dot={false} strokeDasharray="3 3" name="Support" />
+                                        <Line type="monotone" dataKey="resistance" stroke="#EF4444" strokeWidth={1} dot={false} strokeDasharray="3 3" name="Resistance" />
+                                    </ReLineChart>
+                                </ResponsiveContainer>
+                            </div>
+                            <div className="grid grid-cols-4 gap-3 mt-4">
+                                <div className="bg-purple-50 rounded-lg p-3 text-center">
+                                    <p className="text-xs text-gray-500">Current</p>
+                                    <p className="text-lg font-bold text-purple-600">${stock.price?.toFixed(2)}</p>
                                 </div>
-                                <div className="bg-gray-50 rounded-xl p-4 text-center">
-                                    <p className="text-xs text-gray-500">100-Day MA</p>
-                                    <p className="text-lg font-bold text-gray-900">${data.ma100 || (stock.price * 0.92).toFixed(2)}</p>
+                                <div className="bg-green-50 rounded-lg p-3 text-center">
+                                    <p className="text-xs text-gray-500">50-MA</p>
+                                    <p className="text-lg font-bold text-green-600">${data.ma50 || (stock.price * 0.95).toFixed(2)}</p>
                                 </div>
-                                <div className="bg-gray-50 rounded-xl p-4 text-center">
-                                    <p className="text-xs text-gray-500">200-Day MA</p>
-                                    <p className="text-lg font-bold text-gray-900">${data.ma200 || (stock.price * 0.88).toFixed(2)}</p>
+                                <div className="bg-blue-50 rounded-lg p-3 text-center">
+                                    <p className="text-xs text-gray-500">Support</p>
+                                    <p className="text-lg font-bold text-blue-600">${(stock.price * 0.92).toFixed(2)}</p>
+                                </div>
+                                <div className="bg-red-50 rounded-lg p-3 text-center">
+                                    <p className="text-xs text-gray-500">Resistance</p>
+                                    <p className="text-lg font-bold text-red-600">${(stock.price * 1.08).toFixed(2)}</p>
                                 </div>
                             </div>
-                            <div className="grid grid-cols-2 gap-4 mb-6">
-                                <div className="p-4 bg-gray-50 rounded-xl">
-                                    <div className="flex items-center justify-between mb-2">
-                                        <span className="text-sm text-gray-600">RSI (14)</span>
-                                        <span className={`font-bold ${(data.rsi || 58) > 70 ? 'text-red-600' : (data.rsi || 58) < 30 ? 'text-green-600' : 'text-gray-900'}`}>
-                                            {data.rsi || 58}
-                                        </span>
+                        </div>
+                        
+                        <div className="grid grid-cols-2 gap-6">
+                            <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                                <h4 className="font-semibold text-gray-900 mb-4">Momentum Indicator</h4>
+                                <div className="space-y-4">
+                                    <div>
+                                        <div className="flex items-center justify-between mb-2">
+                                            <span className="text-sm text-gray-600">RSI (14)</span>
+                                            <span className={`font-bold text-sm ${(data.rsi || 72) > 70 ? 'text-red-600' : (data.rsi || 72) < 30 ? 'text-green-600' : 'text-yellow-600'}`}>
+                                                {data.rsi || 72} - {(data.rsi || 72) > 70 ? 'Overbought' : (data.rsi || 72) < 30 ? 'Oversold' : 'Neutral'}
+                                            </span>
+                                        </div>
+                                        <div className="h-3 bg-gradient-to-r from-green-400 via-yellow-400 to-red-400 rounded-full overflow-hidden relative">
+                                            <div className="absolute top-0 w-1 h-full bg-purple-700" style={{ left: `${data.rsi || 72}%` }} />
+                                        </div>
+                                        <div className="flex justify-between text-xs text-gray-500 mt-1">
+                                            <span>0 (Oversold)</span>
+                                            <span>50</span>
+                                            <span>100 (Overbought)</span>
+                                        </div>
                                     </div>
-                                    <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
-                                        <div className="h-full bg-purple-500 rounded-full" style={{ width: `${data.rsi || 58}%` }} />
+                                    <div className="p-3 bg-gray-50 rounded-lg">
+                                        <div className="flex justify-between text-sm mb-1">
+                                            <span className="text-gray-600">MACD</span>
+                                            <span className={`font-medium ${data.macdSignal === 'Bullish' ? 'text-green-600' : 'text-yellow-600'}`}>
+                                                {data.macdSignal || 'Weakening'}
+                                            </span>
+                                        </div>
+                                        <p className="text-xs text-gray-500">Momentum weakening, cautious entry suggested</p>
                                     </div>
-                                </div>
-                                <div className="p-4 bg-gray-50 rounded-xl">
-                                    <div className="flex items-center justify-between mb-2">
-                                        <span className="text-sm text-gray-600">MACD Signal</span>
-                                        <span className={`font-bold ${data.macdSignal === 'Bullish' ? 'text-green-600' : 'text-red-600'}`}>
-                                            {data.macdSignal || 'Bullish'}
-                                        </span>
-                                    </div>
-                                    <p className="text-xs text-gray-500">Volume: {data.volumeTrend || 'Above Average'}</p>
                                 </div>
                             </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="bg-green-50 rounded-xl p-4">
-                                    <p className="text-sm text-gray-600 mb-2">Support Levels</p>
-                                    <div className="flex gap-2">
-                                        {(data.support || [stock.price * 0.95, stock.price * 0.9]).map((s, i) => (
-                                            <span key={i} className="px-2 py-1 bg-green-100 text-green-700 text-sm rounded">${s?.toFixed?.(2) || s}</span>
-                                        ))}
+                            
+                            <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                                <h4 className="font-semibold text-gray-900 mb-4">Trading Metrics</h4>
+                                <div className="space-y-3">
+                                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                        <span className="text-sm text-gray-600">Trend Below</span>
+                                        <span className="font-medium text-yellow-600">Stability Threshold</span>
                                     </div>
-                                </div>
-                                <div className="bg-red-50 rounded-xl p-4">
-                                    <p className="text-sm text-gray-600 mb-2">Resistance Levels</p>
-                                    <div className="flex gap-2">
-                                        {(data.resistance || [stock.price * 1.05, stock.price * 1.1]).map((r, i) => (
-                                            <span key={i} className="px-2 py-1 bg-red-100 text-red-700 text-sm rounded">${r?.toFixed?.(2) || r}</span>
-                                        ))}
+                                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                        <span className="text-sm text-gray-600">Volume</span>
+                                        <span className="font-medium text-green-600">{data.volumeTrend || 'Elevated'}</span>
+                                    </div>
+                                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                        <span className="text-sm text-gray-600">Institutional Interest</span>
+                                        <span className="font-medium text-green-600">Present</span>
+                                    </div>
+                                    <div className="flex items-center justify-between p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                                        <span className="text-sm text-gray-700 font-medium">Recommendation</span>
+                                        <span className="font-bold text-yellow-700">Cautious</span>
                                     </div>
                                 </div>
                             </div>
