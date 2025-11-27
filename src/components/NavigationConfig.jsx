@@ -13,12 +13,12 @@ export const menuItems = [
     { label: 'Learning', icon: GraduationCap, href: createPageUrl('Learning') },
     { label: 'Geospatial', icon: Globe, href: createPageUrl('Geospatial') },
     { label: 'Intelligence', icon: Lightbulb, href: createPageUrl('Intelligence') },
-    { label: 'Resume Builder', icon: FileText, href: createPageUrl('ResumeBuilder') },
+    { label: 'ResumePro', icon: FileText, href: createPageUrl('ResumeBuilder') },
     { label: 'Tasks', icon: ListTodo, href: createPageUrl('Tasks') },
     { label: 'Notes', icon: StickyNote, href: createPageUrl('Notes') },
     { label: 'Games', icon: Gamepad2, href: createPageUrl('Games') },
-    { label: 'Terms of Use', icon: ScrollText, href: createPageUrl('TermsOfUse') },
     { label: 'Settings', icon: Settings, href: createPageUrl('Settings') },
+    { label: 'Terms of Use', icon: ScrollText, href: createPageUrl('TermsOfUse') },
 ];
 
 export const NAVIGATION_ITEMS = menuItems.map(item => ({
