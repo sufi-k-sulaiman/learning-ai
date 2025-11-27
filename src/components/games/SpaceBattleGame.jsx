@@ -1188,9 +1188,9 @@ export default function SpaceBattleGame({ onExit }) {
             <div className="max-w-6xl mx-auto">
                 {/* Header */}
                 <div className="text-center mb-4">
-                    <img src={LOGO_URL} alt="1cPublishing" className="w-12 h-12 mx-auto mb-2 rounded-xl" />
-                    <h1 className="text-3xl font-black text-gray-900 mb-1">SPACE BATTLE</h1>
-                    <p className="text-gray-500 text-sm">FPS Combat Learning Game</p>
+                    <img src={LOGO_URL} alt="1cPublishing" className="w-14 h-14 mx-auto mb-2 rounded-xl" />
+                    <h1 className="text-4xl font-black text-gray-900 mb-1">SPACE BATTLE</h1>
+                    <p className="text-gray-500">FPS Combat Learning Game</p>
                 </div>
 
                 {/* Search bar */}
@@ -1239,10 +1239,10 @@ export default function SpaceBattleGame({ onExit }) {
                                 const TopicIcon = icons[i % icons.length];
                                 return (
                                     <button key={topic.id || i} onClick={() => startGame(topic)}
-                                        className="h-32 py-4 px-4 bg-gradient-to-br from-purple-600 to-violet-700 hover:from-purple-700 hover:to-violet-800 text-left rounded-xl transition-all hover:scale-[1.02] hover:shadow-lg">
-                                        <TopicIcon className="w-5 h-5 text-white/70 mb-2" />
-                                        <p className="font-semibold text-white text-sm leading-tight line-clamp-2">{topic.label}</p>
-                                        <p className="text-xs text-white/70 line-clamp-2 mt-1">{topic.description}</p>
+                                        className="h-36 py-4 px-4 bg-gradient-to-br from-purple-600 to-violet-700 hover:from-purple-700 hover:to-violet-800 text-left rounded-xl transition-all hover:scale-[1.02] hover:shadow-lg">
+                                        <TopicIcon className="w-6 h-6 text-white/70 mb-2" />
+                                        <p className="font-semibold text-white text-base leading-tight line-clamp-2">{topic.label}</p>
+                                        <p className="text-sm text-white/70 line-clamp-2 mt-1">{topic.description}</p>
                                     </button>
                                 );
                             })}
@@ -1257,12 +1257,12 @@ export default function SpaceBattleGame({ onExit }) {
                         { icon: Sparkles, title: 'Knowledge Quiz', desc: 'Answer questions after battle', bgColor: 'bg-purple-100', iconColor: 'text-purple-600' },
                         { icon: Trophy, title: 'Earn Awards', desc: 'Collect medals and achievements', bgColor: 'bg-emerald-100', iconColor: 'text-emerald-600' }
                     ].map((item, i) => (
-                        <div key={i} className="bg-white border border-gray-200 rounded-lg p-3 text-center shadow-sm">
-                            <div className={`w-10 h-10 ${item.bgColor} rounded-lg mx-auto mb-2 flex items-center justify-center`}>
-                                <item.icon className={`w-5 h-5 ${item.iconColor}`} />
+                        <div key={i} className="bg-white border border-gray-200 rounded-lg p-4 text-center shadow-sm">
+                            <div className={`w-12 h-12 ${item.bgColor} rounded-lg mx-auto mb-2 flex items-center justify-center`}>
+                                <item.icon className={`w-6 h-6 ${item.iconColor}`} />
                             </div>
-                            <h3 className="text-gray-900 font-semibold text-sm mb-1">{item.title}</h3>
-                            <p className="text-gray-500 text-xs">{item.desc}</p>
+                            <h3 className="text-gray-900 font-semibold text-base mb-1">{item.title}</h3>
+                            <p className="text-gray-500 text-sm">{item.desc}</p>
                         </div>
                     ))}
                 </div>

@@ -558,9 +558,9 @@ export default function WordShooter({ onExit }) {
       
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-4">
-          <img src={LOGO_URL} alt="1cPublishing" className="w-12 h-12 mx-auto mb-2 rounded-xl" />
-          <h1 className="text-3xl font-black text-gray-900 mb-1">WORD SHOOTER</h1>
-          <p className="text-gray-500 text-sm">Gamified Vocabulary Learning</p>
+          <img src={LOGO_URL} alt="1cPublishing" className="w-14 h-14 mx-auto mb-2 rounded-xl" />
+          <h1 className="text-4xl font-black text-gray-900 mb-1">WORD SHOOTER</h1>
+          <p className="text-gray-500">Gamified Vocabulary Learning</p>
         </div>
 
         <div className="bg-white rounded-xl border border-purple-200 p-3 mb-4 shadow-sm">
@@ -601,10 +601,10 @@ export default function WordShooter({ onExit }) {
                 const TopicIcon = icons[i % icons.length];
                 return (
                   <button key={topic.id || i} onClick={() => handleStartGame(topic)} 
-                    className={`h-32 text-left py-4 px-4 rounded-xl bg-gradient-to-br ${tabInfo?.color || 'from-purple-600 to-purple-700'} hover:opacity-90 text-white transition-all hover:scale-[1.02] hover:shadow-lg`}>
-                    <TopicIcon className="w-5 h-5 text-white/70 mb-2" />
-                    <div className="text-sm font-bold line-clamp-2 leading-tight">{topic.label}</div>
-                    <div className="text-xs text-white/70 line-clamp-2 mt-1">{topic.description}</div>
+                    className={`h-36 text-left py-4 px-4 rounded-xl bg-gradient-to-br ${tabInfo?.color || 'from-purple-600 to-purple-700'} hover:opacity-90 text-white transition-all hover:scale-[1.02] hover:shadow-lg`}>
+                    <TopicIcon className="w-6 h-6 text-white/70 mb-2" />
+                    <div className="text-base font-bold line-clamp-2 leading-tight">{topic.label}</div>
+                    <div className="text-sm text-white/70 line-clamp-2 mt-1">{topic.description}</div>
                   </button>
                 );
               })}
@@ -618,12 +618,12 @@ export default function WordShooter({ onExit }) {
             { icon: Zap, title: 'Combo System', desc: 'Chain reactions multiply your score exponentially', bgColor: 'bg-purple-100', iconColor: 'text-purple-600' },
             { icon: Book, title: 'Learn & Master', desc: 'Every explosion teaches you something new', bgColor: 'bg-emerald-100', iconColor: 'text-emerald-600' }
           ].map((item, i) => (
-            <div key={i} className="bg-white border border-gray-200 rounded-lg p-3 text-center shadow-sm">
-              <div className={`w-10 h-10 ${item.bgColor} rounded-lg mx-auto mb-2 flex items-center justify-center`}>
-                <item.icon className={`w-5 h-5 ${item.iconColor}`} />
+            <div key={i} className="bg-white border border-gray-200 rounded-lg p-4 text-center shadow-sm">
+              <div className={`w-12 h-12 ${item.bgColor} rounded-lg mx-auto mb-2 flex items-center justify-center`}>
+                <item.icon className={`w-6 h-6 ${item.iconColor}`} />
               </div>
-              <h3 className="text-gray-900 font-semibold text-sm mb-1">{item.title}</h3>
-              <p className="text-gray-500 text-xs">{item.desc}</p>
+              <h3 className="text-gray-900 font-semibold text-base mb-1">{item.title}</h3>
+              <p className="text-gray-500 text-sm">{item.desc}</p>
             </div>
           ))}
         </div>
