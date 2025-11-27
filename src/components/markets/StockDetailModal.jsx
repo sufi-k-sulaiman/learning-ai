@@ -851,44 +851,82 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
                 );
 
             case 'valuation':
+                const valuationComparison = [
+                    { metric: 'Current', value: stock.price, fill: '#8B5CF6' },
+                    { metric: 'Intrinsic', value: data.fairValue || (stock.price * 1.1), fill: '#10B981' },
+                    { metric: 'Market Avg', value: data.sectorAvgPE ? (stock.eps * data.sectorAvgPE) : (stock.price * 0.95), fill: '#6B7280' }
+                ];
+                const valuationMetrics = [
+                    { metric: 'P/E Ratio', current: stock.pe || 20, historical: 18, sector: data.sectorAvgPE || 22 },
+                    { metric: 'P/B Ratio', current: 3.2, historical: 2.8, sector: 3.5 },
+                    { metric: 'EV/EBITDA', current: 12.5, historical: 11.2, sector: 14.0 },
+                    { metric: 'Price/Sales', current: 4.8, historical: 4.2, sector: 5.2 }
+                ];
                 return (
                     <div className="space-y-6">
                         <div className="bg-white rounded-2xl border border-gray-200 p-6">
                             <div className="flex items-center justify-between mb-6">
                                 <div className="flex items-center gap-2">
                                     <BarChart3 className="w-5 h-5 text-purple-600" />
-                                    <h3 className="font-semibold text-gray-900">Valuation Analysis</h3>
+                                    <h3 className="font-semibold text-gray-900">Valuation Overview</h3>
                                 </div>
                                 <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                                    data.grade === 'A' || data.grade === 'B' ? 'bg-green-100 text-green-700' :
-                                    data.grade === 'C' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
+                                    data.marginOfSafety > 15 ? 'bg-green-100 text-green-700' : 
+                                    data.marginOfSafety > 0 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
                                 }`}>
-                                    Grade: {data.grade || 'B+'}
+                                    {data.marginOfSafety > 15 ? 'Undervalued' : data.marginOfSafety > 0 ? 'Fair Value' : 'Overvalued'}
                                 </span>
                             </div>
-                            <div className="grid grid-cols-3 gap-4 mb-6">
-                                <div className="bg-purple-50 rounded-xl p-4 text-center">
-                                    <p className="text-sm text-gray-600">Fair Value</p>
-                                    <p className="text-2xl font-bold text-purple-600">${data.fairValue || (stock.price * 1.1).toFixed(2)}</p>
+                            <div className="grid grid-cols-2 gap-6">
+                                <div className="h-56">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart data={valuationComparison} layout="horizontal">
+                                            <XAxis type="number" tick={{ fontSize: 10 }} tickFormatter={(v) => `$${v.toFixed(0)}`} />
+                                            <YAxis type="category" dataKey="metric" tick={{ fontSize: 11 }} width={70} />
+                                            <Tooltip formatter={(v) => `$${Number(v).toFixed(2)}`} />
+                                            <Bar dataKey="value" radius={[0, 4, 4, 0]}>
+                                                {valuationComparison.map((entry, i) => <Cell key={i} fill={entry.fill} />)}
+                                            </Bar>
+                                        </BarChart>
+                                    </ResponsiveContainer>
                                 </div>
-                                <div className="bg-blue-50 rounded-xl p-4 text-center">
-                                    <p className="text-sm text-gray-600">DCF Value</p>
-                                    <p className="text-2xl font-bold text-blue-600">${data.dcfValue || (stock.price * 1.15).toFixed(2)}</p>
-                                </div>
-                                <div className="bg-green-50 rounded-xl p-4 text-center">
-                                    <p className="text-sm text-gray-600">Margin of Safety</p>
-                                    <p className="text-2xl font-bold text-green-600">{data.marginOfSafety || 12}%</p>
+                                <div className="space-y-3">
+                                    <div className="p-4 bg-purple-50 rounded-xl">
+                                        <p className="text-sm text-gray-600">Intrinsic Valuation</p>
+                                        <p className="text-2xl font-bold text-purple-600">${data.fairValue || (stock.price * 1.1).toFixed(2)}</p>
+                                    </div>
+                                    <div className="p-4 bg-green-50 rounded-xl">
+                                        <p className="text-sm text-gray-600">Margin of Safety</p>
+                                        <p className={`text-2xl font-bold ${(data.marginOfSafety || 8) > 0 ? 'text-green-600' : 'text-red-600'}`}>{data.marginOfSafety || 8}%</p>
+                                        <p className="text-xs text-gray-500 mt-1">{(data.marginOfSafety || 8) > 15 ? 'Attractive' : (data.marginOfSafety || 8) > 0 ? 'Limited' : 'Overvalued'}</p>
+                                    </div>
+                                    <div className="p-4 bg-gray-50 rounded-xl">
+                                        <p className="text-sm text-gray-600">Current vs Long-Term Avg</p>
+                                        <p className="text-lg font-bold text-gray-900">{stock.pe}x vs 18.5x</p>
+                                        <p className="text-xs text-red-500 mt-1">Above average</p>
+                                    </div>
                                 </div>
                             </div>
-                            <div className="space-y-3">
-                                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                    <span className="text-sm text-gray-600">Sector Avg P/E</span>
-                                    <span className="font-medium text-gray-700">{data.sectorAvgPE || 22.5}x</span>
-                                </div>
-                                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                                    <span className="text-sm text-gray-600">Current P/E</span>
-                                    <span className="font-medium text-gray-700">{stock.pe || 18.3}x</span>
-                                </div>
+                        </div>
+                        
+                        <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                            <h4 className="font-semibold text-gray-900 mb-4">Key Valuation Ratios</h4>
+                            <div className="space-y-4">
+                                {valuationMetrics.map((m, i) => (
+                                    <div key={i} className="space-y-2">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-sm text-gray-700">{m.metric}</span>
+                                            <div className="flex gap-3 text-sm">
+                                                <span className="text-purple-600 font-medium">Current: {m.current}</span>
+                                                <span className="text-gray-500">Hist: {m.historical}</span>
+                                                <span className="text-gray-500">Sector: {m.sector}</span>
+                                            </div>
+                                        </div>
+                                        <div className="h-2 bg-gray-100 rounded-full overflow-hidden flex">
+                                            <div className="bg-purple-400" style={{ width: `${(m.current / m.sector) * 50}%` }} />
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </div>
