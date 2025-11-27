@@ -20,8 +20,9 @@ export const menuItems = [
 ];
 
 export const footerLinks = [
-    { label: "Contact Us", href: "#" },
-    { label: "Governance", href: "#" },
-    { label: "Cookie Policy", href: "#" },
-    { label: "Terms of Use", href: "#" },
+    { label: "Contact Us", href: createPageUrl('ContactUs') },
+    { label: "Governance", href: createPageUrl('Governance') },
+    { label: "Cookie Policy", href: createPageUrl('CookiePolicy') },
+    { label: "Terms of Use", href: createPageUrl('TermsOfUse') },
+    { label: "Teams", href: createPageUrl('Teams') },
 ];
