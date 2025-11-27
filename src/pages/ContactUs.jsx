@@ -61,8 +61,8 @@ const ContactCard = ({ icon: Icon, title, description, email, buttonText, color,
                     className="absolute inset-0 bg-white rounded-2xl border border-gray-200 p-6 hover:shadow-lg transition-shadow flex flex-col"
                     style={{ backfaceVisibility: 'hidden' }}
                 >
-                    <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-4`} style={{ backgroundColor: `${color}20` }}>
-                        <Icon className="w-7 h-7" style={{ color }} />
+                    <div className="mb-4">
+                        <Icon className="w-9 h-9" style={{ color }} />
                     </div>
                     <h3 className="text-xl font-bold text-gray-900 mb-4 min-h-[56px] flex items-center">{title}</h3>
                     <a 
