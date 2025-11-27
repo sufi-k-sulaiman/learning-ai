@@ -128,7 +128,15 @@ export default function Teams() {
                         </div>
                     </Card>
 
-                    <CountryVisitorsCard title="Team Locations" data={teamLocations} />
+                    <CountryVisitorsCard 
+                        title="Team Locations" 
+                        subtitle="Our global presence"
+                        countries={teamLocations.map(loc => ({
+                            label: loc.country,
+                            percentage: loc.percentage,
+                            color: ['#EC4899', '#6B4EE6', '#50C8E8', '#F59E0B', '#10B981'][teamLocations.indexOf(loc) % 5]
+                        }))}
+                    />
                 </div>
 
                 {/* Values */}
