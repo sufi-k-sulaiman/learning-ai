@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { LOGO_URL, footerLinks } from '../NavigationConfig';
 
 export default function Footer() {
@@ -9,7 +10,7 @@ export default function Footer() {
                     <img src={LOGO_URL} alt="1cPublishing" className="h-8 w-8 object-contain grayscale" />
                     <nav className="flex flex-wrap justify-center gap-6 text-sm">
                         {footerLinks.map((link, i) => (
-                            <a key={i} href={link.href} className="text-gray-600 hover:text-purple-600 transition-colors">{link.label}</a>
+                            <Link key={i} to={link.href} className="text-gray-600 hover:text-purple-600 transition-colors">{link.label}</Link>
                         ))}
                     </nav>
                 </div>
