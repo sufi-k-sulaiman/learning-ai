@@ -83,6 +83,9 @@ export default function Qwirey() {
     // Mic
     const [isListening, setIsListening] = useState(false);
     const recognitionRef = useRef(null);
+    
+    // Response format
+    const [responseFormat, setResponseFormat] = useState('dynamic');
 
     // Initialize speech recognition
     useEffect(() => {
@@ -197,9 +200,19 @@ export default function Qwirey() {
         setLoading(true);
         setResult(null);
 
+        // Build format instruction based on selected format
+        const formatInstructions = {
+            dynamic: '',
+            short: 'IMPORTANT: Keep your response under 280 characters. Use bullet points for key facts. Be extremely concise.',
+            long: 'IMPORTANT: Provide a detailed, comprehensive response with 6-8 paragraphs. Include thorough explanations, examples, and context.',
+            tabled: 'IMPORTANT: Structure your response with a brief summary paragraph followed by a markdown table summarizing key details. Use columns like Category, Detail, Notes where appropriate.'
+        };
+
+        const formatInstruction = formatInstructions[responseFormat] || '';
+        
         const fullPrompt = fileContent
-            ? `Referencing the following document content:\n\n---\n${fileContent}\n---\n\nAnswer the user's question: ${currentPrompt}`
-            : currentPrompt;
+            ? `${formatInstruction}\n\nReferencing the following document content:\n\n---\n${fileContent}\n---\n\nAnswer the user's question: ${currentPrompt}`
+            : `${formatInstruction}\n\n${currentPrompt}`;
 
         try {
             if (selectedModel === 'qwirey') {
@@ -368,7 +381,30 @@ export default function Qwirey() {
                         }}
                     />
                     
-                    <div className="flex items-center justify-end pt-4 border-t border-gray-100 gap-1">
+                    <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                        {/* Response Format Switches */}
+                        <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+                            {[
+                                { id: 'dynamic', label: 'Dynamic' },
+                                { id: 'short', label: 'Short' },
+                                { id: 'long', label: 'Long' },
+                                { id: 'tabled', label: 'Tabled' },
+                            ].map((format) => (
+                                <button
+                                    key={format.id}
+                                    onClick={() => setResponseFormat(format.id)}
+                                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-all ${
+                                        responseFormat === format.id
+                                            ? 'bg-white text-purple-700 shadow-sm'
+                                            : 'text-gray-500 hover:text-gray-700'
+                                    }`}
+                                >
+                                    {format.label}
+                                </button>
+                            ))}
+                        </div>
+                        
+                        <div className="flex items-center gap-1">
                         <button
                             onClick={() => setShowUrlDialog(true)}
                             className="p-2.5 rounded-lg hover:bg-gray-100 text-gray-500 hover:text-purple-600 transition-colors"
@@ -416,6 +452,7 @@ export default function Qwirey() {
                                 <SendArrowIcon />
                             )}
                         </button>
+                        </div>
                     </div>
                 </div>
 
