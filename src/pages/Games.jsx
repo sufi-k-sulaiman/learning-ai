@@ -27,7 +27,7 @@ export default function Games() {
             <div className="max-w-6xl mx-auto">
                 <div className="text-center mb-8">
                     <div className="inline-flex items-center gap-3 mb-4">
-                        <h1 className="text-4xl font-bold text-gray-900">Game Arcade</h1>
+                        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Game Arcade</h1>
                     </div>
                     <p className="text-gray-500">Gamified Learning</p>
                 </div>
