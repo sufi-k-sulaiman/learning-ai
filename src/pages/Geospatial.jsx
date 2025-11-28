@@ -19,6 +19,8 @@ import ResourcesChart from '@/components/geospatial/ResourcesChart';
 import InfrastructureStats from '@/components/geospatial/InfrastructureStats';
 import DataTable from '@/components/geospatial/DataTable';
 import MultiSelectDropdown from '@/components/intelligence/MultiSelectDropdown';
+import GeographicalModels from '@/components/geospatial/GeographicalModels';
+import AnomalyDetection from '@/components/geospatial/AnomalyDetection';
 
 const COLORS = ['#8B5CF6', '#10B981', '#F59E0B', '#EF4444', '#3B82F6', '#EC4899', '#06B6D4', '#84CC16'];
 
@@ -566,20 +568,27 @@ export default function Geospatial() {
                         Anomaly Detection
                     </button>
                     <button
+                        onClick={() => setMainTab('models')}
+                        className={`px-5 py-2.5 rounded-lg font-medium transition-all ${mainTab === 'models' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
+                    >
+                        Geographical Models
+                    </button>
+                    <button
                         onClick={() => setMainTab('geographical')}
                         className={`px-5 py-2.5 rounded-lg font-medium transition-all ${mainTab === 'geographical' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}`}
                     >
-                        Geographical Models
+                        Country Data
                     </button>
                 </div>
 
                 {/* Anomaly Detection Tab */}
                 {mainTab === 'anomaly' && (
-                    <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
-                        <Activity className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                        <h3 className="text-lg font-semibold text-gray-700 mb-2">Anomaly Detection</h3>
-                        <p className="text-sm text-gray-500">Detect anomalies and outliers in geospatial data patterns. Coming soon.</p>
-                    </div>
+                    <AnomalyDetection selectedCountries={selectedCountries} />
+                )}
+
+                {/* Geographical Models Tab */}
+                {mainTab === 'models' && (
+                    <GeographicalModels selectedCountries={selectedCountries} />
                 )}
 
                 {/* Geographical Models Tab - Instruction or Selected Countries Display */}
