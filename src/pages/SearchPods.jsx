@@ -48,14 +48,25 @@ const CATEGORIES = [
 
 const QUICK_TOPICS = ['AI trends', 'Morning motivation', 'Sleep story', 'Health tips', 'World news', 'Book summary'];
 
-const TRENDING = [
+const ALL_TRENDING = [
     { title: 'The Psychology of Happiness', category: 'Psychology', plays: 3421, image: 'https://images.unsplash.com/photo-1489710437720-ebb67ec84dd2?w=400&h=400&fit=crop' },
     { title: 'The Science of Learning', category: 'Education', plays: 3156, image: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=400&h=400&fit=crop' },
     { title: 'AI Revolution in Industries', category: 'Technology', plays: 2847, image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=400&h=400&fit=crop' },
     { title: 'Startup Playbook', category: 'Startups', plays: 2789, image: 'https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=400&h=400&fit=crop' },
     { title: 'Investment Basics', category: 'Finance', plays: 2567, image: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=400&fit=crop' },
     { title: 'Peak Performance', category: 'Sports', plays: 2567, image: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=400&h=400&fit=crop' },
+    { title: 'Mindfulness Meditation', category: 'Wellness', plays: 2234, image: 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=400&h=400&fit=crop' },
+    { title: 'Creative Writing Tips', category: 'Arts', plays: 1987, image: 'https://images.unsplash.com/photo-1455390582262-044cdead277a?w=400&h=400&fit=crop' },
+    { title: 'Healthy Eating Habits', category: 'Health', plays: 2654, image: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=400&h=400&fit=crop' },
+    { title: 'Leadership Skills', category: 'Business', plays: 2345, image: 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=400&fit=crop' },
+    { title: 'Space Exploration', category: 'Science', plays: 2890, image: 'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=400&h=400&fit=crop' },
+    { title: 'Music Theory Basics', category: 'Music', plays: 1756, image: 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&h=400&fit=crop' },
 ];
+
+const getRandomTrending = () => {
+    const shuffled = [...ALL_TRENDING].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, 6);
+};
 
 // Clean text for speech synthesis
 const cleanTextForSpeech = (text) => {
@@ -141,6 +152,15 @@ export default function SearchPods() {
     const audioRef = useRef(null);
     const [podImage, setPodImage] = useState(null);
     const [imageLoading, setImageLoading] = useState(false);
+    const [trending, setTrending] = useState(getRandomTrending);
+
+    // Auto-refresh trending every 30 seconds
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setTrending(getRandomTrending());
+        }, 30000);
+        return () => clearInterval(interval);
+    }, []);
 
     // Load voices
     useEffect(() => {
@@ -437,34 +457,22 @@ Use short sentences for better pacing. Do NOT use any markdown formatting.`,
 
     return (
         <div className="min-h-screen bg-gray-50 pb-8">
-            {/* Header */}
-            <div className="bg-white border-b border-gray-200 px-4 md:px-6 py-4 mb-6">
-                <div className="max-w-7xl mx-auto flex items-center gap-4">
-                    <div className="flex items-center gap-2">
-                        <div>
-                            <span className="text-gray-900 font-bold text-lg">SearchPods</span>
-                            <p className="text-xs text-gray-500">Generative Podcast</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <main className="max-w-7xl mx-auto px-4 md:px-6 space-y-8">
+            <main className="max-w-7xl mx-auto px-4 md:px-6 pt-6 space-y-8">
 
                 {/* Trending Section */}
                 <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl border border-purple-100 p-6">
                     <div className="flex items-center gap-3 mb-6">
                         <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
-                            <TrendingUp className="w-5 h-5 text-purple-600" />
+                            <Radio className="w-5 h-5 text-purple-600" />
                         </div>
                         <div>
-                            <h3 className="text-gray-900 font-bold text-lg">Trending Now</h3>
-                            <p className="text-gray-500 text-sm">What others are listening to</p>
+                            <span className="text-gray-900 font-bold text-lg">SearchPods</span>
+                            <p className="text-xs text-gray-500">Generative Podcast</p>
                         </div>
                     </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {TRENDING.map((item, i) => (
+                        {trending.map((item, i) => (
                             <div
                                 key={i}
                                 onClick={() => playEpisode(item)}
