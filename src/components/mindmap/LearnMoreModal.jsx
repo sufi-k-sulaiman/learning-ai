@@ -231,7 +231,7 @@ For each document, provide the actual URL where it can be found.`,
                                     <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
                                     <span className="ml-3 text-gray-600">Loading comprehensive data...</span>
                                 </div>
-                            ) : data ? (
+                            ) : (
                                 <>
                                     {/* Overview Tab */}
                                     <TabsContent value="overview" className="m-0">
@@ -556,10 +556,6 @@ For each document, provide the actual URL where it can be found.`,
                                         </div>
                                     </TabsContent>
                                 </>
-                            ) : (
-                                <div className="text-center text-gray-500 py-12">
-                                    No data available. Please try again.
-                                </div>
                             )}
                         </div>
                     </Tabs>
