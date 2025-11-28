@@ -55,19 +55,29 @@ export default function Geospatial() {
 
     const [loadingSections, setLoadingSections] = useState({});
     const [mainTab, setMainTab] = useState('geomatics');
+    const [loadedSections, setLoadedSections] = useState({});
 
-    // Load dynamic data when countries change
+    // Only load summary when countries change, not all sections
     useEffect(() => {
         if (selectedCountries.length > 0) {
             setDynamicData({});
             setAnalysisData(null);
-            loadDataInChunks();
+            setLoadedSections({});
+            loadSummaryOnly();
         } else {
             setDynamicData(null);
             setAnalysisData(null);
             setLoadingSections({});
+            setLoadedSections({});
         }
     }, [selectedCountries]);
+
+    // Load section data when category is selected
+    useEffect(() => {
+        if (selectedCountries.length > 0 && activeCategory !== 'all') {
+            loadCategoryData(activeCategory);
+        }
+    }, [activeCategory, selectedCountries]);
 
     const loadSectionData = async (sectionName, prompt, schema, dataKeys) => {
         const countriesStr = selectedCountries.join(', ');
@@ -85,6 +95,71 @@ export default function Geospatial() {
             console.error(`Failed to load ${sectionName}:`, error);
         } finally {
             setLoadingSections(prev => ({ ...prev, [sectionName]: false }));
+            setLoadedSections(prev => ({ ...prev, [sectionName]: true }));
+        }
+    };
+
+    const loadSummaryOnly = async () => {
+        const countriesStr = selectedCountries.join(', ');
+        setLoadingSections(prev => ({ ...prev, summary: true }));
+        try {
+            const response = await base44.integrations.Core.InvokeLLM({
+                prompt: `For ${countriesStr}: Generate summary analysis. Return: summary (string with key findings), keyInsights (4 strings).`,
+                add_context_from_internet: true,
+                response_json_schema: { type: "object", properties: { summary: { type: "string" }, keyInsights: { type: "array", items: { type: "string" } } } }
+            });
+            if (response) {
+                setDynamicData(prev => ({ ...prev, ...response }));
+                setAnalysisData({ summary: response.summary, keyInsights: response.keyInsights });
+            }
+        } catch (error) {
+            console.error('Failed to load summary:', error);
+        } finally {
+            setLoadingSections(prev => ({ ...prev, summary: false }));
+        }
+    };
+
+    const loadCategoryData = async (category) => {
+        if (loadedSections[category]) return; // Already loaded
+
+        const sectionConfigs = {
+            infrastructure: {
+                prompt: `Generate transportation, energy, telecom, water infrastructure data. Return: transportData (5 items: type, count, capacity, condition, investment), transportStats (4 items: title, value, unit), energyData (6 items: source, capacity, share, growth, plants), energyStats (4), telecomData (4 items: type, count, coverage, investment, growth), telecomStats (4), waterData (4 items: type, count, capacity, condition, age), waterStats (4).`,
+                schema: { type: "object", properties: { transportData: { type: "array", items: { type: "object" } }, transportStats: { type: "array", items: { type: "object" } }, energyData: { type: "array", items: { type: "object" } }, energyStats: { type: "array", items: { type: "object" } }, telecomData: { type: "array", items: { type: "object" } }, telecomStats: { type: "array", items: { type: "object" } }, waterData: { type: "array", items: { type: "object" } }, waterStats: { type: "array", items: { type: "object" } } } }
+            },
+            resources: {
+                prompt: `Generate natural resources data. Return: resourcesData (5 items: resource, reserves, production, value, rank), resourceStats (4), mineralsData (5 items: mineral, reserves, production, globalRank, value), mineralStats (4), agriculturalData (4 items: resource, amount, utilization, output, globalRank), agriculturalStats (4), humanCapitalData (4 items: metric, value, growth, globalRank), humanCapitalStats (4).`,
+                schema: { type: "object", properties: { resourcesData: { type: "array", items: { type: "object" } }, resourceStats: { type: "array", items: { type: "object" } }, mineralsData: { type: "array", items: { type: "object" } }, mineralStats: { type: "array", items: { type: "object" } }, agriculturalData: { type: "array", items: { type: "object" } }, agriculturalStats: { type: "array", items: { type: "object" } }, humanCapitalData: { type: "array", items: { type: "object" } }, humanCapitalStats: { type: "array", items: { type: "object" } } } }
+            },
+            assets: {
+                prompt: `Generate national assets data. Return: financialData (4 items: asset, value, change, type), financialStats (4), industrialData (4 items: sector, count, employment, output, growth), industrialStats (4), intellectualData (4 items: category, count, annual, value, globalShare), intellectualStats (4), strategicReservesData (4 items: reserve, capacity, current, value, days), strategicStats (4), digitalAssetsData (4 items: asset, count, capacity, investment, growth), digitalStats (4).`,
+                schema: { type: "object", properties: { financialData: { type: "array", items: { type: "object" } }, financialStats: { type: "array", items: { type: "object" } }, industrialData: { type: "array", items: { type: "object" } }, industrialStats: { type: "array", items: { type: "object" } }, intellectualData: { type: "array", items: { type: "object" } }, intellectualStats: { type: "array", items: { type: "object" } }, strategicReservesData: { type: "array", items: { type: "object" } }, strategicStats: { type: "array", items: { type: "object" } }, digitalAssetsData: { type: "array", items: { type: "object" } }, digitalStats: { type: "array", items: { type: "object" } } } }
+            },
+            governance: {
+                prompt: `Generate governance and economic data. Return: governanceData (4 items: institution, count, personnel, budget, efficiency), governanceStats (4), lawEnforcementData (4 items: agency, personnel, budget, jurisdiction, clearRate), lawEnforcementStats (4), financialInfraData (4 items: type, count, assets, coverage, rating), financialInfraStats (4), tradeNetworksData (4 items: network, count, volume, value, globalRank), tradeStats (4), laborMarketData (4 items: metric, value, change, rate), laborStats (4).`,
+                schema: { type: "object", properties: { governanceData: { type: "array", items: { type: "object" } }, governanceStats: { type: "array", items: { type: "object" } }, lawEnforcementData: { type: "array", items: { type: "object" } }, lawEnforcementStats: { type: "array", items: { type: "object" } }, financialInfraData: { type: "array", items: { type: "object" } }, financialInfraStats: { type: "array", items: { type: "object" } }, tradeNetworksData: { type: "array", items: { type: "object" } }, tradeStats: { type: "array", items: { type: "object" } }, laborMarketData: { type: "array", items: { type: "object" } }, laborStats: { type: "array", items: { type: "object" } } } }
+            },
+            economic: {
+                prompt: `Generate governance and economic data. Return: financialInfraData (4 items: type, count, assets, coverage, rating), financialInfraStats (4), tradeNetworksData (4 items: network, count, volume, value, globalRank), tradeStats (4), laborMarketData (4 items: metric, value, change, rate), laborStats (4).`,
+                schema: { type: "object", properties: { financialInfraData: { type: "array", items: { type: "object" } }, financialInfraStats: { type: "array", items: { type: "object" } }, tradeNetworksData: { type: "array", items: { type: "object" } }, tradeStats: { type: "array", items: { type: "object" } }, laborMarketData: { type: "array", items: { type: "object" } }, laborStats: { type: "array", items: { type: "object" } } } }
+            },
+            social: {
+                prompt: `Generate social data. Return: educationData (4 items: level, institutions, enrollment, teachers, spending), educationStats (4), healthcareData (4 items: facility, count, capacity, staff, spending), healthcareStats (4), socialSafetyData (4 items: program, beneficiaries, annual, coverage, fundStatus), socialSafetyStats (4).`,
+                schema: { type: "object", properties: { educationData: { type: "array", items: { type: "object" } }, educationStats: { type: "array", items: { type: "object" } }, healthcareData: { type: "array", items: { type: "object" } }, healthcareStats: { type: "array", items: { type: "object" } }, socialSafetyData: { type: "array", items: { type: "object" } }, socialSafetyStats: { type: "array", items: { type: "object" } } } }
+            },
+            global: {
+                prompt: `Generate global positioning data. Return: diplomaticData (4 items: type, count, personnel, regions, budget), diplomaticStats (4), geopoliticalData (4 items: asset, size, value, rank, control), geopoliticalStats (4), softPowerData (4 items: category, value, reach, rank, growth), softPowerStats (4).`,
+                schema: { type: "object", properties: { diplomaticData: { type: "array", items: { type: "object" } }, diplomaticStats: { type: "array", items: { type: "object" } }, geopoliticalData: { type: "array", items: { type: "object" } }, geopoliticalStats: { type: "array", items: { type: "object" } }, softPowerData: { type: "array", items: { type: "object" } }, softPowerStats: { type: "array", items: { type: "object" } } } }
+            },
+            environment: {
+                prompt: `Generate environment data. Return: climateResilienceData (4 items: system, count, capacity, investment, condition), climateStats (4), protectedAreasData (4 items: type, count, area, visitors, budget), protectedStats (4), renewablePotentialData (4 items: source, potential, installed, utilization, growth), renewableStats (4).`,
+                schema: { type: "object", properties: { climateResilienceData: { type: "array", items: { type: "object" } }, climateStats: { type: "array", items: { type: "object" } }, protectedAreasData: { type: "array", items: { type: "object" } }, protectedStats: { type: "array", items: { type: "object" } }, renewablePotentialData: { type: "array", items: { type: "object" } }, renewableStats: { type: "array", items: { type: "object" } } } }
+            }
+        };
+
+        const config = sectionConfigs[category];
+        if (config) {
+            await loadSectionData(category, config.prompt, config.schema);
         }
     };
 
@@ -97,80 +172,7 @@ export default function Geospatial() {
         ) : null
     );
 
-    const loadDataInChunks = async () => {
-        // Define priority order for loading sections
-        const loadOrder = [
-            { section: 'summary', priority: 1 },
-            { section: 'infrastructure', priority: 2 },
-            { section: 'resources', priority: 3 },
-            { section: 'assets', priority: 4 },
-            { section: 'governance', priority: 5 },
-            { section: 'social', priority: 6 },
-            { section: 'global', priority: 7 },
-            { section: 'defense', priority: 8 }
-        ];
-
-        // Start all section loaders
-        setLoadingSections({
-            infrastructure: true, resources: true, assets: true, governance: true,
-            social: true, global: true, defense: true, summary: true
-        });
-
-        // Load summary first (highest priority)
-        const countriesStr = selectedCountries.join(', ');
-        try {
-            const response = await base44.integrations.Core.InvokeLLM({
-                prompt: `For ${countriesStr}: Generate summary analysis and comparison. Return: summary (string with key findings), keyInsights (4 strings), trendData (12 monthly objects with period, infrastructure 50-95, energy 50-95, digital 50-95), countryComparison (one object per country with country name, infrastructure 50-95, resources 50-95, digital 50-95).`,
-                add_context_from_internet: true,
-                response_json_schema: { type: "object", properties: { summary: { type: "string" }, keyInsights: { type: "array", items: { type: "string" } }, trendData: { type: "array", items: { type: "object" } }, countryComparison: { type: "array", items: { type: "object" } } } }
-            });
-            if (response) {
-                setDynamicData(prev => ({ ...prev, ...response }));
-                setAnalysisData({ summary: response.summary, keyInsights: response.keyInsights });
-            }
-        } catch (error) {
-            console.error('Failed to load summary:', error);
-        } finally {
-            setLoadingSections(prev => ({ ...prev, summary: false }));
-        }
-
-        // Load sections sequentially in priority order
-        await loadSectionData('infrastructure', 
-            `Generate transportation, energy, telecom, water infrastructure data. Return: transportData (5 items: type, count, capacity, condition, investment), transportStats (4 items: title, value, unit), energyData (6 items: source, capacity, share, growth, plants), energyStats (4), telecomData (4 items: type, count, coverage, investment, growth), telecomStats (4), waterData (4 items: type, count, capacity, condition, age), waterStats (4).`,
-            { type: "object", properties: { transportData: { type: "array", items: { type: "object" } }, transportStats: { type: "array", items: { type: "object" } }, energyData: { type: "array", items: { type: "object" } }, energyStats: { type: "array", items: { type: "object" } }, telecomData: { type: "array", items: { type: "object" } }, telecomStats: { type: "array", items: { type: "object" } }, waterData: { type: "array", items: { type: "object" } }, waterStats: { type: "array", items: { type: "object" } } } }
-        );
-
-        await loadSectionData('resources',
-            `Generate natural resources data. Return: resourcesData (5 items: resource, reserves, production, value, rank), resourceStats (4), mineralsData (5 items: mineral, reserves, production, globalRank, value), mineralStats (4), agriculturalData (4 items: resource, amount, utilization, output, globalRank), agriculturalStats (4), humanCapitalData (4 items: metric, value, growth, globalRank), humanCapitalStats (4).`,
-            { type: "object", properties: { resourcesData: { type: "array", items: { type: "object" } }, resourceStats: { type: "array", items: { type: "object" } }, mineralsData: { type: "array", items: { type: "object" } }, mineralStats: { type: "array", items: { type: "object" } }, agriculturalData: { type: "array", items: { type: "object" } }, agriculturalStats: { type: "array", items: { type: "object" } }, humanCapitalData: { type: "array", items: { type: "object" } }, humanCapitalStats: { type: "array", items: { type: "object" } } } }
-        );
-
-        await loadSectionData('assets',
-            `Generate national assets data. Return: financialData (4 items: asset, value, change, type), financialStats (4), industrialData (4 items: sector, count, employment, output, growth), industrialStats (4), intellectualData (4 items: category, count, annual, value, globalShare), intellectualStats (4), strategicReservesData (4 items: reserve, capacity, current, value, days), strategicStats (4), digitalAssetsData (4 items: asset, count, capacity, investment, growth), digitalStats (4).`,
-            { type: "object", properties: { financialData: { type: "array", items: { type: "object" } }, financialStats: { type: "array", items: { type: "object" } }, industrialData: { type: "array", items: { type: "object" } }, industrialStats: { type: "array", items: { type: "object" } }, intellectualData: { type: "array", items: { type: "object" } }, intellectualStats: { type: "array", items: { type: "object" } }, strategicReservesData: { type: "array", items: { type: "object" } }, strategicStats: { type: "array", items: { type: "object" } }, digitalAssetsData: { type: "array", items: { type: "object" } }, digitalStats: { type: "array", items: { type: "object" } } } }
-        );
-
-        await loadSectionData('governance',
-            `Generate governance and economic data. Return: governanceData (4 items: institution, count, personnel, budget, efficiency), governanceStats (4), lawEnforcementData (4 items: agency, personnel, budget, jurisdiction, clearRate), lawEnforcementStats (4), financialInfraData (4 items: type, count, assets, coverage, rating), financialInfraStats (4), tradeNetworksData (4 items: network, count, volume, value, globalRank), tradeStats (4), laborMarketData (4 items: metric, value, change, rate), laborStats (4).`,
-            { type: "object", properties: { governanceData: { type: "array", items: { type: "object" } }, governanceStats: { type: "array", items: { type: "object" } }, lawEnforcementData: { type: "array", items: { type: "object" } }, lawEnforcementStats: { type: "array", items: { type: "object" } }, financialInfraData: { type: "array", items: { type: "object" } }, financialInfraStats: { type: "array", items: { type: "object" } }, tradeNetworksData: { type: "array", items: { type: "object" } }, tradeStats: { type: "array", items: { type: "object" } }, laborMarketData: { type: "array", items: { type: "object" } }, laborStats: { type: "array", items: { type: "object" } } } }
-        );
-
-        await loadSectionData('social',
-            `Generate social data. Return: educationData (4 items: level, institutions, enrollment, teachers, spending), educationStats (4), healthcareData (4 items: facility, count, capacity, staff, spending), healthcareStats (4), socialSafetyData (4 items: program, beneficiaries, annual, coverage, fundStatus), socialSafetyStats (4).`,
-            { type: "object", properties: { educationData: { type: "array", items: { type: "object" } }, educationStats: { type: "array", items: { type: "object" } }, healthcareData: { type: "array", items: { type: "object" } }, healthcareStats: { type: "array", items: { type: "object" } }, socialSafetyData: { type: "array", items: { type: "object" } }, socialSafetyStats: { type: "array", items: { type: "object" } } } }
-        );
-
-        await loadSectionData('global',
-            `Generate global positioning and environment data. Return: diplomaticData (4 items: type, count, personnel, regions, budget), diplomaticStats (4), geopoliticalData (4 items: asset, size, value, rank, control), geopoliticalStats (4), softPowerData (4 items: category, value, reach, rank, growth), softPowerStats (4), climateResilienceData (4 items: system, count, capacity, investment, condition), climateStats (4), protectedAreasData (4 items: type, count, area, visitors, budget), protectedStats (4), renewablePotentialData (4 items: source, potential, installed, utilization, growth), renewableStats (4).`,
-            { type: "object", properties: { diplomaticData: { type: "array", items: { type: "object" } }, diplomaticStats: { type: "array", items: { type: "object" } }, geopoliticalData: { type: "array", items: { type: "object" } }, geopoliticalStats: { type: "array", items: { type: "object" } }, softPowerData: { type: "array", items: { type: "object" } }, softPowerStats: { type: "array", items: { type: "object" } }, climateResilienceData: { type: "array", items: { type: "object" } }, climateStats: { type: "array", items: { type: "object" } }, protectedAreasData: { type: "array", items: { type: "object" } }, protectedStats: { type: "array", items: { type: "object" } }, renewablePotentialData: { type: "array", items: { type: "object" } }, renewableStats: { type: "array", items: { type: "object" } } } }
-        );
-
-        loadSectionData('defense',
-            `Generate defense and public facilities data. Return: defenseData (4 items: type, count, personnel, status, budget), defenseStats (4), publicFacilitiesData (4 items: type, count, capacity, condition, funding), publicFacilitiesStats (4).`,
-            { type: "object", properties: { defenseData: { type: "array", items: { type: "object" } }, defenseStats: { type: "array", items: { type: "object" } }, publicFacilitiesData: { type: "array", items: { type: "object" } }, publicFacilitiesStats: { type: "array", items: { type: "object" } } } }
-        );
-
-    };
+    // loadDataInChunks is now replaced by on-demand loading via loadCategoryData
 
 
 
