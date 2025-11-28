@@ -609,13 +609,20 @@ export default function Qwirey() {
                                             <p className="text-gray-700 text-base leading-relaxed">
                                                 {result.text?.split('•')[0]?.trim().slice(0, 280)}
                                             </p>
-                                            <ul className="space-y-2 mt-4">
-                                                {(result.text?.match(/•[^•]+/g) || []).slice(0, 5).map((bullet, i) => (
-                                                    <li key={i} className="flex items-start gap-2 text-gray-600">
-                                                        <span className="text-purple-600 mt-1">•</span>
-                                                        <span>{bullet.replace('•', '').trim()}</span>
-                                                    </li>
-                                                ))}
+                                            <ul className="space-y-3 mt-4 bg-gray-50 rounded-xl p-4">
+                                                {(() => {
+                                                    const bullets = result.text?.match(/•[^•]+/g) || [];
+                                                    const displayBullets = bullets.length >= 5 ? bullets.slice(0, 5) : [
+                                                        ...bullets,
+                                                        ...Array(5 - bullets.length).fill(null).map((_, i) => `• Key point ${bullets.length + i + 1}`)
+                                                    ];
+                                                    return displayBullets.map((bullet, i) => (
+                                                        <li key={i} className="flex items-start gap-3 text-gray-700">
+                                                            <span className="w-6 h-6 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-sm font-medium flex-shrink-0">{i + 1}</span>
+                                                            <span>{bullet?.replace('•', '').trim()}</span>
+                                                        </li>
+                                                    ));
+                                                })()}
                                             </ul>
                                         </div>
                                     )}
@@ -819,48 +826,51 @@ export default function Qwirey() {
                                 {result.type === 'qwirey' && (
                             <>
                                 {result.chartData?.hasChartData && (responseFormat === 'dynamic') && (
-                                    <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-                                        <h3 className="font-bold text-gray-900 mb-2">{result.chartData.chartTitle || 'Data Visualization'}</h3>
-                                        <p className="text-sm text-gray-500 mb-4">{result.chartData.chartDescription}</p>
-                                        
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                            {result.chartData.lineChartData?.length > 0 && (
+                                    <>
+                                        {result.chartData.lineChartData?.length > 0 && (
+                                            <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+                                                <h3 className="font-bold text-gray-900 mb-2">{result.chartData.chartTitle || 'Bar Chart'}</h3>
+                                                <p className="text-sm text-gray-500 mb-4">{result.chartData.chartDescription}</p>
                                                 <div className="h-64">
                                                     <ResponsiveContainer width="100%" height="100%">
                                                         <BarChart data={result.chartData.lineChartData}>
                                                             <CartesianGrid strokeDasharray="3 3" />
-                                                            <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                                                            <XAxis dataKey="name" tick={{ fontSize: 10 }} angle={-20} textAnchor="end" height={60} />
                                                             <YAxis tick={{ fontSize: 12 }} />
                                                             <Tooltip />
                                                             <Bar dataKey="value" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
                                                         </BarChart>
                                                     </ResponsiveContainer>
                                                 </div>
-                                            )}
-                                            
-                                            {result.chartData.pieChartData?.length > 0 && (
-                                                <div className="h-64">
+                                            </div>
+                                        )}
+                                        
+                                        {result.chartData.pieChartData?.length > 0 && (
+                                            <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+                                                <h3 className="font-bold text-gray-900 mb-4">Distribution</h3>
+                                                <div className="h-72">
                                                     <ResponsiveContainer width="100%" height="100%">
                                                         <PieChart>
                                                             <Pie
                                                                 data={result.chartData.pieChartData}
                                                                 cx="50%"
                                                                 cy="50%"
-                                                                outerRadius={80}
+                                                                outerRadius={90}
                                                                 dataKey="value"
-                                                                label={({ name }) => name}
+                                                                label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                                                                labelLine={true}
                                                             >
                                                                 {result.chartData.pieChartData.map((entry, index) => (
                                                                     <Cell key={index} fill={CHART_COLORS[index % CHART_COLORS.length]} />
                                                                 ))}
                                                             </Pie>
-                                                            <Tooltip />
+                                                            <Tooltip formatter={(value) => value.toLocaleString()} />
                                                         </PieChart>
                                                     </ResponsiveContainer>
                                                 </div>
-                                            )}
-                                        </div>
-                                    </div>
+                                            </div>
+                                        )}
+                                    </>
                                 )}
 
                                 {result.images?.length > 0 && (responseFormat === 'dynamic' || responseFormat === 'reviews') && (
