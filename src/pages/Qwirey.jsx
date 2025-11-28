@@ -102,6 +102,7 @@ export default function Qwirey() {
     
     // Response format
     const [responseFormat, setResponseFormat] = useState('dynamic');
+    const [formatLoading, setFormatLoading] = useState(false);
 
     // Initialize speech recognition
     useEffect(() => {
@@ -425,6 +426,125 @@ export default function Qwirey() {
         handleSubmit(question);
     };
 
+    const handleFormatChange = async (newFormat) => {
+        setResponseFormat(newFormat);
+        
+        // If no result yet or switching away from current, just change format
+        if (!result || !result.text) return;
+        
+        const currentPrompt = prompt;
+        
+        // Check if we already have data for this format
+        if (newFormat === 'dynamic' && result.dashboardData) return;
+        if (newFormat === 'tabled' && result.tabledData) return;
+        if (newFormat === 'reviews' && result.reviewsData) return;
+        if (newFormat === 'short' || newFormat === 'long') return; // These just use text
+        
+        // Generate data for the new format
+        setFormatLoading(true);
+        try {
+            if (newFormat === 'dynamic' && !result.dashboardData) {
+                const [imagesResponse, webDataResponse, dashboardDataResponse] = await Promise.all([
+                    base44.integrations.Core.InvokeLLM({
+                        prompt: `Generate 4 detailed image prompts related to: "${currentPrompt}". Each should be suitable for AI image generation.`,
+                        response_json_schema: {
+                            type: "object",
+                            properties: {
+                                imagePrompts: { type: "array", items: { type: "string" } }
+                            }
+                        }
+                    }),
+                    base44.integrations.Core.InvokeLLM({
+                        prompt: `For the topic "${currentPrompt}", generate realistic chart data if relevant. Return hasChartData: false if not applicable.`,
+                        add_context_from_internet: true,
+                        response_json_schema: {
+                            type: "object",
+                            properties: {
+                                hasChartData: { type: "boolean" },
+                                lineChartData: { type: "array", items: { type: "object", properties: { name: { type: "string" }, value: { type: "number" } } } },
+                                pieChartData: { type: "array", items: { type: "object", properties: { name: { type: "string" }, value: { type: "number" } } } },
+                                chartTitle: { type: "string" },
+                                chartDescription: { type: "string" }
+                            }
+                        }
+                    }),
+                    base44.integrations.Core.InvokeLLM({
+                        prompt: `For "${currentPrompt}", generate dashboard data with: 3 info cards, 3 rankings, 4 timeline events, 4 goals, 4 notifications.`,
+                        add_context_from_internet: true,
+                        response_json_schema: {
+                            type: "object",
+                            properties: {
+                                infoCards: { type: "array", items: { type: "object", properties: { content: { type: "string" }, color: { type: "string" } } } },
+                                rankings: { type: "array", items: { type: "object", properties: { name: { type: "string" }, value: { type: "number" } } } },
+                                timeline: { type: "array", items: { type: "object", properties: { time: { type: "string" }, title: { type: "string" }, description: { type: "string" }, status: { type: "string" } } } },
+                                goals: { type: "array", items: { type: "object", properties: { label: { type: "string" }, current: { type: "number" }, target: { type: "number" } } } },
+                                notifications: { type: "array", items: { type: "object", properties: { title: { type: "string" }, description: { type: "string" }, time: { type: "string" }, type: { type: "string" } } } }
+                            }
+                        }
+                    })
+                ]);
+                
+                const imagePrompts = imagesResponse?.imagePrompts?.slice(0, 4) || [];
+                const generatedImages = await Promise.all(
+                    imagePrompts.map(async (imgPrompt) => {
+                        try {
+                            const img = await base44.integrations.Core.GenerateImage({ prompt: imgPrompt });
+                            return { prompt: imgPrompt, url: img.url };
+                        } catch (e) { return null; }
+                    })
+                );
+                
+                setResult(prev => ({
+                    ...prev,
+                    images: generatedImages.filter(Boolean),
+                    chartData: webDataResponse?.hasChartData ? webDataResponse : null,
+                    dashboardData: dashboardDataResponse
+                }));
+            } else if (newFormat === 'tabled' && !result.tabledData) {
+                const tabledResponse = await base44.integrations.Core.InvokeLLM({
+                    prompt: `For "${currentPrompt}", create a comparison table. Provide: a 2-sentence summary, and 4-5 items to compare. Each item needs: name, 2-3 pros, 2-3 cons, and a rating 1-10.`,
+                    add_context_from_internet: true,
+                    response_json_schema: {
+                        type: "object",
+                        properties: {
+                            summary: { type: "string" },
+                            items: { type: "array", items: { type: "object", properties: { 
+                                name: { type: "string" }, 
+                                pros: { type: "array", items: { type: "string" } }, 
+                                cons: { type: "array", items: { type: "string" } }, 
+                                rating: { type: "number" } 
+                            } } }
+                        }
+                    }
+                });
+                setResult(prev => ({ ...prev, tabledData: tabledResponse }));
+            } else if (newFormat === 'reviews' && !result.reviewsData) {
+                const reviewsResponse = await base44.integrations.Core.InvokeLLM({
+                    prompt: `For "${currentPrompt}", generate exactly 5 realistic user reviews. Provide: a title, a brief intro (max 400 chars), and 5 reviews each with: reviewer name, rating 1-10, review text (2-3 sentences), and date.`,
+                    add_context_from_internet: true,
+                    response_json_schema: {
+                        type: "object",
+                        properties: {
+                            title: { type: "string" },
+                            intro: { type: "string" },
+                            reviews: { type: "array", items: { type: "object", properties: { 
+                                name: { type: "string" }, 
+                                rating: { type: "number" }, 
+                                text: { type: "string" }, 
+                                date: { type: "string" }
+                            } } }
+                        }
+                    }
+                });
+                setResult(prev => ({ ...prev, reviewsData: reviewsResponse }));
+            }
+        } catch (error) {
+            console.error('Format generation error:', error);
+        } finally {
+            setFormatLoading(false);
+        }
+    };
+
     return (
         <div className="min-h-screen bg-white p-4 md:p-8">
             <div className="max-w-4xl mx-auto">
@@ -527,27 +647,30 @@ export default function Qwirey() {
                         {/* Right side - Format buttons + Send */}
                         <div className="flex items-center gap-2">
                             {selectedModel === 'qwirey' && (
-                                <div className="flex items-center gap-1 bg-gray-100 rounded-xl p-1 h-12">
-                                    {[
-                                        { id: 'dynamic', label: 'Dynamic' },
-                                        { id: 'short', label: 'Short' },
-                                        { id: 'long', label: 'Long' },
-                                        { id: 'tabled', label: 'Tabled' },
-                                        { id: 'reviews', label: 'Reviews' },
-                                    ].map((format) => (
-                                        <button
-                                            key={format.id}
-                                            onClick={() => setResponseFormat(format.id)}
-                                            className={`px-3 h-10 rounded-lg text-xs font-medium transition-all ${
-                                                responseFormat === format.id
-                                                    ? 'bg-white text-purple-700 shadow-sm'
-                                                    : 'text-gray-500 hover:text-gray-700'
-                                            }`}
-                                        >
-                                            {format.label}
-                                        </button>
-                                    ))}
-                                </div>
+                            <div className="flex items-center gap-1 bg-gray-100 rounded-xl p-1 h-12">
+                                {[
+                                    { id: 'dynamic', label: 'Dynamic' },
+                                    { id: 'short', label: 'Short' },
+                                    { id: 'long', label: 'Long' },
+                                    { id: 'tabled', label: 'Tabled' },
+                                    { id: 'reviews', label: 'Reviews' },
+                                ].map((format) => (
+                                    <button
+                                        key={format.id}
+                                        onClick={() => handleFormatChange(format.id)}
+                                        disabled={formatLoading}
+                                        className={`px-3 h-10 rounded-lg text-xs font-medium transition-all ${
+                                            responseFormat === format.id
+                                                ? 'bg-white text-purple-700 shadow-sm'
+                                                : 'text-gray-500 hover:text-gray-700'
+                                        } ${formatLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    >
+                                        {formatLoading && responseFormat === format.id ? (
+                                            <Loader2 className="w-3 h-3 animate-spin" />
+                                        ) : format.label}
+                                    </button>
+                                ))}
+                            </div>
                             )}
                             
                             <button
