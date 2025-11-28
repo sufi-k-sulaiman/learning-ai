@@ -1660,15 +1660,16 @@ export default function Geospatial() {
                     <GeographicalModels selectedCountries={selectedCountries} />
                 )}
 
-                {/* Country Data Tab - removed duplicate content */}
+                {/* Country Data Tab - simplified version */}
                 {mainTab === 'geographical' && (
-                    selectedCountries.length === 0 ? (
                     <div className="bg-gray-50 border border-gray-200 rounded-xl p-8 text-center">
                         <Globe className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                        <h3 className="text-lg font-semibold text-gray-700 mb-2">Select Countries to Begin</h3>
-                        <p className="text-sm text-gray-500">Choose one or more countries from the dropdown above to view infrastructure and resource data</p>
+                        <h3 className="text-lg font-semibold text-gray-700 mb-2">Country Data Moved to Geomatics</h3>
+                        <p className="text-sm text-gray-500">The detailed country infrastructure and resource data is now available in the Geomatics tab. Click on Geomatics to access all country-specific data.</p>
                     </div>
-                    ) : (
+                )}
+                {/* Hidden legacy content */}
+                {false && (
                     <>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         {CATEGORIES.map(cat => (
@@ -2724,7 +2725,6 @@ export default function Geospatial() {
                                     </CategorySection>
                                     )}
                                     </>
-                                    )
                                     )}
                                     </div>
                                     </div>
