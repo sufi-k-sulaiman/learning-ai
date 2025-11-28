@@ -21,6 +21,7 @@ import DataTable from '@/components/geospatial/DataTable';
 import MultiSelectDropdown from '@/components/intelligence/MultiSelectDropdown';
 import GeographicalModels from '@/components/geospatial/GeographicalModels';
 import AnomalyDetection from '@/components/geospatial/AnomalyDetection';
+import CountrySelectModal from '@/components/shared/CountrySelectModal';
 
 const COLORS = ['#8B5CF6', '#10B981', '#F59E0B', '#EF4444', '#3B82F6', '#EC4899', '#06B6D4', '#84CC16'];
 
@@ -44,7 +45,9 @@ export default function Geospatial() {
     const [activeCategory, setActiveCategory] = useState('all');
     const [loading, setLoading] = useState(false);
     const [analysisData, setAnalysisData] = useState(null);
-    const [selectedCountries, setSelectedCountries] = useState([]);
+    const [selectedCountry, setSelectedCountry] = useState('');
+    const [showCountryModal, setShowCountryModal] = useState(false);
+    const selectedCountries = selectedCountry ? [selectedCountry] : [];
     const [dynamicData, setDynamicData] = useState(null);
     const [dataLoading, setDataLoading] = useState(false);
 
@@ -548,13 +551,13 @@ export default function Geospatial() {
                             <p className="text-white/80">Infrastructure, Resources & National Assets Analytics</p>
                         </div>
                         <div className="flex gap-3 items-center">
-                            <MultiSelectDropdown
-                                options={COUNTRIES}
-                                selected={selectedCountries}
-                                onChange={setSelectedCountries}
-                                placeholder="Select Countries"
-                                icon={Globe}
-                            />
+                            <button
+                                onClick={() => setShowCountryModal(true)}
+                                className="flex items-center gap-2 px-4 py-3 bg-white/20 border-2 border-white/30 rounded-xl hover:bg-white/30 transition-all min-w-[200px]"
+                            >
+                                <Globe className="w-5 h-5 text-white" />
+                                <span className="text-white font-medium">{selectedCountry || 'Select Country'}</span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -2721,6 +2724,14 @@ export default function Geospatial() {
                                     </>
                                     )}
                                     </div>
+
+                <CountrySelectModal
+                    isOpen={showCountryModal}
+                    onClose={() => setShowCountryModal(false)}
+                    selectedCountry={selectedCountry}
+                    onSelect={setSelectedCountry}
+                    title="Select Country for Analysis"
+                />
                                     </div>
                                     );
                                     }

@@ -24,6 +24,7 @@ import StackedBarChart from '@/components/dashboard/StackedBarChart';
 import AreaChartWithMarkers from '@/components/dashboard/AreaChartWithMarkers';
 import MultiSelectDropdown from '@/components/intelligence/MultiSelectDropdown';
 import LineChartWithMarkers from '@/components/dashboard/LineChartWithMarkers';
+import CountrySelectModal from '@/components/shared/CountrySelectModal';
 
 const MODULES = [
     { id: 'forecast', name: 'Forecast', subtitle: '5-year predictions across all sectors', icon: LineChart, color: '#F59E0B', dataSources: ['GDP Growth', 'Employment Rates', 'Trade Balance', 'Consumer Spending', 'Industrial Output', 'Interest Rates'], buttonText: 'Run Forecast' },
@@ -52,7 +53,9 @@ export default function Intelligence() {
 
     const [activeTab, setActiveTab] = useState('forecast');
     const [selectedDomains, setSelectedDomains] = useState([]);
-    const [selectedCountries, setSelectedCountries] = useState([]);
+    const [selectedCountry, setSelectedCountry] = useState('');
+    const [showCountryModal, setShowCountryModal] = useState(false);
+    const selectedCountries = selectedCountry ? [selectedCountry] : [];
     const [selectedTimeHorizons, setSelectedTimeHorizons] = useState([]);
     const [selectedModels, setSelectedModels] = useState([]);
     const [selectedDataSources, setSelectedDataSources] = useState([]);
@@ -456,14 +459,13 @@ Provide detailed JSON with:
 
                 {/* Controls Row */}
                 <div className="flex flex-wrap gap-3 mb-6">
-
-                    <MultiSelectDropdown
-                        options={COUNTRIES}
-                        selected={selectedCountries}
-                        onChange={setSelectedCountries}
-                        placeholder="Select Countries"
-                        icon={Globe}
-                    />
+                    <button
+                        onClick={() => setShowCountryModal(true)}
+                        className="flex items-center gap-2 px-4 py-3 bg-white border-2 border-gray-300 rounded-xl hover:border-purple-400 transition-all min-w-[200px]"
+                    >
+                        <Globe className="w-5 h-5 text-gray-600" />
+                        <span className="text-gray-900 font-medium">{selectedCountry || 'Select Country'}</span>
+                    </button>
                     <MultiSelectDropdown
                         options={TIME_HORIZONS}
                         selected={selectedTimeHorizons}
@@ -899,6 +901,14 @@ Provide detailed JSON with:
                         ))}
                     </div>
                 ) : null}
+
+                <CountrySelectModal
+                    isOpen={showCountryModal}
+                    onClose={() => setShowCountryModal(false)}
+                    selectedCountry={selectedCountry}
+                    onSelect={setSelectedCountry}
+                    title="Select Country for Analysis"
+                />
             </div>
         </div>
     );
