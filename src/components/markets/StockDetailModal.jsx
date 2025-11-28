@@ -2173,16 +2173,17 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
                                             { title: `Q2 2024 Report (10-Q)`, date: 'July 2024', description: 'Second quarter financial results' },
                                             { title: `Q1 2024 Report (10-Q)`, date: 'April 2024', description: 'First quarter financial results' }
                                         ]).map((r, i) => (
-                                            <div key={i} className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 cursor-pointer transition-colors">
+                                            <a key={i} href={r.url || `https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=${stock.ticker}&type=10-Q`} target="_blank" rel="noopener noreferrer" className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl hover:bg-blue-50 cursor-pointer transition-colors block">
                                                 <div className="w-9 h-9 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                                                     <FileText className="w-4 h-4 text-blue-600" />
                                                 </div>
                                                 <div className="flex-1 min-w-0">
-                                                    <p className="font-medium text-gray-900">{r.title}</p>
+                                                    <p className="font-medium text-gray-900 hover:text-blue-600">{r.title}</p>
                                                     <p className="text-sm text-gray-500">{r.date} •</p>
                                                     <p className="text-xs text-gray-400 mt-1">{r.description}</p>
                                                 </div>
-                                            </div>
+                                                <ExternalLink className="w-4 h-4 text-gray-400 mt-1" />
+                                            </a>
                                         ))}
                                     </div>
                                 </>
