@@ -218,10 +218,10 @@ export default function Qwirey() {
 
         // Build format instruction based on selected format
         const formatInstructions = {
-            dynamic: 'Format your response with clear paragraph breaks. Use markdown headers (##) to organize sections. Add line breaks between paragraphs for readability.',
-            short: 'IMPORTANT: Keep your response under 280 characters total. Include a few bullet points with key facts. Be extremely concise.',
-            long: 'IMPORTANT: Provide a detailed, comprehensive response with 6-8 paragraphs. Include thorough explanations, examples, and context. Add clear paragraph breaks between each section. Do NOT include images or charts.',
-            tabled: 'IMPORTANT: Provide a brief 2-3 sentence summary first. Then create a markdown comparison table with columns: Option | Pros | Cons | Recommendation. Help the user weigh decisions and reason through choices. Format the table properly with | separators and header row with dashes. Do NOT include images or charts.'
+            dynamic: 'Provide a helpful, informative response about the topic. Be clear and concise.',
+            short: 'CRITICAL: Your response MUST be under 280 characters maximum. Then add exactly 5 bullet points with key facts (each bullet under 60 chars). Format: First a short blurb, then 5 bullets starting with •',
+            long: 'IMPORTANT: Provide a detailed response with 6-8 well-spaced paragraphs. Add TWO line breaks between each paragraph for clear separation. Include thorough explanations and examples.',
+            tabled: 'Provide a 2 sentence summary. Then provide structured data for a comparison with 4-5 items. Each item needs: name, pros (2-3 points), cons (2-3 points), and a rating out of 10.'
         };
 
         const formatInstruction = formatInstructions[responseFormat] || '';
@@ -268,9 +268,9 @@ export default function Qwirey() {
                             }
                         }
                     }),
-                    // Generate dynamic dashboard data based on query
+                    // Generate dynamic dashboard data OR tabled data based on format
                     responseFormat === 'dynamic' ? base44.integrations.Core.InvokeLLM({
-                        prompt: `For the topic "${currentPrompt}", generate realistic dashboard visualization data. Create data that represents key metrics, rankings, timeline events, goals, and notifications relevant to this topic.`,
+                        prompt: `For "${currentPrompt}", generate dashboard data with: 3 info cards (short insights), 3 rankings (name + numeric value), 4 timeline events (time, title, description, status: completed/current/pending), 4 goals (label, current number, target number), 4 notifications (title, description, time, type: success/warning/info/error).`,
                         add_context_from_internet: true,
                         response_json_schema: {
                             type: "object",
@@ -280,6 +280,21 @@ export default function Qwirey() {
                                 timeline: { type: "array", items: { type: "object", properties: { time: { type: "string" }, title: { type: "string" }, description: { type: "string" }, status: { type: "string" } } } },
                                 goals: { type: "array", items: { type: "object", properties: { label: { type: "string" }, current: { type: "number" }, target: { type: "number" } } } },
                                 notifications: { type: "array", items: { type: "object", properties: { title: { type: "string" }, description: { type: "string" }, time: { type: "string" }, type: { type: "string" } } } }
+                            }
+                        }
+                    }) : responseFormat === 'tabled' ? base44.integrations.Core.InvokeLLM({
+                        prompt: `For "${currentPrompt}", create a comparison table. Provide: a 2-sentence summary, and 4-5 items to compare. Each item needs: name, 2-3 pros, 2-3 cons, and a rating 1-10.`,
+                        add_context_from_internet: true,
+                        response_json_schema: {
+                            type: "object",
+                            properties: {
+                                summary: { type: "string" },
+                                items: { type: "array", items: { type: "object", properties: { 
+                                    name: { type: "string" }, 
+                                    pros: { type: "array", items: { type: "string" } }, 
+                                    cons: { type: "array", items: { type: "string" } }, 
+                                    rating: { type: "number" } 
+                                } } }
                             }
                         }
                     }) : Promise.resolve(null)
@@ -326,11 +341,15 @@ export default function Qwirey() {
                     ]
                 };
 
-                const finalDashboardData = dashboardDataResponse && (
-                    dashboardDataResponse.infoCards?.length > 0 || 
-                    dashboardDataResponse.rankings?.length > 0 ||
-                    dashboardDataResponse.timeline?.length > 0
-                ) ? dashboardDataResponse : (responseFormat === 'dynamic' ? fallbackDashboardData : null);
+                const finalDashboardData = responseFormat === 'dynamic' ? (
+                    dashboardDataResponse && (
+                        dashboardDataResponse.infoCards?.length > 0 || 
+                        dashboardDataResponse.rankings?.length > 0 ||
+                        dashboardDataResponse.timeline?.length > 0
+                    ) ? dashboardDataResponse : fallbackDashboardData
+                ) : null;
+
+                const tabledData = responseFormat === 'tabled' && dashboardDataResponse ? dashboardDataResponse : null;
 
                 setResult({
                     type: 'qwirey',
@@ -339,7 +358,8 @@ export default function Qwirey() {
                     sources: textResponse?.sources || [],
                     images: generatedImages.filter(Boolean),
                     chartData: webDataResponse?.hasChartData ? webDataResponse : null,
-                    dashboardData: finalDashboardData
+                    dashboardData: finalDashboardData,
+                    tabledData: tabledData
                 });
 
             } else {
@@ -564,115 +584,155 @@ export default function Qwirey() {
                                         </Button>
                                     </div>
                                     
-                                    <div className="prose prose-sm max-w-none text-gray-700 prose-p:mb-4 prose-headings:mt-6 prose-headings:mb-3 prose-table:w-full prose-th:bg-purple-50 prose-th:p-3 prose-th:text-left prose-th:font-semibold prose-th:border prose-th:border-gray-200 prose-td:p-3 prose-td:border prose-td:border-gray-200 prose-tr:even:bg-gray-50">
-                                        <ReactMarkdown>{result.text}</ReactMarkdown>
-                                    </div>
+                                    {/* SHORT FORMAT */}
+                                    {responseFormat === 'short' && (
+                                        <div className="space-y-4">
+                                            <p className="text-gray-700 text-base leading-relaxed">
+                                                {result.text?.split('•')[0]?.trim().slice(0, 280)}
+                                            </p>
+                                            <ul className="space-y-2 mt-4">
+                                                {(result.text?.match(/•[^•]+/g) || []).slice(0, 5).map((bullet, i) => (
+                                                    <li key={i} className="flex items-start gap-2 text-gray-600">
+                                                        <span className="text-purple-600 mt-1">•</span>
+                                                        <span>{bullet.replace('•', '').trim()}</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                        </div>
+                                    )}
                                     
-                                    {/* Dynamic format: Show dashboard components with AI-generated data */}
-                                    {responseFormat === 'dynamic' && result.type === 'qwirey' && result.dashboardData && (
-                                        <div className="mt-6 space-y-6">
-                                            {/* Dynamic Info Cards */}
-                                            {result.dashboardData.infoCards?.length > 0 && (
-                                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                                    {result.dashboardData.infoCards.slice(0, 3).map((card, i) => (
-                                                        <InfoCard key={i} content={card.content} bgColor={card.color || ['#8b5cf6', '#6366f1', '#3b82f6'][i]} />
-                                                    ))}
-                                                </div>
-                                            )}
-                                            
-                                            {/* Dynamic Rankings */}
-                                            {result.dashboardData.rankings?.length >= 3 && (
-                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                    <RankingPodium 
-                                                        title="Top Rankings" 
-                                                        data={result.dashboardData.rankings.slice(0, 3).map((r, i) => ({ 
-                                                            name: r.name, 
-                                                            value: r.value, 
-                                                            position: i + 1 
-                                                        }))} 
-                                                    />
-                                                </div>
-                                            )}
-                                            
-                                            {/* Dynamic Activity & Progress Row */}
-                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                {result.dashboardData.timeline?.length > 0 && (
-                                                    <TimelineCard 
-                                                        title="Activity Timeline"
-                                                        events={result.dashboardData.timeline.slice(0, 4).map(e => ({
-                                                            time: e.time,
-                                                            title: e.title,
-                                                            description: e.description,
-                                                            status: e.status || 'completed'
-                                                        }))}
-                                                    />
-                                                )}
-                                                {result.dashboardData.goals?.length > 0 && (
-                                                    <ProgressListCard 
-                                                        title="Goals Progress"
-                                                        items={result.dashboardData.goals.slice(0, 4).map((g, i) => ({
-                                                            label: g.label,
-                                                            value: Math.round((g.current / g.target) * 100),
-                                                            current: String(g.current),
-                                                            target: String(g.target),
-                                                            color: ['#8B5CF6', '#10B981', '#3B82F6', '#F59E0B'][i % 4]
-                                                        }))}
-                                                    />
-                                                )}
-                                                {result.dashboardData.notifications?.length > 0 && (
-                                                    <NotificationList 
-                                                        title="Notifications"
-                                                        notifications={result.dashboardData.notifications.slice(0, 4).map(n => ({
-                                                            title: n.title,
-                                                            message: n.description,
-                                                            time: n.time,
-                                                            type: n.type || 'info'
-                                                        }))}
-                                                    />
-                                                )}
+                                    {/* LONG FORMAT */}
+                                    {responseFormat === 'long' && (
+                                        <div className="prose prose-sm max-w-none text-gray-700 space-y-6">
+                                            {result.text?.split(/\n\n+/).filter(p => p.trim()).map((para, i) => (
+                                                <p key={i} className="text-gray-700 leading-relaxed">{para.trim()}</p>
+                                            ))}
+                                        </div>
+                                    )}
+                                    
+                                    {/* TABLED FORMAT */}
+                                    {responseFormat === 'tabled' && result.tabledData && (
+                                        <div className="space-y-4">
+                                            <p className="text-gray-700 mb-4">{result.tabledData.summary}</p>
+                                            <div className="rounded-xl border border-gray-200 overflow-hidden">
+                                                <Table>
+                                                    <TableHeader>
+                                                        <TableRow className="bg-purple-50">
+                                                            <TableHead className="font-semibold text-purple-900">Option</TableHead>
+                                                            <TableHead className="font-semibold text-purple-900">Pros</TableHead>
+                                                            <TableHead className="font-semibold text-purple-900">Cons</TableHead>
+                                                            <TableHead className="font-semibold text-purple-900 text-center">Rating</TableHead>
+                                                        </TableRow>
+                                                    </TableHeader>
+                                                    <TableBody>
+                                                        {result.tabledData.items?.map((item, i) => (
+                                                            <TableRow key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                                                                <TableCell className="font-medium text-gray-900">{item.name}</TableCell>
+                                                                <TableCell className="text-green-700">
+                                                                    <ul className="list-disc list-inside space-y-1">
+                                                                        {item.pros?.map((p, j) => <li key={j}>{p}</li>)}
+                                                                    </ul>
+                                                                </TableCell>
+                                                                <TableCell className="text-red-600">
+                                                                    <ul className="list-disc list-inside space-y-1">
+                                                                        {item.cons?.map((c, j) => <li key={j}>{c}</li>)}
+                                                                    </ul>
+                                                                </TableCell>
+                                                                <TableCell className="text-center">
+                                                                    <span className={`inline-flex items-center justify-center w-10 h-10 rounded-full font-bold ${
+                                                                        item.rating >= 8 ? 'bg-green-100 text-green-700' :
+                                                                        item.rating >= 6 ? 'bg-yellow-100 text-yellow-700' :
+                                                                        'bg-red-100 text-red-700'
+                                                                    }`}>
+                                                                        {item.rating}
+                                                                    </span>
+                                                                </TableCell>
+                                                            </TableRow>
+                                                        ))}
+                                                    </TableBody>
+                                                </Table>
                                             </div>
                                         </div>
                                     )}
                                     
-                                    {/* Tabled format: Parse and render proper table */}
-                                    {responseFormat === 'tabled' && result.text && (() => {
-                                        // Parse markdown table from response
-                                        const lines = result.text.split('\n');
-                                        const tableLines = lines.filter(line => line.includes('|') && !line.match(/^[\s|-]+$/));
-                                        const headerLine = tableLines[0];
-                                        const dataLines = tableLines.slice(1);
-                                        
-                                        if (headerLine && dataLines.length > 0) {
-                                            const headers = headerLine.split('|').map(h => h.trim()).filter(Boolean);
-                                            const rows = dataLines.map(line => 
-                                                line.split('|').map(cell => cell.trim()).filter(Boolean)
-                                            );
+                                    {/* DYNAMIC FORMAT */}
+                                    {responseFormat === 'dynamic' && (
+                                        <div className="space-y-6">
+                                            <div className="prose prose-sm max-w-none text-gray-700">
+                                                <ReactMarkdown>{result.text}</ReactMarkdown>
+                                            </div>
                                             
-                                            return (
-                                                <div className="mt-6 rounded-xl border border-gray-200 overflow-hidden">
-                                                    <Table>
-                                                        <TableHeader>
-                                                            <TableRow className="bg-purple-50">
-                                                                {headers.map((header, i) => (
-                                                                    <TableHead key={i} className="font-semibold text-purple-900">{header}</TableHead>
-                                                                ))}
-                                                            </TableRow>
-                                                        </TableHeader>
-                                                        <TableBody>
-                                                            {rows.map((row, i) => (
-                                                                <TableRow key={i} className={i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                                                                    {row.map((cell, j) => (
-                                                                        <TableCell key={j} className="text-gray-700">{cell}</TableCell>
-                                                                    ))}
-                                                                </TableRow>
+                                            {result.type === 'qwirey' && result.dashboardData && (
+                                                <>
+                                                    {/* Info Cards */}
+                                                    {result.dashboardData.infoCards?.length > 0 && (
+                                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                                            {result.dashboardData.infoCards.slice(0, 3).map((card, i) => (
+                                                                <InfoCard key={i} content={card.content} bgColor={card.color || ['#8b5cf6', '#6366f1', '#3b82f6'][i]} />
                                                             ))}
-                                                        </TableBody>
-                                                    </Table>
-                                                </div>
-                                            );
-                                        }
-                                        return null;
-                                    })()}
+                                                        </div>
+                                                    )}
+                                                    
+                                                    {/* Rankings */}
+                                                    {result.dashboardData.rankings?.length >= 3 && (
+                                                        <RankingPodium 
+                                                            title="Top Rankings" 
+                                                            data={result.dashboardData.rankings.slice(0, 3).map((r, i) => ({ 
+                                                                name: r.name, 
+                                                                value: r.value, 
+                                                                position: i + 1 
+                                                            }))} 
+                                                        />
+                                                    )}
+                                                    
+                                                    {/* Timeline, Goals, Notifications */}
+                                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                        {result.dashboardData.timeline?.length > 0 && (
+                                                            <TimelineCard 
+                                                                title="Activity Timeline"
+                                                                events={result.dashboardData.timeline.slice(0, 4).map(e => ({
+                                                                    time: e.time || 'Now',
+                                                                    title: e.title,
+                                                                    description: e.description,
+                                                                    status: e.status || 'completed'
+                                                                }))}
+                                                            />
+                                                        )}
+                                                        {result.dashboardData.goals?.length > 0 && (
+                                                            <ProgressListCard 
+                                                                title="Goals Progress"
+                                                                items={result.dashboardData.goals.slice(0, 4).map((g, i) => ({
+                                                                    label: g.label,
+                                                                    value: Math.round((g.current / g.target) * 100),
+                                                                    current: String(g.current),
+                                                                    target: String(g.target),
+                                                                    color: ['#8B5CF6', '#10B981', '#3B82F6', '#F59E0B'][i % 4]
+                                                                }))}
+                                                            />
+                                                        )}
+                                                        {result.dashboardData.notifications?.length > 0 && (
+                                                            <NotificationList 
+                                                                title="Notifications"
+                                                                notifications={result.dashboardData.notifications.slice(0, 4).map(n => ({
+                                                                    title: n.title,
+                                                                    message: n.description,
+                                                                    time: n.time,
+                                                                    type: n.type || 'info'
+                                                                }))}
+                                                            />
+                                                        )}
+                                                    </div>
+                                                </>
+                                            )}
+                                        </div>
+                                    )}
+                                    
+                                    {/* DEFAULT (other models) */}
+                                    {result.type !== 'qwirey' && (
+                                        <div className="prose prose-sm max-w-none text-gray-700">
+                                            <ReactMarkdown>{result.text}</ReactMarkdown>
+                                        </div>
+                                    )}
                                 </div>
 
                                 {result.type === 'qwirey' && (
