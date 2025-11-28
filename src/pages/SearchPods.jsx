@@ -236,7 +236,7 @@ export default function SearchPods() {
         
         // Generate image in parallel
         base44.integrations.Core.GenerateImage({
-            prompt: `Beautiful lifestyle photography for "${episode.title}". Authentic, natural scene with real people or calming environment. Warm lighting, editorial style, no text or graphics.`
+            prompt: `Beautiful lifestyle photography for "${episode.title}". Authentic, natural scene with real people or calming environment. Warm lighting, editorial style. No technology, no phones, no computers, no headphones, no microphones, no text or graphics.`
         }).then(result => {
             setPodImage(result.url);
             setImageLoading(false);
@@ -734,8 +734,10 @@ Use short sentences for better pacing. Do NOT use any markdown formatting.`,
                                         {!podImage && <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />}
                                         {!podImage && <Radio className="w-16 h-16 text-white/80" />}
                                         {isPlaying && (
-                                            <div className={`${podImage ? 'absolute inset-0 bg-black/30 flex items-end justify-center pb-4' : 'absolute bottom-4 left-1/2 -translate-x-1/2'}`}>
-                                                <AnimatedBars isPlaying={true} color="#ffffff" />
+                                            <div className={`${podImage ? 'absolute inset-0 bg-black/30 flex items-center justify-center' : 'absolute inset-0 flex items-center justify-center'}`}>
+                                                <div className="scale-[2.6]">
+                                                    <AnimatedBars isPlaying={true} color="#ffffff" />
+                                                </div>
                                             </div>
                                         )}
                                     </>
