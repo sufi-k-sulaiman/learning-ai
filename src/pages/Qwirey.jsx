@@ -203,9 +203,9 @@ export default function Qwirey() {
         // Build format instruction based on selected format
         const formatInstructions = {
             dynamic: '',
-            short: 'IMPORTANT: Keep your response under 280 characters. Use bullet points for key facts. Be extremely concise.',
-            long: 'IMPORTANT: Provide a detailed, comprehensive response with 6-8 paragraphs. Include thorough explanations, examples, and context.',
-            tabled: 'IMPORTANT: Structure your response with a brief summary paragraph followed by a markdown table summarizing key details. Use columns like Category, Detail, Notes where appropriate.'
+            short: 'IMPORTANT: Keep your response under 280 characters total. Include a few bullet points with key facts. Be extremely concise.',
+            long: 'IMPORTANT: Provide a detailed, comprehensive response with 6-8 paragraphs. Include thorough explanations, examples, and context. Do NOT include images or charts.',
+            tabled: 'IMPORTANT: Provide a brief summary, then create a comparison table with columns for options/choices, pros, cons, and reasoning. Help the user weigh decisions and think through choices. Do NOT include images or charts.'
         };
 
         const formatInstruction = formatInstructions[responseFormat] || '';
@@ -505,7 +505,7 @@ export default function Qwirey() {
 
                                 {result.type === 'qwirey' && (
                             <>
-                                {result.chartData?.hasChartData && (
+                                {result.chartData?.hasChartData && responseFormat === 'dynamic' && (
                                     <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
                                         <h3 className="font-bold text-gray-900 mb-2">{result.chartData.chartTitle || 'Data Visualization'}</h3>
                                         <p className="text-sm text-gray-500 mb-4">{result.chartData.chartDescription}</p>
@@ -550,7 +550,7 @@ export default function Qwirey() {
                                     </div>
                                 )}
 
-                                {result.images?.length > 0 && (
+                                {result.images?.length > 0 && responseFormat === 'dynamic' && (
                                     <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
                                         <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
                                             <ImageIcon className="w-5 h-5 text-purple-600" />
