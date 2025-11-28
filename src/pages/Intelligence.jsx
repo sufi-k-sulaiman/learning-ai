@@ -447,41 +447,6 @@ Provide:
                     ))}
                 </div>
 
-                {/* Controls Row */}
-                <div className="flex flex-wrap gap-3 mb-6">
-                    <MultiSelectDropdown
-                        options={DOMAINS}
-                        selected={selectedDomains}
-                        onChange={setSelectedDomains}
-                        placeholder="Select Domains"
-                        icon={Building2}
-                    />
-                    <MultiSelectDropdown
-                        options={COUNTRIES}
-                        selected={selectedCountries}
-                        onChange={setSelectedCountries}
-                        placeholder="Select Countries"
-                        icon={Globe}
-                    />
-                    <MultiSelectDropdown
-                        options={TIME_HORIZONS}
-                        selected={selectedTimeHorizons}
-                        onChange={setSelectedTimeHorizons}
-                        placeholder="Time Horizons"
-                        icon={Clock}
-                    />
-                    <MultiSelectDropdown
-                        options={MODEL_TYPES}
-                        selected={selectedModels}
-                        onChange={setSelectedModels}
-                        placeholder="Models"
-                        icon={Cpu}
-                    />
-                    <Button onClick={loadDynamicData} variant="outline" size="sm" className="gap-2 border-2" disabled={dataLoading}>
-                        <RefreshCw className={`w-4 h-4 ${dataLoading ? 'animate-spin' : ''}`} /> Refresh Data
-                    </Button>
-                </div>
-
                 {dataLoading ? (
                     <div className="flex flex-col items-center justify-center py-20">
                         <style>{`
