@@ -3,7 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { 
     Play, Pause, SkipBack, SkipForward, Volume2, VolumeX,
     Sparkles, Radio, Loader2, TrendingUp, Users, Mic,
-    ChevronRight, X, Clock, Search, Plus, AlertTriangle, Download
+    ChevronRight, X, Clock, Search, Plus, AlertTriangle
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -139,8 +139,6 @@ export default function SearchPods() {
     const utteranceRef = useRef(null);
     const timerRef = useRef(null);
     const audioRef = useRef(null);
-    const [useElevenLabs, setUseElevenLabs] = useState(false);
-    const [audioLoading, setAudioLoading] = useState(false);
     const [podImage, setPodImage] = useState(null);
     const [imageLoading, setImageLoading] = useState(false);
 
@@ -236,7 +234,7 @@ export default function SearchPods() {
         
         // Generate image in parallel
         base44.integrations.Core.GenerateImage({
-            prompt: `Beautiful lifestyle photography for "${episode.title}". Authentic, natural scene with real people or calming environment. Warm lighting, editorial style. No technology, no phones, no computers, no headphones, no microphones, no text or graphics.`
+            prompt: `Beautiful lifestyle photography for "${episode.title}". Authentic, natural scene with real people or calming environment. Warm lighting, editorial style. No technology, no phones, no computers, no headphones, no microphones. Absolutely no text, no words, no letters, no titles, no captions, no watermarks.`
         }).then(result => {
             setPodImage(result.url);
             setImageLoading(false);
@@ -285,77 +283,10 @@ Use short sentences for better pacing. Do NOT use any markdown formatting.`,
             setIsGenerating(false);
             setCurrentCaption(sentences[0] || 'Ready to play');
             
-            // If using ElevenLabs, generate audio
-            if (useElevenLabs) {
-                setAudioLoading(true);
-                setGenerationStep('Generating natural voice...');
-                try {
-                    const fullText = sentences.join(' ');
-                    const response = await base44.functions.invoke('elevenlabsTTS', { 
-                        text: fullText,
-                        voice_id: 'EXAVITQu4vr4xnSDxMaL' // Sarah - natural female voice
-                    });
-                    
-                    const blob = new Blob([response.data], { type: 'audio/mpeg' });
-                    const audioUrl = URL.createObjectURL(blob);
-                    
-                    if (audioRef.current) {
-                        audioRef.current.pause();
-                        URL.revokeObjectURL(audioRef.current.src);
-                    }
-                    
-                    const audio = new Audio(audioUrl);
-                    audioRef.current = audio;
-                    
-                    audio.onloadedmetadata = () => {
-                        setDuration(Math.floor(audio.duration));
-                    };
-                    
-                    audio.ontimeupdate = () => {
-                        setCurrentTime(Math.floor(audio.currentTime));
-                        // Update caption based on time
-                        const progress = audio.currentTime / audio.duration;
-                        const sentenceIndex = Math.floor(progress * sentences.length);
-                        if (sentenceIndex !== currentIndexRef.current && sentenceIndex < sentences.length) {
-                            currentIndexRef.current = sentenceIndex;
-                            const text = sentences[sentenceIndex];
-                            setCurrentCaption(text);
-                            setCaptionWords(text.split(/\s+/));
-                            // Estimate word progress within sentence
-                            const sentenceProgress = (progress * sentences.length) % 1;
-                            const words = text.split(/\s+/);
-                            setCurrentWordIndex(Math.floor(sentenceProgress * words.length));
-                        }
-                    };
-                    
-                    audio.onended = () => {
-                        setIsPlaying(false);
-                        isPlayingRef.current = false;
-                        setCurrentWordIndex(-1);
-                    };
-                    
-                    setAudioLoading(false);
-                    
-                    // Auto-start playback
-                    setTimeout(() => {
-                        audio.play();
-                        setIsPlaying(true);
-                        isPlayingRef.current = true;
-                    }, 300);
-                    
-                } catch (error) {
-                    console.error('ElevenLabs error:', error);
-                    setAudioLoading(false);
-                    // Fallback to browser TTS
-                    setUseElevenLabs(false);
-                    setTimeout(() => startSpeaking(), 500);
-                }
-            } else {
-                // Auto-start playback with browser TTS
-                setTimeout(() => {
-                    startSpeaking();
-                }, 500);
-            }
+            // Auto-start playback with browser TTS
+            setTimeout(() => {
+                startSpeaking();
+            }, 500);
             
         } catch (error) {
             console.error('Script generation error:', error);
@@ -470,24 +401,12 @@ Use short sentences for better pacing. Do NOT use any markdown formatting.`,
 
     // Toggle play/pause
     const togglePlay = useCallback(() => {
-        if (useElevenLabs && audioRef.current) {
-            if (isPlaying) {
-                audioRef.current.pause();
-                setIsPlaying(false);
-                isPlayingRef.current = false;
-            } else {
-                audioRef.current.play();
-                setIsPlaying(true);
-                isPlayingRef.current = true;
-            }
+        if (isPlaying) {
+            stopPlayback();
         } else {
-            if (isPlaying) {
-                stopPlayback();
-            } else {
-                startSpeaking();
-            }
+            startSpeaking();
         }
-    }, [isPlaying, stopPlayback, startSpeaking, useElevenLabs]);
+    }, [isPlaying, stopPlayback, startSpeaking]);
 
     // Close player
     const closePlayer = useCallback(() => {
@@ -724,12 +643,12 @@ Use short sentences for better pacing. Do NOT use any markdown formatting.`,
                                             Retry
                                         </Button>
                                     </div>
-                                ) : (isGenerating || audioLoading) && !imageLoading ? (
+                                ) : isGenerating && !imageLoading ? (
                                     <div className={`${podImage ? 'absolute inset-0 bg-black/50' : ''} flex flex-col items-center justify-center gap-3`}>
                                         <Loader2 className="w-12 h-12 text-white/80 animate-spin" />
-                                        <span className="text-white/80 text-sm">{audioLoading ? 'Generating natural voice...' : generationStep}</span>
+                                        <span className="text-white/80 text-sm">{generationStep}</span>
                                     </div>
-                                ) : !isGenerating && !audioLoading && !imageLoading ? (
+                                ) : !isGenerating && !imageLoading ? (
                                     <>
                                         {!podImage && <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />}
                                         {!podImage && <Radio className="w-16 h-16 text-white/80" />}
@@ -873,42 +792,12 @@ Use short sentences for better pacing. Do NOT use any markdown formatting.`,
                             </div>
                         </div>
 
-                        {/* Voice Selection & Download */}
-                        <div className="mt-4 flex items-center justify-center gap-4">
-                            {voices.length > 1 && (
-                                <select
-                                    value={selectedVoice?.name || ''}
-                                    onChange={(e) => {
-                                        const voice = voices.find(v => v.name === e.target.value);
-                                        setSelectedVoice(voice);
-                                    }}
-                                    className="bg-gray-50 border border-gray-200 rounded-lg px-3 py-1 text-sm text-gray-700"
-                                >
-                                    {voices.map((voice) => (
-                                        <option key={voice.name} value={voice.name}>
-                                            {voice.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            )}
-                            {useElevenLabs && audioRef.current && !isGenerating && !audioLoading && (
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="gap-2"
-                                    onClick={() => {
-                                        const a = document.createElement('a');
-                                        a.href = audioRef.current.src;
-                                        a.download = `${currentEpisode?.title || 'podcast'}.mp3`;
-                                        document.body.appendChild(a);
-                                        a.click();
-                                        document.body.removeChild(a);
-                                    }}
-                                >
-                                    <Download className="w-4 h-4" />
-                                    Download MP3
-                                </Button>
-                            )}
+                        {/* Voice Selection */}
+                        <div className="mt-4 flex items-center justify-center">
+                            <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg">
+                                <Mic className="w-4 h-4 text-purple-600" />
+                                <span className="text-sm text-gray-700">Samantha</span>
+                            </div>
                         </div>
                     </div>
                 </DialogContent>
