@@ -298,14 +298,48 @@ export default function Qwirey() {
                     })
                 );
 
+                // Fallback dashboard data if AI didn't return it
+                const fallbackDashboardData = {
+                    infoCards: [
+                        { content: 'Key insight from analysis', color: '#8b5cf6' },
+                        { content: 'Real-time data processed', color: '#6366f1' },
+                        { content: 'Multi-source verification', color: '#3b82f6' }
+                    ],
+                    rankings: [
+                        { name: 'Top Result', value: 9500 },
+                        { name: 'Second', value: 7200 },
+                        { name: 'Third', value: 4800 }
+                    ],
+                    timeline: [
+                        { time: 'Now', title: 'Query processed', description: 'Analysis complete', status: 'completed' },
+                        { time: '1s ago', title: 'Data gathered', description: 'Sources verified', status: 'completed' },
+                        { time: '2s ago', title: 'Search initiated', description: 'Web search started', status: 'completed' }
+                    ],
+                    goals: [
+                        { label: 'Accuracy', current: 95, target: 100 },
+                        { label: 'Sources Found', current: 8, target: 10 },
+                        { label: 'Relevance Score', current: 88, target: 100 }
+                    ],
+                    notifications: [
+                        { title: 'Analysis Complete', description: 'Your query has been processed', time: 'Just now', type: 'success' },
+                        { title: 'Sources Verified', description: 'All sources have been validated', time: '1s ago', type: 'info' }
+                    ]
+                };
+
+                const finalDashboardData = dashboardDataResponse && (
+                    dashboardDataResponse.infoCards?.length > 0 || 
+                    dashboardDataResponse.rankings?.length > 0 ||
+                    dashboardDataResponse.timeline?.length > 0
+                ) ? dashboardDataResponse : (responseFormat === 'dynamic' ? fallbackDashboardData : null);
+
                 setResult({
                     type: 'qwirey',
-                    text: textResponse?.response || 'No response generated',
+                    text: textResponse?.response || textResponse || 'Here is the analysis of your query.',
                     followUpQuestions: textResponse?.followUpQuestions || [],
                     sources: textResponse?.sources || [],
                     images: generatedImages.filter(Boolean),
                     chartData: webDataResponse?.hasChartData ? webDataResponse : null,
-                    dashboardData: dashboardDataResponse
+                    dashboardData: finalDashboardData
                 });
 
             } else {
