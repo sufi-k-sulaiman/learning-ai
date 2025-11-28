@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { LOGO_URL } from '@/components/NavigationConfig';
 import ReactMarkdown from 'react-markdown';
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import InfoCard from '@/components/dashboard/InfoCard';
 import { toast } from 'sonner';
 import { ERROR_CODES, getErrorCode } from '@/components/ErrorDisplay';
 
@@ -202,10 +203,10 @@ export default function Qwirey() {
 
         // Build format instruction based on selected format
         const formatInstructions = {
-            dynamic: '',
+            dynamic: 'Format your response with clear paragraph breaks. Use markdown headers (##) to organize sections. Add line breaks between paragraphs for readability.',
             short: 'IMPORTANT: Keep your response under 280 characters total. Include a few bullet points with key facts. Be extremely concise.',
-            long: 'IMPORTANT: Provide a detailed, comprehensive response with 6-8 paragraphs. Include thorough explanations, examples, and context. Do NOT include images or charts.',
-            tabled: 'IMPORTANT: Provide a brief summary, then create a comparison table with columns for options/choices, pros, cons, and reasoning. Help the user weigh decisions and think through choices. Do NOT include images or charts.'
+            long: 'IMPORTANT: Provide a detailed, comprehensive response with 6-8 paragraphs. Include thorough explanations, examples, and context. Add clear paragraph breaks between each section. Do NOT include images or charts.',
+            tabled: 'IMPORTANT: Provide a brief 2-3 sentence summary first. Then create a markdown comparison table with columns: Option | Pros | Cons | Recommendation. Help the user weigh decisions and reason through choices. Format the table properly with | separators and header row with dashes. Do NOT include images or charts.'
         };
 
         const formatInstruction = formatInstructions[responseFormat] || '';
@@ -498,9 +499,18 @@ export default function Qwirey() {
                                         </Button>
                                     </div>
                                     
-                                    <div className="prose prose-sm max-w-none text-gray-700">
+                                    <div className="prose prose-sm max-w-none text-gray-700 prose-p:mb-4 prose-headings:mt-6 prose-headings:mb-3 prose-table:w-full prose-th:bg-purple-50 prose-th:p-3 prose-th:text-left prose-th:font-semibold prose-th:border prose-th:border-gray-200 prose-td:p-3 prose-td:border prose-td:border-gray-200 prose-tr:even:bg-gray-50">
                                         <ReactMarkdown>{result.text}</ReactMarkdown>
                                     </div>
+                                    
+                                    {/* Dynamic format: Show info cards for key insights */}
+                                    {responseFormat === 'dynamic' && result.type === 'qwirey' && (
+                                        <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-3">
+                                            <InfoCard content="AI-powered insights" bgColor="#8b5cf6" />
+                                            <InfoCard content="Real-time web data" bgColor="#6366f1" />
+                                            <InfoCard content="Multi-source analysis" bgColor="#3b82f6" />
+                                        </div>
+                                    )}
                                 </div>
 
                                 {result.type === 'qwirey' && (
