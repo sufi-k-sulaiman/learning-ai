@@ -913,103 +913,6 @@ const STOCK_DATA = [
     { ticker: 'ARMK', name: 'Aramark', sector: 'Consumer', industry: 'Food Services', marketCap: '12' },
     { ticker: 'CBRE', name: 'CBRE Group', sector: 'Real Estate', industry: 'Real Estate Services', marketCap: '28' },
     { ticker: 'JLL', name: 'Jones Lang LaSalle', sector: 'Real Estate', industry: 'Real Estate Services', marketCap: '12' },
-    // Additional 100 stocks
-    { ticker: 'BURL', name: 'Burlington Stores', sector: 'Consumer', industry: 'Discount Retail', marketCap: '18' },
-    { ticker: 'FIVE', name: 'Five Below', sector: 'Consumer', industry: 'Discount Retail', marketCap: '8' },
-    { ticker: 'DKS', name: 'Dicks Sporting Goods', sector: 'Consumer', industry: 'Sports Retail', marketCap: '18' },
-    { ticker: 'ATRC', name: 'AtriCure Inc.', sector: 'Healthcare', industry: 'Medical Devices', marketCap: '2' },
-    { ticker: 'AXNX', name: 'Axonics Inc.', sector: 'Healthcare', industry: 'Medical Devices', marketCap: '4' },
-    { ticker: 'NUVA', name: 'NuVasive Inc.', sector: 'Healthcare', industry: 'Medical Devices', marketCap: '3' },
-    { ticker: 'GKOS', name: 'Glaukos Corporation', sector: 'Healthcare', industry: 'Medical Devices', marketCap: '5' },
-    { ticker: 'MASI', name: 'Masimo Corporation', sector: 'Healthcare', industry: 'Medical Devices', marketCap: '10' },
-    { ticker: 'TNDM', name: 'Tandem Diabetes', sector: 'Healthcare', industry: 'Diabetes', marketCap: '3' },
-    { ticker: 'DOCS', name: 'Doximity Inc.', sector: 'Healthcare', industry: 'Healthcare Tech', marketCap: '8' },
-    { ticker: 'TDOC', name: 'Teladoc Health', sector: 'Healthcare', industry: 'Telehealth', marketCap: '5' },
-    { ticker: 'GDRX', name: 'GoodRx Holdings', sector: 'Healthcare', industry: 'Healthcare Tech', marketCap: '3' },
-    { ticker: 'ACHC', name: 'Acadia Healthcare', sector: 'Healthcare', industry: 'Behavioral Health', marketCap: '8' },
-    { ticker: 'HALO', name: 'Halozyme Therapeutics', sector: 'Healthcare', industry: 'Biotechnology', marketCap: '8' },
-    { ticker: 'MEDP', name: 'Medpace Holdings', sector: 'Healthcare', industry: 'CRO', marketCap: '12' },
-    { ticker: 'TYL', name: 'Tyler Technologies', sector: 'Technology', industry: 'Government Software', marketCap: '18' },
-    { ticker: 'GWRE', name: 'Guidewire Software', sector: 'Technology', industry: 'Insurance Software', marketCap: '12' },
-    { ticker: 'MANH', name: 'Manhattan Associates', sector: 'Technology', industry: 'Supply Chain Software', marketCap: '15' },
-    { ticker: 'SSNC', name: 'SS&C Technologies', sector: 'Technology', industry: 'Financial Software', marketCap: '18' },
-    { ticker: 'OLED', name: 'Universal Display', sector: 'Technology', industry: 'Display Tech', marketCap: '8' },
-    { ticker: 'MKSI', name: 'MKS Instruments', sector: 'Technology', industry: 'Semiconductor Equipment', marketCap: '8' },
-    { ticker: 'POWI', name: 'Power Integrations', sector: 'Technology', industry: 'Power Semiconductors', marketCap: '5' },
-    { ticker: 'DIOD', name: 'Diodes Incorporated', sector: 'Technology', industry: 'Semiconductors', marketCap: '5' },
-    { ticker: 'SYNA', name: 'Synaptics Inc.', sector: 'Technology', industry: 'Semiconductors', marketCap: '5' },
-    { ticker: 'SITM', name: 'SiTime Corporation', sector: 'Technology', industry: 'Timing Semiconductors', marketCap: '5' },
-    { ticker: 'PI', name: 'Impinj Inc.', sector: 'Technology', industry: 'RFID', marketCap: '3' },
-    { ticker: 'LOGI', name: 'Logitech International', sector: 'Technology', industry: 'Peripherals', marketCap: '12' },
-    { ticker: 'PSTG', name: 'Pure Storage', sector: 'Technology', industry: 'Data Storage', marketCap: '15' },
-    { ticker: 'JBL', name: 'Jabil Inc.', sector: 'Technology', industry: 'EMS', marketCap: '15' },
-    { ticker: 'FLEX', name: 'Flex Ltd.', sector: 'Technology', industry: 'EMS', marketCap: '12' },
-    { ticker: 'CGNX', name: 'Cognex Corporation', sector: 'Technology', industry: 'Machine Vision', marketCap: '8' },
-    { ticker: 'ANET', name: 'Arista Networks', sector: 'Technology', industry: 'Cloud Networking', marketCap: '75' },
-    { ticker: 'LSCC', name: 'Lattice Semiconductor', sector: 'Technology', industry: 'FPGAs', marketCap: '8' },
-    { ticker: 'LFUS', name: 'Littelfuse Inc.', sector: 'Technology', industry: 'Circuit Protection', marketCap: '5' },
-    { ticker: 'GFL', name: 'GFL Environmental', sector: 'Industrials', industry: 'Waste Management', marketCap: '15' },
-    { ticker: 'CLH', name: 'Clean Harbors', sector: 'Industrials', industry: 'Environmental Services', marketCap: '10' },
-    { ticker: 'RSG', name: 'Republic Services', sector: 'Industrials', industry: 'Waste Management', marketCap: '52' },
-    { ticker: 'NDSN', name: 'Nordson Corporation', sector: 'Industrials', industry: 'Precision Dispensing', marketCap: '15' },
-    { ticker: 'TTC', name: 'Toro Company', sector: 'Industrials', industry: 'Outdoor Equipment', marketCap: '12' },
-    { ticker: 'SSD', name: 'Simpson Manufacturing', sector: 'Industrials', industry: 'Building Products', marketCap: '8' },
-    { ticker: 'BLD', name: 'TopBuild Corp', sector: 'Industrials', industry: 'Insulation', marketCap: '8' },
-    { ticker: 'J', name: 'Jacobs Solutions', sector: 'Industrials', industry: 'Engineering', marketCap: '18' },
-    { ticker: 'ACM', name: 'AECOM', sector: 'Industrials', industry: 'Engineering', marketCap: '12' },
-    { ticker: 'PWR', name: 'Quanta Services', sector: 'Industrials', industry: 'Infrastructure', marketCap: '42' },
-    { ticker: 'EME', name: 'EMCOR Group', sector: 'Industrials', industry: 'Construction', marketCap: '15' },
-    { ticker: 'MTDR', name: 'Matador Resources', sector: 'Energy', industry: 'Oil & Gas E&P', marketCap: '8' },
-    { ticker: 'CTRA', name: 'Coterra Energy', sector: 'Energy', industry: 'Oil & Gas E&P', marketCap: '18' },
-    { ticker: 'AR', name: 'Antero Resources', sector: 'Energy', industry: 'Natural Gas', marketCap: '8' },
-    { ticker: 'RRC', name: 'Range Resources', sector: 'Energy', industry: 'Natural Gas', marketCap: '8' },
-    { ticker: 'SWN', name: 'Southwestern Energy', sector: 'Energy', industry: 'Natural Gas', marketCap: '8' },
-    { ticker: 'EQT', name: 'EQT Corporation', sector: 'Energy', industry: 'Natural Gas', marketCap: '18' },
-    { ticker: 'CHRD', name: 'Chord Energy', sector: 'Energy', industry: 'Oil & Gas E&P', marketCap: '8' },
-    { ticker: 'SM', name: 'SM Energy', sector: 'Energy', industry: 'Oil & Gas E&P', marketCap: '5' },
-    { ticker: 'PDCE', name: 'PDC Energy', sector: 'Energy', industry: 'Oil & Gas E&P', marketCap: '5' },
-    { ticker: 'ESTE', name: 'Earthstone Energy', sector: 'Energy', industry: 'Oil & Gas E&P', marketCap: '2' },
-    { ticker: 'DINO', name: 'HF Sinclair', sector: 'Energy', industry: 'Refining', marketCap: '12' },
-    { ticker: 'PARR', name: 'Par Pacific Holdings', sector: 'Energy', industry: 'Refining', marketCap: '2' },
-    { ticker: 'DK', name: 'Delek US Holdings', sector: 'Energy', industry: 'Refining', marketCap: '2' },
-    { ticker: 'TRGP', name: 'Targa Resources', sector: 'Energy', industry: 'Midstream', marketCap: '22' },
-    { ticker: 'WMB', name: 'Williams Companies', sector: 'Energy', industry: 'Midstream', marketCap: '42' },
-    { ticker: 'KMI', name: 'Kinder Morgan', sector: 'Energy', industry: 'Midstream', marketCap: '42' },
-    { ticker: 'OKE', name: 'ONEOK Inc.', sector: 'Energy', industry: 'Midstream', marketCap: '52' },
-    { ticker: 'EPD', name: 'Enterprise Products', sector: 'Energy', industry: 'Midstream', marketCap: '58' },
-    { ticker: 'ET', name: 'Energy Transfer', sector: 'Energy', industry: 'Midstream', marketCap: '42' },
-    { ticker: 'MPLX', name: 'MPLX LP', sector: 'Energy', industry: 'Midstream', marketCap: '38' },
-    { ticker: 'PAA', name: 'Plains All American', sector: 'Energy', industry: 'Midstream', marketCap: '12' },
-    { ticker: 'AM', name: 'Antero Midstream', sector: 'Energy', industry: 'Midstream', marketCap: '5' },
-    { ticker: 'CIVI', name: 'Civitas Resources', sector: 'Energy', industry: 'Oil & Gas E&P', marketCap: '8' },
-    { ticker: 'MGY', name: 'Magnolia Oil & Gas', sector: 'Energy', industry: 'Oil & Gas E&P', marketCap: '5' },
-    { ticker: 'MTTR', name: 'Matterport Inc.', sector: 'Technology', industry: '3D Capture', marketCap: '2' },
-    { ticker: 'YEXT', name: 'Yext Inc.', sector: 'Technology', industry: 'Digital Presence', marketCap: '1' },
-    { ticker: 'BOX', name: 'Box Inc.', sector: 'Technology', industry: 'Cloud Storage', marketCap: '5' },
-    { ticker: 'DBX', name: 'Dropbox Inc.', sector: 'Technology', industry: 'Cloud Storage', marketCap: '10' },
-    { ticker: 'ESTC', name: 'Elastic N.V.', sector: 'Technology', industry: 'Search Technology', marketCap: '8' },
-    { ticker: 'CFLT', name: 'Confluent Inc.', sector: 'Technology', industry: 'Data Streaming', marketCap: '10' },
-    { ticker: 'GTLB', name: 'GitLab Inc.', sector: 'Technology', industry: 'DevOps', marketCap: '8' },
-    { ticker: 'DT', name: 'Dynatrace Inc.', sector: 'Technology', industry: 'Observability', marketCap: '15' },
-    { ticker: 'PCTY', name: 'Paylocity Holding', sector: 'Technology', industry: 'Payroll Software', marketCap: '12' },
-    { ticker: 'PAYC', name: 'Paycom Software', sector: 'Technology', industry: 'Payroll Software', marketCap: '12' },
-    { ticker: 'GDDY', name: 'GoDaddy Inc.', sector: 'Technology', industry: 'Web Services', marketCap: '18' },
-    { ticker: 'WIX', name: 'Wix.com Ltd.', sector: 'Technology', industry: 'Website Builder', marketCap: '8' },
-    { ticker: 'ZI', name: 'ZoomInfo Technologies', sector: 'Technology', industry: 'Sales Intelligence', marketCap: '8' },
-    { ticker: 'CYBR', name: 'CyberArk Software', sector: 'Technology', industry: 'Identity Security', marketCap: '12' },
-    { ticker: 'VRNS', name: 'Varonis Systems', sector: 'Technology', industry: 'Data Security', marketCap: '5' },
-    { ticker: 'GOOS', name: 'Canada Goose', sector: 'Consumer', industry: 'Luxury Apparel', marketCap: '3' },
-    { ticker: 'PRPH', name: 'ProPhase Labs', sector: 'Healthcare', industry: 'Diagnostics', marketCap: '1' },
-    { ticker: 'MRSN', name: 'Mersana Therapeutics', sector: 'Healthcare', industry: 'Biotechnology', marketCap: '1' },
-    { ticker: 'ACET', name: 'Adicet Bio', sector: 'Healthcare', industry: 'Biotechnology', marketCap: '1' },
-    { ticker: 'KURA', name: 'Kura Oncology', sector: 'Healthcare', industry: 'Biotechnology', marketCap: '2' },
-    { ticker: 'XENE', name: 'Xenon Pharmaceuticals', sector: 'Healthcare', industry: 'Biotechnology', marketCap: '5' },
-    { ticker: 'ARQT', name: 'Arcutis Biotherapeutics', sector: 'Healthcare', industry: 'Biotechnology', marketCap: '2' },
-    { ticker: 'RCUS', name: 'Arcus Biosciences', sector: 'Healthcare', industry: 'Biotechnology', marketCap: '3' },
-    { ticker: 'KYMR', name: 'Kymera Therapeutics', sector: 'Healthcare', industry: 'Biotechnology', marketCap: '3' },
-    { ticker: 'NVAX', name: 'Novavax Inc.', sector: 'Healthcare', industry: 'Vaccines', marketCap: '2' },
-    { ticker: 'BNTX', name: 'BioNTech SE', sector: 'Healthcare', industry: 'Biotechnology', marketCap: '25' },
-    { ticker: 'BHVN', name: 'Biohaven Ltd.', sector: 'Healthcare', industry: 'Biotechnology', marketCap: '5' },
 ];
 
 function generateStockData(stockInfo) {
@@ -1042,7 +945,6 @@ export default function Markets() {
     const [selectedStock, setSelectedStock] = useState(null);
     const [showStockModal, setShowStockModal] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [loadedCount, setLoadedCount] = useState(0);
 
     useEffect(() => { fetchStockData(); }, []);
 
@@ -1055,109 +957,91 @@ export default function Markets() {
 
     const fetchStockData = async () => {
         setLoading(true);
-        setLoadedCount(0);
-        setStocks([]);
-        
-        // Load stocks in batches sequentially using LLM
-        const BATCH_SIZE = 50;
-        const batches = [];
-        for (let i = 0; i < STOCK_DATA.length; i += BATCH_SIZE) {
-            batches.push(STOCK_DATA.slice(i, i + BATCH_SIZE));
-        }
-
-        // Load first batch immediately
-        const firstBatch = batches[0].map(generateStockData);
-        setStocks(firstBatch);
-        setLoadedCount(firstBatch.length);
-        setLoading(false);
-
-        // Load remaining batches with LLM data
-        for (let batchIndex = 1; batchIndex < batches.length; batchIndex++) {
-            const batch = batches[batchIndex];
-            const tickers = batch.map(s => s.ticker).join(', ');
+        try {
+            // Get a random batch of 30 stocks to fetch real data for
+            const stockBatch = STOCK_DATA.sort(() => Math.random() - 0.5).slice(0, 30);
+            const tickers = stockBatch.map(s => s.ticker).join(', ');
             
-            try {
-                const response = await base44.integrations.Core.InvokeLLM({
-                    prompt: `Provide current stock market data for ${batch.length} stocks: ${tickers}
+            const response = await base44.integrations.Core.InvokeLLM({
+                prompt: `Provide current stock market data for these tickers: ${tickers}
 
-For EACH stock provide realistic data:
-- Current price (realistic market price)
-- Daily change % (-5 to +5)
-- Volume
-- MOAT score (0-100), ROE %, P/E ratio, Z-Score, EPS, Dividend %, Sales Growth Rate %
+For each stock, provide realistic current market data including:
+- Current price (realistic based on recent trading)
+- Daily change percentage (-5% to +5% typical range)
+- Trading volume
+- Key financial metrics: MOAT score (0-100), ROE %, P/E ratio, Z-Score, EPS, Dividend yield
 
-Return exactly ${batch.length} stocks with all metrics.`,
-                    add_context_from_internet: true,
-                    response_json_schema: {
-                        type: "object",
-                        properties: {
-                            stocks: {
-                                type: "array",
-                                items: {
-                                    type: "object",
-                                    properties: {
-                                        ticker: { type: "string" },
-                                        price: { type: "number" },
-                                        change: { type: "number" },
-                                        volume: { type: "string" },
-                                        moat: { type: "number" },
-                                        roe: { type: "number" },
-                                        pe: { type: "number" },
-                                        zscore: { type: "number" },
-                                        eps: { type: "number" },
-                                        dividend: { type: "number" },
-                                        sgr: { type: "number" }
-                                    }
+Return data for all ${stockBatch.length} stocks.`,
+                add_context_from_internet: true,
+                response_json_schema: {
+                    type: "object",
+                    properties: {
+                        stocks: {
+                            type: "array",
+                            items: {
+                                type: "object",
+                                properties: {
+                                    ticker: { type: "string" },
+                                    price: { type: "number" },
+                                    change: { type: "number" },
+                                    volume: { type: "string" },
+                                    moat: { type: "number" },
+                                    roe: { type: "number" },
+                                    pe: { type: "number" },
+                                    zscore: { type: "number" },
+                                    eps: { type: "number" },
+                                    dividend: { type: "number" },
+                                    sgr: { type: "number" }
                                 }
                             }
                         }
                     }
-                });
+                }
+            });
 
-                const llmStocks = response?.stocks || [];
-                const batchStocks = batch.map(stock => {
-                    const llmData = llmStocks.find(s => s.ticker === stock.ticker);
-                    if (llmData) {
-                        const history = [];
-                        let price = llmData.price * 0.9;
-                        for (let i = 0; i < 20; i++) { 
-                            price = price * (1 + (Math.random() - 0.48) * 0.02); 
-                            history.push(Math.round(price * 100) / 100); 
-                        }
-                        return {
-                            ...stock,
-                            price: llmData.price,
-                            change: llmData.change,
-                            volume: llmData.volume || `${(Math.random() * 50 + 5).toFixed(1)}M`,
-                            moat: llmData.moat || 50 + Math.floor(Math.random() * 40),
-                            roe: llmData.roe || 10 + Math.floor(Math.random() * 25),
-                            roic: (llmData.roe || 15) - 2 + Math.floor(Math.random() * 5),
-                            roa: Math.floor((llmData.roe || 15) * 0.6),
-                            pe: llmData.pe || 15 + Math.floor(Math.random() * 25),
-                            peg: Math.round(((llmData.pe || 20) / (llmData.sgr || 10)) * 100) / 100,
-                            zscore: llmData.zscore || 2 + Math.random() * 2,
-                            eps: llmData.eps || 1 + Math.random() * 10,
-                            dividend: llmData.dividend || Math.random() * 3,
-                            sgr: llmData.sgr || 5 + Math.floor(Math.random() * 20),
-                            beta: Math.round((0.7 + Math.random() * 0.8) * 100) / 100,
-                            fcf: Math.floor(Math.random() * 5000) + 500,
-                            eva: 40 + Math.floor(Math.random() * 50),
-                            aiRating: 55 + Math.floor(Math.random() * 40),
-                            history
-                        };
+            // Merge LLM data with our stock info
+            const llmStocks = response?.stocks || [];
+            const updatedStocks = STOCK_DATA.map(stock => {
+                const llmData = llmStocks.find(s => s.ticker === stock.ticker);
+                if (llmData) {
+                    const history = [];
+                    let price = llmData.price * 0.9;
+                    for (let i = 0; i < 20; i++) { 
+                        price = price * (1 + (Math.random() - 0.48) * 0.02); 
+                        history.push(Math.round(price * 100) / 100); 
                     }
-                    return generateStockData(stock);
-                });
+                    return {
+                        ...stock,
+                        price: llmData.price,
+                        change: llmData.change,
+                        volume: llmData.volume || `${(Math.random() * 50 + 5).toFixed(1)}M`,
+                        moat: llmData.moat || 50 + Math.floor(Math.random() * 40),
+                        roe: llmData.roe || 10 + Math.floor(Math.random() * 25),
+                        roic: (llmData.roe || 15) - 2 + Math.floor(Math.random() * 5),
+                        roa: Math.floor((llmData.roe || 15) * 0.6),
+                        pe: llmData.pe || 15 + Math.floor(Math.random() * 25),
+                        peg: Math.round(((llmData.pe || 20) / (llmData.sgr || 10)) * 100) / 100,
+                        zscore: llmData.zscore || 2 + Math.random() * 2,
+                        eps: llmData.eps || 1 + Math.random() * 10,
+                        dividend: llmData.dividend || Math.random() * 3,
+                        sgr: llmData.sgr || 5 + Math.floor(Math.random() * 20),
+                        beta: Math.round((0.7 + Math.random() * 0.8) * 100) / 100,
+                        fcf: Math.floor(Math.random() * 5000) + 500,
+                        eva: 40 + Math.floor(Math.random() * 50),
+                        aiRating: 55 + Math.floor(Math.random() * 40),
+                        history
+                    };
+                }
+                return generateStockData(stock);
+            });
 
-                setStocks(prev => [...prev, ...batchStocks]);
-                setLoadedCount(prev => prev + batchStocks.length);
-            } catch (error) {
-                console.error('Error fetching batch data:', error);
-                // Fallback to generated data for this batch
-                const batchStocks = batch.map(generateStockData);
-                setStocks(prev => [...prev, ...batchStocks]);
-                setLoadedCount(prev => prev + batchStocks.length);
-            }
+            setStocks(updatedStocks);
+        } catch (error) {
+            console.error('Error fetching stock data:', error);
+            // Fallback to generated data
+            setStocks(STOCK_DATA.map(generateStockData));
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -1202,10 +1086,7 @@ Return exactly ${batch.length} stocks with all metrics.`,
             </div>
 
             <div className="flex items-center justify-between mb-4 mt-6">
-                <p className="text-gray-600">
-                    Showing <span className="font-bold text-gray-900">{filteredStocks.length}</span> of {stocks.length} stocks
-                    {loadedCount < STOCK_DATA.length && <span className="ml-2 text-purple-600">(loading {loadedCount}/{STOCK_DATA.length})</span>}
-                </p>
+                <p className="text-gray-600">Showing <span className="font-bold text-gray-900">{filteredStocks.length}</span> of {stocks.length} stocks</p>
             </div>
 
             {loading ? (

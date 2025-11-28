@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Search, FileText, Sparkles, Radio, Brain, Settings, ArrowLeft, Loader2 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import PageLayout from '../components/PageLayout';
+import PageLayout from '@/components/PageLayout';
 import { base44 } from '@/api/base44Client';
 
 const PAGES = [
