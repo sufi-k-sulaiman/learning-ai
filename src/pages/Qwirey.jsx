@@ -329,41 +329,8 @@ export default function Qwirey() {
                     })
                 );
 
-                // Fallback dashboard data if AI didn't return it
-                const fallbackDashboardData = {
-                    infoCards: [
-                        { content: 'Key insight from analysis', color: '#8b5cf6' },
-                        { content: 'Real-time data processed', color: '#6366f1' },
-                        { content: 'Multi-source verification', color: '#3b82f6' }
-                    ],
-                    rankings: [
-                        { name: 'Top Result', value: 9500 },
-                        { name: 'Second', value: 7200 },
-                        { name: 'Third', value: 4800 }
-                    ],
-                    timeline: [
-                        { time: 'Now', title: 'Query processed', description: 'Analysis complete', status: 'completed' },
-                        { time: '1s ago', title: 'Data gathered', description: 'Sources verified', status: 'completed' },
-                        { time: '2s ago', title: 'Search initiated', description: 'Web search started', status: 'completed' }
-                    ],
-                    goals: [
-                        { label: 'Accuracy', current: 95, target: 100 },
-                        { label: 'Sources Found', current: 8, target: 10 },
-                        { label: 'Relevance Score', current: 88, target: 100 }
-                    ],
-                    notifications: [
-                        { title: 'Analysis Complete', description: 'Your query has been processed', time: 'Just now', type: 'success' },
-                        { title: 'Sources Verified', description: 'All sources have been validated', time: '1s ago', type: 'info' }
-                    ]
-                };
-
-                const finalDashboardData = responseFormat === 'dynamic' ? (
-                    dashboardDataResponse && (
-                        dashboardDataResponse.infoCards?.length > 0 || 
-                        dashboardDataResponse.rankings?.length > 0 ||
-                        dashboardDataResponse.timeline?.length > 0
-                    ) ? dashboardDataResponse : fallbackDashboardData
-                ) : null;
+                // Only use AI-generated dashboard data - no fallbacks
+                const finalDashboardData = responseFormat === 'dynamic' && dashboardDataResponse ? dashboardDataResponse : null;
 
                 const tabledData = responseFormat === 'tabled' && dashboardDataResponse ? dashboardDataResponse : null;
                 const reviewsData = responseFormat === 'reviews' && dashboardDataResponse ? dashboardDataResponse : null;
@@ -610,19 +577,12 @@ export default function Qwirey() {
                                                 {result.text?.split('•')[0]?.trim().slice(0, 280)}
                                             </p>
                                             <ul className="space-y-3 mt-4 bg-gray-50 rounded-xl p-4">
-                                                {(() => {
-                                                    const bullets = result.text?.match(/•[^•]+/g) || [];
-                                                    const displayBullets = bullets.length >= 5 ? bullets.slice(0, 5) : [
-                                                        ...bullets,
-                                                        ...Array(5 - bullets.length).fill(null).map((_, i) => `• Key point ${bullets.length + i + 1}`)
-                                                    ];
-                                                    return displayBullets.map((bullet, i) => (
-                                                        <li key={i} className="flex items-start gap-3 text-gray-700">
-                                                            <span className="w-6 h-6 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-sm font-medium flex-shrink-0">{i + 1}</span>
-                                                            <span>{bullet?.replace('•', '').trim()}</span>
-                                                        </li>
-                                                    ));
-                                                })()}
+                                                {(result.text?.match(/•[^•]+/g) || []).slice(0, 5).map((bullet, i) => (
+                                                    <li key={i} className="flex items-start gap-3 text-gray-700">
+                                                        <span className="w-6 h-6 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-sm font-medium flex-shrink-0">{i + 1}</span>
+                                                        <span>{bullet?.replace('•', '').trim()}</span>
+                                                    </li>
+                                                ))}
                                             </ul>
                                         </div>
                                     )}
