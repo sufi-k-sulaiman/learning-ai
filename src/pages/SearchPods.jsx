@@ -637,14 +637,7 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
                                 <X className="w-6 h-6" />
                             </button>
                             <span className="text-gray-500 text-sm uppercase tracking-wider">Now Playing</span>
-                            <button 
-                                onClick={downloadAudio}
-                                disabled={isGenerating}
-                                className="text-gray-400 hover:text-gray-600 disabled:opacity-50"
-                                title="Download Script"
-                            >
-                                <Download className="w-5 h-5" />
-                            </button>
+                            <div className="w-6" />
                         </div>
 
                         {/* Album Art */}
@@ -731,30 +724,25 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
                         {/* Progress - clickable timeline */}
                         <div className="mb-6">
                             <div 
-                                className="relative h-1 bg-gray-200 rounded-full cursor-pointer group"
+                                className="relative h-2 bg-gray-200 rounded-full cursor-pointer group"
                                 onClick={(e) => {
                                     const rect = e.currentTarget.getBoundingClientRect();
                                     const percent = (e.clientX - rect.left) / rect.width;
                                     const newTime = Math.floor(percent * duration);
+                                    const newIndex = Math.floor(percent * sentencesRef.current.length);
                                     
-                                    if (useElevenLabs && audioRef.current) {
-                                        audioRef.current.currentTime = percent * audioRef.current.duration;
-                                        setCurrentTime(newTime);
-                                    } else {
-                                        const newIndex = Math.floor(percent * sentencesRef.current.length);
-                                        // Stop current speech and jump to new position
-                                        window.speechSynthesis?.cancel();
-                                        currentIndexRef.current = Math.max(0, Math.min(newIndex, sentencesRef.current.length - 1));
-                                        setCurrentTime(newTime);
-                                        
-                                        if (isPlayingRef.current) {
-                                            setTimeout(() => speakNextSentence(), 100);
-                                        } else {
-                                            const text = sentencesRef.current[currentIndexRef.current] || '';
-                                            setCurrentCaption(text);
-                                            setCaptionWords(text.split(/\s+/));
-                                            setCurrentWordIndex(-1);
-                                        }
+                                    // Stop current speech and jump to new position
+                                    window.speechSynthesis?.cancel();
+                                    currentIndexRef.current = Math.max(0, Math.min(newIndex, sentencesRef.current.length - 1));
+                                    setCurrentTime(newTime);
+                                    
+                                    const text = sentencesRef.current[currentIndexRef.current] || '';
+                                    setCurrentCaption(text);
+                                    setCaptionWords(text.split(/\s+/));
+                                    setCurrentWordIndex(-1);
+                                    
+                                    if (isPlayingRef.current) {
+                                        setTimeout(() => speakNextSentence(), 100);
                                     }
                                 }}
                             >
@@ -824,12 +812,21 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
                             </div>
                         </div>
 
-                        {/* Voice Selection */}
-                        <div className="mt-4 flex items-center justify-center">
+                        {/* Voice Selection & Download */}
+                        <div className="mt-4 flex items-center justify-center gap-3">
                             <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg">
                                 <Mic className="w-4 h-4 text-purple-600" />
                                 <span className="text-sm text-gray-700">Samantha</span>
                             </div>
+                            <button 
+                                onClick={downloadAudio}
+                                disabled={isGenerating}
+                                className="flex items-center gap-2 px-3 py-1.5 bg-purple-50 hover:bg-purple-100 border border-purple-200 rounded-lg text-purple-600 disabled:opacity-50 transition-colors"
+                                title="Download Script"
+                            >
+                                <Download className="w-4 h-4" />
+                                <span className="text-sm">Download</span>
+                            </button>
                         </div>
                     </div>
                 </DialogContent>
