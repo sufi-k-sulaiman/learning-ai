@@ -1042,6 +1042,7 @@ export default function Markets() {
     const [selectedStock, setSelectedStock] = useState(null);
     const [showStockModal, setShowStockModal] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [loadedCount, setLoadedCount] = useState(0);
 
     useEffect(() => { fetchStockData(); }, []);
 
@@ -1054,8 +1055,31 @@ export default function Markets() {
 
     const fetchStockData = async () => {
         setLoading(true);
+        setLoadedCount(0);
+        
+        // Load stocks in batches progressively
+        const BATCH_SIZE = 100;
+        const batches = [];
+        for (let i = 0; i < STOCK_DATA.length; i += BATCH_SIZE) {
+            batches.push(STOCK_DATA.slice(i, i + BATCH_SIZE));
+        }
+
+        // Load first batch with generated data immediately
+        const initialStocks = batches[0].map(generateStockData);
+        setStocks(initialStocks);
+        setLoadedCount(batches[0].length);
+        setLoading(false);
+
+        // Load remaining batches progressively
+        for (let i = 1; i < batches.length; i++) {
+            const batch = batches[i].map(generateStockData);
+            setStocks(prev => [...prev, ...batch]);
+            setLoadedCount(prev => prev + batch.length);
+            await new Promise(resolve => setTimeout(resolve, 100));
+        }
+
+        // Fetch real data for a subset after all are loaded
         try {
-            // Get a random batch of 30 stocks to fetch real data for
             const stockBatch = STOCK_DATA.sort(() => Math.random() - 0.5).slice(0, 30);
             const tickers = stockBatch.map(s => s.ticker).join(', ');
             
@@ -1134,11 +1158,7 @@ Return data for all ${stockBatch.length} stocks.`,
 
             setStocks(updatedStocks);
         } catch (error) {
-            console.error('Error fetching stock data:', error);
-            // Fallback to generated data
-            setStocks(STOCK_DATA.map(generateStockData));
-        } finally {
-            setLoading(false);
+            console.error('Error fetching enhanced data:', error);
         }
     };
 
@@ -1183,7 +1203,10 @@ Return data for all ${stockBatch.length} stocks.`,
             </div>
 
             <div className="flex items-center justify-between mb-4 mt-6">
-                <p className="text-gray-600">Showing <span className="font-bold text-gray-900">{filteredStocks.length}</span> of {stocks.length} stocks</p>
+                <p className="text-gray-600">
+                    Showing <span className="font-bold text-gray-900">{filteredStocks.length}</span> of {stocks.length} stocks
+                    {loadedCount < STOCK_DATA.length && <span className="ml-2 text-purple-600">(loading {loadedCount}/{STOCK_DATA.length})</span>}
+                </p>
             </div>
 
             {loading ? (
