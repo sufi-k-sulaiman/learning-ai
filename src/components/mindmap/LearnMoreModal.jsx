@@ -254,48 +254,52 @@ For each document, provide the actual URL where it can be found.`,
                                                 )}
                                             </div>
 
-                                            <p className="text-gray-700 text-lg leading-relaxed">{data.overview?.description}</p>
+                                            <p className="text-gray-700 text-lg leading-relaxed">{data?.overview?.description || 'Loading description...'}</p>
                                             
-                                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                                <div className="bg-purple-50 rounded-xl p-4">
-                                                    <div className="flex items-center gap-2 text-purple-700 mb-2">
-                                                        <Calendar className="w-5 h-5" />
-                                                        <span className="font-semibold">When</span>
+                                            {data?.overview && (
+                                                <>
+                                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                                        <div className="bg-purple-50 rounded-xl p-4">
+                                                            <div className="flex items-center gap-2 text-purple-700 mb-2">
+                                                                <Calendar className="w-5 h-5" />
+                                                                <span className="font-semibold">When</span>
+                                                            </div>
+                                                            <p className="text-gray-700 text-sm">{data.overview?.when}</p>
+                                                        </div>
+                                                        <div className="bg-blue-50 rounded-xl p-4">
+                                                            <div className="flex items-center gap-2 text-blue-700 mb-2">
+                                                                <User className="w-5 h-5" />
+                                                                <span className="font-semibold">Who</span>
+                                                            </div>
+                                                            <p className="text-gray-700 text-sm">{data.overview?.who}</p>
+                                                        </div>
+                                                        <div className="bg-emerald-50 rounded-xl p-4">
+                                                            <div className="flex items-center gap-2 text-emerald-700 mb-2">
+                                                                <Target className="w-5 h-5" />
+                                                                <span className="font-semibold">What</span>
+                                                            </div>
+                                                            <p className="text-gray-700 text-sm">{data.overview?.what}</p>
+                                                        </div>
+                                                        <div className="bg-orange-50 rounded-xl p-4">
+                                                            <div className="flex items-center gap-2 text-orange-700 mb-2">
+                                                                <MapPin className="w-5 h-5" />
+                                                                <span className="font-semibold">Where</span>
+                                                            </div>
+                                                            <p className="text-gray-700 text-sm">{data.overview?.where}</p>
+                                                        </div>
                                                     </div>
-                                                    <p className="text-gray-700 text-sm">{data.overview?.when}</p>
-                                                </div>
-                                                <div className="bg-blue-50 rounded-xl p-4">
-                                                    <div className="flex items-center gap-2 text-blue-700 mb-2">
-                                                        <User className="w-5 h-5" />
-                                                        <span className="font-semibold">Who</span>
-                                                    </div>
-                                                    <p className="text-gray-700 text-sm">{data.overview?.who}</p>
-                                                </div>
-                                                <div className="bg-emerald-50 rounded-xl p-4">
-                                                    <div className="flex items-center gap-2 text-emerald-700 mb-2">
-                                                        <Target className="w-5 h-5" />
-                                                        <span className="font-semibold">What</span>
-                                                    </div>
-                                                    <p className="text-gray-700 text-sm">{data.overview?.what}</p>
-                                                </div>
-                                                <div className="bg-orange-50 rounded-xl p-4">
-                                                    <div className="flex items-center gap-2 text-orange-700 mb-2">
-                                                        <MapPin className="w-5 h-5" />
-                                                        <span className="font-semibold">Where</span>
-                                                    </div>
-                                                    <p className="text-gray-700 text-sm">{data.overview?.where}</p>
-                                                </div>
-                                            </div>
 
-                                            <div className="space-y-4">
-                                                <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                                                    <Lightbulb className="w-5 h-5 text-amber-500" />
-                                                    Significance
-                                                </h3>
-                                                {data.overview?.significance?.map((para, i) => (
-                                                    <p key={i} className="text-gray-600 leading-relaxed">{para}</p>
-                                                ))}
-                                            </div>
+                                                    <div className="space-y-4">
+                                                        <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+                                                            <Lightbulb className="w-5 h-5 text-amber-500" />
+                                                            Significance
+                                                        </h3>
+                                                        {data.overview?.significance?.map((para, i) => (
+                                                            <p key={i} className="text-gray-600 leading-relaxed">{para}</p>
+                                                        ))}
+                                                    </div>
+                                                </>
+                                            )}
                                         </div>
                                     </TabsContent>
 
@@ -308,7 +312,7 @@ For each document, provide the actual URL where it can be found.`,
                                                     Required Skills
                                                 </h3>
                                                 <div className="flex flex-wrap gap-2">
-                                                    {data.professional?.skills?.map((skill, i) => (
+                                                    {data?.professional?.skills?.map((skill, i) => (
                                                         <span key={i} className="px-3 py-1.5 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">
                                                             {skill}
                                                         </span>
@@ -322,7 +326,7 @@ For each document, provide the actual URL where it can be found.`,
                                                     Related Subjects
                                                 </h3>
                                                 <div className="flex flex-wrap gap-2">
-                                                    {data.professional?.relatedSubjects?.map((subject, i) => (
+                                                    {data?.professional?.relatedSubjects?.map((subject, i) => (
                                                         <span key={i} className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
                                                             {subject}
                                                         </span>
@@ -336,7 +340,7 @@ For each document, provide the actual URL where it can be found.`,
                                                     Subject Matter Experts
                                                 </h3>
                                                 <div className="space-y-3">
-                                                    {data.professional?.experts?.map((expert, i) => (
+                                                    {data?.professional?.experts?.map((expert, i) => (
                                                         <div key={i} className="flex items-start gap-3">
                                                             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white font-bold">
                                                                 {expert.name?.charAt(0)}
@@ -357,7 +361,7 @@ For each document, provide the actual URL where it can be found.`,
                                                     Relevant Job Titles
                                                 </h3>
                                                 <div className="space-y-2">
-                                                    {data.professional?.jobTitles?.map((title, i) => (
+                                                    {data?.professional?.jobTitles?.map((title, i) => (
                                                         <div key={i} className="flex items-center gap-2 text-gray-700">
                                                             <Building className="w-4 h-4 text-gray-400" />
                                                             {title}
@@ -373,7 +377,7 @@ For each document, provide the actual URL where it can be found.`,
                                         <div className="relative">
                                             <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-purple-200" />
                                             <div className="space-y-6">
-                                                {data.timeline?.map((event, i) => (
+                                                {data?.timeline?.map((event, i) => (
                                                     <div key={i} className="relative pl-12">
                                                         <div className="absolute left-0 w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center text-white text-xs font-bold shadow-lg">
                                                             {i + 1}
@@ -397,7 +401,7 @@ For each document, provide the actual URL where it can be found.`,
                                     <TabsContent value="insights" className="m-0">
                                         <div className="space-y-6">
                                             {/* Key Stats with Radial Progress Cards */}
-                                            {data.insights?.keyStats && (
+                                            {data?.insights?.keyStats && (
                                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                                     {data.insights.keyStats.slice(0, 2).map((stat, i) => (
                                                         <RadialProgressCard 
@@ -419,7 +423,7 @@ For each document, provide the actual URL where it can be found.`,
 
                                             <div className="grid md:grid-cols-2 gap-6">
                                                 {/* Stacked Bar Chart */}
-                                                {data.insights?.barChartData && (
+                                                {data?.insights?.barChartData && (
                                                     <div className="bg-white rounded-xl border p-5">
                                                         <h3 className="font-semibold text-gray-900 mb-4">{data.insights.barChartTitle}</h3>
                                                         <div className="h-64">
@@ -438,7 +442,7 @@ For each document, provide the actual URL where it can be found.`,
                                                 )}
 
                                                 {/* Area Chart */}
-                                                {data.insights?.lineChartData && (
+                                                {data?.insights?.lineChartData && (
                                                     <div className="bg-white rounded-xl border p-5">
                                                         <h3 className="font-semibold text-gray-900 mb-4">{data.insights.lineChartTitle}</h3>
                                                         <div className="h-64">
@@ -467,7 +471,7 @@ For each document, provide the actual URL where it can be found.`,
                                                 )}
 
                                                 {/* Pie Chart */}
-                                                {data.insights?.pieChartData && (
+                                                {data?.insights?.pieChartData && (
                                                     <div className="bg-white rounded-xl border p-5 md:col-span-2">
                                                         <h3 className="font-semibold text-gray-900 mb-4">{data.insights.pieChartTitle}</h3>
                                                         <div className="h-64">
