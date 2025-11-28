@@ -69,19 +69,29 @@ Provide realistic data in JSON format with these sections:
 1. summary: Brief analysis summary for these countries
 2. keyInsights: Array of 4 key insights
 3. transportData: Array of 6 objects with {type, count, capacity, condition, investment}
-4. energyData: Array of 6 objects with {source, capacity, share, growth, plants}
-5. telecomData: Array of 5 objects with {type, count, coverage, investment, growth}
-6. waterData: Array of 5 objects with {type, count, capacity, condition, age}
-7. resourcesData: Array of 6 objects with {resource, reserves, production, value, rank}
-8. mineralsData: Array of 6 objects with {mineral, reserves, production, globalRank, value}
-9. financialData: Array of 5 objects with {asset, value, change, type}
-10. industrialData: Array of 5 objects with {sector, count, employment, output, growth}
-11. educationData: Array of 5 objects with {level, institutions, enrollment, teachers, spending}
-12. healthcareData: Array of 5 objects with {facility, count, capacity, staff, spending}
-13. trendData: Array of 12 objects with {period, infrastructure, energy, digital} for monthly trends
-14. countryComparison: Array comparing selected countries with {country, infrastructure, resources, digital} scores 0-100
+4. transportStats: Array of 4 objects with {title, value, unit} for highway km, railways km, airports count, seaports count
+5. energyData: Array of 6 objects with {source, capacity, share, growth, plants}
+6. energyStats: Array of 4 objects with {title, value, unit} for power plants, grid capacity GW, renewable %, pipelines km
+7. telecomData: Array of 5 objects with {type, count, coverage, investment, growth}
+8. telecomStats: Array of 4 objects with {title, value, unit} for 5G towers, fiber km, data centers, satellites
+9. waterData: Array of 5 objects with {type, count, capacity, condition, age}
+10. waterStats: Array of 4 objects with {title, value, unit} for dams, reservoirs, treatment plants, pipeline km
+11. resourcesData: Array of 6 objects with {resource, reserves, production, value, rank}
+12. resourceStats: Array of 4 objects with {title, value, unit} for oil reserves, gas reserves, coal, shale
+13. mineralsData: Array of 6 objects with {mineral, reserves, production, globalRank, value}
+14. mineralStats: Array of 4 objects with {title, value, unit} for iron, copper, gold, rare earth
+15. financialData: Array of 5 objects with {asset, value, change, type}
+16. financialStats: Array of 4 objects with {title, value, unit} for gold reserves, foreign reserves, pension, banking assets
+17. industrialData: Array of 5 objects with {sector, count, employment, output, growth}
+18. industrialStats: Array of 4 objects with {title, value, unit} for manufacturing plants, tech hubs, industrial parks, R&D centers
+19. educationData: Array of 5 objects with {level, institutions, enrollment, teachers, spending}
+20. educationStats: Array of 4 objects with {title, value, unit} for schools, universities, colleges, spending
+21. healthcareData: Array of 5 objects with {facility, count, capacity, staff, spending}
+22. healthcareStats: Array of 4 objects with {title, value, unit} for hospitals, beds, pharmacies, spending
+23. trendData: Array of 12 objects with {period, infrastructure, energy, digital} for monthly trends
+24. countryComparison: Array comparing selected countries with {country, infrastructure, resources, digital} scores 0-100
 
-Make data realistic and proportional to each country's actual size and development level.`,
+Make all data realistic and proportional to each country's actual size and development level. Use actual known statistics where possible.`,
                 add_context_from_internet: true,
                 response_json_schema: {
                     type: "object",
@@ -89,15 +99,25 @@ Make data realistic and proportional to each country's actual size and developme
                         summary: { type: "string" },
                         keyInsights: { type: "array", items: { type: "string" } },
                         transportData: { type: "array", items: { type: "object", properties: { type: { type: "string" }, count: { type: "string" }, capacity: { type: "string" }, condition: { type: "string" }, investment: { type: "string" } } } },
+                        transportStats: { type: "array", items: { type: "object", properties: { title: { type: "string" }, value: { type: "string" }, unit: { type: "string" } } } },
                         energyData: { type: "array", items: { type: "object", properties: { source: { type: "string" }, capacity: { type: "string" }, share: { type: "string" }, growth: { type: "string" }, plants: { type: "string" } } } },
+                        energyStats: { type: "array", items: { type: "object", properties: { title: { type: "string" }, value: { type: "string" }, unit: { type: "string" } } } },
                         telecomData: { type: "array", items: { type: "object", properties: { type: { type: "string" }, count: { type: "string" }, coverage: { type: "string" }, investment: { type: "string" }, growth: { type: "string" } } } },
+                        telecomStats: { type: "array", items: { type: "object", properties: { title: { type: "string" }, value: { type: "string" }, unit: { type: "string" } } } },
                         waterData: { type: "array", items: { type: "object", properties: { type: { type: "string" }, count: { type: "string" }, capacity: { type: "string" }, condition: { type: "string" }, age: { type: "string" } } } },
+                        waterStats: { type: "array", items: { type: "object", properties: { title: { type: "string" }, value: { type: "string" }, unit: { type: "string" } } } },
                         resourcesData: { type: "array", items: { type: "object", properties: { resource: { type: "string" }, reserves: { type: "string" }, production: { type: "string" }, value: { type: "string" }, rank: { type: "string" } } } },
+                        resourceStats: { type: "array", items: { type: "object", properties: { title: { type: "string" }, value: { type: "string" }, unit: { type: "string" } } } },
                         mineralsData: { type: "array", items: { type: "object", properties: { mineral: { type: "string" }, reserves: { type: "string" }, production: { type: "string" }, globalRank: { type: "string" }, value: { type: "string" } } } },
+                        mineralStats: { type: "array", items: { type: "object", properties: { title: { type: "string" }, value: { type: "string" }, unit: { type: "string" } } } },
                         financialData: { type: "array", items: { type: "object", properties: { asset: { type: "string" }, value: { type: "string" }, change: { type: "string" }, type: { type: "string" } } } },
+                        financialStats: { type: "array", items: { type: "object", properties: { title: { type: "string" }, value: { type: "string" }, unit: { type: "string" } } } },
                         industrialData: { type: "array", items: { type: "object", properties: { sector: { type: "string" }, count: { type: "string" }, employment: { type: "string" }, output: { type: "string" }, growth: { type: "string" } } } },
+                        industrialStats: { type: "array", items: { type: "object", properties: { title: { type: "string" }, value: { type: "string" }, unit: { type: "string" } } } },
                         educationData: { type: "array", items: { type: "object", properties: { level: { type: "string" }, institutions: { type: "string" }, enrollment: { type: "string" }, teachers: { type: "string" }, spending: { type: "string" } } } },
+                        educationStats: { type: "array", items: { type: "object", properties: { title: { type: "string" }, value: { type: "string" }, unit: { type: "string" } } } },
                         healthcareData: { type: "array", items: { type: "object", properties: { facility: { type: "string" }, count: { type: "string" }, capacity: { type: "string" }, staff: { type: "string" }, spending: { type: "string" } } } },
+                        healthcareStats: { type: "array", items: { type: "object", properties: { title: { type: "string" }, value: { type: "string" }, unit: { type: "string" } } } },
                         trendData: { type: "array", items: { type: "object", properties: { period: { type: "string" }, infrastructure: { type: "number" }, energy: { type: "number" }, digital: { type: "number" } } } },
                         countryComparison: { type: "array", items: { type: "object", properties: { country: { type: "string" }, infrastructure: { type: "number" }, resources: { type: "number" }, digital: { type: "number" } } } }
                     }
@@ -696,10 +716,9 @@ Make data realistic and proportional to each country's actual size and developme
 
                             <TabsContent value="transportation">
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                                    <AssetCard title="Highway Network" value="164,000" unit="miles" icon={Train} color="#3B82F6" change={2.1} trend="up" />
-                                    <AssetCard title="Railway Lines" value="161,400" unit="miles" icon={Train} color="#10B981" change={0.8} trend="up" />
-                                    <AssetCard title="Airports" value="5,080" unit="facilities" icon={Plane} color="#F59E0B" change={1.2} trend="up" />
-                                    <AssetCard title="Seaports" value="360" unit="deep-water" icon={Anchor} color="#8B5CF6" change={0.5} trend="stable" />
+                                    {(dynamicData?.transportStats || []).map((stat, i) => (
+                                        <AssetCard key={i} title={stat.title} value={stat.value} unit={stat.unit} icon={[Train, Train, Plane, Anchor][i]} color={['#3B82F6', '#10B981', '#F59E0B', '#8B5CF6'][i]} />
+                                    ))}
                                 </div>
                                 <DataTable
                                     title={`Transportation Infrastructure - ${selectedCountries.join(', ')}`}
@@ -719,10 +738,9 @@ Make data realistic and proportional to each country's actual size and developme
 
                             <TabsContent value="energy">
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                                    <AssetCard title="Power Plants" value="10,800" unit="facilities" icon={Zap} color="#F59E0B" change={3.2} trend="up" />
-                                    <AssetCard title="Grid Capacity" value="1,200" unit="GW" icon={Zap} color="#EF4444" change={4.5} trend="up" />
-                                    <AssetCard title="Renewable Share" value="29" unit="%" icon={Sun} color="#10B981" change={15.2} trend="up" />
-                                    <AssetCard title="Gas Pipelines" value="305K" unit="miles" icon={Fuel} color="#8B5CF6" change={1.8} trend="up" />
+                                    {(dynamicData?.energyStats || []).map((stat, i) => (
+                                        <AssetCard key={i} title={stat.title} value={stat.value} unit={stat.unit} icon={[Zap, Zap, Sun, Fuel][i]} color={['#F59E0B', '#EF4444', '#10B981', '#8B5CF6'][i]} />
+                                    ))}
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                     <div className="bg-gray-50 rounded-xl p-5">
@@ -771,10 +789,9 @@ Make data realistic and proportional to each country's actual size and developme
 
                             <TabsContent value="telecom">
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                                    <AssetCard title="5G Towers" value="418K" unit="active" icon={Radio} color="#8B5CF6" change={45.2} trend="up" />
-                                    <AssetCard title="Fiber Optic" value="2.1M" unit="miles" icon={Network} color="#3B82F6" change={12.8} trend="up" />
-                                    <AssetCard title="Data Centers" value="5,375" unit="facilities" icon={Server} color="#10B981" change={18.5} trend="up" />
-                                    <AssetCard title="Satellites" value="3,400" unit="active" icon={Globe} color="#F59E0B" change={28.3} trend="up" />
+                                    {(dynamicData?.telecomStats || []).map((stat, i) => (
+                                        <AssetCard key={i} title={stat.title} value={stat.value} unit={stat.unit} icon={[Radio, Network, Server, Globe][i]} color={['#8B5CF6', '#3B82F6', '#10B981', '#F59E0B'][i]} />
+                                    ))}
                                 </div>
                                 <DataTable
                                     title={`Telecommunications - ${selectedCountries.join(', ')}`}
@@ -793,10 +810,9 @@ Make data realistic and proportional to each country's actual size and developme
 
                             <TabsContent value="water">
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                                    <AssetCard title="Dams" value="91,457" unit="total" icon={Droplets} color="#06B6D4" change={0.2} trend="stable" />
-                                    <AssetCard title="Reservoirs" value="53,000" unit="capacity" icon={Droplets} color="#3B82F6" change={1.1} trend="up" />
-                                    <AssetCard title="Treatment Plants" value="16,000" unit="facilities" icon={Droplets} color="#10B981" change={2.3} trend="up" />
-                                    <AssetCard title="Pipeline Network" value="2.2M" unit="miles" icon={Droplets} color="#8B5CF6" change={0.8} trend="up" />
+                                    {(dynamicData?.waterStats || []).map((stat, i) => (
+                                        <AssetCard key={i} title={stat.title} value={stat.value} unit={stat.unit} icon={Droplets} color={['#06B6D4', '#3B82F6', '#10B981', '#8B5CF6'][i]} />
+                                    ))}
                                 </div>
                                 <DataTable
                                     title={`Water Infrastructure - ${selectedCountries.join(', ')}`}
@@ -879,10 +895,9 @@ Make data realistic and proportional to each country's actual size and developme
 
                             <TabsContent value="energy">
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                                    <AssetCard title="Oil Reserves" value="68.8B" unit="barrels" icon={Fuel} color="#F59E0B" />
-                                    <AssetCard title="Natural Gas" value="625" unit="Tcf" icon={Fuel} color="#3B82F6" />
-                                    <AssetCard title="Coal Reserves" value="253B" unit="tonnes" icon={Fuel} color="#6B7280" />
-                                    <AssetCard title="Shale Oil" value="78.2B" unit="barrels" icon={Fuel} color="#8B5CF6" />
+                                    {(dynamicData?.resourceStats || []).map((stat, i) => (
+                                        <AssetCard key={i} title={stat.title} value={stat.value} unit={stat.unit} icon={Fuel} color={['#F59E0B', '#3B82F6', '#6B7280', '#8B5CF6'][i]} />
+                                    ))}
                                 </div>
                                 <DataTable
                                     title={`Energy Resources - ${selectedCountries.join(', ')}`}
@@ -899,10 +914,9 @@ Make data realistic and proportional to each country's actual size and developme
 
                             <TabsContent value="minerals">
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                                    <AssetCard title="Iron Ore" value="3B" unit="tonnes" icon={Database} color="#EF4444" />
-                                    <AssetCard title="Copper" value="48M" unit="tonnes" icon={Database} color="#F59E0B" />
-                                    <AssetCard title="Gold" value="3,000" unit="tonnes" icon={Coins} color="#F59E0B" />
-                                    <AssetCard title="Rare Earth" value="1.5M" unit="tonnes" icon={Database} color="#8B5CF6" />
+                                    {(dynamicData?.mineralStats || []).map((stat, i) => (
+                                        <AssetCard key={i} title={stat.title} value={stat.value} unit={stat.unit} icon={[Database, Database, Coins, Database][i]} color={['#EF4444', '#F59E0B', '#F59E0B', '#8B5CF6'][i]} />
+                                    ))}
                                 </div>
                                 <DataTable
                                     title={`Mineral Resources - ${selectedCountries.join(', ')}`}
@@ -979,10 +993,9 @@ Make data realistic and proportional to each country's actual size and developme
 
                             <TabsContent value="financial">
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                                    <AssetCard title="Gold Reserves" value="8,133" unit="tonnes" icon={Coins} color="#F59E0B" change={2.1} trend="up" />
-                                    <AssetCard title="Foreign Reserves" value="$242B" icon={Banknote} color="#10B981" change={-1.2} trend="down" />
-                                    <AssetCard title="Pension Assets" value="$35.4T" icon={Landmark} color="#3B82F6" change={6.2} trend="up" />
-                                    <AssetCard title="Banking Assets" value="$23.7T" icon={Landmark} color="#8B5CF6" change={3.5} trend="up" />
+                                    {(dynamicData?.financialStats || []).map((stat, i) => (
+                                        <AssetCard key={i} title={stat.title} value={stat.value} unit={stat.unit} icon={[Coins, Banknote, Landmark, Landmark][i]} color={['#F59E0B', '#10B981', '#3B82F6', '#8B5CF6'][i]} />
+                                    ))}
                                 </div>
                                 <DataTable
                                     title={`Financial Assets - ${selectedCountries.join(', ')}`}
@@ -1000,10 +1013,9 @@ Make data realistic and proportional to each country's actual size and developme
 
                             <TabsContent value="industrial">
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                                    <AssetCard title="Manufacturing" value="292,825" unit="plants" icon={Factory} color="#EF4444" />
-                                    <AssetCard title="Tech Hubs" value="45" unit="major" icon={Cpu} color="#8B5CF6" />
-                                    <AssetCard title="Industrial Parks" value="1,200+" icon={Building2} color="#3B82F6" />
-                                    <AssetCard title="R&D Centers" value="15,000+" icon={Lightbulb} color="#10B981" />
+                                    {(dynamicData?.industrialStats || []).map((stat, i) => (
+                                        <AssetCard key={i} title={stat.title} value={stat.value} unit={stat.unit} icon={[Factory, Cpu, Building2, Lightbulb][i]} color={['#EF4444', '#8B5CF6', '#3B82F6', '#10B981'][i]} />
+                                    ))}
                                 </div>
                                 <DataTable
                                     title={`Industrial Assets - ${selectedCountries.join(', ')}`}
@@ -1239,10 +1251,9 @@ Make data realistic and proportional to each country's actual size and developme
 
                             <TabsContent value="education">
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                                    <AssetCard title="K-12 Schools" value="130,930" icon={GraduationCap} color="#EC4899" />
-                                    <AssetCard title="Universities" value="4,873" icon={BookOpen} color="#8B5CF6" />
-                                    <AssetCard title="Community Colleges" value="1,043" icon={GraduationCap} color="#3B82F6" />
-                                    <AssetCard title="Ed Spending" value="$1.6T" icon={Banknote} color="#10B981" />
+                                    {(dynamicData?.educationStats || []).map((stat, i) => (
+                                        <AssetCard key={i} title={stat.title} value={stat.value} unit={stat.unit} icon={[GraduationCap, BookOpen, GraduationCap, Banknote][i]} color={['#EC4899', '#8B5CF6', '#3B82F6', '#10B981'][i]} />
+                                    ))}
                                 </div>
                                 <DataTable
                                     title={`Education Systems - ${selectedCountries.join(', ')}`}
@@ -1259,10 +1270,9 @@ Make data realistic and proportional to each country's actual size and developme
 
                             <TabsContent value="healthcare">
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                                    <AssetCard title="Hospitals" value="6,090" icon={Stethoscope} color="#EF4444" />
-                                    <AssetCard title="Hospital Beds" value="920K" icon={Heart} color="#EC4899" />
-                                    <AssetCard title="Pharmacies" value="88,000" icon={Stethoscope} color="#10B981" />
-                                    <AssetCard title="Health Spending" value="$4.3T" icon={Banknote} color="#3B82F6" change={5.2} trend="up" />
+                                    {(dynamicData?.healthcareStats || []).map((stat, i) => (
+                                        <AssetCard key={i} title={stat.title} value={stat.value} unit={stat.unit} icon={[Stethoscope, Heart, Stethoscope, Banknote][i]} color={['#EF4444', '#EC4899', '#10B981', '#3B82F6'][i]} />
+                                    ))}
                                 </div>
                                 <DataTable
                                     title={`Healthcare Systems - ${selectedCountries.join(', ')}`}
