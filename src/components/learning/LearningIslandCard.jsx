@@ -48,11 +48,7 @@ export default function LearningIslandCard({ topic, index, progress = 0, onExplo
                 {index + 1}
             </div>
             
-            {/* XP Badge */}
-            <div className="absolute top-4 right-0 z-20 flex items-center gap-1 px-3 py-1 bg-amber-400 rounded-full text-sm font-bold text-amber-900">
-                <GraduationCap className="w-4 h-4" />
-                {xpReward} XP
-            </div>
+
             
             {/* Island SVG - varied by index for unique look */}
             <div className="w-44 h-36 mx-auto">
@@ -78,13 +74,11 @@ export default function LearningIslandCard({ topic, index, progress = 0, onExplo
                 </div>
             )}
             
-            {/* Points badge below island */}
+            {/* XP Badge below island */}
             <div className="flex justify-center -mt-4 relative z-20">
-                <div 
-                    className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold shadow-lg border-2 border-white"
-                    style={{ backgroundColor: topic.color }}
-                >
-                    {xpReward}
+                <div className="flex items-center gap-1.5 px-4 py-1.5 bg-amber-400 rounded-full text-base font-bold text-amber-900 shadow-lg">
+                    <GraduationCap className="w-5 h-5" />
+                    {xpReward} XP
                 </div>
             </div>
             
