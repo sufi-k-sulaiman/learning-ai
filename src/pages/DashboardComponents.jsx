@@ -179,6 +179,39 @@ export default function DashboardComponents() {
                             <NotificationList />
                         </div>
                     </section>
+
+                    <section>
+                        <h2 className="text-xl font-semibold text-gray-700 mb-4">Island Illustrations</h2>
+                        <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-9 gap-4">
+                            <div className="bg-white rounded-xl p-4 border border-gray-200 flex items-center justify-center">
+                                <Island1 className="w-20 h-20" color="#6B4EE6" />
+                            </div>
+                            <div className="bg-white rounded-xl p-4 border border-gray-200 flex items-center justify-center">
+                                <Island2 className="w-20 h-20" color="#50C8E8" />
+                            </div>
+                            <div className="bg-white rounded-xl p-4 border border-gray-200 flex items-center justify-center">
+                                <Island3 className="w-20 h-20" color="#8BC34A" />
+                            </div>
+                            <div className="bg-white rounded-xl p-4 border border-gray-200 flex items-center justify-center">
+                                <Island4 className="w-20 h-20" color="#F59E0B" />
+                            </div>
+                            <div className="bg-white rounded-xl p-4 border border-gray-200 flex items-center justify-center">
+                                <Island5 className="w-20 h-20" color="#EC4899" />
+                            </div>
+                            <div className="bg-white rounded-xl p-4 border border-gray-200 flex items-center justify-center">
+                                <Island6 className="w-20 h-20" color="#14B8A6" />
+                            </div>
+                            <div className="bg-white rounded-xl p-4 border border-gray-200 flex items-center justify-center">
+                                <Island7 className="w-20 h-20" color="#A78BFA" />
+                            </div>
+                            <div className="bg-white rounded-xl p-4 border border-gray-200 flex items-center justify-center">
+                                <Island8 className="w-20 h-20" color="#F97316" />
+                            </div>
+                            <div className="bg-white rounded-xl p-4 border border-gray-200 flex items-center justify-center">
+                                <Island9 className="w-20 h-20" color="#3B82F6" />
+                            </div>
+                        </div>
+                    </section>
                 </div>
             </div>
         </PageLayout>
