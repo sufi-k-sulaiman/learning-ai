@@ -37,6 +37,7 @@ import ProgressListCard from '@/components/dashboard/ProgressListCard';
 import NotificationList from '@/components/dashboard/NotificationList';
 import KPIGridCard from '@/components/dashboard/KPIGridCard';
 import { Island1, Island2, Island3, Island4, Island5, Island6, Island7, Island8, Island9 } from '@/components/islands/IslandSVGs';
+import { Island10, Island11, Island12, Island13, Island14, Island15, Island16, Island17, Island18 } from '@/components/islands/IslandSVGs2';
 
 export default function DashboardComponents() {
     return (
