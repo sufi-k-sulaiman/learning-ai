@@ -98,13 +98,43 @@ export default function Geospatial() {
     );
 
     const loadDataInChunks = async () => {
+        // Define priority order for loading sections
+        const loadOrder = [
+            { section: 'summary', priority: 1 },
+            { section: 'infrastructure', priority: 2 },
+            { section: 'resources', priority: 3 },
+            { section: 'assets', priority: 4 },
+            { section: 'governance', priority: 5 },
+            { section: 'social', priority: 6 },
+            { section: 'global', priority: 7 },
+            { section: 'defense', priority: 8 }
+        ];
+
         // Start all section loaders
         setLoadingSections({
             infrastructure: true, resources: true, assets: true, governance: true,
             social: true, global: true, defense: true, summary: true
         });
 
-        // Load all sections in parallel
+        // Load summary first (highest priority)
+        const countriesStr = selectedCountries.join(', ');
+        try {
+            const response = await base44.integrations.Core.InvokeLLM({
+                prompt: `For ${countriesStr}: Generate summary analysis and comparison. Return: summary (string with key findings), keyInsights (4 strings), trendData (12 monthly objects with period, infrastructure 50-95, energy 50-95, digital 50-95), countryComparison (one object per country with country name, infrastructure 50-95, resources 50-95, digital 50-95).`,
+                add_context_from_internet: true,
+                response_json_schema: { type: "object", properties: { summary: { type: "string" }, keyInsights: { type: "array", items: { type: "string" } }, trendData: { type: "array", items: { type: "object" } }, countryComparison: { type: "array", items: { type: "object" } } } }
+            });
+            if (response) {
+                setDynamicData(prev => ({ ...prev, ...response }));
+                setAnalysisData({ summary: response.summary, keyInsights: response.keyInsights });
+            }
+        } catch (error) {
+            console.error('Failed to load summary:', error);
+        } finally {
+            setLoadingSections(prev => ({ ...prev, summary: false }));
+        }
+
+        // Load remaining sections in parallel after summary is done
         loadSectionData('infrastructure', 
             `Generate transportation, energy, telecom, water infrastructure data. Return: transportData (5 items: type, count, capacity, condition, investment), transportStats (4 items: title, value, unit), energyData (6 items: source, capacity, share, growth, plants), energyStats (4), telecomData (4 items: type, count, coverage, investment, growth), telecomStats (4), waterData (4 items: type, count, capacity, condition, age), waterStats (4).`,
             { type: "object", properties: { transportData: { type: "array", items: { type: "object" } }, transportStats: { type: "array", items: { type: "object" } }, energyData: { type: "array", items: { type: "object" } }, energyStats: { type: "array", items: { type: "object" } }, telecomData: { type: "array", items: { type: "object" } }, telecomStats: { type: "array", items: { type: "object" } }, waterData: { type: "array", items: { type: "object" } }, waterStats: { type: "array", items: { type: "object" } } } }
@@ -140,24 +170,6 @@ export default function Geospatial() {
             { type: "object", properties: { defenseData: { type: "array", items: { type: "object" } }, defenseStats: { type: "array", items: { type: "object" } }, publicFacilitiesData: { type: "array", items: { type: "object" } }, publicFacilitiesStats: { type: "array", items: { type: "object" } } } }
         );
 
-        // Summary and trends
-        const countriesStr = selectedCountries.join(', ');
-        setLoadingSections(prev => ({ ...prev, summary: true }));
-        try {
-            const response = await base44.integrations.Core.InvokeLLM({
-                prompt: `For ${countriesStr}: Generate summary analysis and comparison. Return: summary (string with key findings), keyInsights (4 strings), trendData (12 monthly objects with period, infrastructure 50-95, energy 50-95, digital 50-95), countryComparison (one object per country with country name, infrastructure 50-95, resources 50-95, digital 50-95).`,
-                add_context_from_internet: true,
-                response_json_schema: { type: "object", properties: { summary: { type: "string" }, keyInsights: { type: "array", items: { type: "string" } }, trendData: { type: "array", items: { type: "object" } }, countryComparison: { type: "array", items: { type: "object" } } } }
-            });
-            if (response) {
-                setDynamicData(prev => ({ ...prev, ...response }));
-                setAnalysisData({ summary: response.summary, keyInsights: response.keyInsights });
-            }
-        } catch (error) {
-            console.error('Failed to load summary:', error);
-        } finally {
-            setLoadingSections(prev => ({ ...prev, summary: false }));
-        }
     };
 
 
