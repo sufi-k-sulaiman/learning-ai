@@ -47,27 +47,25 @@ export default function Geospatial() {
 
     const COUNTRIES = ['USA', 'China', 'India', 'Germany', 'UK', 'France', 'Japan', 'Brazil', 'Canada', 'Australia', 'South Korea', 'Spain', 'Italy', 'Mexico', 'Indonesia', 'Netherlands', 'Saudi Arabia', 'Turkey', 'Switzerland', 'Poland', 'Russia', 'South Africa', 'Nigeria', 'Egypt', 'UAE'];
 
-    const [loadingSection, setLoadingSection] = useState(null);
+    const [loadingSections, setLoadingSections] = useState({});
 
-    // Load dynamic data when countries change - start with fallback immediately
+    // Load dynamic data when countries change
     useEffect(() => {
         if (selectedCountries.length > 0) {
-            // Immediately show fallback data
-            const fallback = generateFallbackData();
-            setDynamicData(fallback);
-            setAnalysisData({ summary: fallback.summary, keyInsights: fallback.keyInsights });
-            // Then load real data in chunks
+            setDynamicData({});
+            setAnalysisData(null);
             loadDataInChunks();
         } else {
             setDynamicData(null);
             setAnalysisData(null);
+            setLoadingSections({});
         }
     }, [selectedCountries]);
 
-    const loadSectionData = async (sectionName, prompt, schema) => {
+    const loadSectionData = async (sectionName, prompt, schema, dataKeys) => {
         const countriesStr = selectedCountries.join(', ');
+        setLoadingSections(prev => ({ ...prev, [sectionName]: true }));
         try {
-            setLoadingSection(sectionName);
             const response = await base44.integrations.Core.InvokeLLM({
                 prompt: `For ${countriesStr}: ${prompt}`,
                 add_context_from_internet: true,
@@ -79,74 +77,80 @@ export default function Geospatial() {
         } catch (error) {
             console.error(`Failed to load ${sectionName}:`, error);
         } finally {
-            setLoadingSection(null);
+            setLoadingSections(prev => ({ ...prev, [sectionName]: false }));
         }
     };
 
-    const loadDataInChunks = async () => {
-        setDataLoading(true);
-        const countriesStr = selectedCountries.join(', ');
+    const SectionLoader = ({ section, label }) => (
+        loadingSections[section] ? (
+            <div className="flex items-center justify-center py-12">
+                <Loader2 className="w-8 h-8 text-blue-600 animate-spin mr-3" />
+                <span className="text-gray-600">Loading {label}...</span>
+            </div>
+        ) : null
+    );
 
-        // Chunk 1: Core Infrastructure
+    const loadDataInChunks = async () => {
+        // Start all section loaders
+        setLoadingSections({
+            infrastructure: true, resources: true, assets: true, governance: true,
+            social: true, global: true, defense: true, summary: true
+        });
+
+        // Load all sections in parallel
         loadSectionData('infrastructure', 
             `Generate transportation, energy, telecom, water infrastructure data. Return: transportData (5 items: type, count, capacity, condition, investment), transportStats (4 items: title, value, unit), energyData (6 items: source, capacity, share, growth, plants), energyStats (4), telecomData (4 items: type, count, coverage, investment, growth), telecomStats (4), waterData (4 items: type, count, capacity, condition, age), waterStats (4).`,
             { type: "object", properties: { transportData: { type: "array", items: { type: "object" } }, transportStats: { type: "array", items: { type: "object" } }, energyData: { type: "array", items: { type: "object" } }, energyStats: { type: "array", items: { type: "object" } }, telecomData: { type: "array", items: { type: "object" } }, telecomStats: { type: "array", items: { type: "object" } }, waterData: { type: "array", items: { type: "object" } }, waterStats: { type: "array", items: { type: "object" } } } }
         );
 
-        // Chunk 2: Resources
-        setTimeout(() => loadSectionData('resources',
-            `Generate natural resources data. Return: resourcesData (5 items: resource, reserves, production, value, rank), resourceStats (4), mineralsData (5 items: mineral, reserves, production, globalRank, value), mineralStats (4), agriculturalData (4 items: resource, amount, utilization, output, globalRank), agriculturalStats (4).`,
-            { type: "object", properties: { resourcesData: { type: "array", items: { type: "object" } }, resourceStats: { type: "array", items: { type: "object" } }, mineralsData: { type: "array", items: { type: "object" } }, mineralStats: { type: "array", items: { type: "object" } }, agriculturalData: { type: "array", items: { type: "object" } }, agriculturalStats: { type: "array", items: { type: "object" } } } }
-        ), 2000);
+        loadSectionData('resources',
+            `Generate natural resources data. Return: resourcesData (5 items: resource, reserves, production, value, rank), resourceStats (4), mineralsData (5 items: mineral, reserves, production, globalRank, value), mineralStats (4), agriculturalData (4 items: resource, amount, utilization, output, globalRank), agriculturalStats (4), humanCapitalData (4 items: metric, value, growth, globalRank), humanCapitalStats (4).`,
+            { type: "object", properties: { resourcesData: { type: "array", items: { type: "object" } }, resourceStats: { type: "array", items: { type: "object" } }, mineralsData: { type: "array", items: { type: "object" } }, mineralStats: { type: "array", items: { type: "object" } }, agriculturalData: { type: "array", items: { type: "object" } }, agriculturalStats: { type: "array", items: { type: "object" } }, humanCapitalData: { type: "array", items: { type: "object" } }, humanCapitalStats: { type: "array", items: { type: "object" } } } }
+        );
 
-        // Chunk 3: National Assets
-        setTimeout(() => loadSectionData('assets',
+        loadSectionData('assets',
             `Generate national assets data. Return: financialData (4 items: asset, value, change, type), financialStats (4), industrialData (4 items: sector, count, employment, output, growth), industrialStats (4), intellectualData (4 items: category, count, annual, value, globalShare), intellectualStats (4), strategicReservesData (4 items: reserve, capacity, current, value, days), strategicStats (4), digitalAssetsData (4 items: asset, count, capacity, investment, growth), digitalStats (4).`,
             { type: "object", properties: { financialData: { type: "array", items: { type: "object" } }, financialStats: { type: "array", items: { type: "object" } }, industrialData: { type: "array", items: { type: "object" } }, industrialStats: { type: "array", items: { type: "object" } }, intellectualData: { type: "array", items: { type: "object" } }, intellectualStats: { type: "array", items: { type: "object" } }, strategicReservesData: { type: "array", items: { type: "object" } }, strategicStats: { type: "array", items: { type: "object" } }, digitalAssetsData: { type: "array", items: { type: "object" } }, digitalStats: { type: "array", items: { type: "object" } } } }
-        ), 4000);
+        );
 
-        // Chunk 4: Governance & Economic
-        setTimeout(() => loadSectionData('governance',
+        loadSectionData('governance',
             `Generate governance and economic data. Return: governanceData (4 items: institution, count, personnel, budget, efficiency), governanceStats (4), lawEnforcementData (4 items: agency, personnel, budget, jurisdiction, clearRate), lawEnforcementStats (4), financialInfraData (4 items: type, count, assets, coverage, rating), financialInfraStats (4), tradeNetworksData (4 items: network, count, volume, value, globalRank), tradeStats (4), laborMarketData (4 items: metric, value, change, rate), laborStats (4).`,
             { type: "object", properties: { governanceData: { type: "array", items: { type: "object" } }, governanceStats: { type: "array", items: { type: "object" } }, lawEnforcementData: { type: "array", items: { type: "object" } }, lawEnforcementStats: { type: "array", items: { type: "object" } }, financialInfraData: { type: "array", items: { type: "object" } }, financialInfraStats: { type: "array", items: { type: "object" } }, tradeNetworksData: { type: "array", items: { type: "object" } }, tradeStats: { type: "array", items: { type: "object" } }, laborMarketData: { type: "array", items: { type: "object" } }, laborStats: { type: "array", items: { type: "object" } } } }
-        ), 6000);
+        );
 
-        // Chunk 5: Social
-        setTimeout(() => loadSectionData('social',
-            `Generate social data. Return: educationData (4 items: level, institutions, enrollment, teachers, spending), educationStats (4), healthcareData (4 items: facility, count, capacity, staff, spending), healthcareStats (4), socialSafetyData (4 items: program, beneficiaries, annual, coverage, fundStatus), socialSafetyStats (4), humanCapitalData (4 items: metric, value, growth, globalRank), humanCapitalStats (4).`,
-            { type: "object", properties: { educationData: { type: "array", items: { type: "object" } }, educationStats: { type: "array", items: { type: "object" } }, healthcareData: { type: "array", items: { type: "object" } }, healthcareStats: { type: "array", items: { type: "object" } }, socialSafetyData: { type: "array", items: { type: "object" } }, socialSafetyStats: { type: "array", items: { type: "object" } }, humanCapitalData: { type: "array", items: { type: "object" } }, humanCapitalStats: { type: "array", items: { type: "object" } } } }
-        ), 8000);
+        loadSectionData('social',
+            `Generate social data. Return: educationData (4 items: level, institutions, enrollment, teachers, spending), educationStats (4), healthcareData (4 items: facility, count, capacity, staff, spending), healthcareStats (4), socialSafetyData (4 items: program, beneficiaries, annual, coverage, fundStatus), socialSafetyStats (4).`,
+            { type: "object", properties: { educationData: { type: "array", items: { type: "object" } }, educationStats: { type: "array", items: { type: "object" } }, healthcareData: { type: "array", items: { type: "object" } }, healthcareStats: { type: "array", items: { type: "object" } }, socialSafetyData: { type: "array", items: { type: "object" } }, socialSafetyStats: { type: "array", items: { type: "object" } } } }
+        );
 
-        // Chunk 6: Global & Environment
-        setTimeout(() => loadSectionData('global',
+        loadSectionData('global',
             `Generate global positioning and environment data. Return: diplomaticData (4 items: type, count, personnel, regions, budget), diplomaticStats (4), geopoliticalData (4 items: asset, size, value, rank, control), geopoliticalStats (4), softPowerData (4 items: category, value, reach, rank, growth), softPowerStats (4), climateResilienceData (4 items: system, count, capacity, investment, condition), climateStats (4), protectedAreasData (4 items: type, count, area, visitors, budget), protectedStats (4), renewablePotentialData (4 items: source, potential, installed, utilization, growth), renewableStats (4).`,
             { type: "object", properties: { diplomaticData: { type: "array", items: { type: "object" } }, diplomaticStats: { type: "array", items: { type: "object" } }, geopoliticalData: { type: "array", items: { type: "object" } }, geopoliticalStats: { type: "array", items: { type: "object" } }, softPowerData: { type: "array", items: { type: "object" } }, softPowerStats: { type: "array", items: { type: "object" } }, climateResilienceData: { type: "array", items: { type: "object" } }, climateStats: { type: "array", items: { type: "object" } }, protectedAreasData: { type: "array", items: { type: "object" } }, protectedStats: { type: "array", items: { type: "object" } }, renewablePotentialData: { type: "array", items: { type: "object" } }, renewableStats: { type: "array", items: { type: "object" } } } }
-        ), 10000);
+        );
 
-        // Chunk 7: Defense & Public Facilities
-        setTimeout(() => loadSectionData('defense',
+        loadSectionData('defense',
             `Generate defense and public facilities data. Return: defenseData (4 items: type, count, personnel, status, budget), defenseStats (4), publicFacilitiesData (4 items: type, count, capacity, condition, funding), publicFacilitiesStats (4).`,
             { type: "object", properties: { defenseData: { type: "array", items: { type: "object" } }, defenseStats: { type: "array", items: { type: "object" } }, publicFacilitiesData: { type: "array", items: { type: "object" } }, publicFacilitiesStats: { type: "array", items: { type: "object" } } } }
-        ), 12000);
+        );
 
-        // Final: Summary and trends
-        setTimeout(async () => {
-            try {
-                const response = await base44.integrations.Core.InvokeLLM({
-                    prompt: `For ${countriesStr}: Generate summary analysis and comparison. Return: summary (string with key findings), keyInsights (4 strings), trendData (12 monthly objects with period, infrastructure 50-95, energy 50-95, digital 50-95), countryComparison (one object per country with country name, infrastructure 50-95, resources 50-95, digital 50-95).`,
-                    add_context_from_internet: true,
-                    response_json_schema: { type: "object", properties: { summary: { type: "string" }, keyInsights: { type: "array", items: { type: "string" } }, trendData: { type: "array", items: { type: "object" } }, countryComparison: { type: "array", items: { type: "object" } } } }
-                });
-                if (response) {
-                    setDynamicData(prev => ({ ...prev, ...response }));
-                    setAnalysisData({ summary: response.summary, keyInsights: response.keyInsights });
-                }
-            } catch (error) {
-                console.error('Failed to load summary:', error);
-            } finally {
-                setDataLoading(false);
+        // Summary and trends
+        const countriesStr = selectedCountries.join(', ');
+        setLoadingSections(prev => ({ ...prev, summary: true }));
+        try {
+            const response = await base44.integrations.Core.InvokeLLM({
+                prompt: `For ${countriesStr}: Generate summary analysis and comparison. Return: summary (string with key findings), keyInsights (4 strings), trendData (12 monthly objects with period, infrastructure 50-95, energy 50-95, digital 50-95), countryComparison (one object per country with country name, infrastructure 50-95, resources 50-95, digital 50-95).`,
+                add_context_from_internet: true,
+                response_json_schema: { type: "object", properties: { summary: { type: "string" }, keyInsights: { type: "array", items: { type: "string" } }, trendData: { type: "array", items: { type: "object" } }, countryComparison: { type: "array", items: { type: "object" } } } }
+            });
+            if (response) {
+                setDynamicData(prev => ({ ...prev, ...response }));
+                setAnalysisData({ summary: response.summary, keyInsights: response.keyInsights });
             }
-        }, 14000);
+        } catch (error) {
+            console.error('Failed to load summary:', error);
+        } finally {
+            setLoadingSections(prev => ({ ...prev, summary: false }));
+        }
     };
 
     const generateFallbackData = () => {
@@ -966,7 +970,15 @@ export default function Geospatial() {
                 )}
 
                 {/* Analysis Results */}
-                {selectedCountries.length > 0 && dynamicData && !dataLoading && analysisData && (
+                {selectedCountries.length > 0 && loadingSections.summary && (
+                    <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl p-6 border border-purple-100">
+                        <div className="flex items-center justify-center py-8">
+                            <Loader2 className="w-8 h-8 text-purple-600 animate-spin mr-3" />
+                            <span className="text-gray-600">Generating AI analysis...</span>
+                        </div>
+                    </div>
+                )}
+                {selectedCountries.length > 0 && !loadingSections.summary && analysisData && (
                     <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl p-6 border border-purple-100">
                         <h3 className="font-bold text-gray-900 mb-3">AI Analysis Summary - {selectedCountries.join(', ')}</h3>
                         <p className="text-gray-700 mb-4">{analysisData.summary}</p>
@@ -984,22 +996,22 @@ export default function Geospatial() {
                     </div>
                 )}
 
-                {/* Loading State */}
-                {dataLoading && (
-                    <div className="flex flex-col items-center justify-center py-20">
-                        <Loader2 className="w-12 h-12 text-blue-600 animate-spin mb-4" />
-                        <p className="text-gray-600">Loading data for {selectedCountries.join(', ')}...</p>
-                    </div>
-                )}
+
 
                 {/* Main Dashboard */}
-                {selectedCountries.length > 0 && dynamicData && !dataLoading && <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {selectedCountries.length > 0 && <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Infrastructure Trend */}
                     <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-5">
                         <h3 className="font-semibold text-gray-900 mb-4">Development Index - {selectedCountries.join(', ')}</h3>
+                        {loadingSections.summary ? (
+                            <div className="h-72 flex items-center justify-center">
+                                <Loader2 className="w-8 h-8 text-blue-600 animate-spin mr-3" />
+                                <span className="text-gray-500">Loading trends...</span>
+                            </div>
+                        ) : (
                         <div className="h-72">
                             <ResponsiveContainer width="100%" height="100%">
-                                <AreaChart data={dynamicData.trendData || trendData}>
+                                <AreaChart data={dynamicData?.trendData || []}>
                                     <defs>
                                         <linearGradient id="infraGrad" x1="0" y1="0" x2="0" y2="1">
                                             <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3}/>
@@ -1021,17 +1033,24 @@ export default function Geospatial() {
                                     <Area type="monotone" dataKey="infrastructure" name="Infrastructure" stroke="#3B82F6" fill="url(#infraGrad)" strokeWidth={2} />
                                     <Area type="monotone" dataKey="energy" name="Energy" stroke="#10B981" fill="url(#energyGrad)" strokeWidth={2} />
                                     <Area type="monotone" dataKey="digital" name="Digital" stroke="#8B5CF6" fill="url(#digitalGrad)" strokeWidth={2} />
-                                </AreaChart>
-                            </ResponsiveContainer>
-                        </div>
-                    </div>
+                                    </AreaChart>
+                                    </ResponsiveContainer>
+                                    </div>
+                                    )}
+                                    </div>
 
-                    {/* Country Comparison */}
-                    <div className="bg-white rounded-xl border border-gray-200 p-5">
-                        <h3 className="font-semibold text-gray-900 mb-4">Country Comparison</h3>
-                        <div className="h-72">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={dynamicData.countryComparison || countryComparison}>
+                                    {/* Country Comparison */}
+                                    <div className="bg-white rounded-xl border border-gray-200 p-5">
+                                    <h3 className="font-semibold text-gray-900 mb-4">Country Comparison</h3>
+                                    {loadingSections.summary ? (
+                                    <div className="h-72 flex items-center justify-center">
+                                    <Loader2 className="w-8 h-8 text-blue-600 animate-spin mr-3" />
+                                    <span className="text-gray-500">Loading comparison...</span>
+                                    </div>
+                                    ) : (
+                                    <div className="h-72">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart data={dynamicData?.countryComparison || []}>
                                     <XAxis dataKey="country" fontSize={10} />
                                     <YAxis fontSize={10} />
                                     <Tooltip />
@@ -1039,14 +1058,15 @@ export default function Geospatial() {
                                     <Bar dataKey="infrastructure" name="Infrastructure" fill="#3B82F6" radius={[4, 4, 0, 0]} />
                                     <Bar dataKey="resources" name="Resources" fill="#10B981" radius={[4, 4, 0, 0]} />
                                     <Bar dataKey="digital" name="Digital" fill="#8B5CF6" radius={[4, 4, 0, 0]} />
-                                </BarChart>
-                            </ResponsiveContainer>
-                        </div>
-                    </div>
-                </div>}
+                                    </BarChart>
+                                    </ResponsiveContainer>
+                                    </div>
+                                    )}
+                                    </div>
+                                    </div>}
 
-                {/* CORE INFRASTRUCTURE */}
-                {selectedCountries.length > 0 && dynamicData && !dataLoading && (activeCategory === 'all' || activeCategory === 'infrastructure') && (
+                                    {/* CORE INFRASTRUCTURE */}
+                                    {selectedCountries.length > 0 && (activeCategory === 'all' || activeCategory === 'infrastructure') && (
                     <CategorySection
                         title={`Core Infrastructure - ${selectedCountries.join(', ')}`}
                         description="Transportation, energy, water, telecommunications, and defense systems"
@@ -1065,8 +1085,15 @@ export default function Geospatial() {
                             </TabsList>
 
                             <TabsContent value="transportation">
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                                    {(dynamicData?.transportStats || []).map((stat, i) => (
+                                        {loadingSections.infrastructure ? (
+                                            <div className="flex items-center justify-center py-16">
+                                                <Loader2 className="w-8 h-8 text-blue-600 animate-spin mr-3" />
+                                                <span className="text-gray-600">Loading transportation data...</span>
+                                            </div>
+                                        ) : (
+                                        <>
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                                            {(dynamicData?.transportStats || []).map((stat, i) => (
                                         <AssetCard key={i} title={stat.title} value={stat.value} unit={stat.unit} icon={[Train, Train, Plane, Anchor][i]} color={['#3B82F6', '#10B981', '#F59E0B', '#8B5CF6'][i]} />
                                     ))}
                                 </div>
@@ -1083,10 +1110,19 @@ export default function Geospatial() {
                                     ]}
                                     data={dynamicData?.transportData || []}
                                     maxRows={10}
-                                />
-                            </TabsContent>
+                                    />
+                                    </>
+                                    )}
+                                    </TabsContent>
 
-                            <TabsContent value="energy">
+                                    <TabsContent value="energy">
+                                    {loadingSections.infrastructure ? (
+                                    <div className="flex items-center justify-center py-16">
+                                        <Loader2 className="w-8 h-8 text-blue-600 animate-spin mr-3" />
+                                        <span className="text-gray-600">Loading energy data...</span>
+                                    </div>
+                                    ) : (
+                                    <>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                                     {(dynamicData?.energyStats || []).map((stat, i) => (
                                         <AssetCard key={i} title={stat.title} value={stat.value} unit={stat.unit} icon={[Zap, Zap, Sun, Fuel][i]} color={['#F59E0B', '#EF4444', '#10B981', '#8B5CF6'][i]} />
@@ -1134,10 +1170,19 @@ export default function Geospatial() {
                                         { key: 'rank', label: 'Rank' }
                                     ]}
                                     data={dynamicData?.resourcesData || []}
-                                />
-                            </TabsContent>
+                                    />
+                                    </>
+                                    )}
+                                    </TabsContent>
 
-                            <TabsContent value="telecom">
+                                    <TabsContent value="telecom">
+                                    {loadingSections.infrastructure ? (
+                                    <div className="flex items-center justify-center py-16">
+                                        <Loader2 className="w-8 h-8 text-blue-600 animate-spin mr-3" />
+                                        <span className="text-gray-600">Loading telecom data...</span>
+                                    </div>
+                                    ) : (
+                                    <>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                                     {(dynamicData?.telecomStats || []).map((stat, i) => (
                                         <AssetCard key={i} title={stat.title} value={stat.value} unit={stat.unit} icon={[Radio, Network, Server, Globe][i]} color={['#8B5CF6', '#3B82F6', '#10B981', '#F59E0B'][i]} />
@@ -1155,10 +1200,19 @@ export default function Geospatial() {
                                         )}
                                     ]}
                                     data={dynamicData?.telecomData || []}
-                                />
-                            </TabsContent>
+                                    />
+                                    </>
+                                    )}
+                                    </TabsContent>
 
-                            <TabsContent value="water">
+                                    <TabsContent value="water">
+                                    {loadingSections.infrastructure ? (
+                                    <div className="flex items-center justify-center py-16">
+                                        <Loader2 className="w-8 h-8 text-blue-600 animate-spin mr-3" />
+                                        <span className="text-gray-600">Loading water data...</span>
+                                    </div>
+                                    ) : (
+                                    <>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                                     {(dynamicData?.waterStats || []).map((stat, i) => (
                                         <AssetCard key={i} title={stat.title} value={stat.value} unit={stat.unit} icon={Droplets} color={['#06B6D4', '#3B82F6', '#10B981', '#8B5CF6'][i]} />
@@ -1176,10 +1230,19 @@ export default function Geospatial() {
                                         { key: 'age', label: 'Avg Age' }
                                     ]}
                                     data={dynamicData?.waterData || []}
-                                />
-                            </TabsContent>
+                                    />
+                                    </>
+                                    )}
+                                    </TabsContent>
 
-                            <TabsContent value="public">
+                                    <TabsContent value="public">
+                                    {loadingSections.defense ? (
+                                    <div className="flex items-center justify-center py-16">
+                                        <Loader2 className="w-8 h-8 text-blue-600 animate-spin mr-3" />
+                                        <span className="text-gray-600">Loading public facilities...</span>
+                                    </div>
+                                    ) : (
+                                    <>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                                     {(dynamicData?.publicFacilitiesStats || []).map((stat, i) => (
                                         <AssetCard key={i} title={stat.title} value={stat.value} unit={stat.unit} icon={[GraduationCap, Stethoscope, Shield, ShieldCheck][i]} color={['#EC4899', '#EF4444', '#F59E0B', '#3B82F6'][i]} />
@@ -1197,9 +1260,18 @@ export default function Geospatial() {
                                         { key: 'funding', label: 'Annual Funding' }
                                     ]}
                                     data={dynamicData?.publicFacilitiesData || []}/>
-                            </TabsContent>
+                                    </>
+                                    )}
+                                    </TabsContent>
 
-                            <TabsContent value="defense">
+                                    <TabsContent value="defense">
+                                    {loadingSections.defense ? (
+                                    <div className="flex items-center justify-center py-16">
+                                        <Loader2 className="w-8 h-8 text-blue-600 animate-spin mr-3" />
+                                        <span className="text-gray-600">Loading defense data...</span>
+                                    </div>
+                                    ) : (
+                                    <>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                                     {(dynamicData?.defenseStats || []).map((stat, i) => (
                                         <AssetCard key={i} title={stat.title} value={stat.value} unit={stat.unit} icon={[Shield, Anchor, Plane, Shield][i]} color={['#EF4444', '#3B82F6', '#8B5CF6', '#10B981'][i]} />
@@ -1217,13 +1289,15 @@ export default function Geospatial() {
                                         { key: 'budget', label: 'Budget' }
                                     ]}
                                     data={dynamicData?.defenseData || []}/>
-                            </TabsContent>
-                        </Tabs>
-                    </CategorySection>
-                )}
+                                    </>
+                                    )}
+                                    </TabsContent>
+                                    </Tabs>
+                                    </CategorySection>
+                                    )}
 
-                {/* NATURAL & STRATEGIC RESOURCES */}
-                {selectedCountries.length > 0 && dynamicData && !dataLoading && (activeCategory === 'all' || activeCategory === 'resources') && (
+                                    {/* NATURAL & STRATEGIC RESOURCES */}
+                                    {selectedCountries.length > 0 && (activeCategory === 'all' || activeCategory === 'resources') && (
                     <CategorySection
                         title={`Natural & Strategic Resources - ${selectedCountries.join(', ')}`}
                         description="Energy reserves, minerals, agricultural resources, human capital, and biodiversity"
@@ -1240,8 +1314,15 @@ export default function Geospatial() {
                             </TabsList>
 
                             <TabsContent value="energy">
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                                    {(dynamicData?.resourceStats || []).map((stat, i) => (
+                                        {loadingSections.resources ? (
+                                            <div className="flex items-center justify-center py-16">
+                                                <Loader2 className="w-8 h-8 text-green-600 animate-spin mr-3" />
+                                                <span className="text-gray-600">Loading energy resources...</span>
+                                            </div>
+                                        ) : (
+                                        <>
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                                            {(dynamicData?.resourceStats || []).map((stat, i) => (
                                         <AssetCard key={i} title={stat.title} value={stat.value} unit={stat.unit} icon={Fuel} color={['#F59E0B', '#3B82F6', '#6B7280', '#8B5CF6'][i]} />
                                     ))}
                                 </div>
@@ -1255,10 +1336,19 @@ export default function Geospatial() {
                                         { key: 'rank', label: 'Rank' }
                                     ]}
                                     data={dynamicData?.resourcesData || []}
-                                />
-                            </TabsContent>
+                                    />
+                                    </>
+                                    )}
+                                    </TabsContent>
 
-                            <TabsContent value="minerals">
+                                    <TabsContent value="minerals">
+                                    {loadingSections.resources ? (
+                                    <div className="flex items-center justify-center py-16">
+                                        <Loader2 className="w-8 h-8 text-green-600 animate-spin mr-3" />
+                                        <span className="text-gray-600">Loading minerals data...</span>
+                                    </div>
+                                    ) : (
+                                    <>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                                     {(dynamicData?.mineralStats || []).map((stat, i) => (
                                         <AssetCard key={i} title={stat.title} value={stat.value} unit={stat.unit} icon={[Database, Database, Coins, Database][i]} color={['#EF4444', '#F59E0B', '#F59E0B', '#8B5CF6'][i]} />
@@ -1274,10 +1364,19 @@ export default function Geospatial() {
                                         { key: 'value', label: 'Annual Value' }
                                     ]}
                                     data={dynamicData?.mineralsData || []}
-                                />
-                            </TabsContent>
+                                    />
+                                    </>
+                                    )}
+                                    </TabsContent>
 
-                            <TabsContent value="agricultural">
+                                    <TabsContent value="agricultural">
+                                    {loadingSections.resources ? (
+                                    <div className="flex items-center justify-center py-16">
+                                        <Loader2 className="w-8 h-8 text-green-600 animate-spin mr-3" />
+                                        <span className="text-gray-600">Loading agricultural data...</span>
+                                    </div>
+                                    ) : (
+                                    <>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                                     {(dynamicData?.agriculturalStats || []).map((stat, i) => (
                                         <AssetCard key={i} title={stat.title} value={stat.value} unit={stat.unit} icon={[Leaf, TreePine, Droplets, Anchor][i]} color={['#10B981', '#059669', '#06B6D4', '#3B82F6'][i]} />
@@ -1293,9 +1392,18 @@ export default function Geospatial() {
                                         { key: 'globalRank', label: 'Global Rank' }
                                     ]}
                                     data={dynamicData?.agriculturalData || []}/>
-                            </TabsContent>
+                                    </>
+                                    )}
+                                    </TabsContent>
 
-                            <TabsContent value="human">
+                                    <TabsContent value="human">
+                                    {loadingSections.resources ? (
+                                    <div className="flex items-center justify-center py-16">
+                                        <Loader2 className="w-8 h-8 text-green-600 animate-spin mr-3" />
+                                        <span className="text-gray-600">Loading human capital data...</span>
+                                    </div>
+                                    ) : (
+                                    <>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                                     {(dynamicData?.humanCapitalStats || []).map((stat, i) => (
                                         <AssetCard key={i} title={stat.title} value={stat.value} unit={stat.unit} icon={[Users, Briefcase, GraduationCap, Award][i]} color={['#EC4899', '#3B82F6', '#8B5CF6', '#10B981'][i]} />
@@ -1310,13 +1418,15 @@ export default function Geospatial() {
                                         { key: 'globalRank', label: 'Global Rank' }
                                     ]}
                                     data={dynamicData?.humanCapitalData || []}/>
-                            </TabsContent>
-                        </Tabs>
-                    </CategorySection>
-                )}
+                                    </>
+                                    )}
+                                    </TabsContent>
+                                    </Tabs>
+                                    </CategorySection>
+                                    )}
 
-                {/* NATIONAL ASSETS */}
-                {selectedCountries.length > 0 && dynamicData && !dataLoading && (activeCategory === 'all' || activeCategory === 'assets') && (
+                                    {/* NATIONAL ASSETS */}
+                                    {selectedCountries.length > 0 && (activeCategory === 'all' || activeCategory === 'assets') && (
                     <CategorySection
                         title={`National Assets - ${selectedCountries.join(', ')}`}
                         description="Financial, industrial, cultural, intellectual, strategic reserves, and digital assets"
@@ -1334,8 +1444,15 @@ export default function Geospatial() {
                             </TabsList>
 
                             <TabsContent value="financial">
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                                    {(dynamicData?.financialStats || []).map((stat, i) => (
+                                        {loadingSections.assets ? (
+                                            <div className="flex items-center justify-center py-16">
+                                                <Loader2 className="w-8 h-8 text-amber-600 animate-spin mr-3" />
+                                                <span className="text-gray-600">Loading financial data...</span>
+                                            </div>
+                                        ) : (
+                                        <>
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                                            {(dynamicData?.financialStats || []).map((stat, i) => (
                                         <AssetCard key={i} title={stat.title} value={stat.value} unit={stat.unit} icon={[Coins, Banknote, Landmark, Landmark][i]} color={['#F59E0B', '#10B981', '#3B82F6', '#8B5CF6'][i]} />
                                     ))}
                                 </div>
@@ -1350,10 +1467,19 @@ export default function Geospatial() {
                                         { key: 'type', label: 'Type' }
                                     ]}
                                     data={dynamicData?.financialData || []}
-                                />
-                            </TabsContent>
+                                    />
+                                    </>
+                                    )}
+                                    </TabsContent>
 
-                            <TabsContent value="industrial">
+                                    <TabsContent value="industrial">
+                                    {loadingSections.assets ? (
+                                    <div className="flex items-center justify-center py-16">
+                                        <Loader2 className="w-8 h-8 text-amber-600 animate-spin mr-3" />
+                                        <span className="text-gray-600">Loading industrial data...</span>
+                                    </div>
+                                    ) : (
+                                    <>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                                     {(dynamicData?.industrialStats || []).map((stat, i) => (
                                         <AssetCard key={i} title={stat.title} value={stat.value} unit={stat.unit} icon={[Factory, Cpu, Building2, Lightbulb][i]} color={['#EF4444', '#8B5CF6', '#3B82F6', '#10B981'][i]} />
@@ -1371,10 +1497,19 @@ export default function Geospatial() {
                                         )}
                                     ]}
                                     data={dynamicData?.industrialData || []}
-                                />
-                            </TabsContent>
+                                    />
+                                    </>
+                                    )}
+                                    </TabsContent>
 
-                            <TabsContent value="intellectual">
+                                    <TabsContent value="intellectual">
+                                    {loadingSections.assets ? (
+                                    <div className="flex items-center justify-center py-16">
+                                        <Loader2 className="w-8 h-8 text-amber-600 animate-spin mr-3" />
+                                        <span className="text-gray-600">Loading intellectual assets...</span>
+                                    </div>
+                                    ) : (
+                                    <>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                                     {(dynamicData?.intellectualStats || []).map((stat, i) => (
                                         <AssetCard key={i} title={stat.title} value={stat.value} unit={stat.unit} icon={[Award, GraduationCap, Award, Lightbulb][i]} color={['#8B5CF6', '#3B82F6', '#F59E0B', '#10B981'][i]} />
@@ -1390,9 +1525,18 @@ export default function Geospatial() {
                                         { key: 'globalShare', label: 'Global Share' }
                                     ]}
                                     data={dynamicData?.intellectualData || []}/>
-                            </TabsContent>
+                                    </>
+                                    )}
+                                    </TabsContent>
 
-                            <TabsContent value="strategic">
+                                    <TabsContent value="strategic">
+                                    {loadingSections.assets ? (
+                                    <div className="flex items-center justify-center py-16">
+                                        <Loader2 className="w-8 h-8 text-amber-600 animate-spin mr-3" />
+                                        <span className="text-gray-600">Loading strategic reserves...</span>
+                                    </div>
+                                    ) : (
+                                    <>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                                     {(dynamicData?.strategicStats || []).map((stat, i) => (
                                         <AssetCard key={i} title={stat.title} value={stat.value} unit={stat.unit} icon={[Fuel, Shield, Leaf, Stethoscope][i]} color={['#F59E0B', '#EF4444', '#10B981', '#8B5CF6'][i]} />
@@ -1408,9 +1552,18 @@ export default function Geospatial() {
                                         { key: 'days', label: 'Coverage' }
                                     ]}
                                     data={dynamicData?.strategicReservesData || []}/>
-                            </TabsContent>
+                                    </>
+                                    )}
+                                    </TabsContent>
 
-                            <TabsContent value="digital">
+                                    <TabsContent value="digital">
+                                    {loadingSections.assets ? (
+                                    <div className="flex items-center justify-center py-16">
+                                        <Loader2 className="w-8 h-8 text-amber-600 animate-spin mr-3" />
+                                        <span className="text-gray-600">Loading digital assets...</span>
+                                    </div>
+                                    ) : (
+                                    <>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                                     {(dynamicData?.digitalStats || []).map((stat, i) => (
                                         <AssetCard key={i} title={stat.title} value={stat.value} unit={stat.unit} icon={[Server, Globe, Cpu, Lock][i]} color={['#8B5CF6', '#3B82F6', '#10B981', '#EF4444'][i]} />
@@ -1428,13 +1581,15 @@ export default function Geospatial() {
                                         )}
                                     ]}
                                     data={dynamicData?.digitalAssetsData || []}/>
-                            </TabsContent>
-                        </Tabs>
-                    </CategorySection>
-                )}
+                                    </>
+                                    )}
+                                    </TabsContent>
+                                    </Tabs>
+                                    </CategorySection>
+                                    )}
 
-                {/* GOVERNANCE & INSTITUTIONS */}
-                {selectedCountries.length > 0 && dynamicData && !dataLoading && (activeCategory === 'all' || activeCategory === 'governance') && (
+                                    {/* GOVERNANCE & INSTITUTIONS */}
+                                    {selectedCountries.length > 0 && (activeCategory === 'all' || activeCategory === 'governance') && (
                     <CategorySection
                         title={`Governance & Institutions - ${selectedCountries.join(', ')}`}
                         description="Legal system, political institutions, law enforcement, and public administration"
@@ -1449,8 +1604,15 @@ export default function Geospatial() {
                             </TabsList>
 
                             <TabsContent value="legal">
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                                    {(dynamicData?.governanceStats || []).map((stat, i) => (
+                                        {loadingSections.governance ? (
+                                            <div className="flex items-center justify-center py-16">
+                                                <Loader2 className="w-8 h-8 text-purple-600 animate-spin mr-3" />
+                                                <span className="text-gray-600">Loading governance data...</span>
+                                            </div>
+                                        ) : (
+                                        <>
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                                            {(dynamicData?.governanceStats || []).map((stat, i) => (
                                         <AssetCard key={i} title={stat.title} value={stat.value} unit={stat.unit} icon={[Scale, Scale, Building2, ShieldCheck][i]} color={['#8B5CF6', '#3B82F6', '#10B981', '#F59E0B'][i]} />
                                     ))}
                                 </div>
@@ -1464,9 +1626,18 @@ export default function Geospatial() {
                                         { key: 'efficiency', label: 'Efficiency' }
                                     ]}
                                     data={dynamicData?.governanceData || []}/>
-                            </TabsContent>
+                                    </>
+                                    )}
+                                    </TabsContent>
 
-                            <TabsContent value="law">
+                                    <TabsContent value="law">
+                                    {loadingSections.governance ? (
+                                    <div className="flex items-center justify-center py-16">
+                                        <Loader2 className="w-8 h-8 text-purple-600 animate-spin mr-3" />
+                                        <span className="text-gray-600">Loading law enforcement...</span>
+                                    </div>
+                                    ) : (
+                                    <>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                                     {(dynamicData?.lawEnforcementStats || []).map((stat, i) => (
                                         <AssetCard key={i} title={stat.title} value={stat.value} unit={stat.unit} icon={[ShieldCheck, ShieldCheck, Shield, Lock][i]} color={['#EF4444', '#3B82F6', '#10B981', '#8B5CF6'][i]} />
@@ -1482,13 +1653,15 @@ export default function Geospatial() {
                                         { key: 'clearRate', label: 'Clear Rate' }
                                     ]}
                                     data={dynamicData?.lawEnforcementData || []}/>
-                            </TabsContent>
-                        </Tabs>
-                    </CategorySection>
-                )}
+                                    </>
+                                    )}
+                                    </TabsContent>
+                                    </Tabs>
+                                    </CategorySection>
+                                    )}
 
-                {/* ECONOMIC SYSTEMS */}
-                {selectedCountries.length > 0 && dynamicData && !dataLoading && (activeCategory === 'all' || activeCategory === 'economic') && (
+                                    {/* ECONOMIC SYSTEMS */}
+                                    {selectedCountries.length > 0 && (activeCategory === 'all' || activeCategory === 'economic') && (
                     <CategorySection
                         title={`Economic Systems - ${selectedCountries.join(', ')}`}
                         description="Financial infrastructure, trade networks, industrial base, and labor markets"
@@ -1504,8 +1677,15 @@ export default function Geospatial() {
                             </TabsList>
 
                             <TabsContent value="financial">
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                                    {(dynamicData?.financialInfraStats || []).map((stat, i) => (
+                                        {loadingSections.governance ? (
+                                            <div className="flex items-center justify-center py-16">
+                                                <Loader2 className="w-8 h-8 text-red-600 animate-spin mr-3" />
+                                                <span className="text-gray-600">Loading financial infrastructure...</span>
+                                            </div>
+                                        ) : (
+                                        <>
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                                            {(dynamicData?.financialInfraStats || []).map((stat, i) => (
                                         <AssetCard key={i} title={stat.title} value={stat.value} unit={stat.unit} icon={[Landmark, BarChart3, Shield, TrendingUp][i]} color={['#3B82F6', '#10B981', '#F59E0B', '#8B5CF6'][i]} />
                                     ))}
                                 </div>
@@ -1519,9 +1699,18 @@ export default function Geospatial() {
                                         { key: 'rating', label: 'Rating' }
                                     ]}
                                     data={dynamicData?.financialInfraData || []}/>
-                            </TabsContent>
+                                    </>
+                                    )}
+                                    </TabsContent>
 
-                            <TabsContent value="trade">
+                                    <TabsContent value="trade">
+                                    {loadingSections.governance ? (
+                                    <div className="flex items-center justify-center py-16">
+                                        <Loader2 className="w-8 h-8 text-red-600 animate-spin mr-3" />
+                                        <span className="text-gray-600">Loading trade networks...</span>
+                                    </div>
+                                    ) : (
+                                    <>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                                     {(dynamicData?.tradeStats || []).map((stat, i) => (
                                         <AssetCard key={i} title={stat.title} value={stat.value} unit={stat.unit} icon={[Anchor, Ship, Globe, Network][i]} color={['#3B82F6', '#10B981', '#8B5CF6', '#F59E0B'][i]} />
@@ -1537,9 +1726,18 @@ export default function Geospatial() {
                                         { key: 'globalRank', label: 'Global Rank' }
                                     ]}
                                     data={dynamicData?.tradeNetworksData || []}/>
-                            </TabsContent>
+                                    </>
+                                    )}
+                                    </TabsContent>
 
-                            <TabsContent value="labor">
+                                    <TabsContent value="labor">
+                                    {loadingSections.governance ? (
+                                    <div className="flex items-center justify-center py-16">
+                                        <Loader2 className="w-8 h-8 text-red-600 animate-spin mr-3" />
+                                        <span className="text-gray-600">Loading labor market...</span>
+                                    </div>
+                                    ) : (
+                                    <>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                                     {(dynamicData?.laborStats || []).map((stat, i) => (
                                         <AssetCard key={i} title={stat.title} value={stat.value} unit={stat.unit} icon={[Users, Cpu, Briefcase, Users][i]} color={['#10B981', '#8B5CF6', '#F59E0B', '#3B82F6'][i]} />
@@ -1554,13 +1752,15 @@ export default function Geospatial() {
                                         { key: 'rate', label: 'Rate/Share' }
                                     ]}
                                     data={dynamicData?.laborMarketData || []}/>
-                            </TabsContent>
-                        </Tabs>
-                    </CategorySection>
-                )}
+                                    </>
+                                    )}
+                                    </TabsContent>
+                                    </Tabs>
+                                    </CategorySection>
+                                    )}
 
-                {/* SOCIAL & HUMAN DEVELOPMENT */}
-                {selectedCountries.length > 0 && dynamicData && !dataLoading && (activeCategory === 'all' || activeCategory === 'social') && (
+                                    {/* SOCIAL & HUMAN DEVELOPMENT */}
+                                    {selectedCountries.length > 0 && (activeCategory === 'all' || activeCategory === 'social') && (
                     <CategorySection
                         title={`Social & Human Development - ${selectedCountries.join(', ')}`}
                         description="Education systems, healthcare, social safety nets, and cultural institutions"
@@ -1576,8 +1776,15 @@ export default function Geospatial() {
                             </TabsList>
 
                             <TabsContent value="education">
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                                    {(dynamicData?.educationStats || []).map((stat, i) => (
+                                        {loadingSections.social ? (
+                                            <div className="flex items-center justify-center py-16">
+                                                <Loader2 className="w-8 h-8 text-pink-600 animate-spin mr-3" />
+                                                <span className="text-gray-600">Loading education data...</span>
+                                            </div>
+                                        ) : (
+                                        <>
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                                            {(dynamicData?.educationStats || []).map((stat, i) => (
                                         <AssetCard key={i} title={stat.title} value={stat.value} unit={stat.unit} icon={[GraduationCap, BookOpen, GraduationCap, Banknote][i]} color={['#EC4899', '#8B5CF6', '#3B82F6', '#10B981'][i]} />
                                     ))}
                                 </div>
@@ -1591,10 +1798,19 @@ export default function Geospatial() {
                                         { key: 'spending', label: 'Spending' }
                                     ]}
                                     data={dynamicData?.educationData || []}
-                                />
-                            </TabsContent>
+                                    />
+                                    </>
+                                    )}
+                                    </TabsContent>
 
-                            <TabsContent value="healthcare">
+                                    <TabsContent value="healthcare">
+                                    {loadingSections.social ? (
+                                    <div className="flex items-center justify-center py-16">
+                                        <Loader2 className="w-8 h-8 text-pink-600 animate-spin mr-3" />
+                                        <span className="text-gray-600">Loading healthcare data...</span>
+                                    </div>
+                                    ) : (
+                                    <>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                                     {(dynamicData?.healthcareStats || []).map((stat, i) => (
                                         <AssetCard key={i} title={stat.title} value={stat.value} unit={stat.unit} icon={[Stethoscope, Heart, Stethoscope, Banknote][i]} color={['#EF4444', '#EC4899', '#10B981', '#3B82F6'][i]} />
@@ -1610,10 +1826,19 @@ export default function Geospatial() {
                                         { key: 'spending', label: 'Spending' }
                                     ]}
                                     data={dynamicData?.healthcareData || []}
-                                />
-                            </TabsContent>
+                                    />
+                                    </>
+                                    )}
+                                    </TabsContent>
 
-                            <TabsContent value="safety">
+                                    <TabsContent value="safety">
+                                    {loadingSections.social ? (
+                                    <div className="flex items-center justify-center py-16">
+                                        <Loader2 className="w-8 h-8 text-pink-600 animate-spin mr-3" />
+                                        <span className="text-gray-600">Loading social safety nets...</span>
+                                    </div>
+                                    ) : (
+                                    <>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                                     {(dynamicData?.socialSafetyStats || []).map((stat, i) => (
                                         <AssetCard key={i} title={stat.title} value={stat.value} unit={stat.unit} icon={[Users, Heart, Heart, Leaf][i]} color={['#8B5CF6', '#EF4444', '#10B981', '#F59E0B'][i]} />
@@ -1629,13 +1854,15 @@ export default function Geospatial() {
                                         { key: 'fundStatus', label: 'Fund Status' }
                                     ]}
                                     data={dynamicData?.socialSafetyData || []}/>
-                            </TabsContent>
-                        </Tabs>
-                    </CategorySection>
-                )}
+                                    </>
+                                    )}
+                                    </TabsContent>
+                                    </Tabs>
+                                    </CategorySection>
+                                    )}
 
-                {/* GLOBAL & STRATEGIC POSITIONING */}
-                {selectedCountries.length > 0 && dynamicData && !dataLoading && (activeCategory === 'all' || activeCategory === 'global') && (
+                                    {/* GLOBAL & STRATEGIC POSITIONING */}
+                                    {selectedCountries.length > 0 && (activeCategory === 'all' || activeCategory === 'global') && (
                     <CategorySection
                         title={`Global & Strategic Positioning - ${selectedCountries.join(', ')}`}
                         description="Diplomatic networks, geopolitical assets, soft power, and cyber infrastructure"
@@ -1651,8 +1878,15 @@ export default function Geospatial() {
                             </TabsList>
 
                             <TabsContent value="diplomatic">
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                                    {(dynamicData?.diplomaticStats || []).map((stat, i) => (
+                                        {loadingSections.global ? (
+                                            <div className="flex items-center justify-center py-16">
+                                                <Loader2 className="w-8 h-8 text-cyan-600 animate-spin mr-3" />
+                                                <span className="text-gray-600">Loading diplomatic data...</span>
+                                            </div>
+                                        ) : (
+                                        <>
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                                            {(dynamicData?.diplomaticStats || []).map((stat, i) => (
                                         <AssetCard key={i} title={stat.title} value={stat.value} unit={stat.unit} icon={[Building2, Building2, Shield, Briefcase][i]} color={['#06B6D4', '#3B82F6', '#EF4444', '#10B981'][i]} />
                                     ))}
                                 </div>
@@ -1666,9 +1900,18 @@ export default function Geospatial() {
                                         { key: 'budget', label: 'Budget' }
                                     ]}
                                     data={dynamicData?.diplomaticData || []}/>
-                            </TabsContent>
+                                    </>
+                                    )}
+                                    </TabsContent>
 
-                            <TabsContent value="geopolitical">
+                                    <TabsContent value="geopolitical">
+                                    {loadingSections.global ? (
+                                    <div className="flex items-center justify-center py-16">
+                                        <Loader2 className="w-8 h-8 text-cyan-600 animate-spin mr-3" />
+                                        <span className="text-gray-600">Loading geopolitical data...</span>
+                                    </div>
+                                    ) : (
+                                    <>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                                     {(dynamicData?.geopoliticalStats || []).map((stat, i) => (
                                         <AssetCard key={i} title={stat.title} value={stat.value} unit={stat.unit} icon={[Anchor, Plane, Globe, Ship][i]} color={['#3B82F6', '#8B5CF6', '#F59E0B', '#10B981'][i]} />
@@ -1684,9 +1927,18 @@ export default function Geospatial() {
                                         { key: 'control', label: 'Control' }
                                     ]}
                                     data={dynamicData?.geopoliticalData || []}/>
-                            </TabsContent>
+                                    </>
+                                    )}
+                                    </TabsContent>
 
-                            <TabsContent value="softpower">
+                                    <TabsContent value="softpower">
+                                    {loadingSections.global ? (
+                                    <div className="flex items-center justify-center py-16">
+                                        <Loader2 className="w-8 h-8 text-cyan-600 animate-spin mr-3" />
+                                        <span className="text-gray-600">Loading soft power data...</span>
+                                    </div>
+                                    ) : (
+                                    <>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                                     {(dynamicData?.softPowerStats || []).map((stat, i) => (
                                         <AssetCard key={i} title={stat.title} value={stat.value} unit={stat.unit} icon={[Award, GraduationCap, Radio, Globe][i]} color={['#EC4899', '#8B5CF6', '#3B82F6', '#10B981'][i]} />
@@ -1704,13 +1956,15 @@ export default function Geospatial() {
                                         )}
                                     ]}
                                     data={dynamicData?.softPowerData || []}/>
-                            </TabsContent>
-                        </Tabs>
-                    </CategorySection>
-                )}
+                                    </>
+                                    )}
+                                    </TabsContent>
+                                    </Tabs>
+                                    </CategorySection>
+                                    )}
 
-                {/* ENVIRONMENTAL & SUSTAINABILITY */}
-                {selectedCountries.length > 0 && dynamicData && !dataLoading && (activeCategory === 'all' || activeCategory === 'environment') && (
+                                    {/* ENVIRONMENTAL & SUSTAINABILITY */}
+                                    {selectedCountries.length > 0 && (activeCategory === 'all' || activeCategory === 'environment') && (
                     <CategorySection
                         title={`Environmental & Sustainability - ${selectedCountries.join(', ')}`}
                         description="Climate resilience, protected areas, and renewable energy potential"
@@ -1726,8 +1980,15 @@ export default function Geospatial() {
                             </TabsList>
 
                             <TabsContent value="climate">
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                                    {(dynamicData?.climateStats || []).map((stat, i) => (
+                                        {loadingSections.global ? (
+                                            <div className="flex items-center justify-center py-16">
+                                                <Loader2 className="w-8 h-8 text-lime-600 animate-spin mr-3" />
+                                                <span className="text-gray-600">Loading climate resilience...</span>
+                                            </div>
+                                        ) : (
+                                        <>
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                                            {(dynamicData?.climateStats || []).map((stat, i) => (
                                         <AssetCard key={i} title={stat.title} value={stat.value} unit={stat.unit} icon={[Droplets, Zap, Shield, Shield][i]} color={['#06B6D4', '#EF4444', '#3B82F6', '#10B981'][i]} />
                                     ))}
                                 </div>
@@ -1743,9 +2004,18 @@ export default function Geospatial() {
                                         )}
                                     ]}
                                     data={dynamicData?.climateResilienceData || []}/>
-                            </TabsContent>
+                                    </>
+                                    )}
+                                    </TabsContent>
 
-                            <TabsContent value="protected">
+                                    <TabsContent value="protected">
+                                    {loadingSections.global ? (
+                                    <div className="flex items-center justify-center py-16">
+                                        <Loader2 className="w-8 h-8 text-lime-600 animate-spin mr-3" />
+                                        <span className="text-gray-600">Loading protected areas...</span>
+                                    </div>
+                                    ) : (
+                                    <>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                                     {(dynamicData?.protectedStats || []).map((stat, i) => (
                                         <AssetCard key={i} title={stat.title} value={stat.value} unit={stat.unit} icon={[TreePine, TreePine, Leaf, Anchor][i]} color={['#84CC16', '#10B981', '#059669', '#06B6D4'][i]} />
@@ -1761,9 +2031,18 @@ export default function Geospatial() {
                                         { key: 'budget', label: 'Budget' }
                                     ]}
                                     data={dynamicData?.protectedAreasData || []}/>
-                            </TabsContent>
+                                    </>
+                                    )}
+                                    </TabsContent>
 
-                            <TabsContent value="renewable">
+                                    <TabsContent value="renewable">
+                                    {loadingSections.global ? (
+                                    <div className="flex items-center justify-center py-16">
+                                        <Loader2 className="w-8 h-8 text-lime-600 animate-spin mr-3" />
+                                        <span className="text-gray-600">Loading renewable potential...</span>
+                                    </div>
+                                    ) : (
+                                    <>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                                     {(dynamicData?.renewableStats || []).map((stat, i) => (
                                         <AssetCard key={i} title={stat.title} value={stat.value} unit={stat.unit} icon={[Sun, Wind, Droplets, Zap][i]} color={['#F59E0B', '#3B82F6', '#06B6D4', '#EF4444'][i]} />
@@ -1781,11 +2060,13 @@ export default function Geospatial() {
                                         )}
                                     ]}
                                     data={dynamicData?.renewablePotentialData || []}/>
-                            </TabsContent>
-                        </Tabs>
-                    </CategorySection>
-                )}
-            </div>
-        </div>
-    );
-}
+                                    </>
+                                    )}
+                                    </TabsContent>
+                                    </Tabs>
+                                    </CategorySection>
+                                    )}
+                                    </div>
+                                    </div>
+                                    );
+                                    }
