@@ -1695,21 +1695,6 @@ export default function Geospatial() {
                         <p className="text-sm text-gray-500">The detailed country infrastructure and resource data is now available in the Geomatics tab. Click on Geomatics to access all country-specific data.</p>
                     </div>
                 )}
-                {/* Hidden legacy content - removed for cleaner code */}
-                </>
-                )}
-                </div>
-
-                <CountrySelectModal
-                    isOpen={showCountryModal}
-                    onClose={() => setShowCountryModal(false)}
-                    selectedCountry={selectedCountry}
-                    onSelect={setSelectedCountry}
-                    title="Select Country for Analysis"
-                />
-                                    </div>
-                                    );
-                                    }
 
 
                     <div className="bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl p-6 border border-purple-100">
