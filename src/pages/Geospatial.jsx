@@ -757,15 +757,15 @@ Make data realistic and proportional to each country's actual size and developme
                                     />
                                 </div>
                                 <DataTable
-                                    title="Energy Resources & Reserves"
+                                    title={`Energy Resources - ${selectedCountries.join(', ')}`}
                                     columns={[
                                         { key: 'resource', label: 'Resource' },
-                                        { key: 'amount', label: 'Reserves' },
+                                        { key: 'reserves', label: 'Reserves' },
                                         { key: 'production', label: 'Production' },
-                                        { key: 'lifespan', label: 'Lifespan' },
-                                        { key: 'value', label: 'Est. Value' }
+                                        { key: 'value', label: 'Value' },
+                                        { key: 'rank', label: 'Rank' }
                                     ]}
-                                    data={energyResourcesTable}
+                                    data={dynamicData?.resourcesData || []}
                                 />
                             </TabsContent>
 
@@ -885,15 +885,15 @@ Make data realistic and proportional to each country's actual size and developme
                                     <AssetCard title="Shale Oil" value="78.2B" unit="barrels" icon={Fuel} color="#8B5CF6" />
                                 </div>
                                 <DataTable
-                                    title="Energy Resources & Reserves"
+                                    title={`Energy Resources - ${selectedCountries.join(', ')}`}
                                     columns={[
                                         { key: 'resource', label: 'Resource' },
-                                        { key: 'amount', label: 'Reserves' },
+                                        { key: 'reserves', label: 'Reserves' },
                                         { key: 'production', label: 'Production' },
-                                        { key: 'lifespan', label: 'Lifespan' },
-                                        { key: 'value', label: 'Est. Value' }
+                                        { key: 'value', label: 'Value' },
+                                        { key: 'rank', label: 'Rank' }
                                     ]}
-                                    data={energyResourcesTable}
+                                    data={dynamicData?.resourcesData || []}
                                 />
                             </TabsContent>
 
