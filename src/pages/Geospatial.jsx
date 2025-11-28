@@ -1695,25 +1695,7 @@ export default function Geospatial() {
                         <p className="text-sm text-gray-500">The detailed country infrastructure and resource data is now available in the Geomatics tab. Click on Geomatics to access all country-specific data.</p>
                     </div>
                 )}
-                {/* Hidden legacy content */}
-                {false && (
-                    <>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        {CATEGORIES.map(cat => (
-                            <button
-                                key={cat.id}
-                                onClick={() => setActiveCategory(activeCategory === cat.id ? 'all' : cat.id)}
-                                className={`p-4 rounded-xl border transition-all text-left ${activeCategory === cat.id ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-white hover:border-gray-300'}`}
-                            >
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: `${cat.color}15` }}>
-                                        <cat.icon className="w-5 h-5" style={{ color: cat.color }} />
-                                    </div>
-                                    <span className="font-medium text-gray-900 text-sm">{cat.name}</span>
-                                </div>
-                            </button>
-                        ))}
-                    </div>
+                {/* Hidden legacy content - removed for cleaner code */}
 
                 {/* Analysis Results */}
                 {selectedCountries.length > 0 && loadingSections.summary && (
