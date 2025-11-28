@@ -5,7 +5,7 @@ import {
     TreePine, Leaf, Sun, Wind, Database, TrendingUp, BarChart3, PieChart,
     Network, Fuel, Anchor, Plane, Radio, Server, Lock, Coins, Award,
     BookOpen, Stethoscope, ShieldCheck, Vote, Banknote, Ship, Loader2,
-    RefreshCw, Filter, Download, ChevronRight, MapPin, Activity
+    RefreshCw, Filter, Download, ChevronRight, MapPin, Activity, Cpu, Lightbulb
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
