@@ -428,6 +428,54 @@ Use short sentences for better pacing. Do NOT use any markdown formatting.`,
         }
     }, [isPlaying, stopPlayback, startSpeaking]);
 
+    // Download MP3
+    const downloadAudio = async () => {
+        try {
+            const cleanText = cleanTextForSpeech(sentencesRef.current.join(' '));
+
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const utterances = sentencesRef.current.map(text => {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.voice = selectedVoice;
+                utterance.rate = 1;
+                utterance.volume = 1;
+                return utterance;
+            });
+
+            // Use MediaRecorder to capture audio
+            const chunks = [];
+            const stream = audioContext.createMediaStreamDestination();
+            const recorder = new MediaRecorder(stream.stream);
+
+            recorder.ondataavailable = (e) => chunks.push(e.data);
+            recorder.onstop = () => {
+                const blob = new Blob(chunks, { type: 'audio/mpeg' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${currentEpisode.title.replace(/[^a-z0-9]/gi, '_')}.mp3`;
+                a.click();
+                URL.revokeObjectURL(url);
+            };
+
+            recorder.start();
+
+            // Speak all text
+            for (const text of sentencesRef.current) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.voice = selectedVoice;
+                window.speechSynthesis.speak(utterance);
+                await new Promise(resolve => {
+                    utterance.onend = resolve;
+                });
+            }
+
+            recorder.stop();
+        } catch (err) {
+            console.error('Download error:', err);
+        }
+    };
+
     // Close player
     const closePlayer = useCallback(() => {
         stopPlayback();
@@ -620,7 +668,14 @@ Use short sentences for better pacing. Do NOT use any markdown formatting.`,
                                 <X className="w-6 h-6" />
                             </button>
                             <span className="text-gray-500 text-sm uppercase tracking-wider">Now Playing</span>
-                            <div className="w-6" />
+                            <button 
+                                onClick={downloadAudio}
+                                disabled={isGenerating}
+                                className="text-gray-400 hover:text-gray-600 disabled:opacity-50"
+                                title="Download MP3"
+                            >
+                                <Download className="w-5 h-5" />
+                            </button>
                         </div>
 
                         {/* Album Art */}
