@@ -1056,109 +1056,108 @@ export default function Markets() {
     const fetchStockData = async () => {
         setLoading(true);
         setLoadedCount(0);
+        setStocks([]);
         
-        // Load stocks in batches progressively
-        const BATCH_SIZE = 100;
+        // Load stocks in batches sequentially using LLM
+        const BATCH_SIZE = 50;
         const batches = [];
         for (let i = 0; i < STOCK_DATA.length; i += BATCH_SIZE) {
             batches.push(STOCK_DATA.slice(i, i + BATCH_SIZE));
         }
 
-        // Load first batch with generated data immediately
-        const initialStocks = batches[0].map(generateStockData);
-        setStocks(initialStocks);
-        setLoadedCount(batches[0].length);
+        // Load first batch immediately
+        const firstBatch = batches[0].map(generateStockData);
+        setStocks(firstBatch);
+        setLoadedCount(firstBatch.length);
         setLoading(false);
 
-        // Load remaining batches progressively
-        for (let i = 1; i < batches.length; i++) {
-            const batch = batches[i].map(generateStockData);
-            setStocks(prev => [...prev, ...batch]);
-            setLoadedCount(prev => prev + batch.length);
-            await new Promise(resolve => setTimeout(resolve, 100));
-        }
-
-        // Fetch real data for a subset after all are loaded
-        try {
-            const stockBatch = STOCK_DATA.sort(() => Math.random() - 0.5).slice(0, 30);
-            const tickers = stockBatch.map(s => s.ticker).join(', ');
+        // Load remaining batches with LLM data
+        for (let batchIndex = 1; batchIndex < batches.length; batchIndex++) {
+            const batch = batches[batchIndex];
+            const tickers = batch.map(s => s.ticker).join(', ');
             
-            const response = await base44.integrations.Core.InvokeLLM({
-                prompt: `Provide current stock market data for these tickers: ${tickers}
+            try {
+                const response = await base44.integrations.Core.InvokeLLM({
+                    prompt: `Provide current stock market data for ${batch.length} stocks: ${tickers}
 
-For each stock, provide realistic current market data including:
-- Current price (realistic based on recent trading)
-- Daily change percentage (-5% to +5% typical range)
-- Trading volume
-- Key financial metrics: MOAT score (0-100), ROE %, P/E ratio, Z-Score, EPS, Dividend yield
+For EACH stock provide realistic data:
+- Current price (realistic market price)
+- Daily change % (-5 to +5)
+- Volume
+- MOAT score (0-100), ROE %, P/E ratio, Z-Score, EPS, Dividend %, Sales Growth Rate %
 
-Return data for all ${stockBatch.length} stocks.`,
-                add_context_from_internet: true,
-                response_json_schema: {
-                    type: "object",
-                    properties: {
-                        stocks: {
-                            type: "array",
-                            items: {
-                                type: "object",
-                                properties: {
-                                    ticker: { type: "string" },
-                                    price: { type: "number" },
-                                    change: { type: "number" },
-                                    volume: { type: "string" },
-                                    moat: { type: "number" },
-                                    roe: { type: "number" },
-                                    pe: { type: "number" },
-                                    zscore: { type: "number" },
-                                    eps: { type: "number" },
-                                    dividend: { type: "number" },
-                                    sgr: { type: "number" }
+Return exactly ${batch.length} stocks with all metrics.`,
+                    add_context_from_internet: true,
+                    response_json_schema: {
+                        type: "object",
+                        properties: {
+                            stocks: {
+                                type: "array",
+                                items: {
+                                    type: "object",
+                                    properties: {
+                                        ticker: { type: "string" },
+                                        price: { type: "number" },
+                                        change: { type: "number" },
+                                        volume: { type: "string" },
+                                        moat: { type: "number" },
+                                        roe: { type: "number" },
+                                        pe: { type: "number" },
+                                        zscore: { type: "number" },
+                                        eps: { type: "number" },
+                                        dividend: { type: "number" },
+                                        sgr: { type: "number" }
+                                    }
                                 }
                             }
                         }
                     }
-                }
-            });
+                });
 
-            // Merge LLM data with our stock info
-            const llmStocks = response?.stocks || [];
-            const updatedStocks = STOCK_DATA.map(stock => {
-                const llmData = llmStocks.find(s => s.ticker === stock.ticker);
-                if (llmData) {
-                    const history = [];
-                    let price = llmData.price * 0.9;
-                    for (let i = 0; i < 20; i++) { 
-                        price = price * (1 + (Math.random() - 0.48) * 0.02); 
-                        history.push(Math.round(price * 100) / 100); 
+                const llmStocks = response?.stocks || [];
+                const batchStocks = batch.map(stock => {
+                    const llmData = llmStocks.find(s => s.ticker === stock.ticker);
+                    if (llmData) {
+                        const history = [];
+                        let price = llmData.price * 0.9;
+                        for (let i = 0; i < 20; i++) { 
+                            price = price * (1 + (Math.random() - 0.48) * 0.02); 
+                            history.push(Math.round(price * 100) / 100); 
+                        }
+                        return {
+                            ...stock,
+                            price: llmData.price,
+                            change: llmData.change,
+                            volume: llmData.volume || `${(Math.random() * 50 + 5).toFixed(1)}M`,
+                            moat: llmData.moat || 50 + Math.floor(Math.random() * 40),
+                            roe: llmData.roe || 10 + Math.floor(Math.random() * 25),
+                            roic: (llmData.roe || 15) - 2 + Math.floor(Math.random() * 5),
+                            roa: Math.floor((llmData.roe || 15) * 0.6),
+                            pe: llmData.pe || 15 + Math.floor(Math.random() * 25),
+                            peg: Math.round(((llmData.pe || 20) / (llmData.sgr || 10)) * 100) / 100,
+                            zscore: llmData.zscore || 2 + Math.random() * 2,
+                            eps: llmData.eps || 1 + Math.random() * 10,
+                            dividend: llmData.dividend || Math.random() * 3,
+                            sgr: llmData.sgr || 5 + Math.floor(Math.random() * 20),
+                            beta: Math.round((0.7 + Math.random() * 0.8) * 100) / 100,
+                            fcf: Math.floor(Math.random() * 5000) + 500,
+                            eva: 40 + Math.floor(Math.random() * 50),
+                            aiRating: 55 + Math.floor(Math.random() * 40),
+                            history
+                        };
                     }
-                    return {
-                        ...stock,
-                        price: llmData.price,
-                        change: llmData.change,
-                        volume: llmData.volume || `${(Math.random() * 50 + 5).toFixed(1)}M`,
-                        moat: llmData.moat || 50 + Math.floor(Math.random() * 40),
-                        roe: llmData.roe || 10 + Math.floor(Math.random() * 25),
-                        roic: (llmData.roe || 15) - 2 + Math.floor(Math.random() * 5),
-                        roa: Math.floor((llmData.roe || 15) * 0.6),
-                        pe: llmData.pe || 15 + Math.floor(Math.random() * 25),
-                        peg: Math.round(((llmData.pe || 20) / (llmData.sgr || 10)) * 100) / 100,
-                        zscore: llmData.zscore || 2 + Math.random() * 2,
-                        eps: llmData.eps || 1 + Math.random() * 10,
-                        dividend: llmData.dividend || Math.random() * 3,
-                        sgr: llmData.sgr || 5 + Math.floor(Math.random() * 20),
-                        beta: Math.round((0.7 + Math.random() * 0.8) * 100) / 100,
-                        fcf: Math.floor(Math.random() * 5000) + 500,
-                        eva: 40 + Math.floor(Math.random() * 50),
-                        aiRating: 55 + Math.floor(Math.random() * 40),
-                        history
-                    };
-                }
-                return generateStockData(stock);
-            });
+                    return generateStockData(stock);
+                });
 
-            setStocks(updatedStocks);
-        } catch (error) {
-            console.error('Error fetching enhanced data:', error);
+                setStocks(prev => [...prev, ...batchStocks]);
+                setLoadedCount(prev => prev + batchStocks.length);
+            } catch (error) {
+                console.error('Error fetching batch data:', error);
+                // Fallback to generated data for this batch
+                const batchStocks = batch.map(generateStockData);
+                setStocks(prev => [...prev, ...batchStocks]);
+                setLoadedCount(prev => prev + batchStocks.length);
+            }
         }
     };
 
