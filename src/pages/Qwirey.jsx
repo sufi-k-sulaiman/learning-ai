@@ -829,6 +829,8 @@ export default function Qwirey() {
 
                 {/* Results */}
                 {result && !formatLoading && (
+                    result.type === 'text' ||
+                    result.type === 'error' ||
                     (responseFormat === 'short' && result.shortData) ||
                     (responseFormat === 'long' && result.longData) ||
                     (responseFormat === 'tabled' && result.tabledData) ||
