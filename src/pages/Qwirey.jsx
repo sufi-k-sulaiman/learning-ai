@@ -585,6 +585,26 @@ export default function Qwirey() {
                     }
                 });
                 setResult(prev => ({ ...prev, longData: longResponse }));
+            } else if (newFormat === 'images' && !result.imagesData) {
+                const imagesResponse = await base44.integrations.Core.InvokeLLM({
+                    prompt: `Generate 8 detailed, creative image prompts related to: "${currentPrompt}". Each should be suitable for AI image generation and visually distinct.`,
+                    response_json_schema: {
+                        type: "object",
+                        properties: {
+                            imagePrompts: { type: "array", items: { type: "string" } }
+                        }
+                    }
+                });
+                const imagePrompts = imagesResponse?.imagePrompts?.slice(0, 8) || [];
+                const generatedImages = await Promise.all(
+                    imagePrompts.map(async (imgPrompt) => {
+                        try {
+                            const img = await base44.integrations.Core.GenerateImage({ prompt: imgPrompt });
+                            return { prompt: imgPrompt, url: img.url };
+                        } catch (e) { return null; }
+                    })
+                );
+                setResult(prev => ({ ...prev, imagesData: generatedImages.filter(Boolean) }));
             }
         } catch (error) {
             console.error('Format generation error:', error);
