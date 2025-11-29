@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Gamepad2, Rocket, Target, Bot } from 'lucide-react';
+import { Gamepad2, Rocket, Target } from 'lucide-react';
 
 import WordShooter from '@/components/games/WordShooter';
 import SpaceBattleGame from '@/components/games/SpaceBattleGame';
-import Robotext from '@/components/games/Robotext';
 import { Button } from '@/components/ui/button';
 
 export default function Games() {
@@ -21,10 +20,6 @@ export default function Games() {
     
     if (activeGame === 'word-shooter') {
         return <WordShooter onExit={() => setActiveGame(null)} />;
-    }
-
-    if (activeGame === 'robotext') {
-        return <Robotext onBack={() => setActiveGame(null)} />;
     }
 
     return (
@@ -58,18 +53,6 @@ export default function Games() {
                       <h2 className="text-2xl font-bold text-gray-900 mb-2">Word Shooter</h2>
                       <p className="text-gray-500 mb-6 flex-grow">Gamified vocabulary learning with AI-powered word sets.</p>
                       <Button onClick={() => setActiveGame('word-shooter')} size="lg" className="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700">
-                          Play Now
-                      </Button>
-                  </div>
-
-                  {/* Robotext Game Card */}
-                  <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm text-center flex flex-col">
-                      <div className="w-20 h-20 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl flex items-center justify-center mx-auto mb-4">
-                          <Bot className="w-10 h-10 text-white" />
-                      </div>
-                      <h2 className="text-2xl font-bold text-gray-900 mb-2">Robotext</h2>
-                      <p className="text-gray-500 mb-6 flex-grow">Action-platformer where combat generates words. Collect meaning to unlock abilities!</p>
-                      <Button onClick={() => setActiveGame('robotext')} size="lg" className="w-full bg-gradient-to-r from-indigo-500 to-violet-600 hover:from-indigo-600 hover:to-violet-700">
                           Play Now
                       </Button>
                   </div>
