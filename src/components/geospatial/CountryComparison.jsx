@@ -199,75 +199,75 @@ DO NOT give generic environmental rankings. Be SPECIFIC to ${categoryNames}.`,
                 </Button>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Top Performers */}
-            <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl border border-emerald-200 p-5">
-                <div className="flex items-center gap-2 mb-4">
-                    <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
-                        <Award className="w-4 h-4 text-emerald-600" />
-                    </div>
-                    <div>
-                        <h3 className="font-semibold text-gray-900">Top Performers</h3>
-                        <p className="text-xs text-gray-500">Leading in {categoryNames}</p>
-                    </div>
-                </div>
-                <div className="space-y-3">
-                    {topCountries.map((country, i) => (
-                        <div 
-                            key={country.name}
-                            className="bg-white rounded-lg p-3 border border-emerald-100 hover:border-emerald-300 transition-colors cursor-pointer"
-                        >
-                            <div className="flex items-center justify-between mb-1">
-                                <div className="flex items-center gap-2">
-                                    <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold flex items-center justify-center">
-                                        {i + 1}
-                                    </span>
-                                    <span className="font-medium text-gray-900">{country.name}</span>
-                                </div>
-                                <div className="flex items-center gap-1 text-emerald-600">
-                                    <TrendingUp className="w-3 h-3" />
-                                    <span className="text-sm font-semibold">{country.score}</span>
-                                </div>
-                            </div>
-                            <p className="text-xs text-gray-500 ml-7 line-clamp-2">{country.reason}</p>
+                {/* Top Performers */}
+                <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl border border-emerald-200 p-5">
+                    <div className="flex items-center gap-2 mb-4">
+                        <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center">
+                            <Award className="w-4 h-4 text-emerald-600" />
                         </div>
-                    ))}
+                        <div>
+                            <h3 className="font-semibold text-gray-900">Top Performers</h3>
+                            <p className="text-xs text-gray-500">Leading in {categoryNames}</p>
+                        </div>
+                    </div>
+                    <div className="space-y-3">
+                        {topCountries.map((country, i) => (
+                            <div 
+                                key={country.name}
+                                className="bg-white rounded-lg p-3 border border-emerald-100 hover:border-emerald-300 transition-colors cursor-pointer"
+                            >
+                                <div className="flex items-center justify-between mb-1">
+                                    <div className="flex items-center gap-2">
+                                        <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 text-xs font-bold flex items-center justify-center">
+                                            {i + 1}
+                                        </span>
+                                        <span className="font-medium text-gray-900">{country.name}</span>
+                                    </div>
+                                    <div className="flex items-center gap-1 text-emerald-600">
+                                        <TrendingUp className="w-3 h-3" />
+                                        <span className="text-sm font-semibold">{country.score}</span>
+                                    </div>
+                                </div>
+                                <p className="text-xs text-gray-500 ml-7 line-clamp-2">{country.reason}</p>
+                            </div>
+                        ))}
+                    </div>
                 </div>
-            </div>
 
-            {/* Needs Improvement */}
-            <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl border border-amber-200 p-5">
-                <div className="flex items-center gap-2 mb-4">
-                    <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center">
-                        <AlertTriangle className="w-4 h-4 text-amber-600" />
-                    </div>
-                    <div>
-                        <h3 className="font-semibold text-gray-900">Needs Improvement</h3>
-                        <p className="text-xs text-gray-500">Lagging in {categoryNames}</p>
-                    </div>
-                </div>
-                <div className="space-y-3">
-                    {bottomCountries.map((country, i) => (
-                        <div 
-                            key={country.name}
-                            className="bg-white rounded-lg p-3 border border-amber-100 hover:border-amber-300 transition-colors cursor-pointer"
-                        >
-                            <div className="flex items-center justify-between mb-1">
-                                <div className="flex items-center gap-2">
-                                    <span className="w-5 h-5 rounded-full bg-amber-100 text-amber-700 text-xs font-bold flex items-center justify-center">
-                                        {i + 1}
-                                    </span>
-                                    <span className="font-medium text-gray-900">{country.name}</span>
-                                </div>
-                                <div className="flex items-center gap-1 text-amber-600">
-                                    <TrendingDown className="w-3 h-3" />
-                                    <span className="text-sm font-semibold">{country.score}</span>
-                                </div>
-                            </div>
-                            <p className="text-xs text-gray-500 ml-7 line-clamp-2">{country.reason}</p>
+                {/* Needs Improvement */}
+                <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl border border-amber-200 p-5">
+                    <div className="flex items-center gap-2 mb-4">
+                        <div className="w-8 h-8 rounded-lg bg-amber-100 flex items-center justify-center">
+                            <AlertTriangle className="w-4 h-4 text-amber-600" />
                         </div>
-                    ))}
+                        <div>
+                            <h3 className="font-semibold text-gray-900">Needs Improvement</h3>
+                            <p className="text-xs text-gray-500">Lagging in {categoryNames}</p>
+                        </div>
+                    </div>
+                    <div className="space-y-3">
+                        {bottomCountries.map((country, i) => (
+                            <div 
+                                key={country.name}
+                                className="bg-white rounded-lg p-3 border border-amber-100 hover:border-amber-300 transition-colors cursor-pointer"
+                            >
+                                <div className="flex items-center justify-between mb-1">
+                                    <div className="flex items-center gap-2">
+                                        <span className="w-5 h-5 rounded-full bg-amber-100 text-amber-700 text-xs font-bold flex items-center justify-center">
+                                            {i + 1}
+                                        </span>
+                                        <span className="font-medium text-gray-900">{country.name}</span>
+                                    </div>
+                                    <div className="flex items-center gap-1 text-amber-600">
+                                        <TrendingDown className="w-3 h-3" />
+                                        <span className="text-sm font-semibold">{country.score}</span>
+                                    </div>
+                                </div>
+                                <p className="text-xs text-gray-500 ml-7 line-clamp-2">{country.reason}</p>
+                            </div>
+                        ))}
+                    </div>
                 </div>
-            </div>
             </div>
         </div>
     );
