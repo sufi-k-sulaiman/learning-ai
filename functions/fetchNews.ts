@@ -86,11 +86,26 @@ function cleanText(text) {
         .trim();
 }
 
-function cleanUrl(url) {
-    // Some RSS feeds wrap URLs, extract actual URL
-    if (url.includes('news.google.com/rss/articles/')) {
-        return url; // Google News redirect URLs work fine
+async function resolveGoogleNewsUrl(url) {
+    // Google News URLs are redirects - follow them to get real URL
+    if (url.includes('news.google.com')) {
+        try {
+            const response = await fetch(url, {
+                method: 'HEAD',
+                redirect: 'follow',
+                headers: {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                },
+            });
+            return response.url || url;
+        } catch {
+            return url;
+        }
     }
+    return url;
+}
+
+function cleanUrl(url) {
     return url.trim();
 }
 
