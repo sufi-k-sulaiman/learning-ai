@@ -680,7 +680,7 @@ export default function MindMapPage() {
                         </div>
                     </div>
                     {!treeData && !loading ? (
-                        <div className="h-full flex flex-col items-center pt-4 overflow-auto">
+                        <div className="h-full flex flex-col items-center pt-2 overflow-auto px-2">
 
                             {/* Search Bar - Right below icon */}
                             <div className="w-full max-w-xl mx-auto mb-4">
@@ -708,7 +708,7 @@ export default function MindMapPage() {
                                 Search for any topic to generate an interactive knowledge tree. Click Explore to dive deeper or Learn for detailed insights.
                             </p>
 
-                            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-9 gap-2 w-full justify-items-center mx-auto" style={{ maxWidth: 'fit-content' }}>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 w-full px-2">
                                 {[
                                     'Geography', 'Psychology', 'Music', 'Business', 'Sociology', 'Environment',
                                     'Mathematics', 'History', 'Literature', 'Sports', 'Science', 'Culture & Anthropology',
