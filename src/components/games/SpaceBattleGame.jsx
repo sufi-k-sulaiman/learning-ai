@@ -56,8 +56,23 @@ export default function SpaceBattleGame({ onExit }) {
     ];
 
     useEffect(() => {
-        generateAllTopics();
+        // Only load the first tab initially
+        loadTabTopics('trending');
     }, []);
+
+    const loadTabTopics = async (tabId) => {
+        if (generatedTopics[tabId]?.length) return; // Already loaded
+        setLoadingTopics(true);
+        setCurrentLoadingTab(TABS.find(t => t.id === tabId)?.label || tabId);
+        const topics = await generateTopicsForTab(tabId);
+        setGeneratedTopics(prev => ({ ...prev, [tabId]: topics }));
+        setLoadingTopics(false);
+    };
+
+    const handleTabClick = (tabId) => {
+        setActiveCategory(tabId);
+        loadTabTopics(tabId);
+    };
 
     const generateTopicsForTab = async (tabId) => {
         const prompts = {
@@ -101,20 +116,7 @@ export default function SpaceBattleGame({ onExit }) {
         }
     };
 
-    const generateAllTopics = async () => {
-        setLoadingTopics(true);
-        setLoadingProgress(0);
-        
-        for (let i = 0; i < TABS.length; i++) {
-            const tab = TABS[i];
-            setCurrentLoadingTab(tab.label);
-            const topics = await generateTopicsForTab(tab.id);
-            setGeneratedTopics(prev => ({ ...prev, [tab.id]: topics }));
-            setLoadingProgress(((i + 1) / TABS.length) * 100);
-        }
-        
-        setLoadingTopics(false);
-    };
+
 
     const startGame = async (topic) => {
         if (topic === 'custom') {
@@ -1288,7 +1290,7 @@ export default function SpaceBattleGame({ onExit }) {
                     {/* Category tabs */}
                     <div className="flex flex-wrap gap-2 mb-4">
                         {TABS.map(tab => (
-                            <Button key={tab.id} onClick={() => setActiveCategory(tab.id)}
+                            <Button key={tab.id} onClick={() => handleTabClick(tab.id)}
                                 className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
                                     activeCategory === tab.id 
                                         ? 'bg-emerald-500 text-white' 

@@ -38,8 +38,18 @@ export default function WordShooter({ onExit }) {
   ];
 
   useEffect(() => {
-    generateAllTopics();
+    // Only load the first tab initially
+    loadTabTopics('trending');
   }, []);
+
+  const loadTabTopics = async (tabId) => {
+    if (generatedTopics[tabId]?.length) return; // Already loaded
+    setLoadingTopics(true);
+    setCurrentLoadingTab(TABS.find(t => t.id === tabId)?.label || tabId);
+    const topics = await generateTopicsForTab(tabId);
+    setGeneratedTopics(prev => ({ ...prev, [tabId]: topics }));
+    setLoadingTopics(false);
+  };
 
   const generateTopicsForTab = async (tabId) => {
     const prompts = {
@@ -83,19 +93,9 @@ export default function WordShooter({ onExit }) {
     }
   };
 
-  const generateAllTopics = async () => {
-    setLoadingTopics(true);
-    setLoadingProgress(0);
-    
-    for (let i = 0; i < TABS.length; i++) {
-      const tab = TABS[i];
-      setCurrentLoadingTab(tab.label);
-      const topics = await generateTopicsForTab(tab.id);
-      setGeneratedTopics(prev => ({ ...prev, [tab.id]: topics }));
-      setLoadingProgress(((i + 1) / TABS.length) * 100);
-    }
-    
-    setLoadingTopics(false);
+  const handleTabClick = (tabId) => {
+    setActiveTab(tabId);
+    loadTabTopics(tabId);
   };
 
   const generateSubLevels = async (topic) => {
@@ -605,7 +605,7 @@ export default function WordShooter({ onExit }) {
         <div className="bg-white rounded-xl border border-gray-200 p-4 mb-4 shadow-sm">
           <div className="flex flex-wrap gap-2 mb-4">
             {TABS.map(tab => (
-              <Button key={tab.id} onClick={() => setActiveTab(tab.id)}
+              <Button key={tab.id} onClick={() => handleTabClick(tab.id)}
                 className={`px-3 py-1.5 rounded-full text-xs font-medium ${activeTab === tab.id ? `bg-gradient-to-r ${tab.color} text-white` : 'bg-gray-200 hover:bg-gray-300 text-gray-700'}`}>
                 {tab.label}
               </Button>

@@ -509,7 +509,7 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
             const response = await base44.functions.invoke('elevenlabsTTS', { 
                 text: fullScript,
                 voice_id: 'EXAVITQu4vr4xnSDxMaL' // Sarah voice
-            });
+            }, { responseType: 'arraybuffer' });
             
             // Response is raw audio buffer
             if (response.data) {
@@ -525,6 +525,28 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
             }
         } catch (err) {
             console.error('MP3 download error:', err);
+            // Fallback: try with fetch directly
+            try {
+                const fullScript = sentencesRef.current.join(' ');
+                const resp = await fetch('/api/functions/elevenlabsTTS', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: fullScript, voice_id: 'EXAVITQu4vr4xnSDxMaL' })
+                });
+                if (resp.ok) {
+                    const blob = await resp.blob();
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${currentEpisode.title.replace(/[^a-z0-9]/gi, '_')}.mp3`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }
+            } catch (fallbackErr) {
+                console.error('Fallback MP3 download also failed:', fallbackErr);
+            }
         } finally {
             setIsDownloadingMp3(false);
         }
