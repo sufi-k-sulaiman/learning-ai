@@ -160,11 +160,13 @@ DO NOT give generic environmental rankings. Be SPECIFIC to ${categoryNames}.`,
         }
     };
 
+    const categoryNames = selectedCategories.map(c => CATEGORY_LABELS[c] || c).join(', ');
+
     if (loading) {
         return (
             <div className="flex items-center justify-center py-12 my-6 bg-gray-50 rounded-xl border border-gray-200">
                 <Loader2 className="w-6 h-6 text-purple-600 animate-spin mr-3" />
-                <span className="text-gray-600">Analyzing country performance...</span>
+                <span className="text-gray-600">Analyzing {categoryNames} performance...</span>
             </div>
         );
     }
@@ -174,6 +176,9 @@ DO NOT give generic environmental rankings. Be SPECIFIC to ${categoryNames}.`,
             <div className="flex items-center justify-center py-12 my-6 bg-red-50 rounded-xl border border-red-200">
                 <AlertTriangle className="w-5 h-5 text-red-500 mr-2" />
                 <span className="text-red-600">{error}</span>
+                <Button variant="outline" size="sm" className="ml-3" onClick={fetchCountryData}>
+                    <RefreshCw className="w-4 h-4 mr-1" /> Retry
+                </Button>
             </div>
         );
     }
@@ -183,7 +188,17 @@ DO NOT give generic environmental rankings. Be SPECIFIC to ${categoryNames}.`,
     }
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-6">
+        <div className="my-6">
+            <div className="flex items-center justify-between mb-4">
+                <div>
+                    <h3 className="font-semibold text-gray-900">Country Comparison: {categoryNames}</h3>
+                    <p className="text-sm text-gray-500">Rankings based on category-specific metrics</p>
+                </div>
+                <Button variant="outline" size="sm" onClick={fetchCountryData} disabled={loading}>
+                    <RefreshCw className={`w-4 h-4 mr-1 ${loading ? 'animate-spin' : ''}`} /> Refresh
+                </Button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Top Performers */}
             <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl border border-emerald-200 p-5">
                 <div className="flex items-center gap-2 mb-4">
@@ -192,7 +207,7 @@ DO NOT give generic environmental rankings. Be SPECIFIC to ${categoryNames}.`,
                     </div>
                     <div>
                         <h3 className="font-semibold text-gray-900">Top Performers</h3>
-                        <p className="text-xs text-gray-500">Leading in environmental metrics</p>
+                        <p className="text-xs text-gray-500">Leading in {categoryNames}</p>
                     </div>
                 </div>
                 <div className="space-y-3">
