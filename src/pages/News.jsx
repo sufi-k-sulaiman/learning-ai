@@ -159,30 +159,28 @@ const NewsGrid = ({ news }) => {
     );
 };
 
-const getDomainFromUrl = (url) => {
-    try {
-        const hostname = new URL(url).hostname.replace('www.', '');
-        return hostname;
-    } catch {
-        return 'news';
-    }
-};
-
-const getFaviconUrl = (url) => {
-    try {
-        const hostname = new URL(url).hostname;
-        return `https://www.google.com/s2/favicons?domain=${hostname}&sz=32`;
-    } catch {
-        return null;
-    }
-};
-
 const NewsCardSimple = ({ article, index }) => {
     const [imageUrl, setImageUrl] = useState(null);
     const [imageLoading, setImageLoading] = useState(true);
     
-    const domain = getDomainFromUrl(article.url);
-    const faviconUrl = getFaviconUrl(article.url);
+    const getDomain = (url) => {
+        try {
+            return new URL(url).hostname.replace('www.', '');
+        } catch {
+            return 'news';
+        }
+    };
+    
+    const getFavicon = (url) => {
+        try {
+            return `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}&sz=32`;
+        } catch {
+            return null;
+        }
+    };
+    
+    const domain = getDomain(article.url);
+    const faviconUrl = getFavicon(article.url);
 
     useEffect(() => {
         const generateImage = async () => {
