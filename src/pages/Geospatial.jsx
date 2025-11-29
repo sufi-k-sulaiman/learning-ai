@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { base44 } from '@/api/base44Client';
 import GeospatialMap from '@/components/geospatial/GeospatialMap';
+import CountryComparison from '@/components/geospatial/CountryComparison';
+import MapModal from '@/components/geospatial/MapModal';
 
 const USE_CASES = [
     { id: 'carbon', name: 'Carbon & Climate', icon: Cloud, color: '#EF4444', description: 'Carbon emissions, climate tracking, net zero' },
@@ -33,6 +35,7 @@ export default function Geospatial() {
     const [searchQuery, setSearchQuery] = useState('');
     const [activeTab, setActiveTab] = useState('explore');
     const [loading, setLoading] = useState(false);
+    const [modalMap, setModalMap] = useState(null);
 
     const selectedUseCases = USE_CASES.filter(u => activeUseCases.includes(u.id));
     const currentUseCase = selectedUseCases[0] || USE_CASES[0];
@@ -214,9 +217,15 @@ export default function Geospatial() {
                     />
                 </div>
 
+                {/* Country Comparison */}
+                <CountryComparison selectedCategories={activeUseCases} />
+
                 {/* Secondary Maps Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                    <div 
+                        className="bg-white rounded-xl border border-gray-200 overflow-hidden cursor-pointer hover:shadow-lg hover:border-red-300 transition-all"
+                        onClick={() => setModalMap({ title: 'Carbon Hotspots', icon: Cloud, color: '#EF4444', useCase: 'carbon', mapType: 'heatmap' })}
+                    >
                         <div className="p-3 border-b border-gray-100 flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <Cloud className="w-4 h-4 text-red-600" />
@@ -233,7 +242,10 @@ export default function Geospatial() {
                         />
                     </div>
 
-                    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                    <div 
+                        className="bg-white rounded-xl border border-gray-200 overflow-hidden cursor-pointer hover:shadow-lg hover:border-emerald-300 transition-all"
+                        onClick={() => setModalMap({ title: 'Forest Coverage', icon: TreePine, color: '#22C55E', useCase: 'forests', mapType: 'satellite' })}
+                    >
                         <div className="p-3 border-b border-gray-100 flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <TreePine className="w-4 h-4 text-emerald-600" />
@@ -250,7 +262,10 @@ export default function Geospatial() {
                         />
                     </div>
 
-                    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                    <div 
+                        className="bg-white rounded-xl border border-gray-200 overflow-hidden cursor-pointer hover:shadow-lg hover:border-orange-300 transition-all"
+                        onClick={() => setModalMap({ title: 'Natural Resources', icon: Mountain, color: '#F97316', useCase: 'resources', mapType: 'terrain' })}
+                    >
                         <div className="p-3 border-b border-gray-100 flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <Mountain className="w-4 h-4 text-orange-600" />
@@ -268,6 +283,19 @@ export default function Geospatial() {
                     </div>
                 </div>
             </div>
+
+            {/* Map Modal */}
+            {modalMap && (
+                <MapModal
+                    isOpen={!!modalMap}
+                    onClose={() => setModalMap(null)}
+                    title={modalMap.title}
+                    icon={modalMap.icon}
+                    iconColor={modalMap.color}
+                    useCase={modalMap.useCase}
+                    mapType={modalMap.mapType}
+                />
+            )}
         </div>
     );
 }
