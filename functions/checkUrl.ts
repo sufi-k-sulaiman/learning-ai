@@ -2,16 +2,19 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
 
 // Common 404 page indicators in HTML content
 const NOT_FOUND_PATTERNS = [
-    /page\s*(not|was\s*not)\s*found/i,
-    /404\s*(error|not\s*found)?/i,
-    /does\s*n[o']t\s*exist/i,
-    /no\s*longer\s*(available|exists)/i,
-    /article\s*(not|was\s*not)\s*found/i,
-    /content\s*(not|is\s*not)\s*available/i,
     /<title>[^<]*404[^<]*<\/title>/i,
     /<title>[^<]*not\s*found[^<]*<\/title>/i,
+    /<title>[^<]*page\s*not\s*found[^<]*<\/title>/i,
     /class="[^"]*error-?404[^"]*"/i,
     /id="[^"]*404[^"]*"/i,
+];
+
+// Trusted news domains - always accept these with 200 status
+const TRUSTED_DOMAINS = [
+    'reuters.com', 'bbc.com', 'bbc.co.uk', 'apnews.com', 'npr.org',
+    'theguardian.com', 'cnn.com', 'cnbc.com', 'techcrunch.com',
+    'wired.com', 'arstechnica.com', 'news.google.com', 'nytimes.com',
+    'washingtonpost.com', 'wsj.com', 'bloomberg.com', 'forbes.com'
 ];
 
 Deno.serve(async (req) => {
@@ -28,6 +31,16 @@ Deno.serve(async (req) => {
         if (!url || !url.startsWith('http')) {
             return Response.json({ valid: false, reason: 'Invalid URL format' });
         }
+
+        // Check if it's a Google News search URL - always valid
+        if (url.includes('news.google.com/search')) {
+            return Response.json({ valid: true, status: 200, reason: 'Google News search' });
+        }
+
+        // Check if domain is trusted
+        const urlObj = new URL(url);
+        const hostname = urlObj.hostname.replace('www.', '');
+        const isTrustedDomain = TRUSTED_DOMAINS.some(domain => hostname.includes(domain));
 
         try {
             // First try HEAD to check status code
@@ -60,7 +73,12 @@ Deno.serve(async (req) => {
                 return Response.json({ valid: false, status: getResponse.status, reason: 'HTTP error status' });
             }
 
-            // Check content for soft 404 patterns
+            // For trusted domains with 200 status, do minimal checking
+            if (isTrustedDomain) {
+                return Response.json({ valid: true, status: getResponse.status, reason: 'Trusted domain' });
+            }
+
+            // Check content for soft 404 patterns only for non-trusted domains
             const contentType = getResponse.headers.get('content-type') || '';
             if (contentType.includes('text/html')) {
                 const html = await getResponse.text();
@@ -70,11 +88,6 @@ Deno.serve(async (req) => {
                     if (pattern.test(html)) {
                         return Response.json({ valid: false, status: 200, reason: 'Soft 404 detected' });
                     }
-                }
-                
-                // Check if HTML is suspiciously short (might be an error page)
-                if (html.length < 500) {
-                    return Response.json({ valid: false, status: 200, reason: 'Page content too short' });
                 }
             }
 
