@@ -708,7 +708,7 @@ export default function MindMapPage() {
                                 Search for any topic to generate an interactive knowledge tree. Click Explore to dive deeper or Learn for detailed insights.
                             </p>
 
-                            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-9 gap-2 w-full justify-items-center mx-auto" style={{ maxWidth: 'fit-content' }}
+                            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-9 gap-2 w-full justify-items-center mx-auto" style={{ maxWidth: 'fit-content' }}>
                                 {[
                                     'Geography', 'Psychology', 'Music', 'Business', 'Sociology', 'Environment',
                                     'Mathematics', 'History', 'Literature', 'Sports', 'Science', 'Culture & Anthropology',
