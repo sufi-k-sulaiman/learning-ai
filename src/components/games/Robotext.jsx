@@ -363,13 +363,11 @@ export default function Robotext({ onBack }) {
             if (!robot.shieldActive && 
                 robot.x < e.x + e.width && robot.x + robot.width > e.x &&
                 robot.y < e.y + e.height && robot.y + robot.height > e.y) {
-                setLives(prev => {
-                    if (prev <= 1) {
-                        setGameStatus('gameover');
-                        return 0;
-                    }
-                    return prev - 1;
-                });
+                livesRef.current -= 1;
+                setLives(livesRef.current);
+                if (livesRef.current <= 0) {
+                    setGameStatus('gameover');
+                }
                 robot.x = 100;
                 robot.y = canvas.height - 100;
                 return false;
