@@ -140,6 +140,14 @@ const NewsGrid = ({ news }) => {
     // RSS feeds provide real URLs - no validation needed
     const articles = news.slice(0, ARTICLES_PER_CATEGORY);
 
+    // Start batch image generation when articles load
+    useEffect(() => {
+        if (articles.length > 0) {
+            imageCache.clear();
+            generateImageBatch(articles);
+        }
+    }, [news]);
+
     if (articles.length === 0) {
         return (
             <div className="text-center py-20 bg-white rounded-2xl border border-gray-200">
