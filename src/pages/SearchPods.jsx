@@ -959,9 +959,14 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
                         </div>
 
                         {/* Controls */}
-                        <div className="flex items-center justify-center gap-6">
-                            <button className="text-gray-400 hover:text-gray-600 p-2">
-                                <SkipBack className="w-6 h-6" />
+                        <div className="flex items-center justify-center gap-4">
+                            <button 
+                                onClick={skipBackward}
+                                disabled={isGenerating}
+                                className="text-gray-400 hover:text-gray-600 p-2 flex flex-col items-center disabled:opacity-50"
+                            >
+                                <RotateCcw className="w-6 h-6" />
+                                <span className="text-xs mt-0.5">15s</span>
                             </button>
                             <button
                                 onClick={togglePlay}
@@ -974,8 +979,22 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
                                     <Play className="w-7 h-7 ml-1" fill="currentColor" />
                                 )}
                             </button>
-                            <button className="text-gray-400 hover:text-gray-600 p-2">
-                                <SkipForward className="w-6 h-6" />
+                            <button 
+                                onClick={loadRecommendations}
+                                disabled={isGenerating}
+                                className="text-gray-400 hover:text-purple-600 p-2 flex flex-col items-center disabled:opacity-50"
+                                title="Recommended Pods"
+                            >
+                                <ListMusic className="w-6 h-6" />
+                                <span className="text-xs mt-0.5">More</span>
+                            </button>
+                            <button 
+                                onClick={skipForward}
+                                disabled={isGenerating}
+                                className="text-gray-400 hover:text-gray-600 p-2 flex flex-col items-center disabled:opacity-50"
+                            >
+                                <RotateCw className="w-6 h-6" />
+                                <span className="text-xs mt-0.5">30s</span>
                             </button>
                         </div>
 
