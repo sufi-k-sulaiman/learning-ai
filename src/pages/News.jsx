@@ -365,38 +365,30 @@ export default function News() {
     const [error, setError] = useState(null);
     const [lastUpdated, setLastUpdated] = useState(null);
 
-    const fetchNews = async (keyword, refresh = false) => {
+    const fetchNews = async (keyword) => {
         setLoading(true);
         setError(null);
         try {
-            // Use backend function - fetches from cache or NewsAPI
+            // Use backend function with RSS + NewsAPI
             const response = await base44.functions.invoke('fetchNews', {
                 query: keyword,
                 category: CATEGORIES.find(c => c.id === keyword)?.id || null,
-                limit: 30,
-                refresh: refresh
+                limit: 30
             });
 
-            console.log('News response:', response);
-
-            // Handle both response.data and direct response
-            const data = response.data || response;
-
-            // Check if backend returned an error
-            if (data?.success === false) {
-                console.error('Backend error:', data?.error);
-                setError(null); // Don't show error, just show empty state
-                setNews([]);
-                setLastUpdated(new Date());
-                return;
-            }
-
-            const articles = data?.articles || [];
-            setNews(articles);
+            setNews(response.data?.articles || []);
             setLastUpdated(new Date());
         } catch (err) {
-            console.error('Error fetching news:', err, err?.response);
-            setError('E200');
+            console.error('Error fetching news:', err);
+            // Check if it's actually an AI error or a network/backend error
+            const errorMessage = err?.message?.toLowerCase() || '';
+            if (errorMessage.includes('network') || errorMessage.includes('fetch') || errorMessage.includes('timeout')) {
+                setError('E100'); // Network error
+            } else if (err?.response?.status === 401) {
+                setError('E400'); // Auth error
+            } else {
+                setError('E200'); // Data load failed (more accurate for backend function errors)
+            }
             setNews([]);
         } finally {
             setLoading(false);
@@ -507,32 +499,11 @@ export default function News() {
                 {!expandedCategory && <div className="mb-4" />}
 
                 {/* Refresh Button */}
-                <div className="flex justify-end gap-2 mb-4">
+                <div className="flex justify-end mb-4">
                     <Button
                         variant="outline"
                         size="sm"
-                        onClick={async () => {
-                            setLoading(true);
-                            try {
-                                const response = await base44.functions.invoke('fetchNews', { populateAll: true });
-                                console.log('Populate all result:', response.data);
-                                alert(`Populated ${response.data?.results?.success?.length || 0} topics!`);
-                                fetchNews(activeCategory);
-                            } catch (err) {
-                                console.error('Populate error:', err);
-                                alert('Failed to populate: ' + err.message);
-                            }
-                            setLoading(false);
-                        }}
-                        disabled={loading}
-                        className="gap-2 bg-green-50 hover:bg-green-100 text-green-700 border-green-200"
-                    >
-                        Populate All Topics (Dev)
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => fetchNews(searchQuery || activeCategory, true)}
+                        onClick={() => fetchNews(searchQuery || activeCategory)}
                         disabled={loading}
                         className="gap-2"
                     >

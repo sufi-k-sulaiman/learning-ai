@@ -1,18 +1,166 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
 
-const NEWSAPI_KEY = Deno.env.get('NEWSAPI_KEY');
+// RSS Feed Sources
+const RSS_SOURCES = {
+    google: (query) => `https://news.google.com/rss/search?q=${encodeURIComponent(query)}&hl=en-US&gl=US&ceid=US:en`,
+    google_top: 'https://news.google.com/rss?hl=en-US&gl=US&ceid=US:en',
+    bbc_world: 'http://feeds.bbci.co.uk/news/world/rss.xml',
+    bbc_tech: 'http://feeds.bbci.co.uk/news/technology/rss.xml',
+    bbc_business: 'http://feeds.bbci.co.uk/news/business/rss.xml',
+    bbc_science: 'http://feeds.bbci.co.uk/news/science_and_environment/rss.xml',
+    npr: 'https://feeds.npr.org/1001/rss.xml',
+    reuters_world: 'https://www.rss.reuters.com/news/worldNews',
+    cnn_top: 'http://rss.cnn.com/rss/edition.rss',
+    nyt_world: 'https://rss.nytimes.com/services/xml/rss/nyt/World.xml',
+    guardian_world: 'https://www.theguardian.com/world/rss',
+    techcrunch: 'https://techcrunch.com/feed/',
+    wired: 'https://www.wired.com/feed/rss',
+    ars: 'https://feeds.arstechnica.com/arstechnica/index',
+};
 
-// All categories and subtopics to fetch
-const ALL_TOPICS = [
-    'technology', 'AI', 'Startups', 'Gadgets', 'Cybersecurity', 'Software', 'Cloud Computing', 'Blockchain', 'Robotics', '5G Networks', 'IoT',
-    'business', 'Stocks', 'Economy', 'Crypto', 'Real Estate', 'Finance', 'Mergers', 'IPOs', 'Venture Capital', 'Banking', 'Commodities',
-    'science', 'Space', 'Physics', 'Biology', 'Climate', 'Research', 'Astronomy', 'Genetics', 'Archaeology', 'Chemistry', 'Quantum',
-    'health', 'Medicine', 'Wellness', 'Mental Health', 'Nutrition', 'Fitness', 'Vaccines', 'Aging', 'Sleep', 'Diseases', 'Healthcare Policy',
-    'politics', 'Elections', 'Policy', 'Congress', 'International', 'Law', 'Supreme Court', 'Diplomacy', 'Defense', 'Immigration', 'Trade',
-    'sports', 'Football', 'Basketball', 'Soccer', 'Tennis', 'Olympics', 'Baseball', 'Golf', 'MMA', 'Formula 1', 'Cricket',
-    'entertainment', 'Movies', 'Music', 'TV Shows', 'Celebrities', 'Gaming', 'Streaming', 'Broadway', 'Awards', 'Podcasts', 'Anime',
-    'world', 'Europe', 'Asia', 'Americas', 'Africa', 'Middle East', 'Australia', 'Russia', 'India', 'China', 'Latin America'
-];
+// Category to RSS mapping
+const CATEGORY_FEEDS = {
+    technology: ['bbc_tech', 'techcrunch', 'wired', 'ars'],
+    business: ['bbc_business'],
+    science: ['bbc_science'],
+    world: ['bbc_world', 'guardian_world', 'nyt_world'],
+    general: ['google_top', 'npr', 'cnn_top'],
+};
+
+// Parse RSS XML
+async function parseRSS(xml, source) {
+    const articles = [];
+    const itemRegex = /<item>([\s\S]*?)<\/item>/gi;
+    let match;
+    const items = [];
+    
+    while ((match = itemRegex.exec(xml)) !== null) {
+        items.push(match[1]);
+    }
+    
+    // Process items and resolve Google News URLs in parallel
+    const promises = items.slice(0, 30).map(async (item) => {
+        const title = extractTag(item, 'title');
+        let link = extractTag(item, 'link') || extractGoogleLink(item);
+        const pubDate = extractTag(item, 'pubDate');
+        const description = extractTag(item, 'description');
+        
+        if (title && link) {
+            // Resolve Google News redirect URLs to actual article URLs
+            const resolvedUrl = await resolveGoogleNewsUrl(cleanUrl(link));
+            const cleanedTitle = cleanText(title);
+            let cleanedSummary = cleanText(description || '');
+            
+            // If summary is empty or too short, generate one from title
+            if (!cleanedSummary || cleanedSummary.length < 20) {
+                cleanedSummary = generateSummaryFromTitle(cleanedTitle);
+            }
+            
+            return {
+                title: cleanedTitle,
+                url: resolvedUrl,
+                source: extractSourceFromUrl(resolvedUrl) || source,
+                summary: cleanedSummary.slice(0, 300),
+                time: formatTime(pubDate),
+                imagePrompt: generateImagePrompt(title),
+            };
+        }
+        return null;
+    });
+    
+    const results = await Promise.all(promises);
+    return results.filter(Boolean);
+}
+
+function extractTag(xml, tag) {
+    const cdataMatch = xml.match(new RegExp(`<${tag}><!\\[CDATA\\[([\\s\\S]*?)\\]\\]></${tag}>`, 'i'));
+    if (cdataMatch) return cdataMatch[1];
+    
+    const simpleMatch = xml.match(new RegExp(`<${tag}>([\\s\\S]*?)</${tag}>`, 'i'));
+    return simpleMatch ? simpleMatch[1] : null;
+}
+
+function extractGoogleLink(item) {
+    // Google News wraps links in CDATA or uses guid
+    const guidMatch = item.match(/<guid[^>]*>([^<]+)<\/guid>/i);
+    if (guidMatch && guidMatch[1].startsWith('http')) return guidMatch[1];
+    
+    const linkMatch = item.match(/<link>([^<]+)<\/link>/i);
+    return linkMatch ? linkMatch[1] : null;
+}
+
+function cleanText(text) {
+    if (!text) return '';
+    return text
+        // Remove all HTML tags including anchor tags with href
+        .replace(/<a[^>]*>.*?<\/a>/gi, '')
+        .replace(/<[^>]*>/g, '')
+        // Decode HTML entities
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&amp;/g, '&')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/&nbsp;/g, ' ')
+        // Remove any remaining URLs
+        .replace(/https?:\/\/[^\s]+/g, '')
+        // Clean up whitespace
+        .replace(/\s+/g, ' ')
+        .trim();
+}
+
+function generateSummaryFromTitle(title) {
+    // Generate a brief description based on the title when RSS description is empty/poor
+    const cleanTitle = cleanText(title);
+    return `Read the full story about: ${cleanTitle}`;
+}
+
+async function resolveGoogleNewsUrl(url) {
+    // Google News URLs are redirects - follow them to get real URL
+    if (url.includes('news.google.com')) {
+        try {
+            const response = await fetch(url, {
+                method: 'HEAD',
+                redirect: 'follow',
+                headers: {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                },
+            });
+            return response.url || url;
+        } catch {
+            return url;
+        }
+    }
+    return url;
+}
+
+function cleanUrl(url) {
+    return url.trim();
+}
+
+function extractSourceFromUrl(url) {
+    try {
+        const hostname = new URL(url).hostname.replace('www.', '');
+        const sources = {
+            'bbc.com': 'BBC', 'bbc.co.uk': 'BBC',
+            'cnn.com': 'CNN',
+            'reuters.com': 'Reuters',
+            'nytimes.com': 'NY Times',
+            'theguardian.com': 'The Guardian',
+            'npr.org': 'NPR',
+            'techcrunch.com': 'TechCrunch',
+            'wired.com': 'Wired',
+            'arstechnica.com': 'Ars Technica',
+            'news.google.com': 'Google News',
+        };
+        for (const [domain, name] of Object.entries(sources)) {
+            if (hostname.includes(domain)) return name;
+        }
+        return hostname.split('.')[0].charAt(0).toUpperCase() + hostname.split('.')[0].slice(1);
+    } catch {
+        return 'News';
+    }
+}
 
 function formatTime(dateStr) {
     if (!dateStr) return 'Recently';
@@ -28,189 +176,190 @@ function formatTime(dateStr) {
         if (diffHours < 24) return `${diffHours}h ago`;
         if (diffDays < 7) return `${diffDays}d ago`;
         return date.toLocaleDateString();
-    } catch (e) {
+    } catch {
         return 'Recently';
     }
 }
 
-async function fetchFromNewsAPI(searchTerm, limit) {
-    const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(searchTerm)}&sortBy=publishedAt&pageSize=${limit}&language=en&apiKey=${NEWSAPI_KEY}`;
-    const response = await fetch(url);
-    const data = await response.json();
-    
-    if (data.status !== 'ok' || !data.articles) {
+function generateImagePrompt(title) {
+    // Generate a lifestyle/professional image prompt based on title keywords
+    const keywords = title.toLowerCase();
+    if (keywords.includes('tech') || keywords.includes('ai') || keywords.includes('robot')) {
+        return 'Modern technology office, clean workspace, soft lighting, minimalist';
+    }
+    if (keywords.includes('climate') || keywords.includes('environment')) {
+        return 'Nature landscape, green forests, blue sky, environmental photography';
+    }
+    if (keywords.includes('business') || keywords.includes('economy') || keywords.includes('market')) {
+        return 'Modern business district, city skyline, professional atmosphere';
+    }
+    if (keywords.includes('health') || keywords.includes('medical')) {
+        return 'Healthcare setting, clean medical environment, wellness concept';
+    }
+    if (keywords.includes('space') || keywords.includes('nasa')) {
+        return 'Space exploration, stars, cosmic imagery, astronomy';
+    }
+    return 'Professional news photography, neutral tones, journalistic style';
+}
+
+// Fetch from RSS
+async function fetchRSS(feedKey, query = null) {
+    try {
+        let url = RSS_SOURCES[feedKey];
+        if (typeof url === 'function') {
+            url = url(query || 'news');
+        }
+        
+        const response = await fetch(url, {
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                'Accept': 'application/rss+xml, application/xml, text/xml, */*',
+            },
+        });
+        
+        if (!response.ok) return [];
+        
+        const xml = await response.text();
+        return await parseRSS(xml, feedKey);
+    } catch (error) {
+        console.error(`RSS fetch failed for ${feedKey}:`, error.message);
         return [];
     }
+}
+
+// Fetch from NewsAPI
+async function fetchNewsAPI(query, category = null) {
+    const apiKey = Deno.env.get('NEWSAPI_KEY');
+    if (!apiKey) return [];
     
-    return data.articles
-        .filter(a => a.title && a.title !== '[Removed]')
-        .map(a => ({
-            title: a.title,
-            source: a.source?.name || 'News',
-            summary: a.description || '',
-            url: a.url || '',
-            published_at: a.publishedAt
+    try {
+        let url = 'https://newsapi.org/v2/';
+        
+        if (query) {
+            url += `everything?q=${encodeURIComponent(query)}&sortBy=publishedAt&pageSize=20`;
+        } else if (category) {
+            url += `top-headlines?category=${category}&country=us&pageSize=20`;
+        } else {
+            url += 'top-headlines?country=us&pageSize=20';
+        }
+        
+        const response = await fetch(url, {
+            headers: { 'X-Api-Key': apiKey },
+        });
+        
+        if (!response.ok) return [];
+        
+        const data = await response.json();
+        
+        return (data.articles || []).map(art => ({
+            title: art.title || 'No title',
+            url: art.url,
+            source: art.source?.name || 'NewsAPI',
+            summary: art.description || '',
+            time: formatTime(art.publishedAt),
+            imagePrompt: generateImagePrompt(art.title || ''),
+            imageUrl: art.urlToImage, // NewsAPI sometimes has images
         }));
+    } catch (error) {
+        console.error('NewsAPI fetch failed:', error.message);
+        return [];
+    }
+}
+
+// Fetch from external scraper (if configured)
+async function fetchExternalScraper(query, scraperUrl) {
+    if (!scraperUrl) return [];
+    
+    try {
+        const response = await fetch(scraperUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query, count: 20 }),
+        });
+        
+        if (!response.ok) return [];
+        
+        const data = await response.json();
+        return data.articles || [];
+    } catch (error) {
+        console.error('External scraper failed:', error.message);
+        return [];
+    }
+}
+
+// Deduplicate articles by URL and title similarity
+function deduplicateArticles(articles) {
+    const seen = new Set();
+    const unique = [];
+    
+    for (const art of articles) {
+        const key = art.url || art.title.toLowerCase().slice(0, 50);
+        if (!seen.has(key) && art.title && art.url) {
+            seen.add(key);
+            unique.push(art);
+        }
+    }
+    
+    return unique;
 }
 
 Deno.serve(async (req) => {
-    const base44 = createClientFromRequest(req);
-    
     try {
+        const base44 = createClientFromRequest(req);
         const user = await base44.auth.me();
+        
         if (!user) {
-            return Response.json({ error: 'Unauthorized', articles: [] }, { status: 401 });
+            return Response.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        let body = {};
-        try {
-            body = await req.json();
-        } catch (e) {}
+        const { query, category, limit = 30, scraperUrl } = await req.json();
         
-        const { query, category, limit = 15, refresh = false, populateAll = false } = body;
-        const searchTerm = query || category || 'technology';
+        const allArticles = [];
+        const fetchPromises = [];
         
-        // POPULATE ALL TOPICS (dev mode - run once to fill DB)
-        if (populateAll && NEWSAPI_KEY) {
-            const results = { success: [], failed: [] };
-            
-            for (const topic of ALL_TOPICS) {
-                try {
-                    // Small delay to avoid rate limiting
-                    await new Promise(r => setTimeout(r, 1000));
-                    
-                    const articles = await fetchFromNewsAPI(topic, 12);
-                    
-                    if (articles.length > 0) {
-                        // Delete old articles for this topic
-                        const oldArticles = await base44.asServiceRole.entities.NewsArticle.filter({ category: topic });
-                        for (const old of oldArticles) {
-                            await base44.asServiceRole.entities.NewsArticle.delete(old.id);
-                        }
-                        
-                        // Save new articles
-                        for (const article of articles) {
-                            await base44.asServiceRole.entities.NewsArticle.create({
-                                title: article.title,
-                                source: article.source,
-                                summary: article.summary,
-                                url: article.url,
-                                category: topic,
-                                published_at: article.published_at
-                            });
-                        }
-                        results.success.push({ topic, count: articles.length });
-                    } else {
-                        results.failed.push({ topic, reason: 'No articles' });
-                    }
-                } catch (err) {
-                    results.failed.push({ topic, reason: err.message });
-                }
+        // 1. RSS Feeds - always fetch these (free & reliable)
+        if (query) {
+            // Search query: use Google News RSS search
+            fetchPromises.push(fetchRSS('google', query));
+        } else if (category && CATEGORY_FEEDS[category]) {
+            // Category-specific feeds
+            for (const feedKey of CATEGORY_FEEDS[category]) {
+                fetchPromises.push(fetchRSS(feedKey));
             }
-            
-            return Response.json({
-                success: true,
-                message: 'Populated all topics',
-                results
-            });
+        } else {
+            // General: fetch from multiple sources
+            fetchPromises.push(fetchRSS('google_top'));
+            fetchPromises.push(fetchRSS('bbc_world'));
+            fetchPromises.push(fetchRSS('npr'));
         }
         
-        // First try NewsAPI directly
-        if (NEWSAPI_KEY) {
-            try {
-                const articles = await fetchFromNewsAPI(searchTerm, limit);
-                
-                if (articles.length > 0) {
-                    return Response.json({
-                        success: true,
-                        count: articles.length,
-                        articles: articles.map(a => ({ ...a, time: formatTime(a.published_at) })),
-                        cached: false
-                    });
-                }
-            } catch (apiError) {
-                console.log('NewsAPI failed:', apiError.message);
-            }
+        // 2. NewsAPI (if key exists)
+        fetchPromises.push(fetchNewsAPI(query, category));
+        
+        // 3. External Scraper (if URL provided)
+        if (scraperUrl) {
+            fetchPromises.push(fetchExternalScraper(query, scraperUrl));
         }
         
-        // Fallback: serve from database cache
-        try {
-            const cached = await base44.asServiceRole.entities.NewsArticle.filter(
-                { category: searchTerm },
-                '-created_date',
-                limit
-            );
-            
-            if (cached && cached.length > 0) {
-                const articles = cached.map(a => ({
-                    title: a.title,
-                    source: a.source || 'News',
-                    summary: a.summary || '',
-                    url: a.url || '',
-                    time: formatTime(a.published_at),
-                    image_url: a.image_url
-                }));
-                
-                return Response.json({
-                    success: true,
-                    count: articles.length,
-                    articles: articles,
-                    cached: true
-                });
-            }
-        } catch (cacheError) {
-            console.log('Cache check failed:', cacheError.message);
+        // Fetch all in parallel
+        const results = await Promise.all(fetchPromises);
+        
+        for (const articles of results) {
+            allArticles.push(...articles);
         }
         
-        // If refresh requested, try NewsAPI again to save to cache
-        if (refresh && NEWSAPI_KEY) {
-            const articles = await fetchFromNewsAPI(searchTerm, limit);
-            
-            if (articles.length > 0) {
-                // Delete old and save new
-                try {
-                    const oldArticles = await base44.asServiceRole.entities.NewsArticle.filter({ category: searchTerm });
-                    for (const old of oldArticles) {
-                        await base44.asServiceRole.entities.NewsArticle.delete(old.id);
-                    }
-                    
-                    for (const article of articles) {
-                        await base44.asServiceRole.entities.NewsArticle.create({
-                            title: article.title,
-                            source: article.source,
-                            summary: article.summary,
-                            url: article.url,
-                            category: searchTerm,
-                            published_at: article.published_at
-                        });
-                    }
-                } catch (saveError) {
-                    console.log('Failed to cache:', saveError.message);
-                }
-                
-                return Response.json({
-                    success: true,
-                    count: articles.length,
-                    articles: articles.map(a => ({ ...a, time: formatTime(a.published_at) })),
-                    cached: false
-                });
-            }
-        }
+        // Deduplicate and limit
+        const uniqueArticles = deduplicateArticles(allArticles).slice(0, limit);
         
-        // No cached content found
         return Response.json({
             success: true,
-            count: 0,
-            articles: [],
-            message: 'No cached articles. Use refresh=true in dev to populate.'
+            count: uniqueArticles.length,
+            query: query || null,
+            category: category || null,
+            articles: uniqueArticles,
         });
         
     } catch (error) {
-        console.error('fetchNews error:', error.message);
-        return Response.json({ 
-            success: false, 
-            error: error.message,
-            articles: [] 
-        });
+        return Response.json({ error: error.message }, { status: 500 });
     }
 });
