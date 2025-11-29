@@ -1,396 +1,361 @@
-import React, { useState } from 'react';
-import { 
-    Target, TrendingUp, Zap, BarChart3, Grid3X3, Globe2, 
-    Building2, CircleDot, ChevronRight, Plus, Minus, ArrowUp, ArrowDown
-} from 'lucide-react';
-import { Button } from "@/components/ui/button";
-import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, ScatterChart, Scatter, ZAxis } from 'recharts';
+import React, { useState, useEffect, useRef } from 'react';
+import { Loader2, Target, TrendingUp, Zap, BarChart3, Grid3X3, Globe, Building, CircleDot } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { base44 } from '@/api/base44Client';
 
 const FRAMEWORKS = [
-    { id: 'swot', name: 'SWOT', icon: Grid3X3, color: '#6366F1', description: 'Strengths, Weaknesses, Opportunities, Threats' },
-    { id: 'dmaic', name: 'DMAIC', icon: Target, color: '#10B981', description: 'Define, Measure, Analyze, Improve, Control' },
-    { id: 'ice', name: 'ICE', icon: Zap, color: '#F59E0B', description: 'Impact, Confidence, Ease scoring' },
-    { id: 'pareto', name: 'Pareto', icon: BarChart3, color: '#EF4444', description: '80/20 principle analysis' },
-    { id: 'ansoff', name: 'Ansoff', icon: Grid3X3, color: '#8B5CF6', description: 'Growth strategy matrix' },
-    { id: 'pestle', name: 'PESTLE', icon: Globe2, color: '#06B6D4', description: 'Political, Economic, Social, Tech, Legal, Environmental' },
-    { id: 'porter', name: 'Porter', icon: Building2, color: '#EC4899', description: "Five forces competitive analysis" },
-    { id: 'bcg', name: 'BCG', icon: CircleDot, color: '#22C55E', description: 'Growth-share matrix' },
+    { id: 'swot', name: 'SWOT', icon: Grid3X3 },
+    { id: 'dmaic', name: 'DMAIC', icon: Target },
+    { id: 'ice', name: 'ICE', icon: Zap },
+    { id: 'pareto', name: 'Pareto', icon: BarChart3 },
+    { id: 'ansoff', name: 'Ansoff', icon: TrendingUp },
+    { id: 'pestle', name: 'PESTLE', icon: Globe },
+    { id: 'porter', name: 'Porter', icon: Building },
+    { id: 'bcg', name: 'BCG', icon: CircleDot },
 ];
 
-const SWOTAnalysis = ({ domain }) => {
-    const data = {
-        strengths: ['Strong GDP growth', 'Skilled workforce', 'Tech innovation', 'Infrastructure'],
-        weaknesses: ['High debt levels', 'Aging population', 'Resource dependency', 'Bureaucracy'],
-        opportunities: ['Green energy', 'Digital transformation', 'Trade agreements', 'Tourism growth'],
-        threats: ['Inflation', 'Geopolitical tensions', 'Climate change', 'Competition']
-    };
-    
-    return (
-        <div className="grid grid-cols-2 gap-4">
-            <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-                <div className="flex items-center gap-2 mb-3">
-                    <Plus className="w-5 h-5 text-green-600" />
-                    <h4 className="font-semibold text-green-800">Strengths</h4>
-                </div>
-                <ul className="space-y-2">
-                    {data.strengths.map((item, i) => (
-                        <li key={i} className="text-sm text-green-700 flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                            {item}
-                        </li>
-                    ))}
-                </ul>
-            </div>
-            <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-                <div className="flex items-center gap-2 mb-3">
-                    <Minus className="w-5 h-5 text-red-600" />
-                    <h4 className="font-semibold text-red-800">Weaknesses</h4>
-                </div>
-                <ul className="space-y-2">
-                    {data.weaknesses.map((item, i) => (
-                        <li key={i} className="text-sm text-red-700 flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
-                            {item}
-                        </li>
-                    ))}
-                </ul>
-            </div>
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                <div className="flex items-center gap-2 mb-3">
-                    <ArrowUp className="w-5 h-5 text-blue-600" />
-                    <h4 className="font-semibold text-blue-800">Opportunities</h4>
-                </div>
-                <ul className="space-y-2">
-                    {data.opportunities.map((item, i) => (
-                        <li key={i} className="text-sm text-blue-700 flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                            {item}
-                        </li>
-                    ))}
-                </ul>
-            </div>
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-                <div className="flex items-center gap-2 mb-3">
-                    <ArrowDown className="w-5 h-5 text-amber-600" />
-                    <h4 className="font-semibold text-amber-800">Threats</h4>
-                </div>
-                <ul className="space-y-2">
-                    {data.threats.map((item, i) => (
-                        <li key={i} className="text-sm text-amber-700 flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                            {item}
-                        </li>
-                    ))}
-                </ul>
-            </div>
-        </div>
-    );
+const CATEGORY_LABELS = {
+    carbon: 'Carbon & Climate',
+    airwater: 'Air & Water Quality',
+    forests: 'Forests & Biodiversity',
+    resources: 'Natural Resources',
+    sustainability: 'Sustainability',
+    health: 'Environmental Health',
+    treasures: 'National Treasures & Protected Areas',
 };
 
-const DMAICAnalysis = () => {
-    const phases = [
-        { name: 'Define', score: 85, color: '#6366F1', desc: 'Problem clearly identified' },
-        { name: 'Measure', score: 72, color: '#8B5CF6', desc: 'Data collection in progress' },
-        { name: 'Analyze', score: 68, color: '#A855F7', desc: 'Root cause analysis' },
-        { name: 'Improve', score: 45, color: '#C084FC', desc: 'Solutions being implemented' },
-        { name: 'Control', score: 30, color: '#E879F9', desc: 'Monitoring systems needed' },
-    ];
-    
-    return (
-        <div className="space-y-4">
-            {phases.map((phase, i) => (
-                <div key={phase.name} className="flex items-center gap-4">
-                    <div className="w-20 text-sm font-medium text-gray-700">{phase.name}</div>
-                    <div className="flex-1 h-8 bg-gray-100 rounded-lg overflow-hidden relative">
-                        <div 
-                            className="h-full rounded-lg transition-all"
-                            style={{ width: `${phase.score}%`, backgroundColor: phase.color }}
-                        />
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium text-gray-600">
-                            {phase.score}%
-                        </span>
-                    </div>
-                    <div className="w-40 text-xs text-gray-500">{phase.desc}</div>
-                </div>
-            ))}
-        </div>
-    );
+const FRAMEWORK_PROMPTS = {
+    swot: (categories) => `Perform a SWOT analysis for global environmental efforts in: ${categories}. Provide Strengths, Weaknesses, Opportunities, and Threats with 3-4 bullet points each.`,
+    dmaic: (categories) => `Apply DMAIC framework to improving global ${categories} outcomes. For each phase (Define, Measure, Analyze, Improve, Control), provide 2-3 specific actionable points.`,
+    ice: (categories) => `Use the ICE scoring framework to prioritize environmental initiatives for ${categories}. List 5 initiatives with Impact (1-10), Confidence (1-10), and Ease (1-10) scores, plus brief reasoning.`,
+    pareto: (categories) => `Apply Pareto principle (80/20 rule) to ${categories}. Identify the 20% of actions that would yield 80% of environmental improvement results. List top 5 high-impact actions.`,
+    ansoff: (categories) => `Apply Ansoff Matrix to environmental strategy for ${categories}. Provide examples for each quadrant: Market Penetration, Market Development, Product Development, Diversification.`,
+    pestle: (categories) => `Conduct PESTLE analysis for ${categories} environmental sector. Analyze Political, Economic, Social, Technological, Legal, and Environmental factors with 2-3 points each.`,
+    porter: (categories) => `Apply Porter's Five Forces to the ${categories} environmental industry. Analyze: Competitive Rivalry, Supplier Power, Buyer Power, Threat of Substitution, Threat of New Entry.`,
+    bcg: (categories) => `Create BCG Matrix analysis for ${categories} environmental initiatives. Categorize current global efforts into Stars, Cash Cows, Question Marks, and Dogs with examples.`,
 };
 
-const ICEAnalysis = () => {
-    const initiatives = [
-        { name: 'Digital Infrastructure', impact: 9, confidence: 8, ease: 6, score: 72 },
-        { name: 'Healthcare Reform', impact: 10, confidence: 6, ease: 4, score: 40 },
-        { name: 'Education Tech', impact: 8, confidence: 9, ease: 7, score: 63 },
-        { name: 'Green Energy', impact: 9, confidence: 7, ease: 5, score: 45 },
-        { name: 'Trade Expansion', impact: 7, confidence: 8, ease: 8, score: 56 },
-    ].sort((a, b) => b.score - a.score);
-    
-    return (
-        <div className="overflow-x-auto">
-            <table className="w-full">
-                <thead className="bg-gray-50 text-xs text-gray-500 uppercase">
-                    <tr>
-                        <th className="px-4 py-3 text-left">Initiative</th>
-                        <th className="px-4 py-3 text-center">Impact</th>
-                        <th className="px-4 py-3 text-center">Confidence</th>
-                        <th className="px-4 py-3 text-center">Ease</th>
-                        <th className="px-4 py-3 text-center">ICE Score</th>
-                    </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                    {initiatives.map((item, i) => (
-                        <tr key={item.name} className="hover:bg-gray-50">
-                            <td className="px-4 py-3 font-medium text-gray-900">{item.name}</td>
-                            <td className="px-4 py-3 text-center">
-                                <span className="px-2 py-1 rounded bg-blue-100 text-blue-700 text-sm font-medium">{item.impact}</span>
-                            </td>
-                            <td className="px-4 py-3 text-center">
-                                <span className="px-2 py-1 rounded bg-green-100 text-green-700 text-sm font-medium">{item.confidence}</span>
-                            </td>
-                            <td className="px-4 py-3 text-center">
-                                <span className="px-2 py-1 rounded bg-amber-100 text-amber-700 text-sm font-medium">{item.ease}</span>
-                            </td>
-                            <td className="px-4 py-3 text-center">
-                                <span className={`px-3 py-1 rounded-full text-sm font-bold ${
-                                    item.score >= 60 ? 'bg-green-100 text-green-700' : 
-                                    item.score >= 40 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700'
-                                }`}>{item.score}</span>
-                            </td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
-    );
+const FRAMEWORK_SCHEMAS = {
+    swot: {
+        type: "object",
+        properties: {
+            strengths: { type: "array", items: { type: "string" } },
+            weaknesses: { type: "array", items: { type: "string" } },
+            opportunities: { type: "array", items: { type: "string" } },
+            threats: { type: "array", items: { type: "string" } }
+        }
+    },
+    dmaic: {
+        type: "object",
+        properties: {
+            define: { type: "array", items: { type: "string" } },
+            measure: { type: "array", items: { type: "string" } },
+            analyze: { type: "array", items: { type: "string" } },
+            improve: { type: "array", items: { type: "string" } },
+            control: { type: "array", items: { type: "string" } }
+        }
+    },
+    ice: {
+        type: "object",
+        properties: {
+            initiatives: {
+                type: "array",
+                items: {
+                    type: "object",
+                    properties: {
+                        name: { type: "string" },
+                        impact: { type: "number" },
+                        confidence: { type: "number" },
+                        ease: { type: "number" },
+                        reasoning: { type: "string" }
+                    }
+                }
+            }
+        }
+    },
+    pareto: {
+        type: "object",
+        properties: {
+            high_impact_actions: {
+                type: "array",
+                items: {
+                    type: "object",
+                    properties: {
+                        action: { type: "string" },
+                        impact_percentage: { type: "number" },
+                        description: { type: "string" }
+                    }
+                }
+            }
+        }
+    },
+    ansoff: {
+        type: "object",
+        properties: {
+            market_penetration: { type: "array", items: { type: "string" } },
+            market_development: { type: "array", items: { type: "string" } },
+            product_development: { type: "array", items: { type: "string" } },
+            diversification: { type: "array", items: { type: "string" } }
+        }
+    },
+    pestle: {
+        type: "object",
+        properties: {
+            political: { type: "array", items: { type: "string" } },
+            economic: { type: "array", items: { type: "string" } },
+            social: { type: "array", items: { type: "string" } },
+            technological: { type: "array", items: { type: "string" } },
+            legal: { type: "array", items: { type: "string" } },
+            environmental: { type: "array", items: { type: "string" } }
+        }
+    },
+    porter: {
+        type: "object",
+        properties: {
+            competitive_rivalry: { type: "string" },
+            supplier_power: { type: "string" },
+            buyer_power: { type: "string" },
+            threat_of_substitution: { type: "string" },
+            threat_of_new_entry: { type: "string" }
+        }
+    },
+    bcg: {
+        type: "object",
+        properties: {
+            stars: { type: "array", items: { type: "string" } },
+            cash_cows: { type: "array", items: { type: "string" } },
+            question_marks: { type: "array", items: { type: "string" } },
+            dogs: { type: "array", items: { type: "string" } }
+        }
+    },
 };
 
-const ParetoAnalysis = () => {
-    const data = [
-        { name: 'Infrastructure', value: 35, cumulative: 35 },
-        { name: 'Healthcare', value: 25, cumulative: 60 },
-        { name: 'Education', value: 15, cumulative: 75 },
-        { name: 'Defense', value: 10, cumulative: 85 },
-        { name: 'Social', value: 8, cumulative: 93 },
-        { name: 'Other', value: 7, cumulative: 100 },
-    ];
-    
-    return (
-        <div className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={data}>
-                    <XAxis dataKey="name" />
-                    <YAxis yAxisId="left" orientation="left" />
-                    <YAxis yAxisId="right" orientation="right" domain={[0, 100]} />
-                    <Tooltip />
-                    <Bar yAxisId="left" dataKey="value" fill="#6366F1" radius={[4, 4, 0, 0]} />
-                </BarChart>
-            </ResponsiveContainer>
+// Render components for each framework
+const SWOTDisplay = ({ data }) => (
+    <div className="grid grid-cols-2 gap-3">
+        <div className="bg-green-50 rounded-lg p-3 border border-green-200">
+            <h4 className="font-semibold text-green-800 mb-2 text-sm">Strengths</h4>
+            <ul className="space-y-1">{data.strengths?.map((s, i) => <li key={i} className="text-xs text-green-700">• {s}</li>)}</ul>
         </div>
-    );
+        <div className="bg-red-50 rounded-lg p-3 border border-red-200">
+            <h4 className="font-semibold text-red-800 mb-2 text-sm">Weaknesses</h4>
+            <ul className="space-y-1">{data.weaknesses?.map((w, i) => <li key={i} className="text-xs text-red-700">• {w}</li>)}</ul>
+        </div>
+        <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
+            <h4 className="font-semibold text-blue-800 mb-2 text-sm">Opportunities</h4>
+            <ul className="space-y-1">{data.opportunities?.map((o, i) => <li key={i} className="text-xs text-blue-700">• {o}</li>)}</ul>
+        </div>
+        <div className="bg-amber-50 rounded-lg p-3 border border-amber-200">
+            <h4 className="font-semibold text-amber-800 mb-2 text-sm">Threats</h4>
+            <ul className="space-y-1">{data.threats?.map((t, i) => <li key={i} className="text-xs text-amber-700">• {t}</li>)}</ul>
+        </div>
+    </div>
+);
+
+const DMAICDisplay = ({ data }) => (
+    <div className="space-y-3">
+        {['define', 'measure', 'analyze', 'improve', 'control'].map((phase) => (
+            <div key={phase} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                <h4 className="font-semibold text-gray-800 mb-2 text-sm capitalize">{phase}</h4>
+                <ul className="space-y-1">{data[phase]?.map((item, i) => <li key={i} className="text-xs text-gray-600">• {item}</li>)}</ul>
+            </div>
+        ))}
+    </div>
+);
+
+const ICEDisplay = ({ data }) => (
+    <div className="space-y-2">
+        {data.initiatives?.map((init, i) => (
+            <div key={i} className="bg-white rounded-lg p-3 border border-gray-200">
+                <div className="flex justify-between items-start mb-2">
+                    <span className="font-medium text-gray-800 text-sm">{init.name}</span>
+                    <span className="text-xs font-bold text-purple-600">Score: {init.impact + init.confidence + init.ease}</span>
+                </div>
+                <div className="flex gap-4 mb-1">
+                    <span className="text-xs"><span className="text-gray-500">Impact:</span> {init.impact}/10</span>
+                    <span className="text-xs"><span className="text-gray-500">Confidence:</span> {init.confidence}/10</span>
+                    <span className="text-xs"><span className="text-gray-500">Ease:</span> {init.ease}/10</span>
+                </div>
+                <p className="text-xs text-gray-500">{init.reasoning}</p>
+            </div>
+        ))}
+    </div>
+);
+
+const ParetoDisplay = ({ data }) => (
+    <div className="space-y-2">
+        {data.high_impact_actions?.map((action, i) => (
+            <div key={i} className="bg-white rounded-lg p-3 border border-gray-200">
+                <div className="flex justify-between items-center mb-1">
+                    <span className="font-medium text-gray-800 text-sm">{action.action}</span>
+                    <span className="text-xs font-bold text-green-600">{action.impact_percentage}% impact</span>
+                </div>
+                <p className="text-xs text-gray-500">{action.description}</p>
+            </div>
+        ))}
+    </div>
+);
+
+const AnsoffDisplay = ({ data }) => (
+    <div className="grid grid-cols-2 gap-3">
+        <div className="bg-blue-50 rounded-lg p-3 border border-blue-200">
+            <h4 className="font-semibold text-blue-800 mb-2 text-sm">Market Penetration</h4>
+            <ul className="space-y-1">{data.market_penetration?.map((m, i) => <li key={i} className="text-xs text-blue-700">• {m}</li>)}</ul>
+        </div>
+        <div className="bg-purple-50 rounded-lg p-3 border border-purple-200">
+            <h4 className="font-semibold text-purple-800 mb-2 text-sm">Market Development</h4>
+            <ul className="space-y-1">{data.market_development?.map((m, i) => <li key={i} className="text-xs text-purple-700">• {m}</li>)}</ul>
+        </div>
+        <div className="bg-green-50 rounded-lg p-3 border border-green-200">
+            <h4 className="font-semibold text-green-800 mb-2 text-sm">Product Development</h4>
+            <ul className="space-y-1">{data.product_development?.map((p, i) => <li key={i} className="text-xs text-green-700">• {p}</li>)}</ul>
+        </div>
+        <div className="bg-orange-50 rounded-lg p-3 border border-orange-200">
+            <h4 className="font-semibold text-orange-800 mb-2 text-sm">Diversification</h4>
+            <ul className="space-y-1">{data.diversification?.map((d, i) => <li key={i} className="text-xs text-orange-700">• {d}</li>)}</ul>
+        </div>
+    </div>
+);
+
+const PESTLEDisplay = ({ data }) => (
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+        {['political', 'economic', 'social', 'technological', 'legal', 'environmental'].map((factor) => (
+            <div key={factor} className="bg-gray-50 rounded-lg p-3 border border-gray-200">
+                <h4 className="font-semibold text-gray-800 mb-2 text-sm capitalize">{factor}</h4>
+                <ul className="space-y-1">{data[factor]?.map((item, i) => <li key={i} className="text-xs text-gray-600">• {item}</li>)}</ul>
+            </div>
+        ))}
+    </div>
+);
+
+const PorterDisplay = ({ data }) => (
+    <div className="space-y-3">
+        {[
+            { key: 'competitive_rivalry', label: 'Competitive Rivalry', color: 'red' },
+            { key: 'supplier_power', label: 'Supplier Power', color: 'blue' },
+            { key: 'buyer_power', label: 'Buyer Power', color: 'green' },
+            { key: 'threat_of_substitution', label: 'Threat of Substitution', color: 'amber' },
+            { key: 'threat_of_new_entry', label: 'Threat of New Entry', color: 'purple' },
+        ].map((force) => (
+            <div key={force.key} className={`bg-${force.color}-50 rounded-lg p-3 border border-${force.color}-200`}>
+                <h4 className={`font-semibold text-${force.color}-800 mb-1 text-sm`}>{force.label}</h4>
+                <p className="text-xs text-gray-600">{data[force.key]}</p>
+            </div>
+        ))}
+    </div>
+);
+
+const BCGDisplay = ({ data }) => (
+    <div className="grid grid-cols-2 gap-3">
+        <div className="bg-yellow-50 rounded-lg p-3 border border-yellow-200">
+            <h4 className="font-semibold text-yellow-800 mb-2 text-sm">⭐ Stars</h4>
+            <ul className="space-y-1">{data.stars?.map((s, i) => <li key={i} className="text-xs text-yellow-700">• {s}</li>)}</ul>
+        </div>
+        <div className="bg-green-50 rounded-lg p-3 border border-green-200">
+            <h4 className="font-semibold text-green-800 mb-2 text-sm">🐄 Cash Cows</h4>
+            <ul className="space-y-1">{data.cash_cows?.map((c, i) => <li key={i} className="text-xs text-green-700">• {c}</li>)}</ul>
+        </div>
+        <div className="bg-purple-50 rounded-lg p-3 border border-purple-200">
+            <h4 className="font-semibold text-purple-800 mb-2 text-sm">❓ Question Marks</h4>
+            <ul className="space-y-1">{data.question_marks?.map((q, i) => <li key={i} className="text-xs text-purple-700">• {q}</li>)}</ul>
+        </div>
+        <div className="bg-gray-100 rounded-lg p-3 border border-gray-300">
+            <h4 className="font-semibold text-gray-700 mb-2 text-sm">🐕 Dogs</h4>
+            <ul className="space-y-1">{data.dogs?.map((d, i) => <li key={i} className="text-xs text-gray-600">• {d}</li>)}</ul>
+        </div>
+    </div>
+);
+
+const DISPLAY_COMPONENTS = {
+    swot: SWOTDisplay,
+    dmaic: DMAICDisplay,
+    ice: ICEDisplay,
+    pareto: ParetoDisplay,
+    ansoff: AnsoffDisplay,
+    pestle: PESTLEDisplay,
+    porter: PorterDisplay,
+    bcg: BCGDisplay,
 };
 
-const AnsoffMatrix = () => {
-    const quadrants = [
-        { name: 'Market Penetration', risk: 'Low', strategy: 'Existing products, existing markets', color: '#22C55E' },
-        { name: 'Product Development', risk: 'Medium', strategy: 'New products, existing markets', color: '#F59E0B' },
-        { name: 'Market Development', risk: 'Medium', strategy: 'Existing products, new markets', color: '#3B82F6' },
-        { name: 'Diversification', risk: 'High', strategy: 'New products, new markets', color: '#EF4444' },
-    ];
-    
-    return (
-        <div className="grid grid-cols-2 gap-4">
-            {quadrants.map(q => (
-                <div 
-                    key={q.name}
-                    className="p-4 rounded-xl border-2"
-                    style={{ borderColor: q.color, backgroundColor: `${q.color}10` }}
-                >
-                    <h4 className="font-semibold mb-1" style={{ color: q.color }}>{q.name}</h4>
-                    <p className="text-xs text-gray-600 mb-2">{q.strategy}</p>
-                    <span className={`text-xs px-2 py-1 rounded-full font-medium`} style={{ backgroundColor: `${q.color}20`, color: q.color }}>
-                        Risk: {q.risk}
-                    </span>
-                </div>
-            ))}
-        </div>
-    );
-};
+export default function AnalysisFrameworks({ selectedCategories = [] }) {
+    const [activeTab, setActiveTab] = useState('swot');
+    const [frameworkData, setFrameworkData] = useState({});
+    const [loading, setLoading] = useState(false);
+    const cacheRef = useRef({});
 
-const PESTLEAnalysis = () => {
-    const factors = [
-        { name: 'Political', score: 72, items: ['Government stability', 'Tax policy', 'Trade regulations'] },
-        { name: 'Economic', score: 65, items: ['GDP growth', 'Interest rates', 'Inflation'] },
-        { name: 'Social', score: 78, items: ['Demographics', 'Education', 'Cultural trends'] },
-        { name: 'Technological', score: 85, items: ['Innovation', 'R&D', 'Digital adoption'] },
-        { name: 'Legal', score: 70, items: ['Employment law', 'Consumer protection', 'IP rights'] },
-        { name: 'Environmental', score: 55, items: ['Climate change', 'Sustainability', 'Regulations'] },
-    ];
-    
-    const colors = ['#EF4444', '#F59E0B', '#22C55E', '#3B82F6', '#8B5CF6', '#10B981'];
-    
-    return (
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {factors.map((f, i) => (
-                <div key={f.name} className="bg-white border border-gray-200 rounded-xl p-4">
-                    <div className="flex items-center justify-between mb-3">
-                        <h4 className="font-semibold text-gray-900">{f.name}</h4>
-                        <span className="text-lg font-bold" style={{ color: colors[i] }}>{f.score}</span>
-                    </div>
-                    <div className="h-2 bg-gray-100 rounded-full mb-3">
-                        <div className="h-full rounded-full" style={{ width: `${f.score}%`, backgroundColor: colors[i] }} />
-                    </div>
-                    <ul className="space-y-1">
-                        {f.items.map((item, j) => (
-                            <li key={j} className="text-xs text-gray-500 flex items-center gap-1">
-                                <span className="w-1 h-1 rounded-full" style={{ backgroundColor: colors[i] }} />
-                                {item}
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            ))}
-        </div>
-    );
-};
+    const categoryKey = selectedCategories.sort().join(',');
 
-const PorterAnalysis = () => {
-    const forces = [
-        { name: 'Competitive Rivalry', score: 75, position: 'top' },
-        { name: 'Supplier Power', score: 45, position: 'left' },
-        { name: 'Buyer Power', score: 60, position: 'right' },
-        { name: 'Threat of Substitution', score: 55, position: 'bottom-left' },
-        { name: 'Threat of New Entry', score: 40, position: 'bottom-right' },
-    ];
-    
-    return (
-        <div className="relative h-80 flex items-center justify-center">
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 bg-red-50 border border-red-200 rounded-xl p-3 text-center w-48">
-                <div className="text-sm font-medium text-red-800">Competitive Rivalry</div>
-                <div className="text-2xl font-bold text-red-600">75%</div>
-            </div>
-            <div className="absolute left-0 top-1/2 -translate-y-1/2 bg-blue-50 border border-blue-200 rounded-xl p-3 text-center w-40">
-                <div className="text-sm font-medium text-blue-800">Supplier Power</div>
-                <div className="text-2xl font-bold text-blue-600">45%</div>
-            </div>
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 bg-green-50 border border-green-200 rounded-xl p-3 text-center w-40">
-                <div className="text-sm font-medium text-green-800">Buyer Power</div>
-                <div className="text-2xl font-bold text-green-600">60%</div>
-            </div>
-            <div className="absolute bottom-0 left-1/4 bg-amber-50 border border-amber-200 rounded-xl p-3 text-center w-44">
-                <div className="text-sm font-medium text-amber-800">Substitution Threat</div>
-                <div className="text-2xl font-bold text-amber-600">55%</div>
-            </div>
-            <div className="absolute bottom-0 right-1/4 bg-purple-50 border border-purple-200 rounded-xl p-3 text-center w-44">
-                <div className="text-sm font-medium text-purple-800">New Entry Threat</div>
-                <div className="text-2xl font-bold text-purple-600">40%</div>
-            </div>
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-                <Building2 className="w-10 h-10 text-white" />
-            </div>
-        </div>
-    );
-};
+    useEffect(() => {
+        if (selectedCategories.length > 0) {
+            fetchFrameworkData(activeTab);
+        }
+    }, [activeTab, categoryKey]);
 
-const BCGMatrix = () => {
-    const products = [
-        { name: 'Tech Sector', x: 80, y: 85, z: 500, type: 'star' },
-        { name: 'Healthcare', x: 70, y: 40, z: 400, type: 'cash' },
-        { name: 'Manufacturing', x: 30, y: 30, z: 350, type: 'dog' },
-        { name: 'Green Energy', x: 40, y: 75, z: 300, type: 'question' },
-        { name: 'Finance', x: 65, y: 55, z: 450, type: 'cash' },
-    ];
-    
-    return (
-        <div className="relative h-80">
-            <div className="absolute inset-0 grid grid-cols-2 grid-rows-2">
-                <div className="bg-purple-50 border-r border-b border-gray-200 p-2">
-                    <span className="text-xs font-medium text-purple-600">? Question Marks</span>
-                </div>
-                <div className="bg-yellow-50 border-b border-gray-200 p-2">
-                    <span className="text-xs font-medium text-yellow-600">★ Stars</span>
-                </div>
-                <div className="bg-gray-50 border-r border-gray-200 p-2">
-                    <span className="text-xs font-medium text-gray-600">✕ Dogs</span>
-                </div>
-                <div className="bg-green-50 p-2">
-                    <span className="text-xs font-medium text-green-600">$ Cash Cows</span>
-                </div>
-            </div>
-            <ResponsiveContainer width="100%" height="100%">
-                <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
-                    <XAxis type="number" dataKey="x" name="Market Share" domain={[0, 100]} hide />
-                    <YAxis type="number" dataKey="y" name="Growth Rate" domain={[0, 100]} hide />
-                    <ZAxis type="number" dataKey="z" range={[100, 500]} />
-                    <Tooltip cursor={{ strokeDasharray: '3 3' }} />
-                    <Scatter name="Products" data={products} fill="#6366F1">
-                        {products.map((entry, index) => (
-                            <Cell key={index} fill={
-                                entry.type === 'star' ? '#F59E0B' :
-                                entry.type === 'cash' ? '#22C55E' :
-                                entry.type === 'question' ? '#8B5CF6' : '#9CA3AF'
-                            } />
-                        ))}
-                    </Scatter>
-                </ScatterChart>
-            </ResponsiveContainer>
-        </div>
-    );
-};
+    const fetchFrameworkData = async (framework) => {
+        const cacheKey = `${framework}-${categoryKey}`;
+        if (cacheRef.current[cacheKey]) {
+            setFrameworkData(prev => ({ ...prev, [framework]: cacheRef.current[cacheKey] }));
+            return;
+        }
 
-export default function AnalysisFrameworks({ activeDomain }) {
-    const [activeFramework, setActiveFramework] = useState('swot');
-    
-    const renderFramework = () => {
-        switch (activeFramework) {
-            case 'swot': return <SWOTAnalysis domain={activeDomain} />;
-            case 'dmaic': return <DMAICAnalysis />;
-            case 'ice': return <ICEAnalysis />;
-            case 'pareto': return <ParetoAnalysis />;
-            case 'ansoff': return <AnsoffMatrix />;
-            case 'pestle': return <PESTLEAnalysis />;
-            case 'porter': return <PorterAnalysis />;
-            case 'bcg': return <BCGMatrix />;
-            default: return <SWOTAnalysis domain={activeDomain} />;
+        setLoading(true);
+        try {
+            const categoryNames = selectedCategories
+                .map(c => CATEGORY_LABELS[c] || c)
+                .join(', ');
+
+            const response = await base44.integrations.Core.InvokeLLM({
+                prompt: FRAMEWORK_PROMPTS[framework](categoryNames),
+                add_context_from_internet: true,
+                response_json_schema: FRAMEWORK_SCHEMAS[framework]
+            });
+
+            cacheRef.current[cacheKey] = response;
+            setFrameworkData(prev => ({ ...prev, [framework]: response }));
+        } catch (err) {
+            console.error('Error fetching framework data:', err);
+        } finally {
+            setLoading(false);
         }
     };
-    
+
+    if (selectedCategories.length === 0) return null;
+
+    const DisplayComponent = DISPLAY_COMPONENTS[activeTab];
+    const data = frameworkData[activeTab];
+
     return (
-        <div className="space-y-6">
-            <div className="flex flex-wrap gap-2">
-                {FRAMEWORKS.map(fw => {
-                    const Icon = fw.icon;
-                    return (
-                        <button
-                            key={fw.id}
-                            onClick={() => setActiveFramework(fw.id)}
-                            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all ${
-                                activeFramework === fw.id
-                                    ? 'bg-white shadow-md border-2'
-                                    : 'bg-white/50 hover:bg-white border border-gray-200'
-                            }`}
-                            style={{ borderColor: activeFramework === fw.id ? fw.color : undefined }}
-                        >
-                            <Icon className="w-4 h-4" style={{ color: fw.color }} />
-                            <span className="font-medium text-sm">{fw.name}</span>
-                        </button>
-                    );
-                })}
-            </div>
-            
-            <div className="bg-white rounded-xl border border-gray-200 p-6">
-                <div className="flex items-center justify-between mb-6">
-                    <div>
-                        <h3 className="text-lg font-semibold text-gray-900">
-                            {FRAMEWORKS.find(f => f.id === activeFramework)?.name} Analysis
-                        </h3>
-                        <p className="text-sm text-gray-500">
-                            {FRAMEWORKS.find(f => f.id === activeFramework)?.description}
-                        </p>
+        <div className="bg-white rounded-xl border border-gray-200 p-4 my-6">
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+                <TabsList className="bg-gray-100 p-1 mb-4 flex-wrap h-auto gap-1">
+                    {FRAMEWORKS.map(fw => {
+                        const Icon = fw.icon;
+                        return (
+                            <TabsTrigger 
+                                key={fw.id} 
+                                value={fw.id}
+                                className="gap-1.5 text-xs data-[state=active]:bg-purple-600 data-[state=active]:text-white"
+                            >
+                                <Icon className="w-3 h-3" />
+                                {fw.name}
+                            </TabsTrigger>
+                        );
+                    })}
+                </TabsList>
+
+                {loading ? (
+                    <div className="flex items-center justify-center py-12">
+                        <Loader2 className="w-6 h-6 text-purple-600 animate-spin mr-3" />
+                        <span className="text-gray-600">Generating {activeTab.toUpperCase()} analysis...</span>
                     </div>
-                </div>
-                {renderFramework()}
-            </div>
+                ) : data ? (
+                    <DisplayComponent data={data} />
+                ) : (
+                    <div className="text-center py-12 text-gray-500">
+                        Select a framework to view analysis
+                    </div>
+                )}
+            </Tabs>
         </div>
     );
 }

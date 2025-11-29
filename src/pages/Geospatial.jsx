@@ -11,6 +11,7 @@ import { base44 } from '@/api/base44Client';
 import GeospatialMap from '@/components/geospatial/GeospatialMap';
 import CountryComparison from '@/components/geospatial/CountryComparison';
 import MapModal from '@/components/geospatial/MapModal';
+import AnalysisFrameworks from '@/components/geospatial/AnalysisFrameworks';
 
 const USE_CASES = [
     { id: 'carbon', name: 'Carbon & Climate', icon: Cloud, color: '#EF4444', description: 'Carbon emissions, climate tracking, net zero' },
@@ -216,6 +217,9 @@ export default function Geospatial() {
                         isWorldMap={true}
                     />
                 </div>
+
+                {/* Analysis Frameworks */}
+                <AnalysisFrameworks selectedCategories={activeUseCases} />
 
                 {/* Country Comparison */}
                 <CountryComparison selectedCategories={activeUseCases} />
