@@ -31,6 +31,10 @@ export default function Robotext({ onBack }) {
     const canvasRef = useRef(null);
     const gameStateRef = useRef(null);
     const keysRef = useRef({});
+    const animationRef = useRef(null);
+    const scoreRef = useRef(0);
+    const levelRef = useRef(1);
+    const livesRef = useRef(3);
     const [gameStatus, setGameStatus] = useState('menu'); // menu, playing, paused, gameover, victory
     const [score, setScore] = useState(0);
     const [lives, setLives] = useState(3);
@@ -39,6 +43,8 @@ export default function Robotext({ onBack }) {
     const [storyIndex, setStoryIndex] = useState(0);
     const [level, setLevel] = useState(1);
     const [showStory, setShowStory] = useState(false);
+    const showStoryRef = useRef(false);
+    const storyIndexRef = useRef(0);
 
     const initGame = useCallback(() => {
         const canvas = canvasRef.current;
