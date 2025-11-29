@@ -25,21 +25,7 @@ const USE_CASES = [
     { id: 'future', name: 'Future & Innovation', icon: Sparkles, color: '#A855F7', description: 'Emerging tech, innovation projects' },
 ];
 
-const KEY_POINTS = [
-    { icon: MapPin, title: 'Location Data', desc: 'Tied to specific geographic coordinates' },
-    { icon: BarChart3, title: 'Spatial Analysis', desc: 'Enables pattern recognition and visualization' },
-    { icon: Layers, title: 'GIS Integration', desc: 'Geographic Information Systems support' },
-    { icon: Target, title: 'Decision Support', desc: 'Powers informed decisions across sectors' },
-    { icon: Satellite, title: 'Remote Sensing', desc: 'GPS and satellite imagery technologies' },
-];
 
-const APPLICATIONS = [
-    { icon: TrendingUp, title: 'Spatial Analytics', desc: 'Analyze data for informed decisions' },
-    { icon: Building2, title: 'Urban & Disaster', desc: 'Planning and emergency response' },
-    { icon: Compass, title: 'GIS & Sensing', desc: 'Advanced mapping tools' },
-    { icon: Activity, title: 'Resource Monitoring', desc: 'Environmental and asset tracking' },
-    { icon: Navigation, title: 'Navigation', desc: 'Location-based services' },
-];
 
 export default function Geospatial() {
     useEffect(() => {
