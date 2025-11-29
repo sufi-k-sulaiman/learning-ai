@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Globe, Paperclip, Mic, MicOff, X, Loader2, Copy, Check, FileText, Image as ImageIcon, ExternalLink, ChevronRight, AlertTriangle, Download, Maximize2 } from 'lucide-react';
+import { Globe, Paperclip, Mic, MicOff, X, Loader2, Check, FileText, Image as ImageIcon, ExternalLink, ChevronRight, AlertTriangle, Download, Maximize2, StickyNote } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -463,24 +463,36 @@ export default function Qwirey() {
         }
     };
 
-    const handleCopy = () => {
-        let textToCopy = '';
+    const [noteSaved, setNoteSaved] = useState(false);
+    
+    const handleAddToNotes = async () => {
+        let noteContent = '';
+        let noteTitle = prompt.slice(0, 50) + (prompt.length > 50 ? '...' : '');
+        
         if (result?.shortData) {
-            textToCopy = result.shortData.blurb + '\n\n' + (result.shortData.bullets || []).map(b => '• ' + b).join('\n');
+            noteContent = `<p>${result.shortData.blurb}</p><ul>${(result.shortData.bullets || []).map(b => `<li>${b}</li>`).join('')}</ul>`;
         } else if (result?.longData) {
-            textToCopy = (result.longData.paragraphs || []).join('\n\n');
+            noteContent = (result.longData.paragraphs || []).map(p => `<p>${p}</p>`).join('');
         } else if (result?.reviewsData) {
-            textToCopy = result.reviewsData.title + '\n\n' + result.reviewsData.intro + '\n\n' + 
-                (result.reviewsData.reviews || []).map(r => `${r.name} (${r.rating}/10): ${r.text}`).join('\n\n');
+            noteContent = `<h2>${result.reviewsData.title || 'Reviews'}</h2><p>${result.reviewsData.intro}</p>` + 
+                (result.reviewsData.reviews || []).map(r => `<p><strong>${r.name}</strong> (${r.rating}/10): ${r.text}</p>`).join('');
         } else if (result?.tabledData) {
-            textToCopy = result.tabledData.summary + '\n\n' + 
-                (result.tabledData.items || []).map(i => `${i.name}: Pros - ${i.pros?.join(', ')} | Cons - ${i.cons?.join(', ')} | Rating: ${i.rating}/10`).join('\n');
+            noteContent = `<p>${result.tabledData.summary}</p><ul>` + 
+                (result.tabledData.items || []).map(i => `<li><strong>${i.name}</strong>: Pros - ${i.pros?.join(', ')} | Cons - ${i.cons?.join(', ')} | Rating: ${i.rating}/10</li>`).join('') + '</ul>';
         } else if (result?.text) {
-            textToCopy = result.text;
+            noteContent = `<p>${result.text}</p>`;
         }
-        navigator.clipboard.writeText(textToCopy);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+        
+        await base44.entities.Note.create({
+            title: noteTitle,
+            content: noteContent,
+            tags: ['Qwirey'],
+            color: 'purple'
+        });
+        
+        setNoteSaved(true);
+        toast.success('Added to Notes');
+        setTimeout(() => setNoteSaved(false), 2000);
     };
 
     const handleFollowUp = (question) => {
@@ -848,8 +860,9 @@ export default function Qwirey() {
                                                   </span>
                                               </div>
                                           </div>
-                                          <Button variant="ghost" size="sm" onClick={handleCopy} className="text-purple-600">
-                                              {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                                          <Button variant="outline" size="sm" onClick={handleAddToNotes} className="text-purple-600 gap-1.5">
+                                              {noteSaved ? <Check className="w-4 h-4 text-green-500" /> : <StickyNote className="w-4 h-4" />}
+                                              {noteSaved ? 'Saved' : 'Add to Notes'}
                                           </Button>
                                       </div>
                                     
