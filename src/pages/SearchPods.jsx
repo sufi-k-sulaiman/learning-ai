@@ -549,6 +549,126 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
         }
     };
 
+    // Skip forward/backward
+    const skipForward = () => {
+        const skipSeconds = 30;
+        const skipSentences = Math.ceil(skipSeconds / 3); // ~3 seconds per sentence
+        const newIndex = Math.min(currentIndexRef.current + skipSentences, sentencesRef.current.length - 1);
+        
+        window.speechSynthesis?.cancel();
+        currentIndexRef.current = newIndex;
+        setCurrentTime(prev => Math.min(prev + skipSeconds, duration));
+        
+        const text = sentencesRef.current[currentIndexRef.current] || '';
+        setCurrentCaption(text);
+        setCaptionWords(text.split(/\s+/));
+        setCurrentWordIndex(-1);
+        
+        if (isPlayingRef.current) {
+            setTimeout(() => speakNextSentence(), 100);
+        }
+    };
+
+    const skipBackward = () => {
+        const skipSeconds = 15;
+        const skipSentences = Math.ceil(skipSeconds / 3);
+        const newIndex = Math.max(currentIndexRef.current - skipSentences, 0);
+        
+        window.speechSynthesis?.cancel();
+        currentIndexRef.current = newIndex;
+        setCurrentTime(prev => Math.max(prev - skipSeconds, 0));
+        
+        const text = sentencesRef.current[currentIndexRef.current] || '';
+        setCurrentCaption(text);
+        setCaptionWords(text.split(/\s+/));
+        setCurrentWordIndex(-1);
+        
+        if (isPlayingRef.current) {
+            setTimeout(() => speakNextSentence(), 100);
+        }
+    };
+
+    // Load recommendations based on current episode
+    const loadRecommendations = async () => {
+        if (!currentEpisode) return;
+        setShowRecommendations(true);
+        
+        try {
+            const response = await base44.integrations.Core.InvokeLLM({
+                prompt: `Based on someone listening to "${currentEpisode.title}" in the ${currentEpisode.category} category, suggest 5 related podcast topics they might enjoy. Make them diverse but related.`,
+                response_json_schema: {
+                    type: "object",
+                    properties: {
+                        recommendations: {
+                            type: "array",
+                            items: {
+                                type: "object",
+                                properties: {
+                                    title: { type: "string" },
+                                    category: { type: "string" },
+                                    reason: { type: "string" }
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+            setRecommendations(response?.recommendations || []);
+        } catch (error) {
+            console.error('Error loading recommendations:', error);
+            setRecommendations([
+                { title: `More ${currentEpisode.category}`, category: currentEpisode.category, reason: 'Similar topic' },
+                { title: 'Trending Now', category: 'Popular', reason: 'What others are listening to' }
+            ]);
+        }
+    };
+
+    // Extend the podcast content
+    const extendPodcast = async () => {
+        if (!currentEpisode || isExtending) return;
+        setIsExtending(true);
+        
+        try {
+            const currentContent = sentencesRef.current.join(' ');
+            
+            const response = await base44.integrations.Core.InvokeLLM({
+                prompt: `Continue this podcast about "${currentEpisode.title}". Here's what was covered so far (summary): "${currentContent.substring(0, 500)}..."
+                
+                Write 3-4 more paragraphs (about 1-2 minutes worth) expanding on the topic with new insights, examples, or related points. Keep the same conversational tone. Do NOT use markdown formatting.`,
+                add_context_from_internet: true
+            });
+            
+            const cleanText = cleanTextForSpeech(response || '');
+            const newSentences = cleanText
+                .replace(/\n+/g, ' ')
+                .split(/(?<=[.!?])\s+/)
+                .map(s => s.trim())
+                .filter(s => s.length > 3);
+            
+            if (newSentences.length > 0) {
+                sentencesRef.current = [...sentencesRef.current, ...newSentences];
+                setDuration(sentencesRef.current.length * 3);
+            }
+        } catch (error) {
+            console.error('Error extending podcast:', error);
+        } finally {
+            setIsExtending(false);
+        }
+    };
+
+    // Convert text to Braille
+    const toBraille = (text) => {
+        const brailleMap = {
+            'a': '⠁', 'b': '⠃', 'c': '⠉', 'd': '⠙', 'e': '⠑', 'f': '⠋', 'g': '⠛', 'h': '⠓',
+            'i': '⠊', 'j': '⠚', 'k': '⠅', 'l': '⠇', 'm': '⠍', 'n': '⠝', 'o': '⠕', 'p': '⠏',
+            'q': '⠟', 'r': '⠗', 's': '⠎', 't': '⠞', 'u': '⠥', 'v': '⠧', 'w': '⠺', 'x': '⠭',
+            'y': '⠽', 'z': '⠵', ' ': ' ', '.': '⠲', ',': '⠂', '!': '⠖', '?': '⠦', "'": '⠄',
+            '-': '⠤', '0': '⠴', '1': '⠂', '2': '⠆', '3': '⠒', '4': '⠲', '5': '⠢', '6': '⠖',
+            '7': '⠶', '8': '⠦', '9': '⠔'
+        };
+        return text.toLowerCase().split('').map(c => brailleMap[c] || c).join('');
+    };
+
     return (
         <div className="min-h-screen bg-gray-50 pb-8">
             <main className="max-w-7xl mx-auto px-4 md:px-6 pt-6 space-y-8">
