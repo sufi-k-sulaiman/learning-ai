@@ -175,14 +175,22 @@ const cleanHtmlFromText = (text) => {
         .trim();
 };
 
+const MAX_IMAGES_TO_GENERATE = 6; // Only generate images for first 6 articles
+
 const NewsCardSimple = ({ article, index }) => {
     const [imageUrl, setImageUrl] = useState(null);
-    const [imageLoading, setImageLoading] = useState(true);
+    const [imageLoading, setImageLoading] = useState(index < MAX_IMAGES_TO_GENERATE);
     
     const cleanTitle = cleanHtmlFromText(article.title);
     const cleanSummary = cleanHtmlFromText(article.summary);
 
     useEffect(() => {
+        // Skip image generation for articles beyond the limit
+        if (index >= MAX_IMAGES_TO_GENERATE) {
+            setImageLoading(false);
+            return;
+        }
+        
         const generateImage = async () => {
             setImageLoading(true);
             try {
@@ -202,8 +210,8 @@ const NewsCardSimple = ({ article, index }) => {
             }
         };
         
-        // Stagger image generation to avoid rate limits
-        const delay = index * 500;
+        // Stagger image generation - 3 seconds apart to avoid rate limits
+        const delay = index * 3000;
         const timer = setTimeout(generateImage, delay);
         return () => clearTimeout(timer);
     }, [cleanTitle, cleanSummary, index]);
