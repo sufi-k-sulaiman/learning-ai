@@ -431,14 +431,24 @@ export default function Qwirey() {
                 setResult(resultData);
 
             } else {
-                // Use actual model-specific endpoints via backend function
-                const response = await base44.functions.invoke('openaiChat', {
-                    model: selectedModel === 'gpt4' ? 'gpt-4o' : selectedModel === 'claude' ? 'claude-3-5-sonnet' : 'gemini-1.5-pro',
-                    prompt: `${webUrl ? `Reference URL: ${webUrl}\n\n` : ''}${fullPrompt}`,
-                    useInternet: true
+                const modelPrompts = {
+                    gpt4: 'You are a helpful AI assistant similar to GPT-4. Provide detailed, accurate, and well-structured responses.',
+                    claude: 'You are a helpful AI assistant similar to Claude. Provide thoughtful, nuanced, and well-reasoned responses.',
+                    gemini: 'You are a helpful AI assistant similar to Gemini. Provide comprehensive and informative responses.'
+                };
+
+                const response = await base44.integrations.Core.InvokeLLM({
+                    prompt: `${modelPrompts[selectedModel]}\n\nProvide a detailed response with multiple paragraphs covering the topic thoroughly.\n\n${webUrl ? `Reference URL: ${webUrl}\n\n` : ''}User question: ${fullPrompt}`,
+                    add_context_from_internet: true,
+                    response_json_schema: {
+                        type: "object",
+                        properties: {
+                            response: { type: "string", description: "A detailed, comprehensive response with multiple paragraphs" }
+                        }
+                    }
                 });
 
-                const textResponse = response.data?.response || response.data?.text || 'No response received';
+                const textResponse = response?.response || (typeof response === 'string' ? response : 'No response received');
 
                 setResult({
                     type: 'text',
