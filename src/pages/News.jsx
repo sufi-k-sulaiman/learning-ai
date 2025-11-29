@@ -205,7 +205,12 @@ const NewsCardSimple = ({ article, index }) => {
     }, [article.title, article.imagePrompt]);
 
     return (
-        <article className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow group">
+        <a 
+            href={article.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow group"
+        >
             <div className="aspect-video bg-gray-100 relative overflow-hidden">
                 {imageLoading ? (
                     <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
