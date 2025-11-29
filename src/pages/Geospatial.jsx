@@ -48,12 +48,10 @@ export default function Geospatial() {
         document.querySelector('meta[name="keywords"]')?.setAttribute('content', 'Geospatial, GIS, mapping, spatial analysis, satellite imagery');
     }, []);
 
-    const [activeUseCases, setActiveUseCases] = useState(['greenhouse', 'carbon']);
+    const [activeUseCases, setActiveUseCases] = useState(['greenhouse']);
     const [searchQuery, setSearchQuery] = useState('');
     const [activeTab, setActiveTab] = useState('explore');
-    const [mapData, setMapData] = useState(null);
     const [loading, setLoading] = useState(false);
-    const [insights, setInsights] = useState([]);
 
     const selectedUseCases = USE_CASES.filter(u => activeUseCases.includes(u.id));
     const currentUseCase = selectedUseCases[0] || USE_CASES[0];
@@ -66,153 +64,135 @@ export default function Geospatial() {
         );
     };
 
-    const generateInsights = async () => {
-        setLoading(true);
-        try {
-            const names = selectedUseCases.map(u => u.name).join(', ');
-            const response = await base44.integrations.Core.InvokeLLM({
-                prompt: `Generate 4 geospatial insights for these use cases: ${names}. Each insight should have a title, value/metric, and trend direction.`,
-                add_context_from_internet: true,
-                response_json_schema: {
-                    type: "object",
-                    properties: {
-                        insights: {
-                            type: "array",
-                            items: {
-                                type: "object",
-                                properties: {
-                                    title: { type: "string" },
-                                    value: { type: "string" },
-                                    trend: { type: "string" },
-                                    change: { type: "string" }
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-            setInsights(response?.insights || []);
-        } catch (error) {
-            console.error('Failed to generate insights:', error);
-            setInsights([
-                { title: 'Active Zones', value: '1,247', trend: 'up', change: '+12%' },
-                { title: 'Coverage Area', value: '45.2K km²', trend: 'up', change: '+8%' },
-                { title: 'Data Points', value: '2.4M', trend: 'up', change: '+24%' },
-                { title: 'Accuracy Rate', value: '98.7%', trend: 'stable', change: '0%' }
-            ]);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        generateInsights();
-    }, [activeUseCases.join(',')]);
+    const filteredUseCases = USE_CASES.filter(uc => 
+        uc.name.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
-            {/* Hero Header */}
-            <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-indigo-700 text-white">
-                <div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
-                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-                        <div>
-                            <div className="flex items-center gap-3 mb-2">
-                                <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
-                                    <Globe className="w-6 h-6" />
-                                </div>
-                                <div>
-                                    <h1 className="text-2xl md:text-3xl font-bold">Geospatial Intelligence</h1>
-                                    <p className="text-white/70 text-sm">AI-Powered Spatial Analytics Platform</p>
-                                </div>
-                            </div>
+            {/* Top Row - Stats Left, Use Case Selector Right */}
+            <div className="mx-4 md:mx-8 mt-4 flex flex-col lg:flex-row gap-4">
+                {/* Stats Panel - Left */}
+                <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-8 shadow-lg lg:w-1/2 flex flex-col justify-between min-h-[320px]">
+                    <div>
+                        <h1 className="text-2xl md:text-3xl font-bold text-white">Geospatial Intelligence</h1>
+                        <p className="text-purple-200 text-sm">AI-Powered Spatial Analytics</p>
+                    </div>
+
+                    {/* Stats */}
+                    <div className="grid grid-cols-3 gap-4 mt-4">
+                        <div className="text-center">
+                            <p className="text-xl md:text-2xl font-bold text-white">{activeUseCases.length}</p>
+                            <p className="text-xs text-purple-200">Active Layers</p>
                         </div>
-                        
-                        {/* Search */}
-                        <div className="flex items-center gap-3">
-                            <div className="relative">
-                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/60" />
-                                <Input 
-                                    value={searchQuery}
-                                    onChange={(e) => setSearchQuery(e.target.value)}
-                                    placeholder="Search locations..."
-                                    className="pl-9 w-64 bg-white/20 border-white/30 text-white placeholder:text-white/60"
-                                />
-                            </div>
-                            <Button onClick={generateInsights} variant="ghost" size="icon" className="text-white hover:bg-white/20">
-                                <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
-                            </Button>
+                        <div className="text-center">
+                            <p className="text-xl md:text-2xl font-bold text-white">4</p>
+                            <p className="text-xs text-purple-200">Map Views</p>
+                        </div>
+                        <div className="text-center">
+                            <p className="text-xl md:text-2xl font-bold text-white">Global</p>
+                            <p className="text-xs text-purple-200">Coverage</p>
+                        </div>
+                        <div className="text-center">
+                            <p className="text-xl md:text-2xl font-bold text-white">2.4M</p>
+                            <p className="text-xs text-purple-200">Data Points</p>
+                        </div>
+                        <div className="text-center">
+                            <p className="text-xl md:text-2xl font-bold text-white">98.7%</p>
+                            <p className="text-xs text-purple-200">Accuracy</p>
+                        </div>
+                        <div className="text-center">
+                            <p className="text-xl md:text-2xl font-bold text-white">Live</p>
+                            <p className="text-xs text-purple-200">Updates</p>
                         </div>
                     </div>
 
-                    {/* Key Points Row */}
-                    <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mt-6 pt-6 border-t border-white/20">
-                        {KEY_POINTS.map((point, i) => (
-                            <div key={i} className="flex items-center gap-2 text-sm">
-                                <point.icon className="w-4 h-4 text-white/70" />
-                                <span className="text-white/90">{point.title}</span>
+                    {/* Progress Bar */}
+                    <div className="mt-4">
+                        <div className="flex justify-between text-xs text-purple-200 mb-1">
+                            <span>Data Quality</span>
+                            <span>Excellent</span>
+                        </div>
+                        <div className="h-2 bg-white/20 rounded-full overflow-hidden">
+                            <div className="h-full rounded-full transition-all bg-white/80" style={{ width: '87%' }} />
+                        </div>
+                    </div>
+
+                    {/* Selected & Generate Button */}
+                    <div className="flex items-center justify-between mt-4 pt-3 border-t border-white/20">
+                        <span className="text-xs text-white/70">
+                            {activeUseCases.length} selected: {selectedUseCases.map(s => s.name).join(', ').substring(0, 30)}{selectedUseCases.map(s => s.name).join(', ').length > 30 ? '...' : ''}
+                        </span>
+                        <Button 
+                            onClick={() => setLoading(true)}
+                            disabled={loading || activeUseCases.length === 0}
+                            className="bg-white text-purple-700 hover:bg-white/90 text-sm"
+                            size="sm"
+                        >
+                            <RefreshCw className={`w-3 h-3 mr-1.5 ${loading ? 'animate-spin' : ''}`} />
+                            Analyze Data
+                        </Button>
+                    </div>
+                </div>
+
+                {/* Use Case Selector - Right */}
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 lg:w-1/2 flex flex-col">
+                    {/* Search Bar */}
+                    <div className="mb-2">
+                        <div className="relative">
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                            <input
+                                type="text"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                placeholder="Search categories..."
+                                className="w-full h-12 pl-12 pr-4 rounded-full border border-gray-200 bg-gray-50 focus:bg-white focus:border-purple-300 focus:ring-2 focus:ring-purple-100 outline-none transition-all text-gray-700 placeholder:text-gray-400"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Use Cases list */}
+                    <div className="flex-1 overflow-y-auto max-h-[250px]">
+                        <div className="space-y-1">
+                            {filteredUseCases.map(useCase => {
+                                const isSelected = activeUseCases.includes(useCase.id);
+                                const Icon = useCase.icon;
+                                return (
+                                    <button
+                                        key={useCase.id}
+                                        onClick={() => toggleUseCase(useCase.id)}
+                                        className={`w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-colors ${
+                                            isSelected ? 'bg-purple-50 border border-purple-200' : 'hover:bg-gray-50'
+                                        }`}
+                                    >
+                                        <div 
+                                            className="w-8 h-8 rounded-lg flex items-center justify-center"
+                                            style={{ backgroundColor: `${useCase.color}20` }}
+                                        >
+                                            <Icon className="w-4 h-4" style={{ color: useCase.color }} />
+                                        </div>
+                                        <span className="flex-1 text-left text-sm font-medium text-gray-700">
+                                            {useCase.name}
+                                        </span>
+                                        {isSelected && (
+                                            <span className="w-5 h-5 rounded-full flex items-center justify-center text-white text-xs" style={{ backgroundColor: useCase.color }}>✓</span>
+                                        )}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                        {filteredUseCases.length === 0 && (
+                            <div className="text-center py-4 text-gray-500 text-sm">
+                                No categories found matching "{searchQuery}"
                             </div>
-                        ))}
+                        )}
                     </div>
                 </div>
             </div>
 
             <div className="max-w-7xl mx-auto px-4 md:px-6 py-6">
-                {/* Use Case Selector - Multi-select */}
-                <div className="mb-2">
-                    <p className="text-xs text-gray-500 mb-2">Select multiple categories to view combined data:</p>
-                </div>
-                <div className="flex gap-2 overflow-x-auto pb-4 mb-6 flex-wrap">
-                    {USE_CASES.map(useCase => {
-                        const Icon = useCase.icon;
-                        const isSelected = activeUseCases.includes(useCase.id);
-                        return (
-                            <button
-                                key={useCase.id}
-                                onClick={() => toggleUseCase(useCase.id)}
-                                className={`flex items-center gap-2 px-3 py-2 rounded-xl whitespace-nowrap transition-all ${
-                                    isSelected
-                                        ? 'bg-white shadow-lg border-2 text-gray-900'
-                                        : 'bg-white/70 text-gray-600 hover:bg-white border border-gray-200'
-                                }`}
-                                style={{ borderColor: isSelected ? useCase.color : undefined }}
-                            >
-                                <Icon className="w-4 h-4" style={{ color: useCase.color }} />
-                                <span className="font-medium text-sm">{useCase.name}</span>
-                                {isSelected && (
-                                    <span className="w-4 h-4 rounded-full flex items-center justify-center text-white text-xs" style={{ backgroundColor: useCase.color }}>✓</span>
-                                )}
-                            </button>
-                        );
-                    })}
-                </div>
-
-                {/* Insights Cards */}
-                {loading ? (
-                    <div className="flex items-center justify-center py-8">
-                        <Loader2 className="w-8 h-8 text-purple-600 animate-spin" />
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                        {insights.map((insight, i) => (
-                            <div key={i} className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                                <p className="text-xs text-gray-500 mb-1">{insight.title}</p>
-                                <div className="flex items-end justify-between">
-                                    <p className="text-2xl font-bold text-gray-900">{insight.value}</p>
-                                    <span className={`text-xs px-2 py-0.5 rounded-full ${
-                                        insight.trend === 'up' ? 'bg-emerald-50 text-emerald-600' :
-                                        insight.trend === 'down' ? 'bg-red-50 text-red-600' :
-                                        'bg-gray-50 text-gray-600'
-                                    }`}>
-                                        {insight.change}
-                                    </span>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                )}
-
-                {/* Tabs */}
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
+                {/* Map View Tabs */}
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-4">
                     <TabsList className="bg-white border border-gray-200">
                         <TabsTrigger value="explore" className="gap-1.5 data-[state=active]:bg-purple-600 data-[state=active]:text-white">
                             <Map className="w-4 h-4" /> Explore Map
