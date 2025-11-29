@@ -254,7 +254,7 @@ export default function Learning() {
 
                     {/* Generate Button */}
                     <div className="flex items-center justify-between mt-4 pt-3 border-t border-white/20">
-                        <span className="text-xs text-white/70">{selectedSubjects.length} selected</span>
+                        <span className="text-xs text-white/70">{selectedSubjects.length} selected: {selectedSubjects.map(s => s.name).join(', ').substring(0, 40)}{selectedSubjects.map(s => s.name).join(', ').length > 40 ? '...' : ''}</span>
                         <Button 
                             onClick={() => generateSubTopics(++requestIdRef.current)}
                             disabled={loadingTopics || selectedSubjects.length === 0}
