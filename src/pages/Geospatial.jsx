@@ -317,17 +317,17 @@ export default function Geospatial() {
                     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
                         <div className="p-3 border-b border-gray-100 flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                                <Route className="w-4 h-4 text-blue-600" />
-                                <span className="font-medium text-sm text-gray-900">Route Analysis</span>
+                                <Cloud className="w-4 h-4 text-red-600" />
+                                <span className="font-medium text-sm text-gray-900">Emissions Hotspots</span>
                             </div>
                             <span className="text-xs text-gray-500">Live</span>
                         </div>
                         <GeospatialMap 
-                            useCase="logistics"
-                            mapType="default"
+                            useCase="greenhouse"
+                            mapType="heatmap"
                             height="200px"
                             mini={true}
-                            color="#3B82F6"
+                            color="#EF4444"
                         />
                     </div>
 
@@ -335,12 +335,12 @@ export default function Geospatial() {
                         <div className="p-3 border-b border-gray-100 flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <TreePine className="w-4 h-4 text-emerald-600" />
-                                <span className="font-medium text-sm text-gray-900">Land Cover</span>
+                                <span className="font-medium text-sm text-gray-900">Renewable Sources</span>
                             </div>
                             <span className="text-xs text-gray-500">Satellite</span>
                         </div>
                         <GeospatialMap 
-                            useCase="environment"
+                            useCase="renewables"
                             mapType="satellite"
                             height="200px"
                             mini={true}
@@ -351,17 +351,17 @@ export default function Geospatial() {
                     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
                         <div className="p-3 border-b border-gray-100 flex items-center justify-between">
                             <div className="flex items-center gap-2">
-                                <Users className="w-4 h-4 text-orange-600" />
-                                <span className="font-medium text-sm text-gray-900">Population Density</span>
+                                <Layers className="w-4 h-4 text-indigo-600" />
+                                <span className="font-medium text-sm text-gray-900">Power Grid</span>
                             </div>
-                            <span className="text-xs text-gray-500">Heatmap</span>
+                            <span className="text-xs text-gray-500">Grid</span>
                         </div>
                         <GeospatialMap 
-                            useCase="urban"
-                            mapType="heatmap"
+                            useCase="grid"
+                            mapType="default"
                             height="200px"
                             mini={true}
-                            color="#F97316"
+                            color="#6366F1"
                         />
                     </div>
                 </div>
