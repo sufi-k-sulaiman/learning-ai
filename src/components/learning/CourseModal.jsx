@@ -30,6 +30,8 @@ export default function CourseModal({ isOpen, onClose, topic, onComplete }) {
     const [showQuizResults, setShowQuizResults] = useState(false);
     const [expandedUnits, setExpandedUnits] = useState({});
     const [isFullscreen, setIsFullscreen] = useState(false);
+    const [unitImages, setUnitImages] = useState({});
+    const [loadingImages, setLoadingImages] = useState({});
 
     useEffect(() => {
         if (isOpen && topic) {
@@ -94,6 +96,11 @@ export default function CourseModal({ isOpen, onClose, topic, onComplete }) {
 
             setCourseData({ ...response, units: unitsWithIds });
             setExpandedUnits({ 0: true });
+            
+            // Generate images for each unit
+            unitsWithIds.forEach((unit, index) => {
+                generateUnitImage(index, unit.title);
+            });
         } catch (error) {
             console.error('Error:', error);
             // Fallback
@@ -284,6 +291,29 @@ export default function CourseModal({ isOpen, onClose, topic, onComplete }) {
                                         
                                         return (
                                             <div key={uIndex} className="border rounded-xl overflow-hidden">
+                                                {/* Unit Image */}
+                                                <div className="relative h-32 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
+                                                    {loadingImages[uIndex] ? (
+                                                        <div className="absolute inset-0 flex items-center justify-center">
+                                                            <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+                                                        </div>
+                                                    ) : unitImages[uIndex] ? (
+                                                        <img 
+                                                            src={unitImages[uIndex]} 
+                                                            alt={unit.title}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        <div className="absolute inset-0 flex items-center justify-center" style={{ backgroundColor: `${topic.color}20` }}>
+                                                            <BookOpen className="w-8 h-8" style={{ color: topic.color }} />
+                                                        </div>
+                                                    )}
+                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                                                    <div className="absolute bottom-2 left-3 right-3">
+                                                        <h3 className="font-semibold text-white text-shadow">{unit.title}</h3>
+                                                    </div>
+                                                </div>
+                                                
                                                 <button
                                                     onClick={() => setExpandedUnits(prev => ({ ...prev, [uIndex]: !prev[uIndex] }))}
                                                     className="w-full p-4 flex items-center gap-4 hover:bg-gray-50"
@@ -292,8 +322,7 @@ export default function CourseModal({ isOpen, onClose, topic, onComplete }) {
                                                         {unitCompleted ? <CheckCircle className="w-5 h-5" /> : uIndex + 1}
                                                     </div>
                                                     <div className="flex-1 text-left">
-                                                        <h3 className="font-semibold">{unit.title}</h3>
-                                                        <p className="text-sm text-gray-500">{unitProgress}/{unit.lessons?.length} lessons</p>
+                                                        <p className="text-sm text-gray-500">{unitProgress}/{unit.lessons?.length} lessons completed</p>
                                                     </div>
                                                     <ChevronRight className={`w-5 h-5 text-gray-400 transition-transform ${expandedUnits[uIndex] ? 'rotate-90' : ''}`} />
                                                 </button>
