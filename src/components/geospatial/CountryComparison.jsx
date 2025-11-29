@@ -35,6 +35,27 @@ const CATEGORY_LABELS = {
 };
 
 const CATEGORY_SPECIFIC_PROMPTS = {
+    coastal: `Focus ONLY on coastal and coral ecosystem metrics:
+- Coral reef health percentage
+- Coastal erosion rates
+- Marine protected areas coverage
+- Sea level rise vulnerability
+- Mangrove forest coverage`,
+
+    ocean: `Focus ONLY on ocean sustainability metrics:
+- Ocean plastic concentration
+- Fish stock sustainability
+- Marine biodiversity index
+- Shipping pollution levels
+- Ocean dead zone areas`,
+
+    wildlife: `Focus ONLY on endangered wildlife metrics:
+- Number of endangered species
+- Habitat protection percentage
+- Anti-poaching effectiveness
+- Species recovery programs
+- Wildlife corridor connectivity`,
+
     carbon: `Focus ONLY on carbon emissions and climate metrics:
 - CO2 emissions per capita (tons)
 - Total emissions (gigatons)
