@@ -507,7 +507,28 @@ export default function News() {
                 {!expandedCategory && <div className="mb-4" />}
 
                 {/* Refresh Button */}
-                <div className="flex justify-end mb-4">
+                <div className="flex justify-end gap-2 mb-4">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={async () => {
+                            setLoading(true);
+                            try {
+                                const response = await base44.functions.invoke('fetchNews', { populateAll: true });
+                                console.log('Populate all result:', response.data);
+                                alert(`Populated ${response.data?.results?.success?.length || 0} topics!`);
+                                fetchNews(activeCategory);
+                            } catch (err) {
+                                console.error('Populate error:', err);
+                                alert('Failed to populate: ' + err.message);
+                            }
+                            setLoading(false);
+                        }}
+                        disabled={loading}
+                        className="gap-2 bg-green-50 hover:bg-green-100 text-green-700 border-green-200"
+                    >
+                        Populate All Topics (Dev)
+                    </Button>
                     <Button
                         variant="outline"
                         size="sm"
