@@ -130,8 +130,27 @@ export default function CourseModal({ isOpen, onClose, topic, onComplete }) {
                 ]
             });
             setExpandedUnits({ 0: true });
+            // Generate image for fallback units
+            generateUnitImage(0, 'Getting Started');
+            generateUnitImage(1, 'Deep Dive');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const generateUnitImage = async (unitIndex, unitTitle) => {
+        setLoadingImages(prev => ({ ...prev, [unitIndex]: true }));
+        try {
+            const result = await base44.integrations.Core.GenerateImage({
+                prompt: `Educational illustration for "${topic.name}" course, unit titled "${unitTitle}". Modern, clean, minimalist educational style with soft gradients. No text or words in the image. Abstract visual representation of the learning concept.`
+            });
+            if (result?.url) {
+                setUnitImages(prev => ({ ...prev, [unitIndex]: result.url }));
+            }
+        } catch (error) {
+            console.error('Error generating unit image:', error);
+        } finally {
+            setLoadingImages(prev => ({ ...prev, [unitIndex]: false }));
         }
     };
 
