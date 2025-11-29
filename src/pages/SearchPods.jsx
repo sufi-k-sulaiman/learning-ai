@@ -632,11 +632,11 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
             const currentContent = sentencesRef.current.join(' ');
             
             const response = await base44.integrations.Core.InvokeLLM({
-                prompt: `Continue this podcast about "${currentEpisode.title}". Here's what was covered so far (summary): "${currentContent.substring(0, 500)}..."
-                
-                Write 3-4 more paragraphs (about 1-2 minutes worth) expanding on the topic with new insights, examples, or related points. Keep the same conversational tone. Do NOT use markdown formatting.`,
-                add_context_from_internet: true
-            });
+                                prompt: `Continue this podcast about "${currentEpisode.title}". Here's what was covered so far (summary): "${currentContent.substring(0, 500)}..."
+
+                                Write 12 more paragraphs (about 5 minutes worth) expanding on the topic with new insights, examples, stories, or related points. Keep the same conversational tone. Do NOT use markdown formatting.`,
+                                add_context_from_internet: true
+                            });
             
             const cleanText = cleanTextForSpeech(response || '');
             const newSentences = cleanText
