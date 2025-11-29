@@ -175,46 +175,101 @@ const cleanHtmlFromText = (text) => {
         .trim();
 };
 
-const MAX_IMAGES_TO_GENERATE = 6; // Only generate images for first 6 articles
+const MAX_IMAGES_TO_GENERATE = 9; // Only generate images for first 9 articles
+const BATCH_SIZE = 3; // Generate 3 images per batch
+const BATCH_DELAY = 5000; // 5 seconds between batches
 
-const NewsCardSimple = ({ article, index }) => {
-    const [imageUrl, setImageUrl] = useState(null);
-    const [imageLoading, setImageLoading] = useState(index < MAX_IMAGES_TO_GENERATE);
+// Store for batch-generated image URLs
+const imageCache = new Map();
+let batchPromise = null;
+
+const generateImageBatch = async (articles) => {
+    const batches = [];
+    for (let i = 0; i < Math.min(articles.length, MAX_IMAGES_TO_GENERATE); i += BATCH_SIZE) {
+        batches.push(articles.slice(i, i + BATCH_SIZE));
+    }
+    
+    for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
+        const batch = batches[batchIndex];
+        
+        // Wait between batches (except first)
+        if (batchIndex > 0) {
+            await new Promise(resolve => setTimeout(resolve, BATCH_DELAY));
+        }
+        
+        // Generate all images in this batch in parallel
+        const promises = batch.map(async (article, idx) => {
+            const globalIndex = batchIndex * BATCH_SIZE + idx;
+            const cleanTitle = cleanHtmlFromText(article.title);
+            const cleanSummary = cleanHtmlFromText(article.summary);
+            const context = `${cleanTitle}. ${cleanSummary}`.slice(0, 200);
+            
+            try {
+                const result = await base44.integrations.Core.GenerateImage({
+                    prompt: `Professional news photography depicting: ${context}. Photorealistic, editorial style, high quality, no text or words, no logos`
+                });
+                if (result?.url) {
+                    imageCache.set(globalIndex, result.url);
+                }
+            } catch (error) {
+                console.log(`Image ${globalIndex} skipped`);
+            }
+        });
+        
+        await Promise.all(promises);
+    }
+};
+
+const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl }) => {
+    const [imageUrl, setImageUrl] = useState(preloadedImageUrl || null);
+    const [imageLoading, setImageLoading] = useState(index < MAX_IMAGES_TO_GENERATE && !preloadedImageUrl);
     
     const cleanTitle = cleanHtmlFromText(article.title);
     const cleanSummary = cleanHtmlFromText(article.summary);
 
     useEffect(() => {
+        if (preloadedImageUrl) {
+            setImageUrl(preloadedImageUrl);
+            setImageLoading(false);
+            return;
+        }
+        
         // Skip image generation for articles beyond the limit
         if (index >= MAX_IMAGES_TO_GENERATE) {
             setImageLoading(false);
             return;
         }
         
-        const generateImage = async () => {
-            setImageLoading(true);
-            try {
-                // Create a specific prompt from both title and description
-                const context = `${cleanTitle}. ${cleanSummary}`.slice(0, 200);
-                const result = await base44.integrations.Core.GenerateImage({
-                    prompt: `Professional news photography depicting: ${context}. Photorealistic, editorial style, high quality, no text or words, no logos`
-                });
-                if (result?.url) {
-                    setImageUrl(result.url);
-                }
-            } catch (error) {
-                // Silently fail - show placeholder instead
-                console.log('Image generation skipped');
-            } finally {
+        // Check cache periodically for batch-generated images
+        const checkCache = () => {
+            const cachedUrl = imageCache.get(index);
+            if (cachedUrl) {
+                setImageUrl(cachedUrl);
                 setImageLoading(false);
+                return true;
             }
+            return false;
         };
         
-        // Stagger image generation - 3 seconds apart to avoid rate limits
-        const delay = index * 3000;
-        const timer = setTimeout(generateImage, delay);
-        return () => clearTimeout(timer);
-    }, [cleanTitle, cleanSummary, index]);
+        if (checkCache()) return;
+        
+        const interval = setInterval(() => {
+            if (checkCache()) {
+                clearInterval(interval);
+            }
+        }, 500);
+        
+        // Timeout after 30 seconds
+        const timeout = setTimeout(() => {
+            clearInterval(interval);
+            setImageLoading(false);
+        }, 30000);
+        
+        return () => {
+            clearInterval(interval);
+            clearTimeout(timeout);
+        };
+    }, [index, preloadedImageUrl]);
 
     return (
         <a 
