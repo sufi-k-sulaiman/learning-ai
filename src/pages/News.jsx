@@ -308,56 +308,14 @@ export default function News() {
         setLoading(true);
         setError(null);
         try {
-            const response = await base44.integrations.Core.InvokeLLM({
-                prompt: `Search for the latest news about "${keyword}" from multiple sources. 
-                
-Use information from news sources like:
-- Google News: https://www.google.com/search?q=${encodeURIComponent(keyword)}&tbm=nws
-- Bing News: https://www.bing.com/news/search?q=${encodeURIComponent(keyword)}
-- DuckDuckGo News: https://duckduckgo.com/?q=${encodeURIComponent(keyword)}&ia=news&iar=news
-
-Provide 30 news articles. 
-
-IMPORTANT: For URLs, use ONLY these reliable news source formats that you KNOW exist:
-- Reuters: https://www.reuters.com/
-- BBC: https://www.bbc.com/news/
-- AP News: https://apnews.com/
-- NPR: https://www.npr.org/
-- The Guardian: https://www.theguardian.com/
-- CNN: https://www.cnn.com/
-- CNBC: https://www.cnbc.com/
-- TechCrunch: https://techcrunch.com/
-- Wired: https://www.wired.com/
-- Ars Technica: https://arstechnica.com/
-
-If you cannot provide a REAL, VERIFIED URL that you are 100% certain exists, use Google News search URL instead:
-https://news.google.com/search?q={encoded_article_title}
-
-This ensures all links will work.`,
-                add_context_from_internet: true,
-                response_json_schema: {
-                    type: "object",
-                    properties: {
-                        articles: {
-                            type: "array",
-                            items: {
-                                type: "object",
-                                properties: {
-                                    title: { type: "string" },
-                                    source: { type: "string" },
-                                    summary: { type: "string" },
-                                    time: { type: "string" },
-                                    url: { type: "string" },
-                                    category: { type: "string" },
-                                    imagePrompt: { type: "string", description: "A short prompt for generating a lifestyle or nature image related to the article, focusing on earth objects, nature, people, or abstract concepts" }
-                                }
-                            }
-                        }
-                    }
-                }
+            // Use backend function with RSS + NewsAPI
+            const response = await base44.functions.invoke('fetchNews', {
+                query: keyword,
+                category: CATEGORIES.find(c => c.id === keyword)?.id || null,
+                limit: 30
             });
 
-            setNews(response?.articles || []);
+            setNews(response.data?.articles || []);
             setLastUpdated(new Date());
         } catch (err) {
             console.error('Error fetching news:', err);
