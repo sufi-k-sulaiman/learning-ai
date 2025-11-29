@@ -309,15 +309,13 @@ export default function Learning() {
                                                 <span className="flex-1 text-left text-sm font-medium text-gray-700">
                                                     {subject.name}
                                                 </span>
-                                                {isSelected && (
-                                                    <Check className="w-4 h-4 text-purple-600" />
-                                                )}
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-                            </div>
-                        ))}
+                                            {isSelected && (
+                                                <Check className="w-4 h-4 text-purple-600" />
+                                            )}
+                                        </button>
+                                    );
+                                })}
+                        </div>
                         {filteredSubjects.length === 0 && (
                             <div className="text-center py-4 text-gray-500 text-sm">
                                 No subjects found matching "{searchQuery}"
