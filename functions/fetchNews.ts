@@ -48,12 +48,19 @@ async function parseRSS(xml, source) {
         if (title && link) {
             // Resolve Google News redirect URLs to actual article URLs
             const resolvedUrl = await resolveGoogleNewsUrl(cleanUrl(link));
+            const cleanedTitle = cleanText(title);
+            let cleanedSummary = cleanText(description || '');
+            
+            // If summary is empty or too short, generate one from title
+            if (!cleanedSummary || cleanedSummary.length < 20) {
+                cleanedSummary = generateSummaryFromTitle(cleanedTitle);
+            }
             
             return {
-                title: cleanText(title),
+                title: cleanedTitle,
                 url: resolvedUrl,
                 source: extractSourceFromUrl(resolvedUrl) || source,
-                summary: cleanText(description || '').slice(0, 300),
+                summary: cleanedSummary.slice(0, 300),
                 time: formatTime(pubDate),
                 imagePrompt: generateImagePrompt(title),
             };
@@ -85,14 +92,27 @@ function extractGoogleLink(item) {
 function cleanText(text) {
     if (!text) return '';
     return text
+        // Remove all HTML tags including anchor tags with href
+        .replace(/<a[^>]*>.*?<\/a>/gi, '')
         .replace(/<[^>]*>/g, '')
+        // Decode HTML entities
         .replace(/&lt;/g, '<')
         .replace(/&gt;/g, '>')
         .replace(/&amp;/g, '&')
         .replace(/&quot;/g, '"')
         .replace(/&#39;/g, "'")
+        .replace(/&nbsp;/g, ' ')
+        // Remove any remaining URLs
+        .replace(/https?:\/\/[^\s]+/g, '')
+        // Clean up whitespace
         .replace(/\s+/g, ' ')
         .trim();
+}
+
+function generateSummaryFromTitle(title) {
+    // Generate a brief description based on the title when RSS description is empty/poor
+    const cleanTitle = cleanText(title);
+    return `Read the full story about: ${cleanTitle}`;
 }
 
 async function resolveGoogleNewsUrl(url) {
