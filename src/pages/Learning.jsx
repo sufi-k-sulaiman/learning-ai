@@ -251,6 +251,20 @@ export default function Learning() {
                             </div>
                         </div>
                     )}
+
+                    {/* Generate Button */}
+                    <div className="flex items-center justify-between mt-4 pt-3 border-t border-white/20">
+                        <span className="text-xs text-white/70">{selectedSubjects.length} selected</span>
+                        <Button 
+                            onClick={() => generateSubTopics(++requestIdRef.current)}
+                            disabled={loadingTopics || selectedSubjects.length === 0}
+                            className="bg-white text-purple-700 hover:bg-white/90 text-sm"
+                            size="sm"
+                        >
+                            <RefreshCw className={`w-3 h-3 mr-1.5 ${loadingTopics ? 'animate-spin' : ''}`} />
+                            Generate Islands
+                        </Button>
+                    </div>
                 </div>
 
                 {/* Subject Selector - Right */}
