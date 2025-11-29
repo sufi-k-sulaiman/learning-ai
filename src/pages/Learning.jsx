@@ -287,34 +287,34 @@ export default function Learning() {
                     <div className="flex-1 overflow-y-auto max-h-[200px]">
                         <div className="space-y-1">
                             {filteredSubjects.map(subject => {
-                                        const isSelected = selectedSubjects.some(s => s.id === subject.id);
-                                        const IconComponent = ICON_MAP[subject.icon] || GraduationCap;
-                                        return (
-                                            <button
-                                                key={subject.id}
-                                                onClick={() => toggleSubject(subject)}
-                                                className={`w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-colors ${
-                                                    isSelected ? 'bg-purple-50 border border-purple-200' : 'hover:bg-gray-50'
-                                                }`}
-                                            >
-                                                <div 
-                                                    className="w-8 h-8 rounded-lg flex items-center justify-center"
-                                                    style={{ backgroundColor: `${subject.color}20` }}
-                                                >
-                                                    <IconComponent 
-                                                        className="w-4 h-4"
-                                                        style={{ color: subject.color }}
-                                                    />
-                                                </div>
-                                                <span className="flex-1 text-left text-sm font-medium text-gray-700">
-                                                    {subject.name}
-                                                </span>
-                                            {isSelected && (
-                                                <Check className="w-4 h-4 text-purple-600" />
-                                            )}
-                                        </button>
-                                    );
-                                })}
+                                const isSelected = selectedSubjects.some(s => s.id === subject.id);
+                                const IconComponent = ICON_MAP[subject.icon] || GraduationCap;
+                                return (
+                                    <button
+                                        key={subject.id}
+                                        onClick={() => toggleSubject(subject)}
+                                        className={`w-full flex items-center gap-2 px-2 py-2 rounded-lg transition-colors ${
+                                            isSelected ? 'bg-purple-50 border border-purple-200' : 'hover:bg-gray-50'
+                                        }`}
+                                    >
+                                        <div 
+                                            className="w-8 h-8 rounded-lg flex items-center justify-center"
+                                            style={{ backgroundColor: `${subject.color}20` }}
+                                        >
+                                            <IconComponent 
+                                                className="w-4 h-4"
+                                                style={{ color: subject.color }}
+                                            />
+                                        </div>
+                                        <span className="flex-1 text-left text-sm font-medium text-gray-700">
+                                            {subject.name}
+                                        </span>
+                                        {isSelected && (
+                                            <Check className="w-4 h-4 text-purple-600" />
+                                        )}
+                                    </button>
+                                );
+                            })}
                         </div>
                         {filteredSubjects.length === 0 && (
                             <div className="text-center py-4 text-gray-500 text-sm">
