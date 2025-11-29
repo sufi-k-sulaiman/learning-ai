@@ -207,7 +207,7 @@ export default function Learning() {
                     </div>
 
                     {/* Stats */}
-                    <div className="grid grid-cols-3 gap-4 mt-4">
+                    <div className="grid grid-cols-3 gap-x-8 gap-y-4 mt-4">
                         <div className="text-center">
                             <p className="text-xl md:text-2xl font-bold text-white">{subTopics.length}</p>
                             <p className="text-xs text-purple-200">Islands</p>
