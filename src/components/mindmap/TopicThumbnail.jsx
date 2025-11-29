@@ -46,50 +46,45 @@ export default function TopicThumbnail({ topic, onClick }) {
     return (
         <button
             onClick={() => onClick(topic)}
-            className="group relative bg-white rounded-2xl border border-gray-200 p-3 hover:shadow-lg hover:border-purple-300 transition-all duration-300 text-left"
+            className="group relative bg-white rounded-2xl border border-gray-200 p-4 hover:shadow-lg hover:border-purple-300 transition-all duration-300 text-left col-span-2"
         >
             {/* Mini mind map visualization */}
-            <div className="relative h-36 mb-2">
+            <div className="relative h-32 mb-2">
                 {/* Connecting lines */}
                 <svg className="absolute inset-0 w-full h-full" style={{ zIndex: 0 }}>
-                    <line x1="50%" y1="50%" x2="22%" y2="18%" stroke={secondary} strokeWidth="2" opacity="0.4" />
-                    <line x1="50%" y1="50%" x2="78%" y2="18%" stroke={tertiary} strokeWidth="2" opacity="0.4" />
-                    <line x1="50%" y1="50%" x2="50%" y2="88%" stroke={secondary} strokeWidth="2" opacity="0.4" />
+                    <line x1="50%" y1="50%" x2="15%" y2="25%" stroke={secondary} strokeWidth="2" opacity="0.4" />
+                    <line x1="50%" y1="50%" x2="85%" y2="25%" stroke={tertiary} strokeWidth="2" opacity="0.4" />
+                    <line x1="50%" y1="50%" x2="50%" y2="90%" stroke={secondary} strokeWidth="2" opacity="0.4" />
                 </svg>
                 
                 {/* Center node */}
                 <div 
-                    className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 rounded-full flex items-center justify-center text-white text-[10px] font-bold shadow-lg z-10 group-hover:scale-110 transition-transform text-center px-1"
+                    className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 px-4 py-2 rounded-xl flex items-center justify-center text-white text-xs font-bold shadow-lg z-10 group-hover:scale-110 transition-transform text-center"
                     style={{ backgroundColor: primary }}
                 >
-                    {topic.length > 10 ? topic.slice(0, 8) + '...' : topic}
+                    {topic}
                 </div>
                 
                 {/* Child nodes */}
                 <div 
-                    className="absolute left-[12%] top-[8%] w-12 h-12 rounded-full flex items-center justify-center text-white text-[8px] font-medium shadow-md group-hover:scale-105 transition-transform"
+                    className="absolute left-[5%] top-[10%] px-3 py-1.5 rounded-lg flex items-center justify-center text-white text-[10px] font-medium shadow-md group-hover:scale-105 transition-transform"
                     style={{ backgroundColor: secondary }}
                 >
-                    {subtopics[0]?.slice(0, 7)}
+                    {subtopics[0]}
                 </div>
                 <div 
-                    className="absolute right-[12%] top-[8%] w-12 h-12 rounded-full flex items-center justify-center text-white text-[8px] font-medium shadow-md group-hover:scale-105 transition-transform"
+                    className="absolute right-[5%] top-[10%] px-3 py-1.5 rounded-lg flex items-center justify-center text-white text-[10px] font-medium shadow-md group-hover:scale-105 transition-transform"
                     style={{ backgroundColor: tertiary }}
                 >
-                    {subtopics[1]?.slice(0, 7)}
+                    {subtopics[1]}
                 </div>
                 <div 
-                    className="absolute left-1/2 -translate-x-1/2 bottom-0 w-12 h-12 rounded-full flex items-center justify-center text-white text-[8px] font-medium shadow-md group-hover:scale-105 transition-transform"
+                    className="absolute left-1/2 -translate-x-1/2 bottom-0 px-3 py-1.5 rounded-lg flex items-center justify-center text-white text-[10px] font-medium shadow-md group-hover:scale-105 transition-transform"
                     style={{ backgroundColor: secondary }}
                 >
-                    {subtopics[2]?.slice(0, 7)}
+                    {subtopics[2]}
                 </div>
             </div>
-            
-            {/* Topic name */}
-            <h3 className="font-semibold text-gray-900 text-xs text-center group-hover:text-purple-700 transition-colors truncate">
-                {topic}
-            </h3>
         </button>
     );
 }
