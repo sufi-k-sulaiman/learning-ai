@@ -116,21 +116,8 @@ function generateSummaryFromTitle(title) {
 }
 
 async function resolveGoogleNewsUrl(url) {
-    // Google News URLs are redirects - follow them to get real URL
-    if (url.includes('news.google.com')) {
-        try {
-            const response = await fetch(url, {
-                method: 'HEAD',
-                redirect: 'follow',
-                headers: {
-                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                },
-            });
-            return response.url || url;
-        } catch {
-            return url;
-        }
-    }
+    // Skip URL resolution to avoid timeouts - just return the Google News URL
+    // Users will be redirected when they click the link
     return url;
 }
 
