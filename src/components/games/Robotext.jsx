@@ -97,9 +97,15 @@ export default function Robotext({ onBack }) {
         ];
 
         setScore(0);
+        scoreRef.current = 0;
         setLives(3);
+        livesRef.current = 3;
+        setLevel(1);
+        levelRef.current = 1;
         setCollectedWords([]);
         setActiveAbilities({});
+        showStoryRef.current = false;
+        storyIndexRef.current = 0;
     }, []);
 
     const spawnEnemy = useCallback(() => {
