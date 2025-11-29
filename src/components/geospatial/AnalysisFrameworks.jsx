@@ -219,14 +219,14 @@ const FRAMEWORK_SCHEMAS = {
     pareto: {
         type: "object",
         properties: {
-            actions: { type: "array", items: { type: "object", properties: { action: { type: "string" }, impact: { type: "number" }, cumulative: { type: "number" } } } },
+            actions: { type: "array", items: { type: "object", properties: { action: { type: "string" }, impact: { type: "number" }, cumulative: { type: "number" }, explanation: { type: "string" } } } },
             insight: { type: "string" }
         }
     },
     ansoff: {
         type: "object",
         properties: {
-            quadrants: { type: "array", items: { type: "object", properties: { quadrant: { type: "string" }, risk: { type: "number" }, reward: { type: "number" }, initiatives: { type: "array", items: { type: "object", properties: { name: { type: "string" }, score: { type: "number" } } } } } } },
+            quadrants: { type: "array", items: { type: "object", properties: { quadrant: { type: "string" }, risk: { type: "number" }, reward: { type: "number" }, description: { type: "string" }, initiatives: { type: "array", items: { type: "object", properties: { name: { type: "string" }, score: { type: "number" }, detail: { type: "string" } } } } } } },
             insight: { type: "string" }
         }
     },
