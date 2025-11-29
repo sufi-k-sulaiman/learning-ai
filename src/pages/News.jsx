@@ -365,28 +365,6 @@ export default function News() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [lastUpdated, setLastUpdated] = useState(null);
-    const [populatingCache, setPopulatingCache] = useState(false);
-    
-    const isDev = window.location.hostname === 'localhost' || window.location.hostname.includes('preview');
-
-    const handlePopulateCache = async () => {
-        setPopulatingCache(true);
-        try {
-            const response = await base44.functions.invoke('populateNewsCache', {});
-            console.log('Cache response:', response.data);
-            if (response.data?.errors?.length > 0) {
-                toast.error('Errors: ' + response.data.errors.slice(0, 2).join(', '));
-            } else {
-                toast.success(response.data?.message || 'Cache populated successfully!');
-            }
-            fetchNews(activeCategory);
-        } catch (err) {
-            console.error('Populate cache error:', err);
-            toast.error('Failed: ' + (err?.response?.data?.error || err?.message || 'Unknown error'));
-        } finally {
-            setPopulatingCache(false);
-        }
-    };
 
     const fetchNews = async (keyword) => {
         setLoading(true);
