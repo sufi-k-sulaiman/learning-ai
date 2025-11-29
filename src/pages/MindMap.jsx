@@ -533,11 +533,11 @@ export default function MindMapPage() {
     return (
         <div
             ref={containerRef}
-            className={`min-h-screen bg-gray-50 ${isFullscreen ? 'p-2 overflow-auto' : 'p-2 md:p-3'}`}
+            className={`min-h-screen bg-gray-50 ${isFullscreen ? 'p-1 overflow-auto' : 'p-1'}`}
         >
             <div className={`${isFullscreen ? 'max-w-none' : 'max-w-7xl mx-auto'}`}>
                 {/* Mind Map Content */}
-                <div className={`bg-white rounded-xl border border-gray-200 ${isFullscreen ? 'h-[calc(100vh-16px)]' : 'h-[calc(100vh-32px)]'} overflow-hidden p-3`}>
+                <div className={`bg-white rounded-xl border border-gray-200 ${isFullscreen ? 'h-[calc(100vh-8px)]' : 'h-[calc(100vh-16px)]'} overflow-hidden p-2`}>
                     {/* Header inside the card */}
                     <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
                         <div className="flex items-center gap-3">
@@ -708,7 +708,7 @@ export default function MindMapPage() {
                                 Search for any topic to generate an interactive knowledge tree. Click Explore to dive deeper or Learn for detailed insights.
                             </p>
 
-                            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-9 gap-2 w-full">
+                            <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-9 gap-2 w-full justify-items-center mx-auto" style={{ maxWidth: 'fit-content' }}
                                 {[
                                     'Geography', 'Psychology', 'Music', 'Business', 'Sociology', 'Environment',
                                     'Mathematics', 'History', 'Literature', 'Sports', 'Science', 'Culture & Anthropology',
