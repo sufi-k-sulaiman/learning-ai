@@ -432,13 +432,13 @@ export default function Qwirey() {
 
             } else {
                 const modelPrompts = {
-                    gpt4: 'You are GPT-4 by OpenAI. Provide a helpful, accurate, and detailed response.',
-                    claude: 'You are Claude by Anthropic. Provide a thoughtful, nuanced, and well-reasoned response.',
-                    gemini: 'You are Gemini by Google. Provide a comprehensive and informative response.'
+                    gpt4: 'You are GPT-4 by OpenAI. Provide a helpful, accurate, and detailed response with multiple paragraphs.',
+                    claude: 'You are Claude by Anthropic. Provide a thoughtful, nuanced, and well-reasoned response with thorough explanations.',
+                    gemini: 'You are Gemini by Google. Provide a comprehensive and informative response with detailed analysis.'
                 };
 
                 const response = await base44.integrations.Core.InvokeLLM({
-                    prompt: `${modelPrompts[selectedModel]}\n\n${webUrl ? `Reference URL: ${webUrl}\n` : ''}User: ${fullPrompt}`,
+                    prompt: `${modelPrompts[selectedModel]}\n\nIMPORTANT: Provide a detailed, comprehensive response with at least 3-4 paragraphs.\n\n${webUrl ? `Reference URL: ${webUrl}\n` : ''}User question: ${fullPrompt}`,
                     add_context_from_internet: true
                 });
 
