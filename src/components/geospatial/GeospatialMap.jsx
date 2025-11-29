@@ -423,7 +423,7 @@ export default function GeospatialMap({
         setSelectedStyle(mapType);
     }, [mapType]);
     
-    const config = isWorldMap ? { center: [20, 0], zoom: 2 } : (USE_CASE_CENTERS[useCase] || USE_CASE_CENTERS.greenhouse);
+    const config = isWorldMap ? { center: [20, 0], zoom: 2 } : (USE_CASE_CENTERS[useCase] || DEFAULT_CENTER);
     const dataPoints = useMemo(() => generateDataPoints(useCase, mini ? 10 : 25, isWorldMap), [useCase, mini, isWorldMap]);
     const routes = useMemo(() => generateRoutes(useCase), [useCase]);
     
