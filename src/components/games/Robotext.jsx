@@ -220,7 +220,7 @@ export default function Robotext({ onBack }) {
         const canvas = canvasRef.current;
         const ctx = canvas?.getContext('2d');
         const g = gameStateRef.current;
-        if (!canvas || !ctx || !g || gameStatus !== 'playing') return;
+        if (!canvas || !ctx || !g) return;
 
         const keys = keysRef.current;
         const dt = 16;
