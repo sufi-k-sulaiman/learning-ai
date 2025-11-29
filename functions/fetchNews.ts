@@ -253,32 +253,7 @@ Deno.serve(async (req) => {
 
         const { query, category, limit = 30 } = await req.json();
 
-        // Check cache first
-        const cacheKey = query?.toLowerCase() || category || 'technology';
-        
-        try {
-            const cached = await base44.entities.NewsCache.filter({ category: cacheKey });
-
-            if (cached.length > 0 && cached[0].articles?.length > 0) {
-                const articles = cached[0].articles.map(art => ({
-                    ...art,
-                    time: formatTimeFromDate(art.publishedAt),
-                }));
-
-                return Response.json({
-                    success: true,
-                    source: 'cache',
-                    count: articles.length,
-                    query: query || null,
-                    category: category || null,
-                    articles: articles.slice(0, limit),
-                });
-            }
-        } catch (cacheError) {
-            console.log('Cache check failed, fetching live:', cacheError.message);
-        }
-
-        // Fetch live from Google News RSS
+        // Fetch live from Google News RSS - skip cache to avoid auth issues
         console.log('Fetching live news for:', query || category || 'technology');
         const liveArticles = await fetchGoogleNewsRSS(query || category || 'technology', !query && !!category);
         
