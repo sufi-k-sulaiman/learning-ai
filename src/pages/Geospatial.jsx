@@ -55,13 +55,23 @@ export default function Geospatial() {
     const [loading, setLoading] = useState(false);
     const [insights, setInsights] = useState([]);
 
-    const currentUseCase = USE_CASES.find(u => u.id === activeUseCase);
+    const selectedUseCases = USE_CASES.filter(u => activeUseCases.includes(u.id));
+    const currentUseCase = selectedUseCases[0] || USE_CASES[0];
+
+    const toggleUseCase = (id) => {
+        setActiveUseCases(prev => 
+            prev.includes(id) 
+                ? prev.filter(x => x !== id)
+                : [...prev, id]
+        );
+    };
 
     const generateInsights = async () => {
         setLoading(true);
         try {
+            const names = selectedUseCases.map(u => u.name).join(', ');
             const response = await base44.integrations.Core.InvokeLLM({
-                prompt: `Generate 4 geospatial insights for ${currentUseCase?.name} use case. Each insight should have a title, value/metric, and trend direction.`,
+                prompt: `Generate 4 geospatial insights for these use cases: ${names}. Each insight should have a title, value/metric, and trend direction.`,
                 add_context_from_internet: true,
                 response_json_schema: {
                     type: "object",
