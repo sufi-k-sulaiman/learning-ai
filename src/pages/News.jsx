@@ -376,18 +376,23 @@ export default function News() {
                 limit: 30
             });
 
-            setNews(response.data?.articles || []);
-            setLastUpdated(new Date());
+            const articles = response.data?.articles || [];
+            if (articles.length === 0 && response.data?.error) {
+                console.error('Backend error:', response.data.error);
+                setError('E200');
+            } else {
+                setNews(articles);
+                setLastUpdated(new Date());
+            }
         } catch (err) {
             console.error('Error fetching news:', err);
-            // Check if it's actually an AI error or a network/backend error
             const errorMessage = err?.message?.toLowerCase() || '';
             if (errorMessage.includes('network') || errorMessage.includes('fetch') || errorMessage.includes('timeout')) {
-                setError('E100'); // Network error
+                setError('E100');
             } else if (err?.response?.status === 401) {
-                setError('E400'); // Auth error
+                setError('E400');
             } else {
-                setError('E200'); // Data load failed (more accurate for backend function errors)
+                setError('E200');
             }
             setNews([]);
         } finally {
