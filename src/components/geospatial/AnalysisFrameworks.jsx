@@ -26,14 +26,84 @@ const CATEGORY_LABELS = {
 };
 
 const FRAMEWORK_PROMPTS = {
-    swot: (categories) => `Perform a detailed SWOT analysis for global environmental efforts in: ${categories}. Provide 4 items each with a score (0-100) indicating strength/severity.`,
-    dmaic: (categories) => `Apply DMAIC framework to improving global ${categories} outcomes. For each phase provide a score (0-100) indicating current progress and 3 specific data points.`,
-    ice: (categories) => `Use ICE scoring for 6 environmental initiatives for ${categories}. Each needs Impact (1-10), Confidence (1-10), Ease (1-10) scores with specific metrics.`,
-    pareto: (categories) => `Apply Pareto (80/20) to ${categories}. List 6 actions with their impact percentage (totaling 100%) and specific measurable outcomes.`,
-    ansoff: (categories) => `Apply Ansoff Matrix to ${categories} environmental strategy. Provide 3 specific initiatives per quadrant with growth potential scores (0-100).`,
-    pestle: (categories) => `Conduct PESTLE analysis for ${categories}. For each factor provide an impact score (0-100) and 2 specific current data points/statistics.`,
-    porter: (categories) => `Apply Porter's Five Forces to ${categories} industry. Rate each force 1-10 and provide specific market data and competitive insights.`,
-    bcg: (categories) => `Create BCG Matrix for ${categories} initiatives. Provide market share % and growth rate % for 8 specific initiatives across all quadrants.`,
+    swot: (categories) => `Perform a SWOT analysis SPECIFICALLY for ${categories} environmental sector.
+
+ONLY include items directly related to ${categories}. Examples:
+- For Carbon & Climate: emissions reduction tech, carbon pricing policies, renewable energy adoption, fossil fuel lobbying
+- For Forests: deforestation rates, reforestation programs, illegal logging, biodiversity corridors
+- For Air & Water: pollution monitoring, treatment infrastructure, industrial emissions, water scarcity
+
+Provide 4 items per category with scores (0-100). Be specific with real data points like percentages, gigatons, PPM levels, hectares.`,
+
+    dmaic: (categories) => `Apply DMAIC framework SPECIFICALLY to ${categories} environmental outcomes.
+
+Focus on actual ${categories} metrics:
+- For Carbon: CO2 emissions (gigatons), temperature anomalies, renewable capacity (GW)
+- For Forests: deforestation rates (hectares/year), forest coverage %, species populations
+- For Air/Water: AQI levels, PM2.5 concentrations, water quality indices
+
+Each phase needs a progress score (0-100) and 3 specific measurable data points relevant to ${categories}.`,
+
+    ice: (categories) => `Score 6 specific initiatives for ${categories} using ICE framework.
+
+Initiatives MUST be directly related to ${categories}:
+- For Carbon: carbon capture, methane reduction, grid decarbonization, EV adoption, building efficiency
+- For Forests: protected area expansion, sustainable forestry, REDD+ programs, indigenous land rights
+- For Resources: circular mining, rare earth recycling, sustainable extraction
+
+Rate Impact/Confidence/Ease (1-10) with specific justification using real metrics.`,
+
+    pareto: (categories) => `Apply Pareto 80/20 rule to ${categories} specifically.
+
+Identify the 20% of actions that drive 80% of improvement in ${categories}:
+- For Carbon: which emission sources to target (power, transport, industry percentages)
+- For Forests: which regions/activities cause most deforestation
+- For Water: which pollutants/sources cause most contamination
+
+List 6 high-impact actions with their specific contribution percentages (must total ~100%).`,
+
+    ansoff: (categories) => `Apply Ansoff Matrix to ${categories} environmental strategy.
+
+All initiatives MUST relate to ${categories}:
+- Market Penetration: scaling existing ${categories} solutions
+- Market Development: new regions/sectors for ${categories} solutions  
+- Product Development: new technologies for ${categories}
+- Diversification: cross-sector ${categories} innovations
+
+Provide 3 specific initiatives per quadrant with growth potential scores based on real market data.`,
+
+    pestle: (categories) => `Conduct PESTLE analysis SPECIFICALLY for ${categories} sector.
+
+Each factor must relate to ${categories}:
+- Political: ${categories}-specific regulations, treaties, government targets
+- Economic: ${categories} market size, investment flows, carbon pricing
+- Social: public awareness of ${categories} issues, behavior changes
+- Technological: ${categories}-specific innovations, R&D breakthroughs
+- Legal: ${categories} compliance requirements, liability laws
+- Environmental: current ${categories} state, trends, tipping points
+
+Include real 2024 statistics and data points for each factor.`,
+
+    porter: (categories) => `Apply Porter's Five Forces to ${categories} industry/sector.
+
+Analyze competitive dynamics specific to ${categories}:
+- Rivalry: competition among ${categories} solution providers
+- Supplier Power: raw materials, technology for ${categories}
+- Buyer Power: governments, corporations demanding ${categories} solutions
+- Substitutes: alternative approaches to ${categories} challenges
+- New Entrants: startups, new players in ${categories} space
+
+Rate each force 1-10 with specific market data and examples from ${categories} sector.`,
+
+    bcg: (categories) => `Create BCG Matrix for ${categories} initiatives and technologies.
+
+Categorize real ${categories} solutions:
+- Stars: high-growth, high-share ${categories} technologies (e.g., solar for carbon, satellite monitoring for forests)
+- Cash Cows: mature ${categories} solutions with stable returns
+- Question Marks: emerging ${categories} innovations with uncertain outcomes
+- Dogs: declining or ineffective ${categories} approaches
+
+Provide market share % and growth rate % for 8 specific ${categories} initiatives.`,
 };
 
 const FRAMEWORK_SCHEMAS = {
