@@ -220,8 +220,16 @@ async function fetchGoogleNewsRSS(queryOrCategory, isCategory = false) {
     const xml = await response.text();
     console.log('XML length:', xml.length);
     
+    if (!xml || xml.length < 100) {
+        throw new Error('Empty or invalid RSS response from Google News');
+    }
+    
     const articles = await parseRSS(xml, 'Google News');
     console.log('Parsed articles:', articles.length);
+    
+    if (articles.length === 0) {
+        throw new Error('No articles parsed from RSS feed');
+    }
     
     return articles;
 }
