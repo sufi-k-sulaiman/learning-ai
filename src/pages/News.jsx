@@ -316,11 +316,24 @@ Use information from news sources like:
 - Bing News: https://www.bing.com/news/search?q=${encodeURIComponent(keyword)}
 - DuckDuckGo News: https://duckduckgo.com/?q=${encodeURIComponent(keyword)}&ia=news&iar=news
 
-Provide 100 most recent and relevant news articles (we will filter out invalid URLs, so provide extra to ensure at least 12 valid ones). 
+Provide 30 news articles. 
 
-CRITICAL: For each article, you MUST provide the REAL, ACTUAL, VALID URL to the original news article on the publisher's website (e.g., https://www.cnn.com/2024/..., https://www.bbc.com/news/..., https://www.reuters.com/...). 
-DO NOT make up URLs. Only include articles where you can provide a real, working link to the source.
-The URL must be a direct link to the article page, not a search results page.`,
+IMPORTANT: For URLs, use ONLY these reliable news source formats that you KNOW exist:
+- Reuters: https://www.reuters.com/
+- BBC: https://www.bbc.com/news/
+- AP News: https://apnews.com/
+- NPR: https://www.npr.org/
+- The Guardian: https://www.theguardian.com/
+- CNN: https://www.cnn.com/
+- CNBC: https://www.cnbc.com/
+- TechCrunch: https://techcrunch.com/
+- Wired: https://www.wired.com/
+- Ars Technica: https://arstechnica.com/
+
+If you cannot provide a REAL, VERIFIED URL that you are 100% certain exists, use Google News search URL instead:
+https://news.google.com/search?q={encoded_article_title}
+
+This ensures all links will work.`,
                 add_context_from_internet: true,
                 response_json_schema: {
                     type: "object",
