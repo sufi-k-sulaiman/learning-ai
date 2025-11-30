@@ -305,7 +305,7 @@ CRITICAL: Do NOT embed URLs or markdown links like [text](url) in any text field
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-4xl max-h-[85vh] overflow-y-auto p-0 z-[10000]">
+            <DialogContent className="max-w-full w-full h-full max-h-full rounded-none md:max-w-4xl md:max-h-[85vh] md:rounded-lg overflow-y-auto p-0 z-[10000]">
                 <div className="p-4 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white z-10">
                     <div className="flex items-center gap-3">
                         {Icon && (

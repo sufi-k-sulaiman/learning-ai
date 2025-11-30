@@ -108,7 +108,7 @@ export default function TaskModal({ task, isOpen, onClose, onSave, onDelete, cat
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
-        className="max-w-2xl" 
+        className="max-w-full w-full h-full max-h-full rounded-none md:max-w-2xl md:max-h-[90vh] md:rounded-lg overflow-y-auto" 
         onPaste={handlePaste}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}

@@ -311,8 +311,8 @@ export default function Notes() {
 
             {/* Editor Modal */}
             <Dialog open={showEditor} onOpenChange={setShowEditor}>
-                <DialogContent className={`${isFullscreen ? 'max-w-full w-full h-full max-h-full rounded-none' : 'max-w-4xl max-h-[90vh]'} p-0 overflow-hidden transition-all`}>
-                    <div className={`flex flex-col ${isFullscreen ? 'h-full' : 'h-[80vh]'}`}>
+                <DialogContent className={`max-w-full w-full h-full max-h-full rounded-none md:max-w-4xl md:max-h-[90vh] md:rounded-lg p-0 overflow-hidden transition-all ${isFullscreen ? '!max-w-full !w-full !h-full !max-h-full !rounded-none' : ''}`}>
+                    <div className={`flex flex-col h-full ${isFullscreen ? '' : 'md:h-[80vh]'}`}>
                         <div className="flex items-center justify-between p-4 border-b bg-white">
                             <Input
                                 placeholder="Note title..."
