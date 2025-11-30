@@ -1085,6 +1085,26 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
                         {/* Options Row */}
                         <div className="mt-4 flex items-center justify-center gap-2 flex-wrap">
                             <button 
+                                onClick={downloadText}
+                                disabled={isGenerating || !sentencesRef.current.length}
+                                className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-600 transition-colors disabled:opacity-50"
+                            >
+                                <FileText className="w-4 h-4" />
+                                Script
+                            </button>
+                            <button 
+                                onClick={downloadMp3}
+                                disabled={isGenerating || isDownloadingMp3 || !sentencesRef.current.length}
+                                className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-600 transition-colors disabled:opacity-50"
+                            >
+                                {isDownloadingMp3 ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                    <Download className="w-4 h-4" />
+                                )}
+                                MP3
+                            </button>
+                            <button 
                                 onClick={() => setShowBraille(!showBraille)}
                                 className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors ${
                                     showBraille 
