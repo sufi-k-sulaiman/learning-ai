@@ -21,13 +21,14 @@ const NewsGrid = ({ news }) => {
     // RSS feeds provide real URLs - no validation needed
     const articles = news.slice(0, ARTICLES_PER_CATEGORY);
 
-    // Start batch image generation when articles load
+    // Start batch image generation when articles load - use stringified news as dependency
+    const newsKey = JSON.stringify(news.map(a => a.title).slice(0, 5));
     useEffect(() => {
+        imageCache.clear();
         if (articles.length > 0) {
-            imageCache.clear();
             generateImageBatch(articles);
         }
-    }, [news]);
+    }, [newsKey]);
 
     if (articles.length === 0) {
         return (
