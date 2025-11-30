@@ -2749,8 +2749,6 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
         }
     };
 
-    const [showMobileNav, setShowMobileNav] = useState(false);
-
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="w-full h-full max-w-full md:max-w-[1400px] max-h-full md:max-h-[90vh] p-0 overflow-hidden bg-gray-50 rounded-none md:rounded-lg">
