@@ -90,12 +90,10 @@ const generateImageBatch = async (articles) => {
         const promises = batch.map(async (article, idx) => {
             const globalIndex = batchIndex * BATCH_SIZE + idx;
             const cleanTitle = cleanHtmlFromText(article.title);
-            const cleanSummary = cleanHtmlFromText(article.summary);
-            const context = `${cleanTitle}. ${cleanSummary}`.slice(0, 200);
             
             try {
                 const result = await base44.integrations.Core.GenerateImage({
-                    prompt: `Professional news photography depicting: ${context}. Photorealistic, editorial style, high quality, no text or words, no logos`
+                    prompt: `Professional news photography depicting: ${cleanTitle.slice(0, 200)}. Photorealistic, editorial style, high quality, no text or words, no logos`
                 });
                 if (result?.url) {
                     imageCache.set(globalIndex, result.url);
@@ -114,7 +112,7 @@ const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl }) => {
     const [imageLoading, setImageLoading] = useState(index < MAX_IMAGES_TO_GENERATE && !preloadedImageUrl);
     
     const cleanTitle = cleanHtmlFromText(article.title);
-    const cleanSummary = cleanHtmlFromText(article.summary);
+    const cleanDescription = cleanHtmlFromText(article.description);
 
     useEffect(() => {
         if (preloadedImageUrl) {
@@ -210,7 +208,7 @@ const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl }) => {
                     {cleanTitle}
                 </h3>
                 <p className="text-gray-600 text-sm line-clamp-2 mb-4">
-                    {cleanSummary || `Read the full story: ${cleanTitle}`}
+                    {cleanDescription || `Read the full story: ${cleanTitle}`}
                 </p>
                 <span className="inline-flex items-center gap-1 text-red-600 hover:text-red-700 text-sm font-medium">
                     Read more <ExternalLink className="w-3 h-3" />
