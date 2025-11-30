@@ -334,99 +334,100 @@ Be specific with real numbers, avoid generic statements. Use actual statistics w
                                 </div>
                             </TabsContent>
 
-                                <TabsContent value="timeline" className="mt-0">
-                                    <div className="bg-white rounded-xl p-4 border">
-                                        <h4 className="font-semibold text-gray-800 mb-3">Impact Score Timeline</h4>
-                                        <div className="h-52">
-                                            <ResponsiveContainer width="100%" height="100%">
-                                                <AreaChart data={chartData}>
-                                                    <defs>
-                                                        <linearGradient id="historicGradient" x1="0" y1="0" x2="0" y2="1">
-                                                            <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.3}/>
-                                                            <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0}/>
-                                                        </linearGradient>
-                                                        <linearGradient id="projectedGradient" x1="0" y1="0" x2="0" y2="1">
-                                                            <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.3}/>
-                                                            <stop offset="95%" stopColor="#F59E0B" stopOpacity={0}/>
-                                                        </linearGradient>
-                                                    </defs>
-                                                    <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                                                    <XAxis 
-                                                        dataKey="year" 
-                                                        tick={{ fontSize: 10 }} 
-                                                        tickLine={false}
-                                                    />
-                                                    <YAxis 
-                                                        domain={[0, 100]} 
-                                                        tick={{ fontSize: 10 }} 
-                                                        tickLine={false}
-                                                    />
-                                                    <Tooltip 
-                                                        content={({ active, payload }) => {
-                                                            if (active && payload && payload[0]) {
-                                                                const d = payload[0].payload;
-                                                                return (
-                                                                    <div className="bg-white p-2 rounded-lg shadow-lg border text-xs">
-                                                                        <p className="font-semibold">{d.year}</p>
-                                                                        <p>
-                                                                            <span className={d.type === 'historic' ? 'text-purple-600' : 'text-amber-600'}>
-                                                                                {d.type === 'historic' ? 'Historic' : 'Projected'}
-                                                                            </span>
-                                                                            : {d.score}
-                                                                        </p>
-                                                                    </div>
-                                                                );
-                                                            }
-                                                            return null;
-                                                        }}
-                                                    />
-                                                    <Area 
-                                                        type="monotone" 
-                                                        dataKey="score" 
-                                                        stroke="#8B5CF6" 
-                                                        strokeWidth={2}
-                                                        fill="url(#historicGradient)"
-                                                        dot={(props) => {
-                                                            const { cx, cy, payload } = props;
-                                                            if (payload.type === 'projected') return null;
+                            <TabsContent value="timeline" className="mt-0">
+                                <div className="bg-gray-50 rounded-lg p-2.5 border">
+                                    <h4 className="font-semibold text-gray-800 text-xs mb-2">Impact Score Timeline</h4>
+                                    <div className="h-40">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <AreaChart data={chartData}>
+                                                <defs>
+                                                    <linearGradient id="historicGradient" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.3}/>
+                                                        <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0}/>
+                                                    </linearGradient>
+                                                    <linearGradient id="projectedGradient" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="5%" stopColor="#F59E0B" stopOpacity={0.3}/>
+                                                        <stop offset="95%" stopColor="#F59E0B" stopOpacity={0}/>
+                                                    </linearGradient>
+                                                </defs>
+                                                <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
+                                                <XAxis 
+                                                    dataKey="year" 
+                                                    tick={{ fontSize: 9 }} 
+                                                    tickLine={false}
+                                                />
+                                                <YAxis 
+                                                    domain={[0, 100]} 
+                                                    tick={{ fontSize: 9 }} 
+                                                    tickLine={false}
+                                                    width={25}
+                                                />
+                                                <Tooltip 
+                                                    content={({ active, payload }) => {
+                                                        if (active && payload && payload[0]) {
+                                                            const d = payload[0].payload;
                                                             return (
-                                                                <circle cx={cx} cy={cy} r={3} fill="#8B5CF6" stroke="#fff" strokeWidth={2} />
+                                                                <div className="bg-white p-1.5 rounded shadow-lg border text-[10px]">
+                                                                    <p className="font-semibold">{d.year}</p>
+                                                                    <p>
+                                                                        <span className={d.type === 'historic' ? 'text-purple-600' : 'text-amber-600'}>
+                                                                            {d.type === 'historic' ? 'Historic' : 'Projected'}
+                                                                        </span>
+                                                                        : {d.score}
+                                                                    </p>
+                                                                </div>
                                                             );
-                                                        }}
-                                                    />
-                                                    <Area 
-                                                        type="monotone" 
-                                                        dataKey="score" 
-                                                        stroke="#F59E0B" 
-                                                        strokeWidth={2}
-                                                        strokeDasharray="5 5"
-                                                        fill="url(#projectedGradient)"
-                                                        dot={(props) => {
-                                                            const { cx, cy, payload } = props;
-                                                            if (payload.type === 'historic') return null;
-                                                            return (
-                                                                <circle cx={cx} cy={cy} r={3} fill="#F59E0B" stroke="#fff" strokeWidth={2} />
-                                                            );
-                                                        }}
-                                                    />
-                                                </AreaChart>
-                                            </ResponsiveContainer>
+                                                        }
+                                                        return null;
+                                                    }}
+                                                />
+                                                <Area 
+                                                    type="monotone" 
+                                                    dataKey="score" 
+                                                    stroke="#8B5CF6" 
+                                                    strokeWidth={2}
+                                                    fill="url(#historicGradient)"
+                                                    dot={(props) => {
+                                                        const { cx, cy, payload } = props;
+                                                        if (payload.type === 'projected') return null;
+                                                        return (
+                                                            <circle cx={cx} cy={cy} r={2} fill="#8B5CF6" stroke="#fff" strokeWidth={1} />
+                                                        );
+                                                    }}
+                                                />
+                                                <Area 
+                                                    type="monotone" 
+                                                    dataKey="score" 
+                                                    stroke="#F59E0B" 
+                                                    strokeWidth={2}
+                                                    strokeDasharray="5 5"
+                                                    fill="url(#projectedGradient)"
+                                                    dot={(props) => {
+                                                        const { cx, cy, payload } = props;
+                                                        if (payload.type === 'historic') return null;
+                                                        return (
+                                                            <circle cx={cx} cy={cy} r={2} fill="#F59E0B" stroke="#fff" strokeWidth={1} />
+                                                        );
+                                                    }}
+                                                />
+                                            </AreaChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                    <div className="flex items-center justify-center gap-4 mt-1.5">
+                                        <div className="flex items-center gap-1">
+                                            <div className="w-2 h-2 rounded-full bg-purple-600" />
+                                            <span className="text-[10px] text-gray-600">Historic</span>
                                         </div>
-                                        <div className="flex items-center justify-center gap-6 mt-2">
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-2 h-2 rounded-full bg-purple-600" />
-                                                <span className="text-xs text-gray-600">Historic</span>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-2 h-2 rounded-full bg-amber-500" />
-                                                <span className="text-xs text-gray-600">Projected</span>
-                                            </div>
+                                        <div className="flex items-center gap-1">
+                                            <div className="w-2 h-2 rounded-full bg-amber-500" />
+                                            <span className="text-[10px] text-gray-600">Projected</span>
                                         </div>
                                     </div>
-                                </TabsContent>
-                            </div>
-                        </Tabs>
-                    </div>
+                                </div>
+                            </TabsContent>
+                        </div>
+                    </Tabs>
+                </div>
             ) : (
                 <div className="flex items-center justify-center h-[calc(100%-3rem)] text-gray-500 text-sm">
                     Failed to load data. Please try again.
