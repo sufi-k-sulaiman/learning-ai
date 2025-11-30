@@ -2766,18 +2766,18 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
                         </button>
                     </div>
 
-                    {/* Mobile Navigation Toggle & Horizontal Scroll Nav */}
-                    <div className="md:hidden bg-white border-b border-gray-200 overflow-x-auto">
-                        <div className="flex gap-1 p-2 min-w-max">
+                    {/* Mobile Navigation - Wrapped Grid */}
+                    <div className="md:hidden bg-white border-b border-gray-200 p-2">
+                        <div className="flex flex-wrap gap-1">
                             {NAV_ITEMS.map(item => (
                                 <button
                                     key={item.id}
                                     onClick={() => setActiveNav(item.id)}
-                                    className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
+                                    className={`flex items-center gap-1 px-2 py-1.5 rounded-lg text-[10px] font-medium transition-colors ${
                                         activeNav === item.id ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-600'
                                     }`}
                                 >
-                                    <item.icon className="w-3.5 h-3.5" />
+                                    <item.icon className="w-3 h-3" />
                                     {item.label}
                                 </button>
                             ))}
