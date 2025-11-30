@@ -588,6 +588,14 @@ export default function GeospatialMap({
                     </div>
                 </div>
             )}
+
+            {/* Location Detail Modal */}
+            <LocationDetailModal
+                isOpen={modalOpen}
+                onClose={() => setModalOpen(false)}
+                location={selectedLocation}
+                useCase={useCase}
+            />
         </div>
     );
 }
