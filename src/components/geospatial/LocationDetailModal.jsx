@@ -244,21 +244,21 @@ Be specific with real numbers, avoid generic statements. Use actual statistics w
                         </div>
                     </div>
 
-                        {/* Tabs for Content */}
-                        <Tabs defaultValue="overview" className="flex-1 overflow-hidden flex flex-col">
-                            <TabsList className="bg-gray-100 p-1 mb-3 w-full justify-start">
-                                <TabsTrigger value="overview" className="gap-1.5 text-xs data-[state=active]:bg-white">
-                                    <FileText className="w-3 h-3" /> Overview
-                                </TabsTrigger>
-                                <TabsTrigger value="findings" className="gap-1.5 text-xs data-[state=active]:bg-white">
-                                    <CheckCircle className="w-3 h-3" /> Key Findings
-                                </TabsTrigger>
-                                <TabsTrigger value="timeline" className="gap-1.5 text-xs data-[state=active]:bg-white">
-                                    <Clock className="w-3 h-3" /> Timeline
-                                </TabsTrigger>
-                            </TabsList>
+                    {/* Tabs for Content */}
+                    <Tabs defaultValue="overview" className="flex-1 overflow-hidden flex flex-col">
+                        <TabsList className="bg-gray-100 p-0.5 mx-3 mt-2 mb-1 justify-start flex-shrink-0">
+                            <TabsTrigger value="overview" className="gap-1 text-[10px] px-2 py-1 data-[state=active]:bg-white">
+                                <FileText className="w-3 h-3" /> Overview
+                            </TabsTrigger>
+                            <TabsTrigger value="findings" className="gap-1 text-[10px] px-2 py-1 data-[state=active]:bg-white">
+                                <CheckCircle className="w-3 h-3" /> Key Findings
+                            </TabsTrigger>
+                            <TabsTrigger value="timeline" className="gap-1 text-[10px] px-2 py-1 data-[state=active]:bg-white">
+                                <Clock className="w-3 h-3" /> Timeline
+                            </TabsTrigger>
+                        </TabsList>
 
-                            <div className="flex-1 overflow-y-auto">
+                        <div className="flex-1 overflow-y-auto px-3 pb-3">
                                 <TabsContent value="overview" className="mt-0">
                                     <div className="bg-white rounded-xl p-4 border">
                                         <h4 className="font-semibold text-gray-800 mb-2">Overview</h4>
