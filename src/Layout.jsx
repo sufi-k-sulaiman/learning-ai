@@ -82,6 +82,11 @@ export default function Layout({ children, currentPageName }) {
     <PageLayout activePage={currentPageName}>
       <ErrorBoundary fallbackMessage="There was an error loading this page.">
       <style>{`
+        /* Hide Leaflet attribution */
+        .leaflet-control-attribution {
+          display: none !important;
+        }
+
         /* Classic UI Style - links instead of buttons */
         [data-ui-style="classic"] button:not([data-keep-button]) {
           background: transparent !important;
