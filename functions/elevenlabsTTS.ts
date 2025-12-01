@@ -24,6 +24,10 @@ Deno.serve(async (req) => {
         const maxChars = 5000;
         const truncatedText = text.length > maxChars ? text.substring(0, maxChars) + '...' : text;
 
+        console.log('Using API key:', apiKey ? apiKey.substring(0, 8) + '...' : 'MISSING');
+        console.log('Voice ID:', voice_id);
+        console.log('Text length:', truncatedText.length);
+
         // Call ElevenLabs API
         const response = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${voice_id}`, {
             method: 'POST',
@@ -34,7 +38,7 @@ Deno.serve(async (req) => {
             },
             body: JSON.stringify({
                 text: truncatedText,
-                model_id: 'eleven_monolingual_v1',
+                model_id: 'eleven_multilingual_v2',
                 voice_settings: {
                     stability: 0.5,
                     similarity_boost: 0.75
@@ -44,7 +48,7 @@ Deno.serve(async (req) => {
 
         if (!response.ok) {
             const error = await response.text();
-            console.error('ElevenLabs error:', error);
+            console.error('ElevenLabs error:', response.status, error);
             return Response.json({ error: 'Failed to generate speech: ' + error }, { status: response.status });
         }
 
