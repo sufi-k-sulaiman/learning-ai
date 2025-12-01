@@ -62,16 +62,11 @@ function CategoryCard({ categoryKey, category, onClick }) {
             <h3 className="text-xl font-bold mb-2">{category.name}</h3>
             <p className="text-white/80 text-sm mb-4">{category.items.length} topics to explore</p>
             <div className="flex flex-wrap gap-1.5">
-                {category.items.slice(0, 4).map((item, i) => (
+                {category.items.map((item, i) => (
                     <span key={i} className="px-2 py-0.5 bg-white/20 rounded-full text-xs">
                         {item}
                     </span>
                 ))}
-                {category.items.length > 4 && (
-                    <span className="px-2 py-0.5 bg-white/20 rounded-full text-xs">
-                        +{category.items.length - 4} more
-                    </span>
-                )}
             </div>
         </div>
     );
