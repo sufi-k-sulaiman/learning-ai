@@ -1,9 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { 
     Brain, Loader2, ChevronRight, Sparkles,
-    Globe, Mountain, Leaf, Zap, Star, Home
+    Globe, Mountain, Leaf, Zap, Star, Home,
+    Atom, FlaskConical, Calculator, BookOpen, Users,
+    Lightbulb, BarChart3, PieChart, TrendingUp, Activity
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import {
+    BarChart, Bar, LineChart, Line, PieChart as RechartsPie, Pie, Cell,
+    AreaChart, Area, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis,
+    XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
+    ComposedChart, Scatter, ScatterChart, RadialBarChart, RadialBar
+} from 'recharts';
 
 const CATEGORIES = {
     Elements_Environment: {
@@ -42,6 +50,8 @@ const CATEGORIES = {
         items: ["Universe", "Galaxy", "Solar System", "Planets", "Asteroids", "Comets", "Black Holes", "Nebulae", "Constellations", "Exoplanets"]
     }
 };
+
+const CHART_COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16'];
 
 function Breadcrumb({ items, onNavigate }) {
     return (
@@ -116,47 +126,174 @@ function ItemCard({ item, color, onClick }) {
     );
 }
 
+function ChartCard({ title, children, color }) {
+    return (
+        <div className="bg-white rounded-xl border border-gray-200 p-4">
+            <h4 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                <BarChart3 className="w-4 h-4" style={{ color }} />
+                {title}
+            </h4>
+            <div className="h-48">
+                {children}
+            </div>
+        </div>
+    );
+}
+
 function ItemDetailView({ item, category }) {
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState(null);
+    const [generatedImages, setGeneratedImages] = useState([]);
+    const [imagesLoading, setImagesLoading] = useState(true);
 
     useEffect(() => {
         fetchItemData();
+        generateImages();
     }, [item]);
+
+    const generateImages = async () => {
+        setImagesLoading(true);
+        try {
+            const imagePromises = [
+                base44.integrations.Core.GenerateImage({
+                    prompt: `Beautiful scientific illustration of ${item}, detailed, educational, vibrant colors, professional quality`
+                }),
+                base44.integrations.Core.GenerateImage({
+                    prompt: `Abstract artistic representation of ${item} showing its essence and characteristics, modern digital art style`
+                })
+            ];
+            const results = await Promise.all(imagePromises);
+            setGeneratedImages(results.map(r => r.url));
+        } catch (error) {
+            console.error('Failed to generate images:', error);
+            setGeneratedImages([]);
+        } finally {
+            setImagesLoading(false);
+        }
+    };
 
     const fetchItemData = async () => {
         setLoading(true);
         setData(null);
         try {
             const response = await base44.integrations.Core.InvokeLLM({
-                prompt: `Provide comprehensive intelligence data about "${item}" in the context of ${category?.name || 'natural world'}. Include:
-1. Overview: A detailed description (3-4 sentences)
-2. Key Facts: 5 interesting facts
-3. Significance: Why it matters to humans and the planet
-4. Related Topics: 4 related concepts to explore
-5. Current Research: Recent scientific discoveries or developments`,
+                prompt: `Provide extremely comprehensive intelligence data about "${item}" in the context of ${category?.name || 'natural world'}. 
+
+Generate detailed scientific data including:
+
+1. Overview: A detailed description (4-5 sentences)
+2. Key Facts: 8 fascinating and surprising facts
+3. Fun Facts: 5 entertaining and memorable facts that would amaze people
+4. Significance: Why it matters to humans and the planet (detailed)
+
+5. Physical Compositions: Provide detailed structural attributes including:
+   - Structure description
+   - Measurable properties (with specific values and units)
+   - Physical states and forms
+   - Density, mass, or size metrics where applicable
+
+6. Chemical Compositions: Provide elemental and molecular makeup including:
+   - Primary elements with percentages
+   - Key compounds or molecules
+   - Chemical properties and reactions
+   - Molecular structure description
+
+7. Mathematical Illustrations: Provide relevant equations and models:
+   - Key equations (with variable explanations)
+   - Mathematical models used to describe behavior
+   - Geometric representations if applicable
+   - Statistical patterns or ratios
+
+8. Research Data: Provide evidence-based insights:
+   - 5 key research findings with study references
+   - Statistical data points with sources
+   - Recent discoveries (2020-2024)
+   - Ongoing research areas
+
+9. Subject Matter Experts: List 5 renowned experts:
+   - Name, institution, specialty
+   - Key contributions to the field
+
+10. Chart Data: Generate realistic data for 10 different visualizations:
+    - Distribution data (8 categories with percentages)
+    - Trend data (12 time points showing changes)
+    - Comparison data (6 items to compare)
+    - Composition breakdown (5 components)
+    - Geographic distribution (6 regions)
+    - Annual statistics (10 years)
+    - Performance metrics (8 metrics)
+    - Correlation data (10 x,y points)
+    - Ranking data (8 items ranked)
+    - Cyclical patterns (12 months)
+
+11. Related Topics: 6 related concepts to explore`,
                 add_context_from_internet: true,
                 response_json_schema: {
                     type: "object",
                     properties: {
                         overview: { type: "string" },
                         keyFacts: { type: "array", items: { type: "string" } },
+                        funFacts: { type: "array", items: { type: "string" } },
                         significance: { type: "string" },
-                        relatedTopics: { type: "array", items: { type: "string" } },
-                        currentResearch: { type: "string" }
+                        physicalCompositions: {
+                            type: "object",
+                            properties: {
+                                structure: { type: "string" },
+                                measurableProperties: { type: "array", items: { type: "object", properties: { property: { type: "string" }, value: { type: "string" }, unit: { type: "string" } } } },
+                                physicalStates: { type: "array", items: { type: "string" } },
+                                metrics: { type: "string" }
+                            }
+                        },
+                        chemicalCompositions: {
+                            type: "object",
+                            properties: {
+                                elements: { type: "array", items: { type: "object", properties: { element: { type: "string" }, percentage: { type: "number" } } } },
+                                compounds: { type: "array", items: { type: "string" } },
+                                properties: { type: "string" },
+                                molecularStructure: { type: "string" }
+                            }
+                        },
+                        mathematicalIllustrations: {
+                            type: "object",
+                            properties: {
+                                equations: { type: "array", items: { type: "object", properties: { equation: { type: "string" }, description: { type: "string" } } } },
+                                models: { type: "array", items: { type: "string" } },
+                                geometricRepresentations: { type: "string" },
+                                statisticalPatterns: { type: "string" }
+                            }
+                        },
+                        researchData: {
+                            type: "object",
+                            properties: {
+                                findings: { type: "array", items: { type: "object", properties: { finding: { type: "string" }, source: { type: "string" }, year: { type: "number" } } } },
+                                statistics: { type: "array", items: { type: "object", properties: { stat: { type: "string" }, value: { type: "string" }, source: { type: "string" } } } },
+                                recentDiscoveries: { type: "array", items: { type: "string" } },
+                                ongoingResearch: { type: "array", items: { type: "string" } }
+                            }
+                        },
+                        experts: { type: "array", items: { type: "object", properties: { name: { type: "string" }, institution: { type: "string" }, specialty: { type: "string" }, contribution: { type: "string" } } } },
+                        chartData: {
+                            type: "object",
+                            properties: {
+                                distribution: { type: "array", items: { type: "object", properties: { name: { type: "string" }, value: { type: "number" } } } },
+                                trend: { type: "array", items: { type: "object", properties: { period: { type: "string" }, value: { type: "number" } } } },
+                                comparison: { type: "array", items: { type: "object", properties: { name: { type: "string" }, valueA: { type: "number" }, valueB: { type: "number" } } } },
+                                composition: { type: "array", items: { type: "object", properties: { name: { type: "string" }, value: { type: "number" } } } },
+                                geographic: { type: "array", items: { type: "object", properties: { region: { type: "string" }, value: { type: "number" } } } },
+                                annual: { type: "array", items: { type: "object", properties: { year: { type: "number" }, value: { type: "number" } } } },
+                                performance: { type: "array", items: { type: "object", properties: { metric: { type: "string" }, score: { type: "number" }, max: { type: "number" } } } },
+                                correlation: { type: "array", items: { type: "object", properties: { x: { type: "number" }, y: { type: "number" } } } },
+                                ranking: { type: "array", items: { type: "object", properties: { name: { type: "string" }, rank: { type: "number" }, score: { type: "number" } } } },
+                                cyclical: { type: "array", items: { type: "object", properties: { month: { type: "string" }, value: { type: "number" } } } }
+                            }
+                        },
+                        relatedTopics: { type: "array", items: { type: "string" } }
                     }
                 }
             });
             setData(response);
         } catch (error) {
             console.error('Failed to fetch item data:', error);
-            setData({
-                overview: `${item} is a fascinating subject within ${category?.name || 'the natural world'}.`,
-                keyFacts: ['Information is being gathered...'],
-                significance: 'This topic plays an important role in our understanding of the world.',
-                relatedTopics: ['More topics coming soon'],
-                currentResearch: 'Research data is being compiled.'
-            });
         } finally {
             setLoading(false);
         }
@@ -166,14 +303,24 @@ function ItemDetailView({ item, category }) {
         return (
             <div className="flex flex-col items-center justify-center py-20">
                 <Loader2 className="w-10 h-10 animate-spin mb-4" style={{ color: category?.color }} />
-                <p className="text-gray-500">Loading intelligence data...</p>
+                <p className="text-gray-500">Loading comprehensive intelligence data...</p>
+                <p className="text-gray-400 text-sm mt-2">Generating charts, compositions, and research data...</p>
+            </div>
+        );
+    }
+
+    if (!data) {
+        return (
+            <div className="text-center py-20">
+                <p className="text-gray-500">Failed to load data. Please try again.</p>
             </div>
         );
     }
 
     return (
-        <div>
-            <div className={`bg-gradient-to-r ${category?.gradient || 'from-purple-600 to-indigo-600'} rounded-2xl p-6 mb-6 text-white`}>
+        <div className="space-y-6">
+            {/* Header */}
+            <div className={`bg-gradient-to-r ${category?.gradient || 'from-purple-600 to-indigo-600'} rounded-2xl p-6 text-white`}>
                 <div className="flex items-center gap-4">
                     <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center">
                         <Sparkles className="w-7 h-7" />
@@ -185,51 +332,476 @@ function ItemDetailView({ item, category }) {
                 </div>
             </div>
 
-            <div className="space-y-6">
-                <div className="bg-white rounded-xl border border-gray-200 p-5">
-                    <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                        <Globe className="w-5 h-5" style={{ color: category?.color }} />
-                        Overview
-                    </h3>
-                    <p className="text-gray-700 leading-relaxed">{data?.overview}</p>
-                </div>
-                
-                <div className="bg-white rounded-xl border border-gray-200 p-5">
-                    <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                        <Sparkles className="w-5 h-5" style={{ color: category?.color }} />
-                        Key Facts
-                    </h3>
-                    <div className="space-y-3">
-                        {data?.keyFacts?.map((fact, i) => (
-                            <div key={i} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-                                <span className="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0" style={{ backgroundColor: category?.color }}>
-                                    {i + 1}
-                                </span>
-                                <p className="text-gray-700 text-sm">{fact}</p>
+            {/* Generated Images */}
+            <div className="bg-white rounded-xl border border-gray-200 p-5">
+                <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <Sparkles className="w-5 h-5" style={{ color: category?.color }} />
+                    AI-Generated Visualizations
+                </h3>
+                {imagesLoading ? (
+                    <div className="flex gap-4">
+                        {[1, 2].map(i => (
+                            <div key={i} className="flex-1 h-48 bg-gray-100 rounded-xl animate-pulse flex items-center justify-center">
+                                <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
                             </div>
                         ))}
                     </div>
-                </div>
-                
-                <div className="bg-white rounded-xl border border-gray-200 p-5" style={{ backgroundColor: `${category?.color}08` }}>
-                    <h3 className="font-semibold text-gray-900 mb-2">Why It Matters</h3>
-                    <p className="text-gray-700">{data?.significance}</p>
-                </div>
-                
-                <div className="bg-white rounded-xl border border-gray-200 p-5">
-                    <h3 className="font-semibold text-gray-900 mb-4">Related Topics</h3>
-                    <div className="flex flex-wrap gap-2">
-                        {data?.relatedTopics?.map((topic, i) => (
-                            <span key={i} className="px-4 py-2 rounded-full text-sm font-medium" style={{ backgroundColor: `${category?.color}15`, color: category?.color }}>
-                                {topic}
-                            </span>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {generatedImages.map((url, i) => (
+                            <img key={i} src={url} alt={`${item} visualization ${i + 1}`} className="w-full h-48 object-cover rounded-xl" />
                         ))}
                     </div>
+                )}
+            </div>
+
+            {/* Overview */}
+            <div className="bg-white rounded-xl border border-gray-200 p-5">
+                <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                    <Globe className="w-5 h-5" style={{ color: category?.color }} />
+                    Overview
+                </h3>
+                <p className="text-gray-700 leading-relaxed">{data?.overview}</p>
+            </div>
+
+            {/* Fun Facts */}
+            <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl border border-amber-200 p-5">
+                <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <Lightbulb className="w-5 h-5 text-amber-500" />
+                    Fun Facts
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {data?.funFacts?.map((fact, i) => (
+                        <div key={i} className="bg-white/80 rounded-lg p-3 flex items-start gap-3">
+                            <span className="text-2xl">🎉</span>
+                            <p className="text-gray-700 text-sm">{fact}</p>
+                        </div>
+                    ))}
                 </div>
-                
-                <div className="bg-white rounded-xl border border-gray-200 p-5">
-                    <h3 className="font-semibold text-gray-900 mb-2">Current Research</h3>
-                    <p className="text-gray-600">{data?.currentResearch}</p>
+            </div>
+
+            {/* Charts Section - 10 Dynamic Charts */}
+            <div className="bg-white rounded-xl border border-gray-200 p-5">
+                <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <BarChart3 className="w-5 h-5" style={{ color: category?.color }} />
+                    Data Visualizations & Analytics
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* 1. Distribution Pie Chart */}
+                    <ChartCard title="Distribution Analysis" color={category?.color}>
+                        <ResponsiveContainer width="100%" height="100%">
+                            <RechartsPie>
+                                <Pie
+                                    data={data?.chartData?.distribution || []}
+                                    dataKey="value"
+                                    nameKey="name"
+                                    cx="50%"
+                                    cy="50%"
+                                    outerRadius={60}
+                                    label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                                    labelLine={false}
+                                >
+                                    {(data?.chartData?.distribution || []).map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                                    ))}
+                                </Pie>
+                                <Tooltip />
+                            </RechartsPie>
+                        </ResponsiveContainer>
+                    </ChartCard>
+
+                    {/* 2. Trend Line Chart */}
+                    <ChartCard title="Trend Analysis" color={category?.color}>
+                        <ResponsiveContainer width="100%" height="100%">
+                            <LineChart data={data?.chartData?.trend || []}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                <XAxis dataKey="period" tick={{ fontSize: 10 }} />
+                                <YAxis tick={{ fontSize: 10 }} />
+                                <Tooltip />
+                                <Line type="monotone" dataKey="value" stroke={category?.color} strokeWidth={2} dot={{ fill: category?.color }} />
+                            </LineChart>
+                        </ResponsiveContainer>
+                    </ChartCard>
+
+                    {/* 3. Comparison Bar Chart */}
+                    <ChartCard title="Comparative Analysis" color={category?.color}>
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={data?.chartData?.comparison || []}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+                                <YAxis tick={{ fontSize: 10 }} />
+                                <Tooltip />
+                                <Bar dataKey="valueA" fill={category?.color} name="Primary" />
+                                <Bar dataKey="valueB" fill="#94A3B8" name="Secondary" />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </ChartCard>
+
+                    {/* 4. Composition Donut */}
+                    <ChartCard title="Composition Breakdown" color={category?.color}>
+                        <ResponsiveContainer width="100%" height="100%">
+                            <RechartsPie>
+                                <Pie
+                                    data={data?.chartData?.composition || []}
+                                    dataKey="value"
+                                    nameKey="name"
+                                    cx="50%"
+                                    cy="50%"
+                                    innerRadius={30}
+                                    outerRadius={60}
+                                >
+                                    {(data?.chartData?.composition || []).map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                                    ))}
+                                </Pie>
+                                <Tooltip />
+                                <Legend />
+                            </RechartsPie>
+                        </ResponsiveContainer>
+                    </ChartCard>
+
+                    {/* 5. Geographic Bar */}
+                    <ChartCard title="Geographic Distribution" color={category?.color}>
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={data?.chartData?.geographic || []} layout="vertical">
+                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                <XAxis type="number" tick={{ fontSize: 10 }} />
+                                <YAxis dataKey="region" type="category" tick={{ fontSize: 10 }} width={80} />
+                                <Tooltip />
+                                <Bar dataKey="value" fill={category?.color} radius={[0, 4, 4, 0]} />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </ChartCard>
+
+                    {/* 6. Annual Area Chart */}
+                    <ChartCard title="Annual Statistics" color={category?.color}>
+                        <ResponsiveContainer width="100%" height="100%">
+                            <AreaChart data={data?.chartData?.annual || []}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                <XAxis dataKey="year" tick={{ fontSize: 10 }} />
+                                <YAxis tick={{ fontSize: 10 }} />
+                                <Tooltip />
+                                <Area type="monotone" dataKey="value" stroke={category?.color} fill={`${category?.color}40`} />
+                            </AreaChart>
+                        </ResponsiveContainer>
+                    </ChartCard>
+
+                    {/* 7. Performance Radar */}
+                    <ChartCard title="Performance Metrics" color={category?.color}>
+                        <ResponsiveContainer width="100%" height="100%">
+                            <RadarChart data={data?.chartData?.performance || []}>
+                                <PolarGrid />
+                                <PolarAngleAxis dataKey="metric" tick={{ fontSize: 8 }} />
+                                <PolarRadiusAxis tick={{ fontSize: 8 }} />
+                                <Radar name="Score" dataKey="score" stroke={category?.color} fill={category?.color} fillOpacity={0.5} />
+                            </RadarChart>
+                        </ResponsiveContainer>
+                    </ChartCard>
+
+                    {/* 8. Correlation Scatter */}
+                    <ChartCard title="Correlation Analysis" color={category?.color}>
+                        <ResponsiveContainer width="100%" height="100%">
+                            <ScatterChart>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                <XAxis dataKey="x" tick={{ fontSize: 10 }} />
+                                <YAxis dataKey="y" tick={{ fontSize: 10 }} />
+                                <Tooltip cursor={{ strokeDasharray: '3 3' }} />
+                                <Scatter data={data?.chartData?.correlation || []} fill={category?.color} />
+                            </ScatterChart>
+                        </ResponsiveContainer>
+                    </ChartCard>
+
+                    {/* 9. Ranking Bar */}
+                    <ChartCard title="Rankings" color={category?.color}>
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={data?.chartData?.ranking || []}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                <XAxis dataKey="name" tick={{ fontSize: 9 }} />
+                                <YAxis tick={{ fontSize: 10 }} />
+                                <Tooltip />
+                                <Bar dataKey="score" fill={category?.color}>
+                                    {(data?.chartData?.ranking || []).map((entry, index) => (
+                                        <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                                    ))}
+                                </Bar>
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </ChartCard>
+
+                    {/* 10. Cyclical Pattern */}
+                    <ChartCard title="Cyclical Patterns" color={category?.color}>
+                        <ResponsiveContainer width="100%" height="100%">
+                            <ComposedChart data={data?.chartData?.cyclical || []}>
+                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                <XAxis dataKey="month" tick={{ fontSize: 9 }} />
+                                <YAxis tick={{ fontSize: 10 }} />
+                                <Tooltip />
+                                <Area type="monotone" dataKey="value" fill={`${category?.color}30`} stroke="none" />
+                                <Line type="monotone" dataKey="value" stroke={category?.color} strokeWidth={2} />
+                            </ComposedChart>
+                        </ResponsiveContainer>
+                    </ChartCard>
+                </div>
+            </div>
+
+            {/* Key Facts */}
+            <div className="bg-white rounded-xl border border-gray-200 p-5">
+                <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <Sparkles className="w-5 h-5" style={{ color: category?.color }} />
+                    Key Facts
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {data?.keyFacts?.map((fact, i) => (
+                        <div key={i} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                            <span className="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0" style={{ backgroundColor: category?.color }}>
+                                {i + 1}
+                            </span>
+                            <p className="text-gray-700 text-sm">{fact}</p>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Physical Compositions */}
+            <div className="bg-white rounded-xl border border-gray-200 p-5">
+                <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <Atom className="w-5 h-5" style={{ color: category?.color }} />
+                    Physical Compositions
+                </h3>
+                <div className="space-y-4">
+                    <div className="p-4 bg-blue-50 rounded-lg">
+                        <h4 className="font-medium text-blue-800 mb-2">Structure</h4>
+                        <p className="text-blue-700 text-sm">{data?.physicalCompositions?.structure}</p>
+                    </div>
+                    <div>
+                        <h4 className="font-medium text-gray-800 mb-3">Measurable Properties</h4>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                            {data?.physicalCompositions?.measurableProperties?.map((prop, i) => (
+                                <div key={i} className="bg-gray-50 rounded-lg p-3">
+                                    <p className="text-xs text-gray-500 uppercase">{prop.property}</p>
+                                    <p className="text-lg font-semibold" style={{ color: category?.color }}>{prop.value} <span className="text-sm text-gray-500">{prop.unit}</span></p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    {data?.physicalCompositions?.physicalStates?.length > 0 && (
+                        <div>
+                            <h4 className="font-medium text-gray-800 mb-2">Physical States</h4>
+                            <div className="flex flex-wrap gap-2">
+                                {data?.physicalCompositions?.physicalStates?.map((state, i) => (
+                                    <span key={i} className="px-3 py-1 bg-gray-100 rounded-full text-sm text-gray-700">{state}</span>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                    {data?.physicalCompositions?.metrics && (
+                        <div className="p-4 bg-gray-50 rounded-lg">
+                            <h4 className="font-medium text-gray-800 mb-2">Additional Metrics</h4>
+                            <p className="text-gray-600 text-sm">{data?.physicalCompositions?.metrics}</p>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Chemical Compositions */}
+            <div className="bg-white rounded-xl border border-gray-200 p-5">
+                <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <FlaskConical className="w-5 h-5" style={{ color: category?.color }} />
+                    Chemical Compositions
+                </h3>
+                <div className="space-y-4">
+                    {data?.chemicalCompositions?.elements?.length > 0 && (
+                        <div>
+                            <h4 className="font-medium text-gray-800 mb-3">Elemental Composition</h4>
+                            <div className="space-y-2">
+                                {data?.chemicalCompositions?.elements?.map((el, i) => (
+                                    <div key={i} className="flex items-center gap-3">
+                                        <span className="w-20 text-sm font-medium text-gray-700">{el.element}</span>
+                                        <div className="flex-1 h-6 bg-gray-100 rounded-full overflow-hidden">
+                                            <div 
+                                                className="h-full rounded-full" 
+                                                style={{ width: `${el.percentage}%`, backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }}
+                                            />
+                                        </div>
+                                        <span className="w-14 text-sm text-gray-600 text-right">{el.percentage}%</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                    {data?.chemicalCompositions?.compounds?.length > 0 && (
+                        <div>
+                            <h4 className="font-medium text-gray-800 mb-2">Key Compounds</h4>
+                            <div className="flex flex-wrap gap-2">
+                                {data?.chemicalCompositions?.compounds?.map((compound, i) => (
+                                    <span key={i} className="px-3 py-1 bg-green-50 text-green-700 rounded-full text-sm">{compound}</span>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                    {data?.chemicalCompositions?.properties && (
+                        <div className="p-4 bg-green-50 rounded-lg">
+                            <h4 className="font-medium text-green-800 mb-2">Chemical Properties</h4>
+                            <p className="text-green-700 text-sm">{data?.chemicalCompositions?.properties}</p>
+                        </div>
+                    )}
+                    {data?.chemicalCompositions?.molecularStructure && (
+                        <div className="p-4 bg-gray-50 rounded-lg">
+                            <h4 className="font-medium text-gray-800 mb-2">Molecular Structure</h4>
+                            <p className="text-gray-600 text-sm">{data?.chemicalCompositions?.molecularStructure}</p>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Mathematical Illustrations */}
+            <div className="bg-white rounded-xl border border-gray-200 p-5">
+                <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <Calculator className="w-5 h-5" style={{ color: category?.color }} />
+                    Mathematical Illustrations
+                </h3>
+                <div className="space-y-4">
+                    {data?.mathematicalIllustrations?.equations?.length > 0 && (
+                        <div>
+                            <h4 className="font-medium text-gray-800 mb-3">Key Equations</h4>
+                            <div className="space-y-3">
+                                {data?.mathematicalIllustrations?.equations?.map((eq, i) => (
+                                    <div key={i} className="p-4 bg-purple-50 rounded-lg border-l-4 border-purple-400">
+                                        <p className="font-mono text-lg text-purple-800 mb-2">{eq.equation}</p>
+                                        <p className="text-purple-600 text-sm">{eq.description}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                    {data?.mathematicalIllustrations?.models?.length > 0 && (
+                        <div>
+                            <h4 className="font-medium text-gray-800 mb-2">Mathematical Models</h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                {data?.mathematicalIllustrations?.models?.map((model, i) => (
+                                    <div key={i} className="p-3 bg-gray-50 rounded-lg flex items-center gap-2">
+                                        <Activity className="w-4 h-4 text-purple-500" />
+                                        <p className="text-gray-700 text-sm">{model}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                    {data?.mathematicalIllustrations?.geometricRepresentations && (
+                        <div className="p-4 bg-indigo-50 rounded-lg">
+                            <h4 className="font-medium text-indigo-800 mb-2">Geometric Representations</h4>
+                            <p className="text-indigo-700 text-sm">{data?.mathematicalIllustrations?.geometricRepresentations}</p>
+                        </div>
+                    )}
+                    {data?.mathematicalIllustrations?.statisticalPatterns && (
+                        <div className="p-4 bg-gray-50 rounded-lg">
+                            <h4 className="font-medium text-gray-800 mb-2">Statistical Patterns</h4>
+                            <p className="text-gray-600 text-sm">{data?.mathematicalIllustrations?.statisticalPatterns}</p>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Research Data */}
+            <div className="bg-white rounded-xl border border-gray-200 p-5">
+                <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <BookOpen className="w-5 h-5" style={{ color: category?.color }} />
+                    Research Data
+                </h3>
+                <div className="space-y-4">
+                    {data?.researchData?.findings?.length > 0 && (
+                        <div>
+                            <h4 className="font-medium text-gray-800 mb-3">Key Research Findings</h4>
+                            <div className="space-y-3">
+                                {data?.researchData?.findings?.map((finding, i) => (
+                                    <div key={i} className="p-4 bg-gray-50 rounded-lg">
+                                        <p className="text-gray-800 mb-2">{finding.finding}</p>
+                                        <p className="text-xs text-gray-500">Source: {finding.source} ({finding.year})</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                    {data?.researchData?.statistics?.length > 0 && (
+                        <div>
+                            <h4 className="font-medium text-gray-800 mb-3">Statistical Data</h4>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                {data?.researchData?.statistics?.map((stat, i) => (
+                                    <div key={i} className="p-4 rounded-lg" style={{ backgroundColor: `${category?.color}10` }}>
+                                        <p className="text-2xl font-bold" style={{ color: category?.color }}>{stat.value}</p>
+                                        <p className="text-sm text-gray-700">{stat.stat}</p>
+                                        <p className="text-xs text-gray-500 mt-1">{stat.source}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                    {data?.researchData?.recentDiscoveries?.length > 0 && (
+                        <div>
+                            <h4 className="font-medium text-gray-800 mb-2">Recent Discoveries (2020-2024)</h4>
+                            <div className="space-y-2">
+                                {data?.researchData?.recentDiscoveries?.map((discovery, i) => (
+                                    <div key={i} className="flex items-start gap-2 p-3 bg-emerald-50 rounded-lg">
+                                        <TrendingUp className="w-4 h-4 text-emerald-500 mt-0.5 flex-shrink-0" />
+                                        <p className="text-emerald-800 text-sm">{discovery}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                    {data?.researchData?.ongoingResearch?.length > 0 && (
+                        <div>
+                            <h4 className="font-medium text-gray-800 mb-2">Ongoing Research Areas</h4>
+                            <div className="flex flex-wrap gap-2">
+                                {data?.researchData?.ongoingResearch?.map((area, i) => (
+                                    <span key={i} className="px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-sm">{area}</span>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Subject Matter Experts */}
+            <div className="bg-white rounded-xl border border-gray-200 p-5">
+                <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    <Users className="w-5 h-5" style={{ color: category?.color }} />
+                    Subject Matter Experts
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {data?.experts?.map((expert, i) => (
+                        <div key={i} className="p-4 bg-gray-50 rounded-xl">
+                            <div className="flex items-start gap-3">
+                                <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold" style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }}>
+                                    {expert.name?.charAt(0)}
+                                </div>
+                                <div className="flex-1">
+                                    <h4 className="font-semibold text-gray-900">{expert.name}</h4>
+                                    <p className="text-sm text-gray-600">{expert.institution}</p>
+                                    <p className="text-xs text-gray-500 mt-1">Specialty: {expert.specialty}</p>
+                                    <p className="text-sm text-gray-700 mt-2">{expert.contribution}</p>
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            {/* Significance */}
+            <div className="rounded-xl border p-5" style={{ backgroundColor: `${category?.color}08`, borderColor: `${category?.color}30` }}>
+                <h3 className="font-semibold text-gray-900 mb-2">Why It Matters</h3>
+                <p className="text-gray-700">{data?.significance}</p>
+            </div>
+
+            {/* Related Topics */}
+            <div className="bg-white rounded-xl border border-gray-200 p-5">
+                <h3 className="font-semibold text-gray-900 mb-4">Related Topics</h3>
+                <div className="flex flex-wrap gap-2">
+                    {data?.relatedTopics?.map((topic, i) => (
+                        <span key={i} className="px-4 py-2 rounded-full text-sm font-medium cursor-pointer hover:scale-105 transition-transform" style={{ backgroundColor: `${category?.color}15`, color: category?.color }}>
+                            {topic}
+                        </span>
+                    ))}
                 </div>
             </div>
         </div>
@@ -266,7 +838,6 @@ export default function Intelligence() {
 
     const currentCategory = selectedCategory ? CATEGORIES[selectedCategory] : null;
 
-    // Build breadcrumb items
     const breadcrumbItems = [{ label: 'Intelligence' }];
     if (selectedCategory) {
         breadcrumbItems.push({ label: currentCategory.name });
@@ -305,12 +876,9 @@ export default function Intelligence() {
                     </div>
                 </div>
 
-                {/* Breadcrumb Navigation */}
                 <Breadcrumb items={breadcrumbItems} onNavigate={handleBreadcrumbNavigate} />
 
-                {/* Content */}
                 {!selectedCategory ? (
-                    /* Category Grid */
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                         {Object.entries(CATEGORIES).map(([key, category]) => (
                             <CategoryCard 
@@ -321,7 +889,6 @@ export default function Intelligence() {
                         ))}
                     </div>
                 ) : !selectedItem ? (
-                    /* Category Items View */
                     <div>
                         <div className={`bg-gradient-to-r ${currentCategory.gradient} rounded-2xl p-6 mb-6 text-white`}>
                             <div className="flex items-center gap-4">
@@ -347,7 +914,6 @@ export default function Intelligence() {
                         </div>
                     </div>
                 ) : (
-                    /* Item Detail View */
                     <ItemDetailView item={selectedItem} category={currentCategory} />
                 )}
             </div>
