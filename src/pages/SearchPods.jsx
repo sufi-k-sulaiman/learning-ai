@@ -169,25 +169,39 @@ export default function SearchPods() {
         return () => clearInterval(interval);
     }, []);
 
-    // Load ONLY Google voices
+    // Load voices - including mobile browser voices
     useEffect(() => {
         const loadVoices = () => {
             const availableVoices = window.speechSynthesis?.getVoices() || [];
             
-            // Get ONLY Google voices
-            const googleVoices = availableVoices.filter(v => 
-                v.name.toLowerCase().includes('google') && v.lang.startsWith('en')
-            );
+            // On mobile, Google voices may not be available, so include all English voices
+            const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            
+            let filteredVoices;
+            if (isMobile) {
+                // On mobile, get all English voices
+                filteredVoices = availableVoices.filter(v => v.lang.startsWith('en'));
+            } else {
+                // On desktop, prefer Google voices but fall back to all English if none
+                const googleVoices = availableVoices.filter(v => 
+                    v.name.toLowerCase().includes('google') && v.lang.startsWith('en')
+                );
+                filteredVoices = googleVoices.length > 0 
+                    ? googleVoices 
+                    : availableVoices.filter(v => v.lang.startsWith('en'));
+            }
             
             // Sort alphabetically
-            googleVoices.sort((a, b) => a.name.localeCompare(b.name));
+            filteredVoices.sort((a, b) => a.name.localeCompare(b.name));
             
-            setVoices(googleVoices);
+            setVoices(filteredVoices);
             
             // Always set the default voice when voices load
-            if (googleVoices.length > 0) {
-                const preferred = googleVoices.find(v => v.name === 'Google UK English Female')
-                    || googleVoices[0];
+            if (filteredVoices.length > 0 && !selectedVoice) {
+                const preferred = filteredVoices.find(v => v.name === 'Google UK English Female')
+                    || filteredVoices.find(v => v.name.toLowerCase().includes('female'))
+                    || filteredVoices.find(v => v.name.toLowerCase().includes('samantha'))
+                    || filteredVoices[0];
                 setSelectedVoice(preferred);
             }
         };
@@ -198,9 +212,10 @@ export default function SearchPods() {
             // Also listen for async voice loading
             window.speechSynthesis.onvoiceschanged = loadVoices;
             
-            // Force reload voices after a delay (some browsers need this)
+            // Force reload voices after delays (some browsers need this, especially mobile)
             setTimeout(loadVoices, 100);
             setTimeout(loadVoices, 500);
+            setTimeout(loadVoices, 1000);
         }
         
         return () => {
