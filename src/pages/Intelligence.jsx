@@ -132,6 +132,28 @@ function CategoryCard({ category, onClick }) {
             </div>
             <h3 className="text-xl font-bold mb-2">{category.name}</h3>
             <p className="text-white/80 text-sm mb-4">{category.items.length} topics to explore</p>
+            
+            {/* Core Philosophy Preview */}
+            {category.corePhilosophy && (
+                <p className="text-white/70 text-xs mb-3 line-clamp-2">{category.corePhilosophy.understanding}</p>
+            )}
+            
+            {/* Features Preview */}
+            {category.features && (
+                <div className="flex flex-wrap gap-1 mb-3">
+                    {category.features.slice(0, 3).map((feature, i) => (
+                        <span key={i} className="px-2 py-0.5 bg-white/10 rounded text-xs text-white/80">
+                            {feature}
+                        </span>
+                    ))}
+                    {category.features.length > 3 && (
+                        <span className="px-2 py-0.5 bg-white/10 rounded text-xs text-white/80">
+                            +{category.features.length - 3}
+                        </span>
+                    )}
+                </div>
+            )}
+            
             <div className="flex flex-wrap gap-1.5">
                 {category.items.map((item, i) => (
                     <span key={i} className="px-2 py-0.5 bg-white/20 rounded-full text-xs">
