@@ -139,7 +139,7 @@ export default function SearchPods() {
     const [currentCaption, setCurrentCaption] = useState('');
     const [captionWords, setCaptionWords] = useState([]);
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
-    const [selectedVoice, setSelectedVoice] = useState('en-US-AriaNeural');
+    const [selectedVoice, setSelectedVoice] = useState('en-us');
     const [isDownloadingMp3, setIsDownloadingMp3] = useState(false);
     const [showRecommendations, setShowRecommendations] = useState(false);
     const [showEqualizer, setShowEqualizer] = useState(false);
@@ -164,8 +164,10 @@ export default function SearchPods() {
     }, []);
 
     // Available Edge TTS voices
-    const edgeVoices = [
-        { id: 'en-US-AriaNeural', label: 'US Female', locale: 'US' },
+    const googleVoices = [
+        { id: 'en-us', label: 'US English' },
+        { id: 'en-gb', label: 'UK English' },
+        { id: 'en-au', label: 'AU English' },
     ];
 
     // Cleanup audio on unmount
@@ -267,18 +269,41 @@ export default function SearchPods() {
         try {
             setGenerationStep('Writing script...');
 
-            // Use a simple fallback script - skip LLM to avoid AI service errors
-            const rawText = `Welcome to this episode about ${episode.title}. 
+            // Generate longer script using LLM for 8 minute podcast
+            let rawText;
+            try {
+                const scriptResponse = await base44.integrations.Core.InvokeLLM({
+                    prompt: `Write a detailed, engaging 8-minute podcast script about "${episode.title}". 
 
-Today we're going to explore this fascinating topic together. Let me share some key insights with you.
+            Include:
+            - A warm welcome and introduction
+            - Deep exploration of the topic with multiple key points
+            - Real examples, stories, or case studies
+            - Practical tips or actionable insights
+            - Interesting facts or statistics
+            - Different perspectives on the topic
+            - A thoughtful conclusion with takeaways
 
-First, it's important to understand the fundamentals. This topic has been gaining attention for good reasons and there are several aspects worth considering.
+            Write in a conversational, friendly tone as if speaking directly to one listener. 
+            Do NOT use markdown, bullet points, or special formatting - just natural flowing paragraphs.
+            Aim for about 1200-1500 words to fill 8 minutes of audio.`,
+                    add_context_from_internet: true
+                });
+                rawText = scriptResponse || `Welcome to this episode about ${episode.title}. Today we explore this fascinating topic together.`;
+            } catch (llmError) {
+                console.log('LLM fallback:', llmError);
+                rawText = `Welcome to this episode about ${episode.title}. 
 
-The implications are quite significant when you think about it. Many experts have shared their perspectives on this subject.
+            Today we're going to explore this fascinating topic together. Let me share some key insights with you.
 
-What makes this particularly interesting is how it connects to our daily lives. Understanding these concepts can help us make better decisions.
+            First, it's important to understand the fundamentals. This topic has been gaining attention for good reasons and there are several aspects worth considering.
 
-As we wrap up, remember that learning is a continuous journey. Thank you for listening, and I hope you found this helpful. Until next time!`;
+            The implications are quite significant when you think about it. Many experts have shared their perspectives on this subject.
+
+            What makes this particularly interesting is how it connects to our daily lives. Understanding these concepts can help us make better decisions.
+
+            As we wrap up, remember that learning is a continuous journey. Thank you for listening, and I hope you found this helpful. Until next time!`;
+            }
             
             setGenerationStep('Generating audio...');
             const cleanText = cleanTextForSpeech(rawText);
@@ -296,13 +321,12 @@ As we wrap up, remember that learning is a continuous journey. Thank you for lis
 
             sentencesRef.current = sentences;
 
-            // Generate audio using Edge TTS backend
+            // Generate audio using Google TTS backend
             let ttsResponse;
             try {
                 ttsResponse = await base44.functions.invoke('edgeTTS', {
                     text: cleanText,
-                    voice: selectedVoice,
-                    pauseMs: 600
+                    lang: selectedVoice
                 });
             } catch (ttsError) {
                 console.error('TTS function error:', ttsError);
@@ -740,7 +764,7 @@ As we wrap up, remember that learning is a continuous journey. Thank you for lis
                                     <img 
                                         src={podImage} 
                                         alt="Podcast cover" 
-                                        className="absolute inset-0 w-full h-full object-cover rounded-2xl"
+                                        className={`absolute inset-0 w-full h-full object-cover rounded-2xl transition-all duration-300 ${isExtending ? 'animate-pulse scale-105' : ''}`}
                                     />
                                 )}
                                 
@@ -931,9 +955,9 @@ As we wrap up, remember that learning is a continuous journey. Thank you for lis
                         </div>
                         </div>
 
-                        {/* Voice Selection - Edge TTS Voices */}
+                        {/* Voice Selection - Google TTS Voices */}
                         <div className="mt-4 flex items-center justify-center gap-2 flex-wrap">
-                        {edgeVoices.map((voice) => (
+                        {googleVoices.map((voice) => (
                             <button
                                 key={voice.id}
                                 onClick={() => setSelectedVoice(voice.id)}

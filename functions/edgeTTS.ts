@@ -79,7 +79,7 @@ Deno.serve(async (req) => {
         }
 
         const body = await req.json();
-        const { text } = body;
+        const { text, lang = "en" } = body;
 
         if (!text) {
             return Response.json({ error: "No text provided" }, { status: 400 });
@@ -87,7 +87,7 @@ Deno.serve(async (req) => {
 
         console.log(`Generating TTS for ${text.length} chars`);
 
-        const audio = await googleTTS(text, "en");
+        const audio = await googleTTS(text, lang);
         
         console.log(`Generated ${audio.length} bytes`);
 
