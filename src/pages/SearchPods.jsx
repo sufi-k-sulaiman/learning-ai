@@ -232,7 +232,7 @@ export default function SearchPods() {
         }
     };
 
-    // Play episode with Edge TTS audio file
+    // Play episode with ElevenLabs TTS audio
     const playEpisode = async (episode) => {
         // Stop any existing audio
         if (audioRef.current) {
