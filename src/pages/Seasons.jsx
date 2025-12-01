@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 import { 
     Sun, Cloud, CloudRain, Wind, Thermometer, Droplets, Eye, 
     BookOpen, GraduationCap, Lightbulb, Globe, Calendar, Heart,
@@ -30,23 +32,25 @@ const TABS = [
 const DEPTH_FILTERS = ['Quick Glance', 'Standard', 'Deep Dive'];
 const INTEREST_FILTERS = ['Science', 'Travel', 'Health', 'Sustainability'];
 
-function Breadcrumb({ items, onNavigate }) {
+function Breadcrumb({ items }) {
     return (
         <nav className="flex items-center gap-2 text-sm mb-6 flex-wrap">
             {items.map((item, index) => (
                 <React.Fragment key={index}>
                     {index > 0 && <ChevronRight className="w-4 h-4 text-gray-400" />}
-                    <button
-                        onClick={() => onNavigate(index)}
-                        className={`flex items-center gap-1.5 px-2 py-1 rounded-lg transition-colors ${
-                            index === items.length - 1 
-                                ? 'text-amber-600 font-medium bg-amber-50' 
-                                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                        }`}
-                    >
-                        {index === 0 && <Home className="w-4 h-4" />}
-                        {item.label}
-                    </button>
+                    {item.href ? (
+                        <Link
+                            to={item.href}
+                            className="flex items-center gap-1.5 px-2 py-1 rounded-lg transition-colors text-gray-600 hover:text-gray-900 hover:bg-gray-100"
+                        >
+                            {index === 0 && <Home className="w-4 h-4" />}
+                            {item.label}
+                        </Link>
+                    ) : (
+                        <span className="flex items-center gap-1.5 px-2 py-1 rounded-lg text-amber-600 font-medium bg-amber-50">
+                            {item.label}
+                        </span>
+                    )}
                 </React.Fragment>
             ))}
         </nav>
@@ -957,16 +961,14 @@ export default function Seasons() {
         source: "Mark Twain"
     });
 
-    const breadcrumbItems = [{ label: 'Seasons', level: 0 }];
+    const breadcrumbItems = [
+        { label: 'Intelligence', href: createPageUrl('Intelligence') },
+        { label: 'Forces & Cycles', href: createPageUrl('Intelligence') + '?category=Forces_Cycles' },
+        { label: 'Seasons' }
+    ];
     if (selectedTopic) {
-        breadcrumbItems.push({ label: selectedTopic.title, level: 1 });
+        breadcrumbItems.push({ label: selectedTopic.title });
     }
-
-    const handleBreadcrumbNavigate = (index) => {
-        if (index === 0) {
-            setSelectedTopic(null);
-        }
-    };
 
     return (
         <div className="min-h-screen bg-gray-50 p-4 md:p-6">
@@ -998,7 +1000,7 @@ export default function Seasons() {
                 <WeatherWisdomQuote quote={dailyQuote.quote} source={dailyQuote.source} />
 
                 {/* Breadcrumb */}
-                <Breadcrumb items={breadcrumbItems} onNavigate={handleBreadcrumbNavigate} />
+                <Breadcrumb items={breadcrumbItems} />
 
                 {selectedTopic ? (
                     <TopicDetailView topic={selectedTopic} onBack={() => setSelectedTopic(null)} />
