@@ -471,8 +471,11 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
         stopPlayback();
         if (audioRef.current) {
             audioRef.current.pause();
-            URL.revokeObjectURL(audioRef.current.src);
             audioRef.current = null;
+        }
+        if (audioUrlRef.current) {
+            URL.revokeObjectURL(audioUrlRef.current);
+            audioUrlRef.current = null;
         }
         setShowPlayer(false);
         setCurrentEpisode(null);
