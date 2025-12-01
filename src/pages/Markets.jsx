@@ -1103,40 +1103,71 @@ Return data for all ${stockBatch.length} stocks.`,
 
 
 
-            {/* Search Bar + Preset Filters Row */}
-            <div className="flex flex-col sm:flex-row gap-3 mb-3 md:mb-4">
-                {/* Search Bar */}
-                <div className="relative flex-shrink-0 w-full sm:w-64">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <input
-                        type="text"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Search ticker, name, sector..."
-                        className="w-full h-10 pl-9 pr-8 rounded-full border border-gray-200 bg-white focus:border-purple-300 focus:ring-2 focus:ring-purple-100 outline-none transition-all text-sm text-gray-700 placeholder:text-gray-400"
-                    />
-                    {searchQuery && (
-                        <button 
-                            onClick={() => setSearchQuery('')}
-                            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                        >
-                            ×
-                        </button>
-                    )}
+            {/* Premium Filter Bar */}
+            <div className="bg-gradient-to-r from-slate-50 via-white to-purple-50 rounded-2xl border border-gray-200/60 shadow-sm p-4 mb-4">
+                <div className="flex flex-col lg:flex-row gap-4">
+                    {/* Search Bar */}
+                    <div className="relative flex-shrink-0 w-full lg:w-72">
+                        <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-indigo-500/10 rounded-xl blur-sm"></div>
+                        <div className="relative">
+                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-500" />
+                            <input
+                                type="text"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                placeholder="Search ticker, name, sector..."
+                                className="w-full h-11 pl-11 pr-10 rounded-xl border-0 bg-white/80 backdrop-blur-sm shadow-inner focus:ring-2 focus:ring-purple-400/50 outline-none transition-all text-sm text-gray-700 placeholder:text-gray-400"
+                            />
+                            {searchQuery && (
+                                <button 
+                                    onClick={() => setSearchQuery('')}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 hover:text-gray-700 transition-colors"
+                                >
+                                    ×
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                    
+                    {/* Preset Filters */}
+                    <div className="flex flex-wrap items-center gap-2">
+                        {PRESET_FILTERS.map(preset => (
+                            <button 
+                                key={preset.id} 
+                                onClick={() => setActivePreset(preset.id)} 
+                                className={`group flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 ${
+                                    activePreset === preset.id 
+                                        ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-500/25 scale-[1.02]' 
+                                        : 'bg-white/70 text-gray-600 hover:bg-white hover:shadow-md hover:text-purple-600 border border-gray-200/50'
+                                }`}
+                            >
+                                <preset.icon className={`w-4 h-4 ${activePreset === preset.id ? 'text-white' : 'text-purple-500 group-hover:scale-110 transition-transform'}`} />
+                                <span className="hidden sm:inline">{preset.label}</span>
+                            </button>
+                        ))}
+                    </div>
                 </div>
-                
-                {/* Preset Filters */}
-                <div className="flex flex-wrap gap-1.5 md:gap-2">
-                    {PRESET_FILTERS.map(preset => (<button key={preset.id} onClick={() => setActivePreset(preset.id)} className={`flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full border transition-all text-xs md:text-sm ${activePreset === preset.id ? 'bg-purple-600 text-white border-purple-600' : 'bg-white text-gray-700 border-gray-200 hover:border-purple-300'}`}><preset.icon className="w-3 h-3 md:w-4 md:h-4" /><span className="hidden sm:inline">{preset.label}</span></button>))}
-                </div>
-            </div>
 
-            <div className="flex items-center gap-1.5 md:gap-2 flex-wrap mb-4">
-                <FilterChips filters={filters} setFilters={setFilters} filterOptions={FILTER_OPTIONS} sectors={sectors} />
-                <span className="px-2 md:px-4 py-1.5 md:py-2 rounded-full border border-purple-300 bg-white text-purple-600 text-xs md:text-sm font-medium">{stocks.length}</span>
-                <button onClick={refreshStocks} disabled={loading} className="w-8 h-8 md:w-10 md:h-10 rounded-full border border-gray-200 bg-white hover:bg-gray-50 flex items-center justify-center transition-colors disabled:opacity-50">
-                    <RefreshCw className={`w-3 h-3 md:w-4 md:h-4 text-gray-600 ${loading ? 'animate-spin' : ''}`} />
-                </button>
+                {/* Dropdown Filters Row */}
+                <div className="flex items-center gap-2 flex-wrap mt-4 pt-4 border-t border-gray-200/50">
+                    <FilterChips filters={filters} setFilters={setFilters} filterOptions={FILTER_OPTIONS} sectors={sectors} />
+                    
+                    <div className="flex items-center gap-2 ml-auto">
+                        <div className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-gradient-to-r from-purple-100 to-indigo-100 border border-purple-200/50">
+                            <BarChart3 className="w-4 h-4 text-purple-600" />
+                            <span className="text-sm font-bold text-purple-700">{stocks.length}</span>
+                            <span className="text-xs text-purple-500">stocks</span>
+                        </div>
+                        
+                        <button 
+                            onClick={refreshStocks} 
+                            disabled={loading} 
+                            className="w-10 h-10 rounded-xl bg-white border border-gray-200 hover:border-purple-300 hover:bg-purple-50 flex items-center justify-center transition-all disabled:opacity-50 group"
+                        >
+                            <RefreshCw className={`w-4 h-4 text-gray-500 group-hover:text-purple-600 ${loading ? 'animate-spin' : ''}`} />
+                        </button>
+                    </div>
+                </div>
             </div>
 
             {/* Market Overview Chart */}
