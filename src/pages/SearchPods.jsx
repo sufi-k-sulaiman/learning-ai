@@ -342,9 +342,11 @@ export default function SearchPods() {
             setGenerationProgress(75);
 
             if (!ttsResponse?.data?.audio) {
-                console.error('TTS response:', ttsResponse);
-                throw new Error(ttsResponse?.data?.error || 'No audio returned');
+                console.error('TTS response missing audio:', JSON.stringify(ttsResponse?.data || {}));
+                throw new Error(ttsResponse?.data?.error || 'No audio data received from TTS service');
             }
+            
+            console.log('Audio received, length:', ttsResponse.data.audio.length);
 
             setGenerationProgress(90);
 
