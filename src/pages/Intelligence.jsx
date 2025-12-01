@@ -5,6 +5,8 @@ import {
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { base44 } from '@/api/base44Client';
+import { Link } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 
 const CATEGORIES = {
     Elements_Environment: {
@@ -33,7 +35,10 @@ const CATEGORIES = {
         icon: Zap,
         color: "#F59E0B",
         gradient: "from-amber-500 to-orange-500",
-        items: ["Gravity", "Seasons", "Weather", "Energy", "Time"]
+        items: ["Gravity", "Seasons", "Weather", "Energy", "Time"],
+        specialLinks: {
+            "Seasons": "Seasons"
+        }
     },
     Cosmic_Celestial: {
         name: "Cosmic & Celestial",
