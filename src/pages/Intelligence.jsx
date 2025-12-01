@@ -165,7 +165,12 @@ function ItemDetailView({ item, category }) {
 4. Related Topics: 4 related concepts to explore
 5. Current Research: Recent scientific discoveries or developments
 6. Fun Facts: 5 surprising or amusing facts
-7. Charts Data - Generate realistic data for 10 different charts:
+7. Physical Compositions: 5 items describing physical properties, structure, states of matter, physical characteristics with name and description
+8. Chemical Compositions: 5 items describing chemical elements, compounds, molecular structure, reactions with name, formula, and description
+9. Mathematical Illustrations: 5 items with mathematical formulas, equations, or models that describe this topic with name, formula, and explanation
+10. Research Data: 5 recent research findings or studies with title, institution, year, and finding
+11. Subject Matter Experts: 5 notable experts or scientists who study this topic with name, affiliation, specialty, and contribution
+12. Charts Data - Generate realistic data for 10 different charts:
    - trendData: Array of 12 monthly data points with month, value, growth fields (showing trends over a year)
    - distributionData: Array of 5 items with name, value for pie chart
    - comparisonData: Array of 6 items with category, current, previous for comparison
