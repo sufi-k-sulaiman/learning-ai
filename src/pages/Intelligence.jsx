@@ -236,6 +236,7 @@ function ItemDetailView({ item, category }) {
 
     return (
         <div>
+            {/* Header */}
             <div className={`bg-gradient-to-r ${category?.gradient || 'from-purple-600 to-indigo-600'} rounded-2xl p-6 mb-6 text-white`}>
                 <div className="flex items-center gap-4">
                     <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center">
@@ -248,7 +249,29 @@ function ItemDetailView({ item, category }) {
                 </div>
             </div>
 
+            {/* Generated Images */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                {imageLoading ? (
+                    <>
+                        <div className="h-64 bg-gray-100 rounded-xl animate-pulse flex items-center justify-center">
+                            <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+                        </div>
+                        <div className="h-64 bg-gray-100 rounded-xl animate-pulse flex items-center justify-center">
+                            <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+                        </div>
+                    </>
+                ) : images.map((img, i) => (
+                    <div key={i} className="relative overflow-hidden rounded-xl shadow-lg">
+                        <img src={img} alt={`${item} ${i + 1}`} className="w-full h-64 object-cover" />
+                        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
+                            <p className="text-white text-sm font-medium">{i === 0 ? 'Realistic View' : 'Artistic Illustration'}</p>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
             <div className="space-y-6">
+                {/* Overview */}
                 <div className="bg-white rounded-xl border border-gray-200 p-5">
                     <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
                         <Globe className="w-5 h-5" style={{ color: category?.color }} />
@@ -256,13 +279,220 @@ function ItemDetailView({ item, category }) {
                     </h3>
                     <p className="text-gray-700 leading-relaxed">{data?.overview}</p>
                 </div>
-                
+
+                {/* Fun Facts Banner */}
+                {data?.funFacts?.length > 0 && (
+                    <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-xl p-5">
+                        <h3 className="font-semibold text-amber-800 mb-4 flex items-center gap-2">
+                            <Star className="w-5 h-5 text-amber-500" />
+                            Fun Facts
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                            {data.funFacts.map((fact, i) => (
+                                <div key={i} className="bg-white rounded-lg p-3 shadow-sm border border-amber-100">
+                                    <div className="flex items-start gap-2">
+                                        <span className="text-xl">🎉</span>
+                                        <p className="text-gray-700 text-sm">{fact}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Charts Section */}
+                <div className="bg-white rounded-xl border border-gray-200 p-5">
+                    <h3 className="font-semibold text-gray-900 mb-6 flex items-center gap-2">
+                        <BarChart3 className="w-5 h-5" style={{ color: category?.color }} />
+                        Data Visualizations
+                    </h3>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Chart 1: Trend Line */}
+                        {data?.trendData?.length > 0 && (
+                            <div className="bg-gray-50 rounded-xl p-4">
+                                <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                                    <TrendingUp className="w-4 h-4" /> Annual Trends
+                                </h4>
+                                <ResponsiveContainer width="100%" height={200}>
+                                    <LineChart data={data.trendData}>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                                        <XAxis dataKey="month" tick={{ fontSize: 10 }} />
+                                        <YAxis tick={{ fontSize: 10 }} />
+                                        <Tooltip />
+                                        <Line type="monotone" dataKey="value" stroke={category?.color} strokeWidth={2} dot={{ fill: category?.color }} />
+                                        <Line type="monotone" dataKey="growth" stroke="#10B981" strokeWidth={2} dot={{ fill: '#10B981' }} />
+                                    </LineChart>
+                                </ResponsiveContainer>
+                            </div>
+                        )}
+
+                        {/* Chart 2: Distribution Pie */}
+                        {data?.distributionData?.length > 0 && (
+                            <div className="bg-gray-50 rounded-xl p-4">
+                                <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                                    <PieChart className="w-4 h-4" /> Distribution
+                                </h4>
+                                <ResponsiveContainer width="100%" height={200}>
+                                    <RechartsPie>
+                                        <Pie data={data.distributionData} cx="50%" cy="50%" outerRadius={70} dataKey="value" label={({ name }) => name}>
+                                            {data.distributionData.map((entry, i) => (
+                                                <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip />
+                                    </RechartsPie>
+                                </ResponsiveContainer>
+                            </div>
+                        )}
+
+                        {/* Chart 3: Comparison Bar */}
+                        {data?.comparisonData?.length > 0 && (
+                            <div className="bg-gray-50 rounded-xl p-4">
+                                <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                                    <BarChart3 className="w-4 h-4" /> Comparison Analysis
+                                </h4>
+                                <ResponsiveContainer width="100%" height={200}>
+                                    <BarChart data={data.comparisonData}>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                                        <XAxis dataKey="category" tick={{ fontSize: 10 }} />
+                                        <YAxis tick={{ fontSize: 10 }} />
+                                        <Tooltip />
+                                        <Bar dataKey="current" fill={category?.color} radius={[4, 4, 0, 0]} />
+                                        <Bar dataKey="previous" fill="#9CA3AF" radius={[4, 4, 0, 0]} />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            </div>
+                        )}
+
+                        {/* Chart 4: Radar */}
+                        {data?.radarData?.length > 0 && (
+                            <div className="bg-gray-50 rounded-xl p-4">
+                                <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                                    <Activity className="w-4 h-4" /> Multi-Factor Analysis
+                                </h4>
+                                <ResponsiveContainer width="100%" height={200}>
+                                    <RadarChart data={data.radarData}>
+                                        <PolarGrid stroke="#e5e7eb" />
+                                        <PolarAngleAxis dataKey="subject" tick={{ fontSize: 10 }} />
+                                        <PolarRadiusAxis tick={{ fontSize: 8 }} />
+                                        <Radar name="Score" dataKey="score" stroke={category?.color} fill={category?.color} fillOpacity={0.5} />
+                                    </RadarChart>
+                                </ResponsiveContainer>
+                            </div>
+                        )}
+
+                        {/* Chart 5: Area Chart */}
+                        {data?.areaData?.length > 0 && (
+                            <div className="bg-gray-50 rounded-xl p-4">
+                                <h4 className="text-sm font-medium text-gray-700 mb-3">Growth Patterns</h4>
+                                <ResponsiveContainer width="100%" height={200}>
+                                    <AreaChart data={data.areaData}>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                                        <XAxis dataKey="month" tick={{ fontSize: 10 }} />
+                                        <YAxis tick={{ fontSize: 10 }} />
+                                        <Tooltip />
+                                        <Area type="monotone" dataKey="primary" stackId="1" stroke={category?.color} fill={category?.color} fillOpacity={0.6} />
+                                        <Area type="monotone" dataKey="secondary" stackId="1" stroke="#10B981" fill="#10B981" fillOpacity={0.6} />
+                                    </AreaChart>
+                                </ResponsiveContainer>
+                            </div>
+                        )}
+
+                        {/* Chart 6: Horizontal Bar */}
+                        {data?.barData?.length > 0 && (
+                            <div className="bg-gray-50 rounded-xl p-4">
+                                <h4 className="text-sm font-medium text-gray-700 mb-3">Performance Metrics</h4>
+                                <ResponsiveContainer width="100%" height={200}>
+                                    <BarChart data={data.barData} layout="vertical">
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                                        <XAxis type="number" tick={{ fontSize: 10 }} />
+                                        <YAxis dataKey="name" type="category" tick={{ fontSize: 10 }} width={80} />
+                                        <Tooltip />
+                                        <Bar dataKey="value" fill={category?.color} radius={[0, 4, 4, 0]} />
+                                        <Bar dataKey="benchmark" fill="#E5E7EB" radius={[0, 4, 4, 0]} />
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            </div>
+                        )}
+
+                        {/* Chart 7: Radial Progress */}
+                        {data?.progressData?.length > 0 && (
+                            <div className="bg-gray-50 rounded-xl p-4">
+                                <h4 className="text-sm font-medium text-gray-700 mb-3">Progress Indicators</h4>
+                                <ResponsiveContainer width="100%" height={200}>
+                                    <RadialBarChart cx="50%" cy="50%" innerRadius="20%" outerRadius="90%" data={data.progressData.map((d, i) => ({ ...d, fill: CHART_COLORS[i % CHART_COLORS.length] }))}>
+                                        <RadialBar background dataKey="value" />
+                                        <Tooltip />
+                                        <Legend iconSize={10} layout="horizontal" verticalAlign="bottom" />
+                                    </RadialBarChart>
+                                </ResponsiveContainer>
+                            </div>
+                        )}
+
+                        {/* Chart 8: Timeline */}
+                        {data?.timelineData?.length > 0 && (
+                            <div className="bg-gray-50 rounded-xl p-4">
+                                <h4 className="text-sm font-medium text-gray-700 mb-3">Historical Timeline</h4>
+                                <ResponsiveContainer width="100%" height={200}>
+                                    <LineChart data={data.timelineData}>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                                        <XAxis dataKey="year" tick={{ fontSize: 10 }} />
+                                        <YAxis tick={{ fontSize: 10 }} />
+                                        <Tooltip />
+                                        <Line type="monotone" dataKey="metric1" stroke={category?.color} strokeWidth={2} />
+                                        <Line type="monotone" dataKey="metric2" stroke="#F59E0B" strokeWidth={2} />
+                                    </LineChart>
+                                </ResponsiveContainer>
+                            </div>
+                        )}
+
+                        {/* Chart 9: Composition */}
+                        {data?.compositionData?.length > 0 && (
+                            <div className="bg-gray-50 rounded-xl p-4">
+                                <h4 className="text-sm font-medium text-gray-700 mb-3">Composition Breakdown</h4>
+                                <ResponsiveContainer width="100%" height={200}>
+                                    <BarChart data={data.compositionData}>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                                        <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+                                        <YAxis tick={{ fontSize: 10 }} />
+                                        <Tooltip />
+                                        <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                                            {data.compositionData.map((entry, i) => (
+                                                <Cell key={i} fill={CHART_COLORS[i % CHART_COLORS.length]} />
+                                            ))}
+                                        </Bar>
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            </div>
+                        )}
+
+                        {/* Chart 10: Scatter/Bubble approximation with area */}
+                        {data?.correlationData?.length > 0 && (
+                            <div className="bg-gray-50 rounded-xl p-4">
+                                <h4 className="text-sm font-medium text-gray-700 mb-3">Correlation Analysis</h4>
+                                <ResponsiveContainer width="100%" height={200}>
+                                    <AreaChart data={data.correlationData}>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                                        <XAxis dataKey="x" tick={{ fontSize: 10 }} />
+                                        <YAxis tick={{ fontSize: 10 }} />
+                                        <Tooltip />
+                                        <Area type="monotone" dataKey="y" stroke={category?.color} fill={category?.color} fillOpacity={0.3} />
+                                        <Area type="monotone" dataKey="size" stroke="#EC4899" fill="#EC4899" fillOpacity={0.3} />
+                                    </AreaChart>
+                                </ResponsiveContainer>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Key Facts */}
                 <div className="bg-white rounded-xl border border-gray-200 p-5">
                     <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
                         <Sparkles className="w-5 h-5" style={{ color: category?.color }} />
                         Key Facts
                     </h3>
-                    <div className="space-y-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         {data?.keyFacts?.map((fact, i) => (
                             <div key={i} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
                                 <span className="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0" style={{ backgroundColor: category?.color }}>
@@ -274,11 +504,13 @@ function ItemDetailView({ item, category }) {
                     </div>
                 </div>
                 
+                {/* Significance */}
                 <div className="bg-white rounded-xl border border-gray-200 p-5" style={{ backgroundColor: `${category?.color}08` }}>
                     <h3 className="font-semibold text-gray-900 mb-2">Why It Matters</h3>
                     <p className="text-gray-700">{data?.significance}</p>
                 </div>
                 
+                {/* Related Topics */}
                 <div className="bg-white rounded-xl border border-gray-200 p-5">
                     <h3 className="font-semibold text-gray-900 mb-4">Related Topics</h3>
                     <div className="flex flex-wrap gap-2">
@@ -290,6 +522,7 @@ function ItemDetailView({ item, category }) {
                     </div>
                 </div>
                 
+                {/* Current Research */}
                 <div className="bg-white rounded-xl border border-gray-200 p-5">
                     <h3 className="font-semibold text-gray-900 mb-2">Current Research</h3>
                     <p className="text-gray-600">{data?.currentResearch}</p>
