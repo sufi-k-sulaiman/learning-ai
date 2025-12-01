@@ -140,7 +140,7 @@ export default function SearchPods() {
     const [currentCaption, setCurrentCaption] = useState('');
     const [captionWords, setCaptionWords] = useState([]);
     const [playbackSpeed, setPlaybackSpeed] = useState(1);
-    const [selectedVoice, setSelectedVoice] = useState('en-gb');
+    const [selectedVoice, setSelectedVoice] = useState('EXAVITQu4vr4xnSDxMaL');
     const [isDownloadingMp3, setIsDownloadingMp3] = useState(false);
     const [showRecommendations, setShowRecommendations] = useState(false);
     const [showEqualizer, setShowEqualizer] = useState(false);
@@ -164,13 +164,13 @@ export default function SearchPods() {
         return () => clearInterval(interval);
     }, []);
 
-    // Available Google TTS voices (language variants only - Google TTS doesn't support gender)
-    const googleVoices = [
-        { id: 'en-gb', label: 'British' },
-        { id: 'en-us', label: 'American' },
-        { id: 'en-au', label: 'Australian' },
-        { id: 'en-za', label: 'South African' },
-    ];
+    // ElevenLabs voice IDs
+            const elevenLabsVoices = [
+                { id: 'EXAVITQu4vr4xnSDxMaL', label: 'Bella' },
+                { id: '21m00Tcm4TlvDq8ikWAM', label: 'Rachel' },
+                { id: 'AZnzlk1XvdvUeBnXmlld', label: 'Domi' },
+                { id: 'MF3mGyEYCl7XYWbV9V6O', label: 'Elli' },
+            ];
 
     // Cleanup audio on unmount
     useEffect(() => {
@@ -329,10 +329,10 @@ export default function SearchPods() {
             // Generate audio using Google TTS backend
             let ttsResponse;
             try {
-                ttsResponse = await base44.functions.invoke('edgeTTS', {
-                    text: cleanText,
-                    lang: selectedVoice
-                });
+                ttsResponse = await base44.functions.invoke('elevenlabsTTS', {
+                                        text: cleanText,
+                                        voice_id: selectedVoice
+                                    });
             } catch (ttsError) {
                 console.error('TTS function error:', ttsError);
                 throw new Error('Audio generation failed');
@@ -570,10 +570,10 @@ export default function SearchPods() {
             const remainingText = remainingSentences.join(' ');
             
             // Generate new audio with new voice
-            const ttsResponse = await base44.functions.invoke('edgeTTS', {
-                text: remainingText,
-                lang: newVoice
-            });
+            const ttsResponse = await base44.functions.invoke('elevenlabsTTS', {
+                                    text: remainingText,
+                                    voice_id: newVoice
+                                });
             
             if (ttsResponse.data?.audio) {
                 // Clean up old audio
@@ -655,10 +655,10 @@ export default function SearchPods() {
             const cleanText = cleanTextForSpeech(response || '');
 
             // Generate new audio for extended content
-            const ttsResponse = await base44.functions.invoke('edgeTTS', {
-                text: cleanText,
-                lang: selectedVoice
-            });
+            const ttsResponse = await base44.functions.invoke('elevenlabsTTS', {
+                                    text: cleanText,
+                                    voice_id: selectedVoice
+                                });
 
             if (ttsResponse.data?.audio) {
                 // Add new sentences to the ref
@@ -1164,7 +1164,7 @@ export default function SearchPods() {
 
                         {/* Voice Selection - Google TTS Voices */}
                         <div className="mt-4 flex items-center justify-center gap-2 flex-wrap">
-                        {googleVoices.map((voice) => (
+                        {elevenLabsVoices.map((voice) => (
                             <button
                                 key={voice.id}
                                 onClick={() => swapVoice(voice.id)}
