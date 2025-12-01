@@ -116,8 +116,6 @@ function ItemCard({ item, color, onClick }) {
     );
 }
 
-
-
 export default function Intelligence() {
     useEffect(() => {
         document.title = 'AI Intelligence for automated decision making';
