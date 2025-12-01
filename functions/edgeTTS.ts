@@ -1,19 +1,18 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
 
-// Google Translate TTS
+// Map voice names for StreamElements
+const VOICE_MAP = {
+    'en-gb': 'Amy',      // British female
+    'en-us': 'Matthew',  // American male
+    'en-au': 'Nicole',   // Australian female
+    'en-za': 'Brian'     // British male (closest to SA)
+};
+
 async function generateTTS(text, lang = "en-gb") {
-    // Map to Google TTS language codes
-    const langMap = {
-        'en-gb': 'en-gb',
-        'en-us': 'en-us',
-        'en-au': 'en-au',
-        'en-za': 'en-za'
-    };
+    const voice = VOICE_MAP[lang] || 'Amy';
     
-    const ttsLang = langMap[lang] || 'en-gb';
-    
-    // Split text into chunks (Google TTS limit ~200 chars)
-    const maxLen = 200;
+    // Split text into chunks
+    const maxLen = 400;
     const chunks = [];
     
     let remaining = text;
@@ -34,18 +33,14 @@ async function generateTTS(text, lang = "en-gb") {
     for (const chunk of chunks) {
         if (!chunk) continue;
         
-        const url = `https://translate.google.com/translate_tts?ie=UTF-8&tl=${ttsLang}&client=tw-ob&q=${encodeURIComponent(chunk)}`;
+        const url = `https://api.streamelements.com/kappa/v2/speech?voice=${voice}&text=${encodeURIComponent(chunk)}`;
         
-        console.log(`Fetching Google TTS chunk: ${chunk.substring(0, 50)}...`);
+        console.log(`Fetching TTS chunk: ${chunk.substring(0, 50)}...`);
         
-        const response = await fetch(url, {
-            headers: {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-            }
-        });
+        const response = await fetch(url);
         
         if (!response.ok) {
-            console.error(`Google TTS failed: ${response.status}`);
+            console.error(`StreamElements failed: ${response.status}`);
             throw new Error(`TTS service error: ${response.status}`);
         }
         
