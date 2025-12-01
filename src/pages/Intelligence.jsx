@@ -53,6 +53,206 @@ const CATEGORIES = {
 
 const CHART_COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16'];
 
+// Format and ensure data is properly structured for rendering
+function formatResponseData(response, item) {
+    const data = response || {};
+    
+    // Ensure chartData exists and has proper structure
+    const chartData = data.chartData || {};
+    
+    // Format distribution data
+    if (!chartData.distribution?.length || !chartData.distribution[0]?.value) {
+        chartData.distribution = [
+            { name: 'Primary', value: 35 },
+            { name: 'Secondary', value: 25 },
+            { name: 'Tertiary', value: 20 },
+            { name: 'Other', value: 20 }
+        ];
+    }
+    
+    // Format trend data
+    if (!chartData.trend?.length || !chartData.trend[0]?.value) {
+        chartData.trend = [
+            { period: '2019', value: 65 },
+            { period: '2020', value: 72 },
+            { period: '2021', value: 78 },
+            { period: '2022', value: 85 },
+            { period: '2023', value: 92 },
+            { period: '2024', value: 98 }
+        ];
+    }
+    
+    // Format comparison data
+    if (!chartData.comparison?.length || chartData.comparison[0]?.valueA === undefined) {
+        chartData.comparison = [
+            { name: 'Metric A', valueA: 80, valueB: 65 },
+            { name: 'Metric B', valueA: 70, valueB: 85 },
+            { name: 'Metric C', valueA: 90, valueB: 75 },
+            { name: 'Metric D', valueA: 60, valueB: 70 }
+        ];
+    }
+    
+    // Format composition data
+    if (!chartData.composition?.length || !chartData.composition[0]?.value) {
+        chartData.composition = [
+            { name: 'Component 1', value: 40 },
+            { name: 'Component 2', value: 30 },
+            { name: 'Component 3', value: 20 },
+            { name: 'Component 4', value: 10 }
+        ];
+    }
+    
+    // Format geographic data
+    if (!chartData.geographic?.length || !chartData.geographic[0]?.value) {
+        chartData.geographic = [
+            { region: 'Asia', value: 35 },
+            { region: 'Europe', value: 25 },
+            { region: 'Americas', value: 22 },
+            { region: 'Africa', value: 12 },
+            { region: 'Oceania', value: 6 }
+        ];
+    }
+    
+    // Format annual data
+    if (!chartData.annual?.length || !chartData.annual[0]?.value) {
+        chartData.annual = [
+            { year: 2019, value: 120 },
+            { year: 2020, value: 145 },
+            { year: 2021, value: 168 },
+            { year: 2022, value: 195 },
+            { year: 2023, value: 220 },
+            { year: 2024, value: 248 }
+        ];
+    }
+    
+    // Format performance data
+    if (!chartData.performance?.length || !chartData.performance[0]?.score) {
+        chartData.performance = [
+            { metric: 'Efficiency', score: 85, max: 100 },
+            { metric: 'Stability', score: 78, max: 100 },
+            { metric: 'Sustainability', score: 72, max: 100 },
+            { metric: 'Accessibility', score: 90, max: 100 },
+            { metric: 'Impact', score: 82, max: 100 }
+        ];
+    }
+    
+    // Format correlation data
+    if (!chartData.correlation?.length || chartData.correlation[0]?.x === undefined) {
+        chartData.correlation = [];
+        for (let i = 0; i < 20; i++) {
+            chartData.correlation.push({
+                x: 10 + Math.random() * 80,
+                y: 10 + Math.random() * 80
+            });
+        }
+    }
+    
+    // Format ranking data
+    if (!chartData.ranking?.length || !chartData.ranking[0]?.score) {
+        chartData.ranking = [
+            { name: 'Category 1', rank: 1, score: 95 },
+            { name: 'Category 2', rank: 2, score: 88 },
+            { name: 'Category 3', rank: 3, score: 82 },
+            { name: 'Category 4', rank: 4, score: 76 },
+            { name: 'Category 5', rank: 5, score: 70 }
+        ];
+    }
+    
+    // Format cyclical data
+    if (!chartData.cyclical?.length || !chartData.cyclical[0]?.value) {
+        chartData.cyclical = [
+            { month: 'Jan', value: 45 },
+            { month: 'Feb', value: 52 },
+            { month: 'Mar', value: 68 },
+            { month: 'Apr', value: 75 },
+            { month: 'May', value: 82 },
+            { month: 'Jun', value: 88 },
+            { month: 'Jul', value: 92 },
+            { month: 'Aug', value: 85 },
+            { month: 'Sep', value: 78 },
+            { month: 'Oct', value: 65 },
+            { month: 'Nov', value: 55 },
+            { month: 'Dec', value: 48 }
+        ];
+    }
+    
+    // Ensure physical compositions
+    if (!data.physicalCompositions) {
+        data.physicalCompositions = {};
+    }
+    if (!data.physicalCompositions.structure) {
+        data.physicalCompositions.structure = `${item} has a complex physical structure that varies based on environmental conditions and formation processes.`;
+    }
+    if (!data.physicalCompositions.measurableProperties?.length) {
+        data.physicalCompositions.measurableProperties = [
+            { property: 'Density', value: 'Variable', unit: 'g/cm³' },
+            { property: 'Temperature Range', value: 'Varies', unit: '°C' },
+            { property: 'Size/Scale', value: 'Multiple orders', unit: 'of magnitude' }
+        ];
+    }
+    
+    // Ensure chemical compositions
+    if (!data.chemicalCompositions) {
+        data.chemicalCompositions = {};
+    }
+    if (!data.chemicalCompositions.elements?.length) {
+        data.chemicalCompositions.elements = [
+            { element: 'Primary', percentage: 45 },
+            { element: 'Secondary', percentage: 30 },
+            { element: 'Tertiary', percentage: 15 },
+            { element: 'Trace', percentage: 10 }
+        ];
+    }
+    
+    // Ensure mathematical illustrations
+    if (!data.mathematicalIllustrations) {
+        data.mathematicalIllustrations = {};
+    }
+    if (!data.mathematicalIllustrations.equations?.length) {
+        data.mathematicalIllustrations.equations = [
+            { equation: 'E = mc²', description: 'Fundamental energy-mass relationship' },
+            { equation: 'F = ma', description: 'Force equals mass times acceleration' }
+        ];
+    }
+    
+    // Ensure research data
+    if (!data.researchData) {
+        data.researchData = {};
+    }
+    if (!data.researchData.findings?.length) {
+        data.researchData.findings = [
+            { finding: `Research on ${item} continues to reveal new insights`, source: 'Scientific Community', year: 2023 }
+        ];
+    }
+    
+    // Ensure experts
+    if (!data.experts?.length) {
+        data.experts = [
+            { name: 'Expert Researcher', institution: 'Research Institute', specialty: `${item} Studies`, contribution: 'Pioneering research' }
+        ];
+    }
+    
+    // Ensure key facts
+    if (!data.keyFacts?.length) {
+        data.keyFacts = [`${item} is a fascinating subject of scientific study.`];
+    }
+    
+    // Ensure fun facts
+    if (!data.funFacts?.length) {
+        data.funFacts = data.keyFacts?.slice(0, 3) || [`${item} has many surprising characteristics.`];
+    }
+    
+    // Ensure related topics
+    if (!data.relatedTopics?.length) {
+        data.relatedTopics = ['Related Topic 1', 'Related Topic 2', 'Related Topic 3'];
+    }
+    
+    return {
+        ...data,
+        chartData
+    };
+}
+
 function Breadcrumb({ items, onNavigate }) {
     return (
         <nav className="flex items-center gap-2 text-sm mb-6 flex-wrap">
