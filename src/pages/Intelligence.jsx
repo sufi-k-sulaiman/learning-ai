@@ -118,7 +118,7 @@ function ItemCard({ item, color, onClick }) {
     );
 }
 
-function ItemDetailView({ item, category }) {
+function ItemDetailView({ item, category, onNavigateToTopic }) {
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState(null);
     const [imageUrl, setImageUrl] = useState(null);
@@ -347,11 +347,16 @@ function ItemDetailView({ item, category }) {
                             Physical Composition
                         </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                            {data.physicalComposition.map((item, i) => (
-                                <div key={i} className="p-4 rounded-lg border border-gray-100 hover:shadow-md transition-shadow" style={{ backgroundColor: `${category?.color}05` }}>
-                                    <h4 className="font-medium text-gray-900 mb-1">{item.property}</h4>
-                                    <p className="text-sm text-gray-600">{item.description}</p>
-                                </div>
+                            {data.physicalComposition.map((comp, i) => (
+                                <button 
+                                    key={i} 
+                                    onClick={() => onNavigateToTopic(comp.property)}
+                                    className="p-4 rounded-lg border border-gray-100 hover:shadow-md hover:border-purple-300 transition-all text-left cursor-pointer group" 
+                                    style={{ backgroundColor: `${category?.color}05` }}
+                                >
+                                    <h4 className="font-medium text-gray-900 mb-1 group-hover:text-purple-600 transition-colors">{comp.property}</h4>
+                                    <p className="text-sm text-gray-600">{comp.description}</p>
+                                </button>
                             ))}
                         </div>
                     </div>
@@ -365,19 +370,23 @@ function ItemDetailView({ item, category }) {
                             Chemical Composition
                         </h3>
                         <div className="space-y-3">
-                            {data.chemicalComposition.map((item, i) => (
-                                <div key={i} className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
+                            {data.chemicalComposition.map((comp, i) => (
+                                <button 
+                                    key={i} 
+                                    onClick={() => onNavigateToTopic(comp.element)}
+                                    className="w-full flex items-center gap-4 p-3 bg-gray-50 rounded-lg hover:bg-purple-50 hover:shadow-md transition-all cursor-pointer group text-left"
+                                >
                                     <div className="w-12 h-12 rounded-lg flex items-center justify-center font-bold text-white" style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }}>
-                                        {item.element?.substring(0, 2)}
+                                        {comp.element?.substring(0, 2)}
                                     </div>
                                     <div className="flex-1">
                                         <div className="flex items-center justify-between">
-                                            <h4 className="font-medium text-gray-900">{item.element}</h4>
-                                            <span className="text-sm font-semibold" style={{ color: category?.color }}>{item.percentage}</span>
+                                            <h4 className="font-medium text-gray-900 group-hover:text-purple-600 transition-colors">{comp.element}</h4>
+                                            <span className="text-sm font-semibold" style={{ color: category?.color }}>{comp.percentage}</span>
                                         </div>
-                                        <p className="text-sm text-gray-600">{item.description}</p>
+                                        <p className="text-sm text-gray-600">{comp.description}</p>
                                     </div>
-                                </div>
+                                </button>
                             ))}
                         </div>
                     </div>
@@ -458,9 +467,14 @@ function ItemDetailView({ item, category }) {
                     <h3 className="font-semibold text-gray-900 mb-4">Related Topics</h3>
                     <div className="flex flex-wrap gap-2">
                         {data?.relatedTopics?.map((topic, i) => (
-                            <span key={i} className="px-4 py-2 rounded-full text-sm font-medium" style={{ backgroundColor: `${category?.color}15`, color: category?.color }}>
+                            <button 
+                                key={i} 
+                                onClick={() => onNavigateToTopic(topic)}
+                                className="px-4 py-2 rounded-full text-sm font-medium hover:scale-105 hover:shadow-md transition-all cursor-pointer" 
+                                style={{ backgroundColor: `${category?.color}15`, color: category?.color }}
+                            >
                                 {topic}
-                            </span>
+                            </button>
                         ))}
                     </div>
                 </div>
@@ -587,7 +601,11 @@ export default function Intelligence() {
                     </div>
                 ) : (
                     /* Item Detail View */
-                    <ItemDetailView item={selectedItem} category={currentCategory} />
+                    <ItemDetailView 
+                        item={selectedItem} 
+                        category={currentCategory} 
+                        onNavigateToTopic={(topic) => setSelectedItem(topic)}
+                    />
                 )}
             </div>
         </div>
