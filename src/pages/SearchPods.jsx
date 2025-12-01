@@ -172,9 +172,7 @@ export default function SearchPods() {
     // Load voices - including mobile browser voices
     useEffect(() => {
         const loadVoices = () => {
-            if (!window.speechSynthesis) return;
-            
-            const availableVoices = window.speechSynthesis.getVoices() || [];
+            const availableVoices = window.speechSynthesis?.getVoices() || [];
             
             // On mobile, Google voices may not be available, so include all English voices
             const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
@@ -208,37 +206,21 @@ export default function SearchPods() {
             }
         };
         
-        // Check if speechSynthesis exists (it should on all modern browsers including mobile)
-        const initSpeechSynthesis = () => {
-            if (typeof window !== 'undefined' && window.speechSynthesis) {
-                // Load voices immediately
-                loadVoices();
-                // Also listen for async voice loading
-                window.speechSynthesis.onvoiceschanged = loadVoices;
-                
-                // Force reload voices after delays (mobile browsers need multiple attempts)
-                setTimeout(loadVoices, 100);
-                setTimeout(loadVoices, 300);
-                setTimeout(loadVoices, 500);
-                setTimeout(loadVoices, 1000);
-                setTimeout(loadVoices, 2000);
-            }
-        };
-        
-        // Run immediately
-        initSpeechSynthesis();
-        
-        // Also run after DOM is fully loaded (helps with mobile)
-        if (document.readyState === 'complete') {
-            initSpeechSynthesis();
-        } else {
-            window.addEventListener('load', initSpeechSynthesis);
+        if ('speechSynthesis' in window) {
+            // Load voices immediately
+            loadVoices();
+            // Also listen for async voice loading
+            window.speechSynthesis.onvoiceschanged = loadVoices;
+            
+            // Force reload voices after delays (some browsers need this, especially mobile)
+            setTimeout(loadVoices, 100);
+            setTimeout(loadVoices, 500);
+            setTimeout(loadVoices, 1000);
         }
         
         return () => {
             window.speechSynthesis?.cancel();
             if (timerRef.current) clearInterval(timerRef.current);
-            window.removeEventListener('load', initSpeechSynthesis);
         };
     }, []);
 
@@ -383,12 +365,17 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
 
     // Start speaking
     const startSpeaking = useCallback(() => {
+        if (!('speechSynthesis' in window)) {
+            setCurrentCaption('Text-to-speech is not supported in your browser.');
+            return;
+        }
+        
         // Cancel any pending speech first
-        window.speechSynthesis?.cancel();
+        window.speechSynthesis.cancel();
         
         // Mobile browsers require a workaround - speech synthesis can get "stuck"
         // This forces it to reset on mobile
-        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent) && window.speechSynthesis) {
+        if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
             // On mobile, we need to "wake up" speechSynthesis
             const wakeSpeech = new SpeechSynthesisUtterance('');
             wakeSpeech.volume = 0;
@@ -415,7 +402,6 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
     // Speak next sentence
     const speakNextSentence = useCallback(() => {
         if (!isPlayingRef.current) return;
-        if (!window.speechSynthesis) return;
         
         if (currentIndexRef.current >= sentencesRef.current.length) {
             stopPlayback();
@@ -434,7 +420,7 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
         utterance.pitch = 1;
         
         // Get available voices
-        const availableVoices = window.speechSynthesis.getVoices() || [];
+        const availableVoices = window.speechSynthesis.getVoices();
         
         // Force set the voice - required for it to work
         if (selectedVoice) {
@@ -443,7 +429,7 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
             // If no voice selected yet, try to find a good default
             const googleVoice = availableVoices.find(v => v.name === 'Google UK English Female') 
                 || availableVoices.find(v => v.name.toLowerCase().includes('google'))
-                || availableVoices.find(v => v.lang?.startsWith('en'));
+                || availableVoices.find(v => v.lang.startsWith('en'));
             if (googleVoice) {
                 utterance.voice = googleVoice;
             }
@@ -487,8 +473,20 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
         
         utteranceRef.current = utterance;
         
-        // Speak the utterance
-        window.speechSynthesis.speak(utterance);
+        // Mobile browsers sometimes need the speak call wrapped
+        try {
+            window.speechSynthesis.speak(utterance);
+        } catch (e) {
+            console.error('Speech synthesis error:', e);
+            // Retry once after a delay
+            setTimeout(() => {
+                try {
+                    window.speechSynthesis.speak(utterance);
+                } catch (e2) {
+                    console.error('Speech synthesis retry failed:', e2);
+                }
+            }, 100);
+        }
     }, [playbackSpeed, isMuted, volume, selectedVoice, duration]);
 
     // Stop playback
@@ -511,7 +509,7 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
             // Small delay then start speaking
             setTimeout(() => {
                 speakNextSentence();
-            }, 150);
+            }, 100);
         }
     }, [isPlaying, stopPlayback, startSpeaking, speakNextSentence]);
 
