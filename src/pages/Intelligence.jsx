@@ -44,7 +44,7 @@ const CATEGORIES = {
         icon: Star,
         color: "#8B5CF6",
         gradient: "from-purple-500 to-indigo-500",
-        items: ["Universe", "Galaxy", "Solar System", "Planets", "Asteroids", "Comets", "Black Holes", "Nebulae"]
+        items: ["Universe", "Galaxy", "Solar System", "Planets", "Asteroids", "Comets", "Black Holes", "Nebulae", "Constellations", "Exoplanets"]
     }
 };
 
