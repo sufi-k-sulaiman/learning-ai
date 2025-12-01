@@ -326,16 +326,17 @@ export default function SearchPods() {
 
             sentencesRef.current = sentences;
 
-            // Generate audio using Google TTS backend
+            // Generate audio using ElevenLabs TTS
             let ttsResponse;
             try {
                 ttsResponse = await base44.functions.invoke('elevenlabsTTS', {
-                                        text: cleanText,
-                                        voice_id: selectedVoice
-                                    });
+                    text: cleanText,
+                    voice_id: selectedVoice
+                });
+                console.log('TTS response received:', ttsResponse?.data ? 'has data' : 'no data', ttsResponse?.data?.error || 'no error');
             } catch (ttsError) {
                 console.error('TTS function error:', ttsError);
-                throw new Error('Audio generation failed');
+                throw new Error(ttsError?.response?.data?.error || ttsError?.message || 'Audio generation failed');
             }
 
             setGenerationProgress(75);
