@@ -570,11 +570,11 @@ export default function SearchPods() {
             const remainingSentences = sentencesRef.current.slice(currentSentenceIndexRef.current);
             const remainingText = remainingSentences.join(' ');
             
-            // Generate new audio with new voice
+            // Generate new audio with new voice using ElevenLabs
             const ttsResponse = await base44.functions.invoke('elevenlabsTTS', {
-                                    text: remainingText,
-                                    voice_id: newVoice
-                                });
+                text: remainingText,
+                voice_id: newVoice
+            });
             
             if (ttsResponse.data?.audio) {
                 // Clean up old audio
