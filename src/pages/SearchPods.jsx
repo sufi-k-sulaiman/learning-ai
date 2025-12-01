@@ -346,6 +346,9 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
             // Auto-start playback with browser TTS
             setTimeout(() => {
                 startSpeaking();
+                setTimeout(() => {
+                    speakNextSentence();
+                }, 100);
             }, 500);
             
         } catch (error) {
