@@ -1052,7 +1052,15 @@ Return data for all ${stockBatch.length} stocks.`,
 
     const filteredStocks = useMemo(() => {
         let result = [...stocks];
-        if (searchQuery) { const q = searchQuery.toLowerCase(); result = result.filter(s => s.ticker?.toLowerCase().includes(q) || s.name?.toLowerCase().includes(q) || s.sector?.toLowerCase().includes(q)); }
+        if (searchQuery) { 
+            const q = searchQuery.toLowerCase().trim(); 
+            result = result.filter(s => 
+                s.ticker?.toLowerCase().includes(q) || 
+                s.name?.toLowerCase().includes(q) || 
+                s.sector?.toLowerCase().includes(q) ||
+                s.industry?.toLowerCase().includes(q)
+            ); 
+        }
         if (activePreset === 'wide-moats') result = result.filter(s => s.moat >= 70);
         else if (activePreset === 'undervalued') result = result.filter(s => s.pe < 20);
         else if (activePreset === 'high-growth') result = result.filter(s => s.sgr >= 15);
