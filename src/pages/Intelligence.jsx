@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { 
     Brain, Loader2, ChevronRight, ArrowLeft, Sparkles,
-    Globe, Mountain, Leaf, Zap, Star, X
+    Globe, Mountain, Leaf, Zap, Star, Home
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { base44 } from '@/api/base44Client';
 
 const CATEGORIES = {
@@ -45,7 +44,30 @@ const CATEGORIES = {
     }
 };
 
-function CategoryCard({ categoryKey, category, onClick }) {
+function Breadcrumb({ items, onNavigate }) {
+    return (
+        <nav className="flex items-center gap-2 text-sm mb-6 flex-wrap">
+            {items.map((item, index) => (
+                <React.Fragment key={index}>
+                    {index > 0 && <ChevronRight className="w-4 h-4 text-gray-400" />}
+                    <button
+                        onClick={() => onNavigate(index)}
+                        className={`flex items-center gap-1.5 px-2 py-1 rounded-lg transition-colors ${
+                            index === items.length - 1 
+                                ? 'text-purple-600 font-medium bg-purple-50' 
+                                : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                        }`}
+                    >
+                        {index === 0 && <Home className="w-4 h-4" />}
+                        {item.label}
+                    </button>
+                </React.Fragment>
+            ))}
+        </nav>
+    );
+}
+
+function CategoryCard({ category, onClick }) {
     const Icon = category.icon;
     
     return (
@@ -95,15 +117,15 @@ function ItemCard({ item, color, onClick }) {
     );
 }
 
-function ItemDetailModal({ isOpen, onClose, item, category }) {
+function ItemDetailView({ item, category }) {
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState(null);
 
     useEffect(() => {
-        if (isOpen && item) {
+        if (item) {
             fetchItemData();
         }
-    }, [isOpen, item]);
+    }, [item]);
 
     const fetchItemData = async () => {
         setLoading(true);
@@ -143,81 +165,83 @@ function ItemDetailModal({ isOpen, onClose, item, category }) {
         }
     };
 
-    if (!isOpen) return null;
+    if (loading) {
+        return (
+            <div className="flex flex-col items-center justify-center py-20">
+                <Loader2 className="w-10 h-10 animate-spin mb-4" style={{ color: category?.color }} />
+                <p className="text-gray-500">Loading intelligence data...</p>
+            </div>
+        );
+    }
 
     return (
-        <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="max-w-full w-full h-full max-h-full rounded-none md:max-w-2xl md:max-h-[85vh] md:rounded-xl overflow-hidden p-0">
-                <div className={`p-6 text-white bg-gradient-to-r ${category?.gradient || 'from-purple-600 to-indigo-600'}`}>
-                    <div className="flex items-center justify-between">
-                        <div>
-                            <p className="text-white/70 text-sm mb-1">{category?.name}</p>
-                            <h2 className="text-2xl font-bold">{item}</h2>
-                        </div>
-                        <Button variant="ghost" size="icon" onClick={onClose} className="text-white hover:bg-white/20">
-                            <X className="w-6 h-6" />
-                        </Button>
+        <div className="space-y-6">
+            <div className={`bg-gradient-to-r ${category?.gradient || 'from-purple-600 to-indigo-600'} rounded-2xl p-6 text-white`}>
+                <div className="flex items-center gap-4">
+                    <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center">
+                        <Sparkles className="w-7 h-7" />
+                    </div>
+                    <div>
+                        <p className="text-white/70 text-sm">{category?.name}</p>
+                        <h2 className="text-2xl font-bold">{item}</h2>
                     </div>
                 </div>
-                
-                <div className="p-6 overflow-y-auto max-h-[calc(100vh-180px)] md:max-h-[calc(85vh-120px)]">
-                    {loading ? (
-                        <div className="flex flex-col items-center justify-center py-16">
-                            <Loader2 className="w-10 h-10 animate-spin mb-4" style={{ color: category?.color }} />
-                            <p className="text-gray-500">Loading intelligence data...</p>
+            </div>
+
+            {data && (
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="lg:col-span-2 space-y-6">
+                        <div className="bg-white rounded-xl border border-gray-200 p-6">
+                            <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                                <Globe className="w-5 h-5" style={{ color: category?.color }} />
+                                Overview
+                            </h3>
+                            <p className="text-gray-700 leading-relaxed">{data.overview}</p>
                         </div>
-                    ) : data ? (
-                        <div className="space-y-6">
-                            <div>
-                                <h3 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
-                                    <Globe className="w-5 h-5" style={{ color: category?.color }} />
-                                    Overview
-                                </h3>
-                                <p className="text-gray-700 leading-relaxed">{data.overview}</p>
-                            </div>
-                            
-                            <div>
-                                <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                                    <Sparkles className="w-5 h-5" style={{ color: category?.color }} />
-                                    Key Facts
-                                </h3>
-                                <div className="space-y-2">
-                                    {data.keyFacts?.map((fact, i) => (
-                                        <div key={i} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-                                            <span className="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0" style={{ backgroundColor: category?.color }}>
-                                                {i + 1}
-                                            </span>
-                                            <p className="text-gray-700 text-sm">{fact}</p>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                            
-                            <div className="p-4 rounded-xl" style={{ backgroundColor: `${category?.color}10` }}>
-                                <h3 className="font-semibold text-gray-900 mb-2">Why It Matters</h3>
-                                <p className="text-gray-700 text-sm">{data.significance}</p>
-                            </div>
-                            
-                            <div>
-                                <h3 className="font-semibold text-gray-900 mb-3">Related Topics</h3>
-                                <div className="flex flex-wrap gap-2">
-                                    {data.relatedTopics?.map((topic, i) => (
-                                        <span key={i} className="px-3 py-1.5 rounded-full text-sm font-medium" style={{ backgroundColor: `${category?.color}20`, color: category?.color }}>
-                                            {topic}
+                        
+                        <div className="bg-white rounded-xl border border-gray-200 p-6">
+                            <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                <Sparkles className="w-5 h-5" style={{ color: category?.color }} />
+                                Key Facts
+                            </h3>
+                            <div className="space-y-3">
+                                {data.keyFacts?.map((fact, i) => (
+                                    <div key={i} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                                        <span className="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0" style={{ backgroundColor: category?.color }}>
+                                            {i + 1}
                                         </span>
-                                    ))}
-                                </div>
-                            </div>
-                            
-                            <div className="p-4 bg-gradient-to-r from-gray-50 to-gray-100 rounded-xl">
-                                <h3 className="font-semibold text-gray-900 mb-2">Current Research</h3>
-                                <p className="text-gray-600 text-sm">{data.currentResearch}</p>
+                                        <p className="text-gray-700 text-sm">{fact}</p>
+                                    </div>
+                                ))}
                             </div>
                         </div>
-                    ) : null}
+                        
+                        <div className="bg-white rounded-xl border border-gray-200 p-6">
+                            <h3 className="font-semibold text-gray-900 mb-3">Current Research</h3>
+                            <p className="text-gray-600">{data.currentResearch}</p>
+                        </div>
+                    </div>
+                    
+                    <div className="space-y-6">
+                        <div className="rounded-xl p-5" style={{ backgroundColor: `${category?.color}10` }}>
+                            <h3 className="font-semibold text-gray-900 mb-3">Why It Matters</h3>
+                            <p className="text-gray-700 text-sm">{data.significance}</p>
+                        </div>
+                        
+                        <div className="bg-white rounded-xl border border-gray-200 p-5">
+                            <h3 className="font-semibold text-gray-900 mb-3">Related Topics</h3>
+                            <div className="flex flex-wrap gap-2">
+                                {data.relatedTopics?.map((topic, i) => (
+                                    <span key={i} className="px-3 py-1.5 rounded-full text-sm font-medium" style={{ backgroundColor: `${category?.color}20`, color: category?.color }}>
+                                        {topic}
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
                 </div>
-            </DialogContent>
-        </Dialog>
+            )}
+        </div>
     );
 }
 
@@ -230,22 +254,35 @@ export default function Intelligence() {
 
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [selectedItem, setSelectedItem] = useState(null);
-    const [showItemModal, setShowItemModal] = useState(false);
+
+    const currentCategory = selectedCategory ? CATEGORIES[selectedCategory] : null;
+
+    // Build breadcrumb items
+    const breadcrumbItems = [{ label: 'Intelligence', level: 0 }];
+    if (selectedCategory && currentCategory) {
+        breadcrumbItems.push({ label: currentCategory.name, level: 1 });
+    }
+    if (selectedItem) {
+        breadcrumbItems.push({ label: selectedItem, level: 2 });
+    }
+
+    const handleBreadcrumbNavigate = (index) => {
+        if (index === 0) {
+            setSelectedCategory(null);
+            setSelectedItem(null);
+        } else if (index === 1) {
+            setSelectedItem(null);
+        }
+    };
 
     const handleCategoryClick = (categoryKey) => {
         setSelectedCategory(categoryKey);
+        setSelectedItem(null);
     };
 
     const handleItemClick = (item) => {
         setSelectedItem(item);
-        setShowItemModal(true);
     };
-
-    const handleBack = () => {
-        setSelectedCategory(null);
-    };
-
-    const currentCategory = selectedCategory ? CATEGORIES[selectedCategory] : null;
 
     return (
         <div className="min-h-screen bg-gray-50 p-4 md:p-6">
@@ -277,6 +314,9 @@ export default function Intelligence() {
                     </div>
                 </div>
 
+                {/* Breadcrumb */}
+                <Breadcrumb items={breadcrumbItems} onNavigate={handleBreadcrumbNavigate} />
+
                 {/* Content */}
                 {!selectedCategory ? (
                     /* Category Grid */
@@ -284,24 +324,14 @@ export default function Intelligence() {
                         {Object.entries(CATEGORIES).map(([key, category]) => (
                             <CategoryCard 
                                 key={key}
-                                categoryKey={key}
                                 category={category}
                                 onClick={() => handleCategoryClick(key)}
                             />
                         ))}
                     </div>
-                ) : (
-                    /* Category Detail View */
+                ) : !selectedItem ? (
+                    /* Category Items View */
                     <div>
-                        <Button 
-                            variant="ghost" 
-                            onClick={handleBack}
-                            className="mb-4 gap-2 text-gray-600 hover:text-gray-900"
-                        >
-                            <ArrowLeft className="w-4 h-4" />
-                            Back to Categories
-                        </Button>
-                        
                         <div className={`bg-gradient-to-r ${currentCategory.gradient} rounded-2xl p-6 mb-6 text-white`}>
                             <div className="flex items-center gap-4">
                                 <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center">
@@ -325,16 +355,11 @@ export default function Intelligence() {
                             ))}
                         </div>
                     </div>
+                ) : (
+                    /* Item Detail View */
+                    <ItemDetailView item={selectedItem} category={currentCategory} />
                 )}
             </div>
-
-            {/* Item Detail Modal */}
-            <ItemDetailModal 
-                isOpen={showItemModal}
-                onClose={() => setShowItemModal(false)}
-                item={selectedItem}
-                category={currentCategory}
-            />
         </div>
     );
 }
