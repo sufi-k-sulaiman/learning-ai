@@ -383,11 +383,6 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
         isPlayingRef.current = true;
         setIsPlaying(true);
         
-        // Small delay to ensure speech synthesis is ready
-        setTimeout(() => {
-            speakNextSentence();
-        }, 100);
-        
         // Start timer for progress
         if (timerRef.current) clearInterval(timerRef.current);
         timerRef.current = setInterval(() => {
@@ -399,7 +394,7 @@ Do NOT mention any websites, URLs, or external references in the audio script.`
                 return prev + 1;
             });
         }, 1000);
-    }, [duration, speakNextSentence]);
+    }, [duration]);
 
     // Speak next sentence
     const speakNextSentence = useCallback(() => {
