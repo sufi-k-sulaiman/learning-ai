@@ -1062,7 +1062,27 @@ Return data for all ${stockBatch.length} stocks.`,
         else if (activePreset === 'high-growth') result = result.filter(s => (s.sgr || 0) >= 15);
         else if (activePreset === 'top-movers') result = result.sort((a, b) => Math.abs(b.change || 0) - Math.abs(a.change || 0));
         
-        // Dropdown filters - parse numeric values from filter strings like "70+", "20%+", "<15", "3+"
+        // Market filter
+        if (filters.market && filters.market !== 'All Markets') {
+            // For now, all stocks are considered US market
+            if (filters.market === 'US') {
+                // Keep all (our data is US stocks)
+            } else {
+                result = []; // No EU/Asia stocks in current dataset
+            }
+        }
+        
+        // Sector filter
+        if (filters.sector && filters.sector !== 'All Sectors') {
+            result = result.filter(s => s.sector === filters.sector);
+        }
+        
+        // Industry filter
+        if (filters.industry && filters.industry !== 'All Industries') {
+            result = result.filter(s => s.industry === filters.industry);
+        }
+        
+        // Metric filters - parse numeric values from filter strings like "70+", "20%+", "<15", "3+"
         if (filters.moat && filters.moat !== 'Any') {
             const val = parseInt(filters.moat.replace('+', ''));
             result = result.filter(s => (s.moat || 0) >= val);
@@ -1079,8 +1099,8 @@ Return data for all ${stockBatch.length} stocks.`,
             const val = parseFloat(filters.zscore.replace('+', ''));
             result = result.filter(s => (s.zscore || 0) >= val);
         }
-        if (filters.sector && filters.sector !== 'All Sectors') result = result.filter(s => s.sector === filters.sector);
-        // Chart filter
+        
+        // Chart filter (from clicking on chart bars)
         if (chartFilter.type && chartFilter.value) {
             result = result.filter(s => 
                 chartFilter.type === 'sector' ? s.sector === chartFilter.value : s.industry === chartFilter.value
