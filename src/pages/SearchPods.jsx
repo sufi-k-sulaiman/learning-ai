@@ -374,9 +374,11 @@ As we wrap up, remember that learning is a continuous journey. Thank you for lis
 
         } catch (error) {
             console.error('Generation error:', error);
-            const errorCode = getErrorCode(error);
-            const errorInfo = ERROR_CODES[errorCode] || ERROR_CODES.E500;
-            setGenerationError({ code: errorCode, ...errorInfo });
+            setGenerationError({ 
+                code: 'E300', 
+                title: 'Generation Failed', 
+                message: error.message || 'Could not generate audio. Please try again.' 
+            });
             setIsGenerating(false);
         }
     };
