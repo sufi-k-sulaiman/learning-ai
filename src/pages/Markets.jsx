@@ -6,6 +6,7 @@ import StockCard from '@/components/markets/StockCard';
 import StockTicker from '@/components/markets/StockTicker';
 import FilterChips from '@/components/markets/FilterChips';
 import StockDetailModal from '@/components/markets/StockDetailModal';
+import MarketOverviewChart from '@/components/markets/MarketOverviewChart';
 import { EmptyState, LoadingState } from '@/components/ErrorDisplay';
 import { base44 } from '@/api/base44Client';
 
@@ -1073,8 +1074,24 @@ Return data for all ${stockBatch.length} stocks.`,
 
 
 
-            <div className="flex flex-wrap gap-1.5 md:gap-2 mb-3 md:mb-4">
-                {PRESET_FILTERS.map(preset => (<button key={preset.id} onClick={() => setActivePreset(preset.id)} className={`flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full border transition-all text-xs md:text-sm ${activePreset === preset.id ? 'bg-purple-600 text-white border-purple-600' : 'bg-white text-gray-700 border-gray-200 hover:border-purple-300'}`}><preset.icon className="w-3 h-3 md:w-4 md:h-4" /><span className="hidden sm:inline">{preset.label}</span></button>))}
+            {/* Search Bar + Preset Filters Row */}
+            <div className="flex flex-col sm:flex-row gap-3 mb-3 md:mb-4">
+                {/* Search Bar */}
+                <div className="relative flex-shrink-0 w-full sm:w-64">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder="Search stocks..."
+                        className="w-full h-10 pl-9 pr-4 rounded-full border border-gray-200 bg-white focus:border-purple-300 focus:ring-2 focus:ring-purple-100 outline-none transition-all text-sm text-gray-700 placeholder:text-gray-400"
+                    />
+                </div>
+                
+                {/* Preset Filters */}
+                <div className="flex flex-wrap gap-1.5 md:gap-2">
+                    {PRESET_FILTERS.map(preset => (<button key={preset.id} onClick={() => setActivePreset(preset.id)} className={`flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-full border transition-all text-xs md:text-sm ${activePreset === preset.id ? 'bg-purple-600 text-white border-purple-600' : 'bg-white text-gray-700 border-gray-200 hover:border-purple-300'}`}><preset.icon className="w-3 h-3 md:w-4 md:h-4" /><span className="hidden sm:inline">{preset.label}</span></button>))}
+                </div>
             </div>
 
             <div className="flex items-center gap-1.5 md:gap-2 flex-wrap mb-4">
@@ -1085,7 +1102,12 @@ Return data for all ${stockBatch.length} stocks.`,
                 </button>
             </div>
 
-            <div className="flex items-center justify-between mb-3 md:mb-4 mt-4 md:mt-6">
+            {/* Market Overview Chart */}
+            {!loading && stocks.length > 0 && (
+                <MarketOverviewChart stocks={stocks} />
+            )}
+
+            <div className="flex items-center justify-between mb-3 md:mb-4">
                 <p className="text-gray-600 text-xs md:text-sm">Showing <span className="font-bold text-gray-900">{filteredStocks.length}</span> of {stocks.length} stocks</p>
             </div>
 
