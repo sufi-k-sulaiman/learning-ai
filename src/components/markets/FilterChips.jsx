@@ -1,11 +1,17 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { ChevronDown, Globe, Building2, Factory } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 
-export default function FilterChips({ filters, setFilters, filterOptions }) {
+export default function FilterChips({ filters, setFilters, filterOptions, sectors, industries }) {
     const handleFilterChange = (key, value) => {
         setFilters(prev => ({ ...prev, [key]: value }));
     };
+
+    // Use passed sectors or fallback
+    const sectorOptions = sectors || ['All Sectors', 'Technology', 'Finance', 'Healthcare', 'Consumer', 'Energy', 'Industrials', 'Materials', 'Utilities', 'Real Estate', 'Telecom', 'Media', 'Automotive'];
+    
+    // Use passed industries or fallback
+    const industryOptions = industries || ['All Industries'];
 
     const FilterButton = ({ filterKey, label, value, defaultValue, icon: Icon, options }) => {
         const isActive = value !== defaultValue;
@@ -17,13 +23,13 @@ export default function FilterChips({ filters, setFilters, filterOptions }) {
                         : 'bg-white/60 border-gray-200/80 text-gray-600 hover:bg-white hover:border-purple-200 hover:text-purple-600'
                 } border backdrop-blur-sm`}>
                     {Icon && <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-purple-500' : 'text-gray-400 group-hover:text-purple-400'}`} />}
-                    <span>{isActive ? value : label}</span>
+                    <span className="max-w-[100px] truncate">{isActive ? value : label}</span>
                     {isActive && (
                         <span className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
                     )}
                     <ChevronDown className={`w-3 h-3 transition-transform ${isActive ? 'text-purple-500' : 'text-gray-400'}`} />
                 </DropdownMenuTrigger>
-                <DropdownMenuContent className="min-w-[140px]">
+                <DropdownMenuContent className="min-w-[140px] max-h-[300px] overflow-y-auto">
                     {options.map(opt => (
                         <DropdownMenuItem 
                             key={opt} 
@@ -88,7 +94,7 @@ export default function FilterChips({ filters, setFilters, filterOptions }) {
                 value={filters.sector}
                 defaultValue="All Sectors"
                 icon={Building2}
-                options={['All Sectors', 'Technology', 'Finance', 'Healthcare', 'Consumer', 'Energy', 'Industrials', 'Materials', 'Utilities', 'Real Estate', 'Telecom', 'Media', 'Automotive']}
+                options={sectorOptions}
             />
 
             <FilterButton 
@@ -97,7 +103,7 @@ export default function FilterChips({ filters, setFilters, filterOptions }) {
                 value={filters.industry}
                 defaultValue="All Industries"
                 icon={Factory}
-                options={['All Industries', 'Software', 'Hardware', 'Semiconductors', 'Banking', 'Retail', 'Pharma', 'Biotechnology', 'E-Commerce', 'Cloud Services']}
+                options={industryOptions}
             />
 
             {/* Divider */}
