@@ -838,6 +838,144 @@ For "${item}", provide:
                 <p className="text-gray-700">{data?.significance}</p>
             </div>
 
+            {/* Atomic & Molecular Structure */}
+            {data?.atomicStructure && (
+                <div className="bg-white rounded-xl border border-gray-200 p-5">
+                    <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                        <Atom className="w-5 h-5" style={{ color: category?.color }} />
+                        Atoms, Elements & Molecules
+                    </h3>
+                    <div className="space-y-6">
+                        {/* Atoms */}
+                        {data?.atomicStructure?.atoms?.length > 0 && (
+                            <div>
+                                <h4 className="font-medium text-gray-800 mb-3 flex items-center gap-2">
+                                    <span className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-xs font-bold">⚛</span>
+                                    Constituent Atoms
+                                </h4>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                    {data?.atomicStructure?.atoms?.map((atom, i) => (
+                                        <div key={i} className="p-4 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-xl border border-indigo-100">
+                                            <div className="flex items-center gap-3 mb-2">
+                                                <div className="w-12 h-12 rounded-full bg-indigo-500 flex items-center justify-center text-white font-bold text-lg">
+                                                    {atom.symbol}
+                                                </div>
+                                                <div>
+                                                    <p className="font-semibold text-gray-900">{atom.name}</p>
+                                                    <p className="text-xs text-gray-500">Atomic # {atom.atomicNumber}</p>
+                                                </div>
+                                            </div>
+                                            <p className="text-xs text-indigo-600 font-mono bg-white/50 px-2 py-1 rounded">{atom.electronConfig}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Elements */}
+                        {data?.atomicStructure?.elements?.length > 0 && (
+                            <div>
+                                <h4 className="font-medium text-gray-800 mb-3 flex items-center gap-2">
+                                    <span className="w-6 h-6 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 text-xs font-bold">E</span>
+                                    Key Elements
+                                </h4>
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-sm">
+                                        <thead>
+                                            <tr className="bg-gray-50">
+                                                <th className="px-4 py-2 text-left font-medium text-gray-600">Element</th>
+                                                <th className="px-4 py-2 text-left font-medium text-gray-600">Symbol</th>
+                                                <th className="px-4 py-2 text-left font-medium text-gray-600">Atomic Mass</th>
+                                                <th className="px-4 py-2 text-left font-medium text-gray-600">State</th>
+                                                <th className="px-4 py-2 text-left font-medium text-gray-600">Group</th>
+                                                <th className="px-4 py-2 text-left font-medium text-gray-600">Role</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {data?.atomicStructure?.elements?.map((el, i) => (
+                                                <tr key={i} className="border-b border-gray-100 hover:bg-gray-50">
+                                                    <td className="px-4 py-3 font-medium text-gray-900">{el.name}</td>
+                                                    <td className="px-4 py-3">
+                                                        <span className="px-2 py-1 bg-emerald-100 text-emerald-700 rounded font-mono font-bold">{el.symbol}</span>
+                                                    </td>
+                                                    <td className="px-4 py-3 text-gray-600">{el.atomicMass} u</td>
+                                                    <td className="px-4 py-3 text-gray-600">{el.state}</td>
+                                                    <td className="px-4 py-3 text-gray-600">{el.group}</td>
+                                                    <td className="px-4 py-3 text-gray-600 text-xs">{el.role}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Molecules */}
+                        {data?.atomicStructure?.molecules?.length > 0 && (
+                            <div>
+                                <h4 className="font-medium text-gray-800 mb-3 flex items-center gap-2">
+                                    <span className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 text-xs font-bold">M</span>
+                                    Key Molecules
+                                </h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    {data?.atomicStructure?.molecules?.map((mol, i) => (
+                                        <div key={i} className="p-4 bg-gradient-to-br from-blue-50 to-cyan-50 rounded-xl border border-blue-100">
+                                            <div className="flex items-start justify-between mb-2">
+                                                <h5 className="font-semibold text-gray-900">{mol.name}</h5>
+                                                <span className="px-3 py-1 bg-blue-500 text-white rounded-full text-sm font-mono">{mol.formula}</span>
+                                            </div>
+                                            <p className="text-sm text-gray-600 mb-2">{mol.structure}</p>
+                                            <p className="text-xs text-blue-700 bg-white/50 px-2 py-1 rounded">{mol.properties}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Chemical Bonds */}
+                        {data?.atomicStructure?.bonds?.length > 0 && (
+                            <div>
+                                <h4 className="font-medium text-gray-800 mb-3 flex items-center gap-2">
+                                    <span className="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 text-xs font-bold">⚡</span>
+                                    Chemical Bonds
+                                </h4>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                                    {data?.atomicStructure?.bonds?.map((bond, i) => (
+                                        <div key={i} className="p-3 bg-amber-50 rounded-lg border border-amber-200">
+                                            <p className="font-semibold text-amber-800">{bond.type}</p>
+                                            <p className="text-sm text-gray-600 mt-1">{bond.description}</p>
+                                            <p className="text-xs text-amber-600 mt-2">Strength: {bond.strength}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Isotopes */}
+                        {data?.atomicStructure?.isotopes?.length > 0 && (
+                            <div>
+                                <h4 className="font-medium text-gray-800 mb-3 flex items-center gap-2">
+                                    <span className="w-6 h-6 rounded-full bg-rose-100 flex items-center justify-center text-rose-600 text-xs font-bold">☢</span>
+                                    Relevant Isotopes
+                                </h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                    {data?.atomicStructure?.isotopes?.map((iso, i) => (
+                                        <div key={i} className="p-4 bg-rose-50 rounded-lg border border-rose-200">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <span className="px-2 py-1 bg-rose-500 text-white rounded font-mono text-sm">{iso.symbol}</span>
+                                                <span className="font-semibold text-gray-900">{iso.name}</span>
+                                            </div>
+                                            <p className="text-sm text-gray-600">Half-life: {iso.halfLife}</p>
+                                            <p className="text-xs text-rose-700 mt-2">{iso.significance}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+
             {/* Related Topics */}
             <div className="bg-white rounded-xl border border-gray-200 p-5">
                 <h3 className="font-semibold text-gray-900 mb-4">Related Topics</h3>
