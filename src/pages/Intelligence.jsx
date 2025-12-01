@@ -509,7 +509,7 @@ For "${item}", provide COMPLETE data:
                     </ChartCard>
 
                     {/* 5. Geographic Bar */}
-                    <ChartCard title="Geographic Distribution" color={category?.color}>
+                    <ChartCard title={`${item} by Region`} color={category?.color}>
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={data?.chartData?.geographic || []} layout="vertical">
                                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
