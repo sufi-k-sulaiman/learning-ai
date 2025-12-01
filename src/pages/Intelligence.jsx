@@ -582,7 +582,7 @@ export default function Intelligence() {
                                 <Brain className="w-6 h-6 text-white" />
                             </div>
                             <div>
-                                <h1 className="text-2xl md:text-3xl font-bold">Natural Intelligence</h1>
+                                <h1 className="text-2xl md:text-3xl font-bold">General Intelligence</h1>
                                 <p className="text-white/80 text-sm">Explore the wonders of our universe</p>
                             </div>
                         </div>
