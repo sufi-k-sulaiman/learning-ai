@@ -121,13 +121,37 @@ function ItemCard({ item, color, onClick }) {
     );
 }
 
+const CHART_COLORS = ['#8B5CF6', '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#EC4899', '#06B6D4', '#84CC16'];
+
 function ItemDetailView({ item, category }) {
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState(null);
+    const [images, setImages] = useState([]);
+    const [imageLoading, setImageLoading] = useState(true);
 
     useEffect(() => {
         fetchItemData();
+        generateImages();
     }, [item]);
+
+    const generateImages = async () => {
+        setImageLoading(true);
+        try {
+            const prompts = [
+                `Beautiful realistic photograph of ${item}, natural lighting, high detail, 4k quality`,
+                `Artistic illustration of ${item} in its natural environment, vibrant colors, detailed`
+            ];
+            const imagePromises = prompts.map(prompt => 
+                base44.integrations.Core.GenerateImage({ prompt })
+            );
+            const results = await Promise.all(imagePromises);
+            setImages(results.map(r => r.url));
+        } catch (error) {
+            console.error('Failed to generate images:', error);
+        } finally {
+            setImageLoading(false);
+        }
+    };
 
     const fetchItemData = async () => {
         setLoading(true);
@@ -136,10 +160,22 @@ function ItemDetailView({ item, category }) {
             const response = await base44.integrations.Core.InvokeLLM({
                 prompt: `Provide comprehensive intelligence data about "${item}" in the context of ${category?.name || 'natural world'}. Include:
 1. Overview: A detailed description (3-4 sentences)
-2. Key Facts: 5 interesting facts
+2. Key Facts: 8 interesting and fun facts
 3. Significance: Why it matters to humans and the planet
 4. Related Topics: 4 related concepts to explore
-5. Current Research: Recent scientific discoveries or developments`,
+5. Current Research: Recent scientific discoveries or developments
+6. Fun Facts: 5 surprising or amusing facts
+7. Charts Data - Generate realistic data for 10 different charts:
+   - trendData: Array of 12 monthly data points with month, value, growth fields (showing trends over a year)
+   - distributionData: Array of 5 items with name, value for pie chart
+   - comparisonData: Array of 6 items with category, current, previous for comparison
+   - radarData: Array of 6 items with subject, score (0-100), fullMark (100)
+   - areaData: Array of 12 items with month, primary, secondary values
+   - barData: Array of 8 items with name, value, benchmark
+   - progressData: Array of 5 items with name, value, fill color
+   - timelineData: Array of 10 items with year, metric1, metric2
+   - compositionData: Array of 4 items with name, value, percentage
+   - correlationData: Array of 8 items with x, y, size values`,
                 add_context_from_internet: true,
                 response_json_schema: {
                     type: "object",
@@ -148,7 +184,18 @@ function ItemDetailView({ item, category }) {
                         keyFacts: { type: "array", items: { type: "string" } },
                         significance: { type: "string" },
                         relatedTopics: { type: "array", items: { type: "string" } },
-                        currentResearch: { type: "string" }
+                        currentResearch: { type: "string" },
+                        funFacts: { type: "array", items: { type: "string" } },
+                        trendData: { type: "array", items: { type: "object" } },
+                        distributionData: { type: "array", items: { type: "object" } },
+                        comparisonData: { type: "array", items: { type: "object" } },
+                        radarData: { type: "array", items: { type: "object" } },
+                        areaData: { type: "array", items: { type: "object" } },
+                        barData: { type: "array", items: { type: "object" } },
+                        progressData: { type: "array", items: { type: "object" } },
+                        timelineData: { type: "array", items: { type: "object" } },
+                        compositionData: { type: "array", items: { type: "object" } },
+                        correlationData: { type: "array", items: { type: "object" } }
                     }
                 }
             });
@@ -160,7 +207,18 @@ function ItemDetailView({ item, category }) {
                 keyFacts: ['Information is being gathered...'],
                 significance: 'This topic plays an important role in our understanding of the world.',
                 relatedTopics: ['More topics coming soon'],
-                currentResearch: 'Research data is being compiled.'
+                currentResearch: 'Research data is being compiled.',
+                funFacts: ['Loading fun facts...'],
+                trendData: [],
+                distributionData: [],
+                comparisonData: [],
+                radarData: [],
+                areaData: [],
+                barData: [],
+                progressData: [],
+                timelineData: [],
+                compositionData: [],
+                correlationData: []
             });
         } finally {
             setLoading(false);
