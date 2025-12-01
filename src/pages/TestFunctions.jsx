@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
     MessageSquare, CreditCard, Phone, FileText, Download, Webhook,
-    Loader2, Check, Copy, Send, Image, Bot, Database, UserPlus, Users, Mail
+    Loader2, Check, Copy, Send, Image, Bot, Database, UserPlus, Users, Mail, Volume2
 } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
@@ -64,8 +64,9 @@ export default function TestFunctions() {
             </div>
 
             <Tabs defaultValue="openai" className="space-y-6">
-                <TabsList className="grid grid-cols-8 w-full">
+                <TabsList className="grid grid-cols-9 w-full">
                     <TabsTrigger value="openai" className="gap-2"><Bot className="w-4 h-4" /> OpenAI</TabsTrigger>
+                    <TabsTrigger value="elevenlabs" className="gap-2"><Volume2 className="w-4 h-4" /> ElevenLabs</TabsTrigger>
                     <TabsTrigger value="stripe" className="gap-2"><CreditCard className="w-4 h-4" /> Stripe</TabsTrigger>
                     <TabsTrigger value="twilio" className="gap-2"><Phone className="w-4 h-4" /> Twilio</TabsTrigger>
                     <TabsTrigger value="email" className="gap-2"><Mail className="w-4 h-4" /> Email</TabsTrigger>
@@ -128,6 +129,108 @@ export default function TestFunctions() {
                             >
                                 {loading === 'embeddings' ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
                                 Generate Embeddings
+                            </Button>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+
+                {/* ElevenLabs Tab */}
+                <TabsContent value="elevenlabs" className="space-y-4">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-2">
+                                <Volume2 className="w-5 h-5 text-purple-600" />
+                                ElevenLabs TTS API Test
+                            </CardTitle>
+                            <CardDescription>Test your ElevenLabs API key and subscription status</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <Button
+                                onClick={async () => {
+                                    setLoading('elevenlabs-test');
+                                    setResult(null);
+                                    try {
+                                        const response = await fetch('/api/elevenlabsTTS?test=true');
+                                        const data = await response.json();
+                                        setResult({ success: response.ok, data });
+                                    } catch (error) {
+                                        setResult({ success: false, error: error.message });
+                                    } finally {
+                                        setLoading('');
+                                    }
+                                }}
+                                disabled={loading === 'elevenlabs-test'}
+                                className="bg-purple-600 hover:bg-purple-700"
+                            >
+                                {loading === 'elevenlabs-test' ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Check className="w-4 h-4 mr-2" />}
+                                Test API Key & Subscription
+                            </Button>
+                            <p className="text-sm text-gray-500">
+                                This will verify your ElevenLabs API key and show your subscription status including character usage.
+                            </p>
+                        </CardContent>
+                    </Card>
+
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>Generate Speech</CardTitle>
+                            <CardDescription>Test text-to-speech generation</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
+                            <Textarea
+                                id="tts-text"
+                                placeholder="Enter text to convert to speech..."
+                                className="min-h-[100px]"
+                                defaultValue="Hello, this is a test of the ElevenLabs text to speech system."
+                            />
+                            <Select defaultValue="EXAVITQu4vr4xnSDxMaL">
+                                <SelectTrigger id="tts-voice">
+                                    <SelectValue placeholder="Select voice" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="EXAVITQu4vr4xnSDxMaL">Bella</SelectItem>
+                                    <SelectItem value="21m00Tcm4TlvDq8ikWAM">Rachel</SelectItem>
+                                    <SelectItem value="AZnzlk1XvdvUeBnXmlld">Domi</SelectItem>
+                                    <SelectItem value="MF3mGyEYCl7XYWbV9V6O">Elli</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <Button
+                                onClick={async () => {
+                                    setLoading('elevenlabs-tts');
+                                    setResult(null);
+                                    try {
+                                        const text = document.getElementById('tts-text').value;
+                                        const voice = document.getElementById('tts-voice')?.querySelector('[data-value]')?.dataset?.value || 'EXAVITQu4vr4xnSDxMaL';
+                                        const response = await base44.functions.invoke('elevenlabsTTS', {
+                                            text,
+                                            voice_id: voice
+                                        });
+                                        if (response.data?.audio) {
+                                            // Play audio
+                                            const binaryString = atob(response.data.audio);
+                                            const bytes = new Uint8Array(binaryString.length);
+                                            for (let i = 0; i < binaryString.length; i++) {
+                                                bytes[i] = binaryString.charCodeAt(i);
+                                            }
+                                            const blob = new Blob([bytes], { type: 'audio/mpeg' });
+                                            const audioUrl = URL.createObjectURL(blob);
+                                            const audio = new Audio(audioUrl);
+                                            audio.play();
+                                            setResult({ success: true, data: { message: 'Audio playing!', bytes: bytes.length } });
+                                        } else {
+                                            setResult({ success: false, data: response.data });
+                                        }
+                                    } catch (error) {
+                                        setResult({ success: false, error: error.message });
+                                    } finally {
+                                        setLoading('');
+                                    }
+                                }}
+                                disabled={loading === 'elevenlabs-tts'}
+                                className="bg-purple-600 hover:bg-purple-700"
+                            >
+                                {loading === 'elevenlabs-tts' ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Volume2 className="w-4 h-4 mr-2" />}
+                                Generate & Play Speech
                             </Button>
                         </CardContent>
                     </Card>
