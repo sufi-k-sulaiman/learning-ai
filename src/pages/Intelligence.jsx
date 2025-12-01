@@ -298,7 +298,17 @@ For "${item}", provide:
                                 cyclical: { type: "array", items: { type: "object", properties: { month: { type: "string" }, value: { type: "number" } } } }
                             }
                         },
-                        relatedTopics: { type: "array", items: { type: "string" } }
+                        relatedTopics: { type: "array", items: { type: "string" } },
+                        atomicStructure: {
+                            type: "object",
+                            properties: {
+                                atoms: { type: "array", items: { type: "object", properties: { name: { type: "string" }, symbol: { type: "string" }, atomicNumber: { type: "number" }, electronConfig: { type: "string" } } } },
+                                elements: { type: "array", items: { type: "object", properties: { name: { type: "string" }, symbol: { type: "string" }, atomicMass: { type: "number" }, state: { type: "string" }, group: { type: "string" }, role: { type: "string" } } } },
+                                molecules: { type: "array", items: { type: "object", properties: { name: { type: "string" }, formula: { type: "string" }, structure: { type: "string" }, properties: { type: "string" } } } },
+                                bonds: { type: "array", items: { type: "object", properties: { type: { type: "string" }, description: { type: "string" }, strength: { type: "string" } } } },
+                                isotopes: { type: "array", items: { type: "object", properties: { name: { type: "string" }, symbol: { type: "string" }, halfLife: { type: "string" }, significance: { type: "string" } } } }
+                            }
+                        }
                     }
                 }
             });
