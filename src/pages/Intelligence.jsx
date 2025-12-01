@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { 
     Brain, Loader2, ChevronRight, Sparkles,
-    Globe, Mountain, Leaf, Zap, Star, Home
+    Globe, Mountain, Leaf, Zap, Star, Home,
+    Beaker, Calculator, FlaskConical, Users, Lightbulb, BookOpen, Atom
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import { BarChart, Bar, PieChart, Pie, Cell, LineChart, Line, RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 
 const CATEGORIES = {
     Elements_Environment: {
@@ -119,10 +121,27 @@ function ItemCard({ item, color, onClick }) {
 function ItemDetailView({ item, category }) {
     const [loading, setLoading] = useState(true);
     const [data, setData] = useState(null);
+    const [imageUrl, setImageUrl] = useState(null);
+    const [imageLoading, setImageLoading] = useState(true);
 
     useEffect(() => {
         fetchItemData();
+        generateImage();
     }, [item]);
+
+    const generateImage = async () => {
+        setImageLoading(true);
+        try {
+            const response = await base44.integrations.Core.GenerateImage({
+                prompt: `A stunning, educational scientific illustration of ${item} in the context of ${category?.name || 'natural world'}. Photorealistic, highly detailed, vibrant colors, professional scientific visualization style.`
+            });
+            setImageUrl(response?.url);
+        } catch (error) {
+            console.error('Failed to generate image:', error);
+        } finally {
+            setImageLoading(false);
+        }
+    };
 
     const fetchItemData = async () => {
         setLoading(true);
@@ -131,10 +150,20 @@ function ItemDetailView({ item, category }) {
             const response = await base44.integrations.Core.InvokeLLM({
                 prompt: `Provide comprehensive intelligence data about "${item}" in the context of ${category?.name || 'natural world'}. Include:
 1. Overview: A detailed description (3-4 sentences)
-2. Key Facts: 5 interesting facts
+2. Key Facts: 5 interesting and fun facts
 3. Significance: Why it matters to humans and the planet
 4. Related Topics: 4 related concepts to explore
-5. Current Research: Recent scientific discoveries or developments`,
+5. Current Research: Recent scientific discoveries or developments
+6. Physical Composition: 5 key physical properties/characteristics with descriptions
+7. Chemical Composition: 5 main chemical elements or compounds with percentages or descriptions
+8. Mathematical Illustrations: 3 mathematical formulas or equations related to this topic with explanations
+9. Research Data: 5 key statistics or research findings with numerical data
+10. Subject Matter Experts: 4 notable scientists or researchers who study this topic with their contributions
+11. Chart Data: Provide numerical data for visualization:
+    - distributionData: 5 items with name and value (percentage distribution)
+    - trendData: 6 data points showing trends over time (year and value)
+    - comparisonData: 4 items comparing different aspects (name, valueA, valueB)
+    - radarData: 5 attributes with scores (0-100) for a radar chart`,
                 add_context_from_internet: true,
                 response_json_schema: {
                     type: "object",
@@ -143,7 +172,16 @@ function ItemDetailView({ item, category }) {
                         keyFacts: { type: "array", items: { type: "string" } },
                         significance: { type: "string" },
                         relatedTopics: { type: "array", items: { type: "string" } },
-                        currentResearch: { type: "string" }
+                        currentResearch: { type: "string" },
+                        physicalComposition: { type: "array", items: { type: "object", properties: { property: { type: "string" }, description: { type: "string" } } } },
+                        chemicalComposition: { type: "array", items: { type: "object", properties: { element: { type: "string" }, percentage: { type: "string" }, description: { type: "string" } } } },
+                        mathematicalIllustrations: { type: "array", items: { type: "object", properties: { formula: { type: "string" }, name: { type: "string" }, explanation: { type: "string" } } } },
+                        researchData: { type: "array", items: { type: "object", properties: { statistic: { type: "string" }, value: { type: "string" }, source: { type: "string" } } } },
+                        subjectMatterExperts: { type: "array", items: { type: "object", properties: { name: { type: "string" }, field: { type: "string" }, contribution: { type: "string" } } } },
+                        distributionData: { type: "array", items: { type: "object", properties: { name: { type: "string" }, value: { type: "number" } } } },
+                        trendData: { type: "array", items: { type: "object", properties: { year: { type: "string" }, value: { type: "number" } } } },
+                        comparisonData: { type: "array", items: { type: "object", properties: { name: { type: "string" }, valueA: { type: "number" }, valueB: { type: "number" } } } },
+                        radarData: { type: "array", items: { type: "object", properties: { attribute: { type: "string" }, score: { type: "number" } } } }
                     }
                 }
             });
@@ -155,12 +193,23 @@ function ItemDetailView({ item, category }) {
                 keyFacts: ['Information is being gathered...'],
                 significance: 'This topic plays an important role in our understanding of the world.',
                 relatedTopics: ['More topics coming soon'],
-                currentResearch: 'Research data is being compiled.'
+                currentResearch: 'Research data is being compiled.',
+                physicalComposition: [],
+                chemicalComposition: [],
+                mathematicalIllustrations: [],
+                researchData: [],
+                subjectMatterExperts: [],
+                distributionData: [{ name: 'Data', value: 100 }],
+                trendData: [],
+                comparisonData: [],
+                radarData: []
             });
         } finally {
             setLoading(false);
         }
     };
+
+    const CHART_COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899'];
 
     if (loading) {
         return (
@@ -173,19 +222,30 @@ function ItemDetailView({ item, category }) {
 
     return (
         <div>
+            {/* Header with Generated Image */}
             <div className={`bg-gradient-to-r ${category?.gradient || 'from-purple-600 to-indigo-600'} rounded-2xl p-6 mb-6 text-white`}>
-                <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center">
-                        <Sparkles className="w-7 h-7" />
+                <div className="flex flex-col md:flex-row md:items-center gap-6">
+                    <div className="flex items-center gap-4 flex-1">
+                        <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center">
+                            <Sparkles className="w-7 h-7" />
+                        </div>
+                        <div>
+                            <p className="text-white/70 text-sm">{category?.name}</p>
+                            <h2 className="text-2xl font-bold">{item}</h2>
+                        </div>
                     </div>
-                    <div>
-                        <p className="text-white/70 text-sm">{category?.name}</p>
-                        <h2 className="text-2xl font-bold">{item}</h2>
-                    </div>
+                    {imageLoading ? (
+                        <div className="w-full md:w-48 h-32 rounded-xl bg-white/20 flex items-center justify-center">
+                            <Loader2 className="w-6 h-6 animate-spin" />
+                        </div>
+                    ) : imageUrl && (
+                        <img src={imageUrl} alt={item} className="w-full md:w-48 h-32 object-cover rounded-xl" />
+                    )}
                 </div>
             </div>
 
             <div className="space-y-6">
+                {/* Overview */}
                 <div className="bg-white rounded-xl border border-gray-200 p-5">
                     <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
                         <Globe className="w-5 h-5" style={{ color: category?.color }} />
@@ -193,16 +253,84 @@ function ItemDetailView({ item, category }) {
                     </h3>
                     <p className="text-gray-700 leading-relaxed">{data?.overview}</p>
                 </div>
-                
+
+                {/* Charts Section */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Distribution Pie Chart */}
+                    {data?.distributionData?.length > 0 && (
+                        <div className="bg-white rounded-xl border border-gray-200 p-5">
+                            <h3 className="font-semibold text-gray-900 mb-4">Distribution Analysis</h3>
+                            <ResponsiveContainer width="100%" height={200}>
+                                <PieChart>
+                                    <Pie data={data.distributionData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={70} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
+                                        {data.distributionData.map((_, index) => (
+                                            <Cell key={index} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                                        ))}
+                                    </Pie>
+                                    <Tooltip />
+                                </PieChart>
+                            </ResponsiveContainer>
+                        </div>
+                    )}
+
+                    {/* Trend Line Chart */}
+                    {data?.trendData?.length > 0 && (
+                        <div className="bg-white rounded-xl border border-gray-200 p-5">
+                            <h3 className="font-semibold text-gray-900 mb-4">Trend Over Time</h3>
+                            <ResponsiveContainer width="100%" height={200}>
+                                <LineChart data={data.trendData}>
+                                    <XAxis dataKey="year" tick={{ fontSize: 12 }} />
+                                    <YAxis tick={{ fontSize: 12 }} />
+                                    <Tooltip />
+                                    <Line type="monotone" dataKey="value" stroke={category?.color} strokeWidth={2} dot={{ fill: category?.color }} />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        </div>
+                    )}
+
+                    {/* Comparison Bar Chart */}
+                    {data?.comparisonData?.length > 0 && (
+                        <div className="bg-white rounded-xl border border-gray-200 p-5">
+                            <h3 className="font-semibold text-gray-900 mb-4">Comparative Analysis</h3>
+                            <ResponsiveContainer width="100%" height={200}>
+                                <BarChart data={data.comparisonData}>
+                                    <XAxis dataKey="name" tick={{ fontSize: 10 }} />
+                                    <YAxis tick={{ fontSize: 12 }} />
+                                    <Tooltip />
+                                    <Legend />
+                                    <Bar dataKey="valueA" fill={category?.color} name="Primary" />
+                                    <Bar dataKey="valueB" fill={CHART_COLORS[1]} name="Secondary" />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+                    )}
+
+                    {/* Radar Chart */}
+                    {data?.radarData?.length > 0 && (
+                        <div className="bg-white rounded-xl border border-gray-200 p-5">
+                            <h3 className="font-semibold text-gray-900 mb-4">Attribute Analysis</h3>
+                            <ResponsiveContainer width="100%" height={200}>
+                                <RadarChart data={data.radarData}>
+                                    <PolarGrid />
+                                    <PolarAngleAxis dataKey="attribute" tick={{ fontSize: 10 }} />
+                                    <Radar dataKey="score" stroke={category?.color} fill={category?.color} fillOpacity={0.5} />
+                                    <Tooltip />
+                                </RadarChart>
+                            </ResponsiveContainer>
+                        </div>
+                    )}
+                </div>
+
+                {/* Fun Facts */}
                 <div className="bg-white rounded-xl border border-gray-200 p-5">
                     <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                        <Sparkles className="w-5 h-5" style={{ color: category?.color }} />
-                        Key Facts
+                        <Lightbulb className="w-5 h-5" style={{ color: category?.color }} />
+                        Fun Facts
                     </h3>
-                    <div className="space-y-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         {data?.keyFacts?.map((fact, i) => (
-                            <div key={i} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-                                <span className="w-6 h-6 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0" style={{ backgroundColor: category?.color }}>
+                            <div key={i} className="flex items-start gap-3 p-3 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg">
+                                <span className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0" style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }}>
                                     {i + 1}
                                 </span>
                                 <p className="text-gray-700 text-sm">{fact}</p>
@@ -210,12 +338,122 @@ function ItemDetailView({ item, category }) {
                         ))}
                     </div>
                 </div>
+
+                {/* Physical Composition */}
+                {data?.physicalComposition?.length > 0 && (
+                    <div className="bg-white rounded-xl border border-gray-200 p-5">
+                        <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                            <Atom className="w-5 h-5" style={{ color: category?.color }} />
+                            Physical Composition
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                            {data.physicalComposition.map((item, i) => (
+                                <div key={i} className="p-4 rounded-lg border border-gray-100 hover:shadow-md transition-shadow" style={{ backgroundColor: `${category?.color}05` }}>
+                                    <h4 className="font-medium text-gray-900 mb-1">{item.property}</h4>
+                                    <p className="text-sm text-gray-600">{item.description}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Chemical Composition */}
+                {data?.chemicalComposition?.length > 0 && (
+                    <div className="bg-white rounded-xl border border-gray-200 p-5">
+                        <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                            <FlaskConical className="w-5 h-5" style={{ color: category?.color }} />
+                            Chemical Composition
+                        </h3>
+                        <div className="space-y-3">
+                            {data.chemicalComposition.map((item, i) => (
+                                <div key={i} className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
+                                    <div className="w-12 h-12 rounded-lg flex items-center justify-center font-bold text-white" style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }}>
+                                        {item.element?.substring(0, 2)}
+                                    </div>
+                                    <div className="flex-1">
+                                        <div className="flex items-center justify-between">
+                                            <h4 className="font-medium text-gray-900">{item.element}</h4>
+                                            <span className="text-sm font-semibold" style={{ color: category?.color }}>{item.percentage}</span>
+                                        </div>
+                                        <p className="text-sm text-gray-600">{item.description}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Mathematical Illustrations */}
+                {data?.mathematicalIllustrations?.length > 0 && (
+                    <div className="bg-white rounded-xl border border-gray-200 p-5">
+                        <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                            <Calculator className="w-5 h-5" style={{ color: category?.color }} />
+                            Mathematical Illustrations
+                        </h3>
+                        <div className="space-y-4">
+                            {data.mathematicalIllustrations.map((item, i) => (
+                                <div key={i} className="p-4 rounded-xl" style={{ backgroundColor: `${category?.color}10` }}>
+                                    <h4 className="font-medium text-gray-900 mb-2">{item.name}</h4>
+                                    <div className="bg-white rounded-lg p-3 mb-2 font-mono text-center text-lg" style={{ color: category?.color }}>
+                                        {item.formula}
+                                    </div>
+                                    <p className="text-sm text-gray-600">{item.explanation}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Research Data */}
+                {data?.researchData?.length > 0 && (
+                    <div className="bg-white rounded-xl border border-gray-200 p-5">
+                        <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                            <BookOpen className="w-5 h-5" style={{ color: category?.color }} />
+                            Research Data & Statistics
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {data.researchData.map((item, i) => (
+                                <div key={i} className="p-4 border border-gray-100 rounded-lg">
+                                    <p className="text-sm text-gray-500 mb-1">{item.statistic}</p>
+                                    <p className="text-2xl font-bold" style={{ color: category?.color }}>{item.value}</p>
+                                    <p className="text-xs text-gray-400 mt-1">Source: {item.source}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* Subject Matter Experts */}
+                {data?.subjectMatterExperts?.length > 0 && (
+                    <div className="bg-white rounded-xl border border-gray-200 p-5">
+                        <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                            <Users className="w-5 h-5" style={{ color: category?.color }} />
+                            Subject Matter Experts
+                        </h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {data.subjectMatterExperts.map((expert, i) => (
+                                <div key={i} className="flex items-start gap-4 p-4 rounded-xl bg-gray-50">
+                                    <div className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold" style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }}>
+                                        {expert.name?.split(' ').map(n => n[0]).join('').substring(0, 2)}
+                                    </div>
+                                    <div>
+                                        <h4 className="font-semibold text-gray-900">{expert.name}</h4>
+                                        <p className="text-sm text-gray-500 mb-1">{expert.field}</p>
+                                        <p className="text-sm text-gray-600">{expert.contribution}</p>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
                 
+                {/* Why It Matters */}
                 <div className="bg-white rounded-xl border border-gray-200 p-5" style={{ backgroundColor: `${category?.color}08` }}>
                     <h3 className="font-semibold text-gray-900 mb-2">Why It Matters</h3>
                     <p className="text-gray-700">{data?.significance}</p>
                 </div>
                 
+                {/* Related Topics */}
                 <div className="bg-white rounded-xl border border-gray-200 p-5">
                     <h3 className="font-semibold text-gray-900 mb-4">Related Topics</h3>
                     <div className="flex flex-wrap gap-2">
@@ -227,6 +465,7 @@ function ItemDetailView({ item, category }) {
                     </div>
                 </div>
                 
+                {/* Current Research */}
                 <div className="bg-white rounded-xl border border-gray-200 p-5">
                     <h3 className="font-semibold text-gray-900 mb-2">Current Research</h3>
                     <p className="text-gray-600">{data?.currentResearch}</p>
