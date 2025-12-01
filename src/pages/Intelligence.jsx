@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { 
-    Brain, Loader2, ChevronRight, Home, Sparkles,
+    Brain, ChevronRight, Home, Sparkles,
     Globe, Mountain, Leaf, Zap, Star
 } from 'lucide-react';
-import { base44 } from '@/api/base44Client';
+import ItemDetailView from '@/components/intelligence/ItemDetailView';
 
 const CATEGORIES = {
     Elements_Environment: {
