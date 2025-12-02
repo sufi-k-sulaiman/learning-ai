@@ -195,7 +195,8 @@ export default function TankCity({ onExit }) {
             }
         }
 
-        const colors = ['#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#3b82f6', '#ec4899', '#06b6d4', '#a855f7'];
+        // Neon colors like the reference image
+        const colors = ['#ff00ff', '#00ffff', '#ff6600', '#00ff00', '#ff0066', '#ffff00', '#00ff99', '#ff3399', '#66ff00', '#00ccff'];
         let wordIndex = 0;
         
         // Create vertical words (text rotated 90 degrees)
@@ -261,9 +262,9 @@ export default function TankCity({ onExit }) {
             });
         }
 
-        // Place base at middle bottom
+        // Place base at bottom center
         const baseX = canvas.width / 2 - TILE;
-        const baseY = canvas.height - TILE * 2.5;
+        const baseY = canvas.height - TILE * 2;
 
         const state = {
             player: {
@@ -310,11 +311,9 @@ export default function TankCity({ onExit }) {
             state.enemies.push({
                 x, y,
                 dir: 2, // Start facing down
-                targetDir: 2,
-                speed: 1.5 + Math.random(),
+                speed: 0.8 + Math.random() * 0.4, // Slower speed
                 shootTimer: 60 + Math.random() * 60,
                 type: Math.random() > 0.5 ? 1 : 2,
-                moveTimer: 0,
                 health: 1,
             });
             state.enemiesTotal--;
@@ -518,64 +517,18 @@ export default function TankCity({ onExit }) {
 
             for (const enemy of state.enemies) {
                 enemy.shootTimer--;
-                enemy.thinkTimer = (enemy.thinkTimer || 0) + 1;
 
-                // Smart AI - behave like a human player
                 const dx = state.player.x - enemy.x;
                 const dy = state.player.y - enemy.y;
-                const distToPlayer = Math.sqrt(dx * dx + dy * dy);
-                
-                // Determine best direction towards player
-                let targetDir = enemy.dir;
-                if (Math.abs(dx) > Math.abs(dy)) {
-                    targetDir = dx > 0 ? 1 : 3; // Right or Left
-                } else {
-                    targetDir = dy > 0 ? 2 : 0; // Down or Up
-                }
-                
-                const oppositeDir = (enemy.dir + 2) % 4;
-                
-                // Think like a player - make decisions
-                if (enemy.thinkTimer > 30 + Math.random() * 40) {
-                    // If player is in line of sight, face them
-                    if (Math.abs(dx) < TILE && dy > 0) {
-                        enemy.targetDir = 2; // Face down
-                    } else if (Math.abs(dx) < TILE && dy < 0) {
-                        enemy.targetDir = 0; // Face up
-                    } else if (Math.abs(dy) < TILE && dx > 0) {
-                        enemy.targetDir = 1; // Face right
-                    } else if (Math.abs(dy) < TILE && dx < 0) {
-                        enemy.targetDir = 3; // Face left
-                    } else {
-                        // Navigate towards player - never go backwards
-                        const possibleDirs = [0, 1, 2, 3].filter(d => d !== oppositeDir);
-                        
-                        // Prefer direction towards player
-                        if (possibleDirs.includes(targetDir)) {
-                            enemy.targetDir = targetDir;
-                        } else {
-                            // Turn left or right
-                            const leftTurn = (enemy.dir + 3) % 4;
-                            const rightTurn = (enemy.dir + 1) % 4;
-                            enemy.targetDir = Math.random() > 0.5 ? leftTurn : rightTurn;
-                        }
-                    }
-                    enemy.thinkTimer = 0;
-                }
-                
-                // Smoothly change direction (never backwards)
-                if (enemy.targetDir !== oppositeDir) {
-                    enemy.dir = enemy.targetDir;
-                }
 
                 // Shoot when player is roughly aligned
                 const aligned = (Math.abs(dx) < TILE * 1.5 || Math.abs(dy) < TILE * 1.5);
-                if (enemy.shootTimer <= 0 && (aligned || Math.random() > 0.7)) {
+                if (enemy.shootTimer <= 0 && (aligned || Math.random() > 0.8)) {
                     shoot(enemy, false);
-                    enemy.shootTimer = 50 + Math.random() * 40;
+                    enemy.shootTimer = 80 + Math.random() * 60;
                 }
 
-                // Move in current direction
+                // Slow movement - keep moving in same direction until blocked
                 let moveX = 0, moveY = 0;
                 if (enemy.dir === 0) moveY = -enemy.speed;
                 else if (enemy.dir === 1) moveX = enemy.speed;
@@ -586,14 +539,15 @@ export default function TankCity({ onExit }) {
                 const newY = enemy.y + moveY;
 
                 if (canMove(newX, newY, TILE, enemy)) {
+                    // Keep moving in same direction
                     enemy.x = newX;
                     enemy.y = newY;
                 } else {
-                    // Blocked - turn left or right (like a player would)
+                    // Hit obstacle - turn left or right only (never backwards)
                     const leftTurn = (enemy.dir + 3) % 4;
                     const rightTurn = (enemy.dir + 1) % 4;
                     
-                    // Check which turn is better
+                    // Check which turn is clear
                     const leftClear = canMove(
                         enemy.x + (leftTurn === 1 ? enemy.speed : leftTurn === 3 ? -enemy.speed : 0),
                         enemy.y + (leftTurn === 0 ? -enemy.speed : leftTurn === 2 ? enemy.speed : 0),
@@ -606,13 +560,13 @@ export default function TankCity({ onExit }) {
                     );
                     
                     if (leftClear && !rightClear) {
-                        enemy.targetDir = leftTurn;
+                        enemy.dir = leftTurn;
                     } else if (rightClear && !leftClear) {
-                        enemy.targetDir = rightTurn;
-                    } else {
-                        enemy.targetDir = Math.random() > 0.5 ? leftTurn : rightTurn;
+                        enemy.dir = rightTurn;
+                    } else if (leftClear && rightClear) {
+                        enemy.dir = Math.random() > 0.5 ? leftTurn : rightTurn;
                     }
-                    enemy.thinkTimer = 0;
+                    // If both blocked, stays in place until next frame
                 }
             }
         };
@@ -761,30 +715,36 @@ export default function TankCity({ onExit }) {
                 ctx.stroke();
             }
 
-            // Draw word bricks (vertical and horizontal)
+            // Draw word bricks with neon glow effect
             for (const brick of wordBricks) {
                 if (brick.health <= 0) continue;
 
-                ctx.fillStyle = brick.color;
-                ctx.shadowBlur = 15;
+                // Strong neon glow
+                ctx.shadowBlur = 20;
                 ctx.shadowColor = brick.color;
 
-                // Rounded rectangle
-                const r = 6;
+                // Draw glow layer
+                ctx.strokeStyle = brick.color;
+                ctx.lineWidth = 2;
                 ctx.beginPath();
-                ctx.roundRect(brick.x, brick.y, brick.width, brick.height, r);
+                ctx.roundRect(brick.x, brick.y, brick.width, brick.height, 4);
+                ctx.stroke();
+
+                // Fill with darker version
+                ctx.fillStyle = brick.color + '30';
                 ctx.fill();
                 ctx.shadowBlur = 0;
 
-                // Word text
+                // Word text with neon effect
                 ctx.save();
-                ctx.fillStyle = '#ffffff';
-                ctx.font = 'bold 13px Inter, sans-serif';
+                ctx.fillStyle = brick.color;
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = brick.color;
+                ctx.font = 'bold 12px Inter, sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
 
                 if (brick.vertical) {
-                    // Rotate text for vertical words
                     ctx.translate(brick.x + brick.width/2, brick.y + brick.height/2);
                     ctx.rotate(-Math.PI / 2);
                     ctx.fillText(brick.word.toUpperCase(), 0, 0);
@@ -792,23 +752,44 @@ export default function TankCity({ onExit }) {
                     ctx.fillText(brick.word.toUpperCase(), brick.x + brick.width/2, brick.y + brick.height/2);
                 }
                 ctx.restore();
+                ctx.shadowBlur = 0;
             }
 
-            // Draw base with logo and topic title
+            // Draw base with protective layer and topic title
             if (!state.baseDestroyed) {
-                // Draw topic title above base (like center text in image)
+                // Protective layer around base (brick wall)
+                ctx.fillStyle = '#8B4513';
+                ctx.shadowBlur = 5;
+                ctx.shadowColor = '#8B4513';
+                const wallThickness = 12;
+                // Top wall
+                ctx.fillRect(baseX - wallThickness, baseY - wallThickness, TILE * 2 + wallThickness * 2, wallThickness);
+                // Left wall
+                ctx.fillRect(baseX - wallThickness, baseY, wallThickness, TILE * 1.5);
+                // Right wall
+                ctx.fillRect(baseX + TILE * 2, baseY, wallThickness, TILE * 1.5);
+                ctx.shadowBlur = 0;
+                
+                // Brick pattern on walls
+                ctx.strokeStyle = '#5a3510';
+                ctx.lineWidth = 1;
+                for (let i = 0; i < 5; i++) {
+                    ctx.strokeRect(baseX - wallThickness + i * 35, baseY - wallThickness, 35, wallThickness);
+                }
+                
+                // Draw topic title above base
                 ctx.fillStyle = '#ffffff';
                 ctx.shadowBlur = 30;
-                ctx.shadowColor = '#8b5cf6';
-                ctx.font = 'bold 48px Inter, sans-serif';
+                ctx.shadowColor = '#ff00ff';
+                ctx.font = 'bold 42px Inter, sans-serif';
                 ctx.textAlign = 'center';
-                ctx.fillText(currentTopic.toUpperCase(), canvas.width / 2, baseY - 40);
+                ctx.fillText(currentTopic.toUpperCase(), canvas.width / 2, baseY - 50);
                 
-                // Second line with glow
-                ctx.shadowColor = '#10b981';
-                ctx.font = 'bold 36px Inter, sans-serif';
-                ctx.fillStyle = '#10b981';
-                ctx.fillText(currentTopic.toLowerCase(), canvas.width / 2, baseY - 5);
+                // Second line with neon glow
+                ctx.shadowColor = '#00ffff';
+                ctx.font = 'bold 28px Inter, sans-serif';
+                ctx.fillStyle = '#00ffff';
+                ctx.fillText(currentTopic.toLowerCase(), canvas.width / 2, baseY - 18);
                 ctx.shadowBlur = 0;
                 
                 // Base glow
