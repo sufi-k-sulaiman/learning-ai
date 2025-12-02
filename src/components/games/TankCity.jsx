@@ -724,9 +724,10 @@ export default function TankCity({ onExit }) {
                             setScore(state.score);
                             setEnemiesLeft(state.enemiesLeft);
 
-                            if (state.enemiesLeft <= 0 && state.enemies.length === 0) {
-                                state.levelComplete = true;
-                            }
+                            // Check for level complete - need all enemies AND all words destroyed
+                                    if (state.enemiesLeft <= 0 && state.enemies.length === 0 && state.wordsDestroyed >= state.totalWords) {
+                                        state.levelComplete = true;
+                                    }
                             return false;
                         }
                     }
@@ -971,8 +972,8 @@ export default function TankCity({ onExit }) {
                 
                 // Perspective scale - starts large at bottom, shrinks toward top
                 const scale = Math.max(0.2, 1.2 - progress * 1.0);
-                // Fade out near top
-                const alpha = progress > 0.8 ? Math.max(0, 1 - (progress - 0.8) * 5) : 1;
+                // Only fade when near the very top of screen
+                const alpha = ft.y < 100 ? Math.max(0, ft.y / 100) : 1;
                 
                 ctx.save();
                 ctx.globalAlpha = alpha;
