@@ -334,16 +334,17 @@ export default function TankCity({ onExit }) {
         };
 
         const addFloatingText = (x, y, text, color, bonus) => {
-            // Start from bottom of screen and float up
+            // Start from bottom and fade as it rises to top
             state.floatingTexts.push({
                 x,
-                y: canvas.height - 80,
-                vy: -1.5,
+                y: canvas.height - 100,
+                vy: -2,
                 text,
                 bonus,
-                life: 150,
-                maxLife: 150,
+                life: 180,
+                maxLife: 180,
                 color,
+                startY: canvas.height - 100,
             });
         };
 
