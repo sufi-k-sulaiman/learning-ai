@@ -6,6 +6,15 @@ import { base44 } from "@/api/base44Client";
 import { X, Loader2, Award, Trophy, Target, Sparkles, Play, Search, Rocket, Crosshair, Zap, Compass, Radio, Shield, Cpu, Globe, Atom, Code, TrendingUp, Brain, Lightbulb, Bug, Ghost, Skull, Bot, Bomb } from 'lucide-react';
 import { LOGO_URL } from '@/components/NavigationConfig';
 
+// UFO ship images
+const ENEMY_SHIPS = [
+    'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/adfcb0160_ship1.png',
+    'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/1ade34330_ship2.png',
+    'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/f12015712_ship3.png',
+    'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/4657e6c28_ship4.png',
+    'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/52957b8d6_ship5.png',
+];
+
 export default function SpaceBattleGame({ onExit }) {
     const [screen, setScreen] = useState('menu');
     const [activeCategory, setActiveCategory] = useState('trending');
@@ -132,11 +141,11 @@ export default function SpaceBattleGame({ onExit }) {
         try {
             const topicLabel = topic === 'custom' ? searchQuery : topic.label;
             const result = await base44.integrations.Core.InvokeLLM({
-                prompt: `Generate 10 educational Yes/No questions for: "${topicLabel}". Each should test real knowledge. Return: { "questions": [{ "question": "Is X true?", "answer": true, "explanation": "Brief explanation" }] }`,
+                prompt: `Generate 10 educational Yes/No questions for: "${topicLabel}". Each should test real knowledge. Include a helpful tip for each question. Return: { "questions": [{ "question": "Is X true?", "answer": true, "explanation": "Brief explanation", "tip": "A helpful hint to guide thinking" }] }`,
                 response_json_schema: {
                     type: "object",
                     properties: {
-                        questions: { type: "array", items: { type: "object", properties: { question: { type: "string" }, answer: { type: "boolean" }, explanation: { type: "string" } } } }
+                        questions: { type: "array", items: { type: "object", properties: { question: { type: "string" }, answer: { type: "boolean" }, explanation: { type: "string" }, tip: { type: "string" } } } }
                     }
                 }
             });
@@ -191,9 +200,11 @@ export default function SpaceBattleGame({ onExit }) {
             levelTarget: 1000 * currentLevel, // 10 aliens * 100 points each
             aliensKilled: 0,
             minAliensToKill: 10,
+            maxEnemiesOnScreen: 10,
             gameOver: false,
             levelComplete: false,
-            enemySpawnTimer: 100,
+            enemySpawnTimer: 180,
+            enemyImages: [],
             cameraShake: 0,
             fov: 90,
             viewAngle: 0,
@@ -257,6 +268,15 @@ export default function SpaceBattleGame({ onExit }) {
                 speed: 0.02 + Math.random() * 0.05
             });
         }
+
+        // Preload enemy ship images
+        ENEMY_SHIPS.forEach((src, i) => {
+            const img = new Image();
+            img.src = src;
+            img.onload = () => {
+                state.enemyImages[i] = img;
+            };
+        });
 
         const keys = {};
         const handleKeyDown = (e) => {
@@ -557,63 +577,44 @@ export default function SpaceBattleGame({ onExit }) {
             if (keys.a) state.viewAngle -= 3;
             if (keys.d) state.viewAngle += 3;
 
-            // Spawn enemies from mountains, stars, above, and everywhere on screen
+            // Spawn enemies - max 10 on screen at a time, spawn a few at a time
             state.enemySpawnTimer--;
-            if (state.enemySpawnTimer <= 0) {
-                const alienType = state.alienTypes[Math.floor(Math.random() * state.alienTypes.length)];
-                const alienColor = ALIEN_COLORS[Math.floor(Math.random() * ALIEN_COLORS.length)];
+            if (state.enemySpawnTimer <= 0 && state.enemies.length < state.maxEnemiesOnScreen) {
+                // Spawn 1-3 enemies at a time
+                const spawnCount = Math.min(
+                    Math.floor(Math.random() * 3) + 1,
+                    state.maxEnemiesOnScreen - state.enemies.length
+                );
                 
-                // Random spawn location type: above (30%), mountains (25%), stars (25%), random (20%)
-                const spawnType = Math.random();
-                let startX, startZ, startVx, startY, fromAbove;
-                
-                if (spawnType < 0.3) {
-                    // Spawn from above (top of screen, dropping down)
-                    startX = (Math.random() - 0.5) * 600; // Random horizontal position
-                    startZ = 0.15 + Math.random() * 0.25; // Medium distance so they're visible
-                    startVx = (Math.random() - 0.5) * 2;
-                    startY = -100 - Math.random() * 200; // Start above screen
-                    fromAbove = true;
-                } else if (spawnType < 0.55) {
-                    // Spawn from mountains (near horizon, left or right)
-                    const fromLeft = Math.random() > 0.5;
-                    startX = fromLeft ? -400 - Math.random() * 200 : 400 + Math.random() * 200;
-                    startZ = 0.03 + Math.random() * 0.08;
-                    startVx = fromLeft ? 2 + Math.random() * 2 : -2 - Math.random() * 2;
-                    fromAbove = false;
-                } else if (spawnType < 0.8) {
-                    // Spawn from stars (top area, very small/far)
-                    startX = (Math.random() - 0.5) * 1000;
-                    startZ = 0.01 + Math.random() * 0.04; // Very far away
-                    startVx = (Math.random() - 0.5) * 1;
-                    fromAbove = false;
-                } else {
-                    // Random spawn across visible area
-                    startX = (Math.random() - 0.5) * 800;
-                    startZ = 0.02 + Math.random() * 0.15;
-                    startVx = (Math.random() - 0.5) * 3;
-                    fromAbove = false;
+                for (let s = 0; s < spawnCount; s++) {
+                    const shipImageIndex = Math.floor(Math.random() * ENEMY_SHIPS.length);
+                    const alienColor = ALIEN_COLORS[Math.floor(Math.random() * ALIEN_COLORS.length)];
+                    
+                    // Random spawn - enemies come from random positions toward player
+                    const startX = (Math.random() - 0.5) * 800;
+                    const startZ = 0.02 + Math.random() * 0.1; // Start far away
+                    const startVx = (Math.random() - 0.5) * 1.5; // Slower horizontal movement
+                    
+                    state.enemies.push({
+                        x: startX,
+                        z: startZ,
+                        y: 0,
+                        vy: 0,
+                        shipImageIndex: shipImageIndex,
+                        color: alienColor,
+                        health: 1,
+                        wobble: Math.random() * Math.PI * 2,
+                        vx: startVx,
+                        fromAbove: false
+                    });
                 }
-                
-                state.enemies.push({
-                    x: startX,
-                    z: startZ,
-                    y: startY || 0,
-                    vy: fromAbove ? 3 + Math.random() * 2 : 0, // Vertical velocity for dropping aliens
-                    type: alienType,
-                    color: alienColor,
-                    health: 1,
-                    wobble: Math.random() * Math.PI * 2,
-                    vx: startVx,
-                    fromAbove: fromAbove
-                });
-                state.enemySpawnTimer = Math.max(25, 100 - state.score / 50);
+                state.enemySpawnTimer = 200 + Math.random() * 100; // Slower spawn rate
             }
 
-            // Update and draw enemies with 3D perspective
+            // Update and draw enemies with 3D perspective - SLOWER movement
             state.enemies = state.enemies.filter((enemy) => {
-                enemy.z += 0.003;
-                enemy.wobble += 0.05;
+                enemy.z += 0.001; // Much slower approach
+                enemy.wobble += 0.03;
                 // Apply horizontal movement if enemy has velocity
                 if (enemy.vx) {
                     enemy.x += enemy.vx;
@@ -650,156 +651,32 @@ export default function SpaceBattleGame({ onExit }) {
                     return false;
                 }
 
-                // Draw enemy based on type
+                // Draw enemy UFO ship image
                 ctx.save();
                 ctx.translate(screenX, screenY);
 
-                ctx.fillStyle = enemy.color;
-                ctx.shadowBlur = 25;
-                ctx.shadowColor = enemy.color;
-                
-                // Draw different alien types
-                if (enemy.type === 'truck') {
-                    // Truck/Bus front view
-                    ctx.fillRect(-size/2.5, -size/4, size/1.25, size/2);
-                    // Windshield
-                    ctx.fillStyle = 'rgba(255,255,255,0.3)';
-                    ctx.fillRect(-size/3.5, -size/5, size/1.75, size/4);
-                    // Headlights
-                    ctx.fillStyle = '#fff';
-                    ctx.beginPath();
-                    ctx.arc(-size/3.5, size/6, size/10, 0, Math.PI * 2);
-                    ctx.arc(size/3.5, size/6, size/10, 0, Math.PI * 2);
-                    ctx.fill();
-                    // Grill
-                    ctx.fillStyle = 'rgba(0,0,0,0.3)';
-                    ctx.fillRect(-size/5, size/12, size/2.5, size/8);
-                } else if (enemy.type === 'spacesuit') {
-                    // Space suit robot - humanoid shape
-                    // Helmet
-                    ctx.beginPath();
-                    ctx.arc(0, -size/4, size/4, 0, Math.PI * 2);
-                    ctx.fill();
-                    // Visor
-                    ctx.fillStyle = 'rgba(255,255,255,0.4)';
-                    ctx.beginPath();
-                    ctx.ellipse(0, -size/4, size/6, size/8, 0, 0, Math.PI * 2);
-                    ctx.fill();
-                    // Body
+                // Draw ship image if loaded
+                const shipImg = state.enemyImages[enemy.shipImageIndex];
+                if (shipImg && shipImg.complete) {
+                    const imgWidth = size * 1.5;
+                    const imgHeight = size * 0.8;
+                    ctx.shadowBlur = 20;
+                    ctx.shadowColor = enemy.color;
+                    ctx.drawImage(shipImg, -imgWidth/2, -imgHeight/2, imgWidth, imgHeight);
+                    ctx.shadowBlur = 0;
+                } else {
+                    // Fallback UFO drawing
                     ctx.fillStyle = enemy.color;
-                    ctx.beginPath();
-                    ctx.ellipse(0, size/8, size/3, size/4, 0, 0, Math.PI * 2);
-                    ctx.fill();
-                    // Arms
-                    ctx.beginPath();
-                    ctx.arc(-size/2.5, 0, size/8, 0, Math.PI * 2);
-                    ctx.arc(size/2.5, 0, size/8, 0, Math.PI * 2);
-                    ctx.fill();
-                    // Legs
-                    ctx.beginPath();
-                    ctx.ellipse(-size/6, size/3, size/10, size/6, 0, 0, Math.PI * 2);
-                    ctx.ellipse(size/6, size/3, size/10, size/6, 0, 0, Math.PI * 2);
-                    ctx.fill();
-                } else if (enemy.type === 'spaceship') {
-                    // Aggressive spaceship - angular design
-                    ctx.beginPath();
-                    ctx.moveTo(0, -size/3);
-                    ctx.lineTo(-size/2, size/4);
-                    ctx.lineTo(-size/4, size/6);
-                    ctx.lineTo(-size/6, size/3);
-                    ctx.lineTo(size/6, size/3);
-                    ctx.lineTo(size/4, size/6);
-                    ctx.lineTo(size/2, size/4);
-                    ctx.closePath();
-                    ctx.fill();
-                    // Cockpit
-                    ctx.fillStyle = 'rgba(255,255,255,0.4)';
-                    ctx.beginPath();
-                    ctx.arc(0, -size/8, size/8, 0, Math.PI * 2);
-                    ctx.fill();
-                    // Wings detail
-                    ctx.fillStyle = 'rgba(0,0,0,0.3)';
-                    ctx.beginPath();
-                    ctx.moveTo(-size/3, size/8);
-                    ctx.lineTo(-size/2, size/4);
-                    ctx.lineTo(-size/4, size/6);
-                    ctx.closePath();
-                    ctx.fill();
-                    ctx.beginPath();
-                    ctx.moveTo(size/3, size/8);
-                    ctx.lineTo(size/2, size/4);
-                    ctx.lineTo(size/4, size/6);
-                    ctx.closePath();
-                    ctx.fill();
-                } else if (enemy.type === 'rocket') {
-                    // Rocket ship - pointed design
-                    ctx.beginPath();
-                    ctx.moveTo(0, -size/2);
-                    ctx.quadraticCurveTo(size/4, -size/4, size/5, size/6);
-                    ctx.lineTo(size/3, size/3);
-                    ctx.lineTo(size/8, size/4);
-                    ctx.lineTo(0, size/3);
-                    ctx.lineTo(-size/8, size/4);
-                    ctx.lineTo(-size/3, size/3);
-                    ctx.lineTo(-size/5, size/6);
-                    ctx.quadraticCurveTo(-size/4, -size/4, 0, -size/2);
-                    ctx.closePath();
-                    ctx.fill();
-                    // Window
-                    ctx.fillStyle = 'rgba(255,255,255,0.5)';
-                    ctx.beginPath();
-                    ctx.arc(0, -size/6, size/10, 0, Math.PI * 2);
-                    ctx.fill();
-                    // Flames
-                    ctx.fillStyle = '#ff6b35';
-                    ctx.beginPath();
-                    ctx.moveTo(-size/10, size/3);
-                    ctx.lineTo(0, size/2);
-                    ctx.lineTo(size/10, size/3);
-                    ctx.closePath();
-                    ctx.fill();
-                } else if (enemy.type === 'ufo') {
-                    // UFO - classic flying saucer
+                    ctx.shadowBlur = 25;
+                    ctx.shadowColor = enemy.color;
                     ctx.beginPath();
                     ctx.ellipse(0, 0, size/2, size/6, 0, 0, Math.PI * 2);
                     ctx.fill();
                     ctx.beginPath();
                     ctx.arc(0, -size/8, size/4, Math.PI, 0, false);
                     ctx.fill();
-                    ctx.fillStyle = 'rgba(255,255,255,0.5)';
-                    ctx.beginPath();
-                    ctx.arc(0, -size/6, size/6, Math.PI, 0, false);
-                    ctx.fill();
-                    // Lights
-                    ctx.fillStyle = '#fff';
-                    for (let i = -2; i <= 2; i++) {
-                        ctx.beginPath();
-                        ctx.arc(i * size/6, size/12, size/20, 0, Math.PI * 2);
-                        ctx.fill();
-                    }
-                } else if (enemy.type === 'mech') {
-                    // Mech robot - bulky design
-                    // Head
-                    ctx.fillRect(-size/6, -size/3, size/3, size/5);
-                    // Visor
-                    ctx.fillStyle = '#fff';
-                    ctx.fillRect(-size/8, -size/3.5, size/4, size/10);
-                    // Body
-                    ctx.fillStyle = enemy.color;
-                    ctx.fillRect(-size/3, -size/8, size/1.5, size/3);
-                    // Arms
-                    ctx.fillRect(-size/2, -size/10, size/6, size/3);
-                    ctx.fillRect(size/3, -size/10, size/6, size/3);
-                    // Legs
-                    ctx.fillRect(-size/4, size/5, size/6, size/4);
-                    ctx.fillRect(size/12, size/5, size/6, size/4);
-                    // Shoulder pads
-                    ctx.beginPath();
-                    ctx.arc(-size/3, -size/10, size/8, 0, Math.PI * 2);
-                    ctx.arc(size/3, -size/10, size/8, 0, Math.PI * 2);
-                    ctx.fill();
+                    ctx.shadowBlur = 0;
                 }
-                ctx.shadowBlur = 0;
 
                 ctx.restore();
 
@@ -1203,62 +1080,51 @@ export default function SpaceBattleGame({ onExit }) {
         const q = questions[currentQuestion];
         const questionsNeeded = levelComplete ? currentLevel + 1 : questions.length;
         return (
-            <div className="fixed inset-0 bg-[#0a0f1a] z-[9999] flex">
-                {/* Left panel - Radar */}
-                <div className="w-80 p-6 flex items-center justify-center">
-                    <div className="relative w-64 h-64">
-                        <svg viewBox="0 0 200 200" className="w-full h-full">
-                            <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(0,200,150,0.3)" strokeWidth="2"/>
-                            <circle cx="100" cy="100" r="60" fill="none" stroke="rgba(0,200,150,0.2)" strokeWidth="1"/>
-                            <circle cx="100" cy="100" r="30" fill="none" stroke="rgba(0,200,150,0.2)" strokeWidth="1"/>
-                            <line x1="10" y1="100" x2="190" y2="100" stroke="rgba(0,200,150,0.2)" strokeWidth="1"/>
-                            <line x1="100" y1="10" x2="100" y2="190" stroke="rgba(0,200,150,0.2)" strokeWidth="1"/>
-                            {/* Blips */}
-                            <circle cx="60" cy="50" r="5" fill="#00ffff"/>
-                            <circle cx="140" cy="80" r="5" fill="#00ffff"/>
-                            <circle cx="100" cy="150" r="6" fill="#00ff88"/>
-                        </svg>
-                        {levelComplete && (
-                            <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="text-center">
-                                    <Trophy className="w-16 h-16 text-yellow-400 mx-auto mb-2" />
-                                    <p className="text-cyan-400 font-bold">LEVEL {currentLevel}</p>
-                                    <p className="text-white text-sm">COMPLETE!</p>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                {/* Right panel - Question */}
-                <div className="flex-1 flex flex-col justify-center p-8">
+            <div className="fixed inset-0 bg-[#0a0f1a] z-[9999] flex items-center justify-center">
+                {/* Centered Question Panel */}
+                <div className="w-full max-w-2xl mx-auto p-6">
                     {levelComplete && (
-                        <div className="bg-gradient-to-r from-cyan-900/50 to-purple-900/50 border border-cyan-500/50 rounded-lg p-4 mb-4 max-w-2xl">
-                            <p className="text-cyan-400 font-bold text-lg">🎯 Level {currentLevel} Complete!</p>
+                        <div className="bg-gradient-to-r from-cyan-900/50 to-purple-900/50 border border-cyan-500/50 rounded-lg p-4 mb-4 text-center">
+                            <Trophy className="w-12 h-12 text-yellow-400 mx-auto mb-2" />
+                            <p className="text-cyan-400 font-bold text-xl">🎯 Level {currentLevel} Complete!</p>
                             <p className="text-gray-300">Answer {currentLevel + 1} questions correctly to unlock Level {currentLevel + 1}</p>
                             <p className="text-green-400 mt-2">Correct answers: {score} / {currentLevel + 1} needed</p>
                         </div>
                     )}
-                    <div className="bg-[#0d1420] border border-gray-700 rounded-lg p-8 max-w-2xl">
-                        <div className="flex justify-between items-center mb-4">
-                            <span className="text-cyan-400 font-mono">{levelComplete ? `Level ${currentLevel} Quiz` : 'Technical track'}</span>
+                    <div className="bg-[#0d1420] border border-gray-700 rounded-xl p-8">
+                        <div className="flex justify-between items-center mb-6">
+                            <span className="text-cyan-400 font-mono text-lg">{levelComplete ? `Level ${currentLevel} Quiz` : 'Knowledge Check'}</span>
                             <div className="flex items-center gap-2">
-                                <img src={LOGO_URL} alt="1cPublishing" className="w-6 h-6 rounded" />
-                                <span className="text-gray-400 font-mono">1cPublishing</span>
+                                <img src={LOGO_URL} alt="1cPublishing" className="w-8 h-8 rounded" />
                             </div>
                         </div>
-                        <h3 className="text-2xl text-white mb-8 leading-relaxed">{q?.question}</h3>
-                        <div className="flex gap-4">
+                        
+                        <h3 className="text-2xl text-white mb-6 leading-relaxed text-center">{q?.question}</h3>
+                        
+                        {/* Tip Section */}
+                        {q?.tip && (
+                            <div className="bg-amber-900/30 border border-amber-500/40 rounded-lg p-4 mb-6">
+                                <div className="flex items-start gap-3">
+                                    <Lightbulb className="w-5 h-5 text-amber-400 flex-shrink-0 mt-0.5" />
+                                    <div>
+                                        <p className="text-amber-400 font-semibold text-sm mb-1">TIP</p>
+                                        <p className="text-amber-200/80 text-sm">{q.tip}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                        
+                        <div className="flex gap-4 justify-center">
                             <Button onClick={() => handleAnswer(false)} 
-                                className="flex-1 h-14 text-lg font-mono border-2 border-red-500/50 bg-transparent hover:bg-red-500/20 text-red-400 rounded-full">
+                                className="w-40 h-14 text-lg font-mono border-2 border-red-500/50 bg-transparent hover:bg-red-500/20 text-red-400 rounded-full">
                                 No
                             </Button>
                             <Button onClick={() => handleAnswer(true)} 
-                                className="flex-1 h-14 text-lg font-mono border-2 border-green-500/50 bg-transparent hover:bg-green-500/20 text-green-400 rounded-full">
+                                className="w-40 h-14 text-lg font-mono border-2 border-green-500/50 bg-transparent hover:bg-green-500/20 text-green-400 rounded-full">
                                 Yes
                             </Button>
                         </div>
-                        <p className="text-right text-gray-500 mt-6 font-mono">Question {currentQuestion + 1} {levelComplete ? `/ ${questionsNeeded}` : ''}</p>
+                        <p className="text-center text-gray-500 mt-6 font-mono">Question {currentQuestion + 1} {levelComplete ? `/ ${questionsNeeded}` : `/ ${questions.length}`}</p>
                     </div>
                 </div>
             </div>
