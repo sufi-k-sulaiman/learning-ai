@@ -972,8 +972,8 @@ export default function TankCity({ onExit }) {
                 
                 // Perspective scale - starts large at bottom, shrinks toward top
                 const scale = Math.max(0.2, 1.2 - progress * 1.0);
-                // Only fade when near the very top of screen
-                const alpha = ft.y < 100 ? Math.max(0, ft.y / 100) : 1;
+                // Fade out near top
+                const alpha = progress > 0.8 ? Math.max(0, 1 - (progress - 0.8) * 5) : 1;
                 
                 ctx.save();
                 ctx.globalAlpha = alpha;
