@@ -677,14 +677,10 @@ export default function TankCity({ onExit }) {
                             state.wordsDestroyed++;
                             setScore(state.score);
                             setWordsDestroyed(state.wordsDestroyed);
-                            addFloatingText(brick.x + brick.width/2, brick.y, brick.word.toUpperCase(), brick.color, 100);
                             
-                            // Show definition
-                            if (brick.definition) {
-                                setTimeout(() => {
-                                    addFloatingText(brick.x + brick.width/2, brick.y + 30, brick.definition.substring(0, 40), '#a855f7', 0);
-                                }, 200);
-                            }
+                            // Show word and short definition
+                            const shortDef = brick.definition ? brick.definition.split('.')[0].substring(0, 50) : '';
+                            addFloatingText(brick.x + brick.width/2, brick.y, `${brick.word.toUpperCase()}: ${shortDef}`, brick.color, 100);
                         }
                         return false;
                     }
@@ -875,16 +871,18 @@ export default function TankCity({ onExit }) {
                 }
                 ctx.globalAlpha = 1;
                 
-                // Draw topic title above base
-                ctx.fillStyle = '#ffffff';
-                ctx.font = 'bold 24px Inter, sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText(currentTopic.toUpperCase(), canvas.width / 2, baseY - 25);
+
                 
                 // Shield health indicator
                 ctx.font = '12px Inter, sans-serif';
                 ctx.fillStyle = '#00ddff';
                 ctx.fillText(`SHIELD: ${state.shieldHealth}/3`, canvas.width / 2, baseY - 8);
+                
+                // Topic title below base
+                ctx.fillStyle = '#a855f7';
+                ctx.font = 'bold 18px Inter, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(currentTopic.toUpperCase(), canvas.width / 2, baseY + TILE * 1.8);
                 
                 // Base - draw globe/world icon
                 const centerX = baseX + TILE;
