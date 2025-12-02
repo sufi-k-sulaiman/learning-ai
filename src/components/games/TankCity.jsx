@@ -195,71 +195,46 @@ export default function TankCity({ onExit }) {
             }
         }
 
-        // Neon colors like the reference image
-        const colors = ['#ff00ff', '#00ffff', '#ff6600', '#00ff00', '#ff0066', '#ffff00', '#00ff99', '#ff3399', '#66ff00', '#00ccff'];
+        // Brand colors
+        const colors = ['#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#3b82f6', '#ec4899', '#06b6d4', '#a855f7'];
         let wordIndex = 0;
         
-        // Create vertical words (text rotated 90 degrees)
-        for (let col = 1; col < MAP_W - 2; col += 3) {
-            if (wordIndex >= shuffledWords.length) break;
-            const word = shuffledWords[wordIndex++];
-            const wordHeight = Math.min(word.primary.length * 18 + 30, TILE * 3);
-            const startRow = 1 + Math.floor(Math.random() * 2);
-            
-            wordBricks.push({
-                x: col * TILE + 10,
-                y: startRow * TILE,
-                width: TILE - 20,
-                height: wordHeight,
-                word: word.primary,
-                definition: word.definition,
-                health: 1,
-                color: colors[Math.floor(Math.random() * colors.length)],
-                vertical: true
-            });
-        }
+        // Create grid-based word placement (no overlaps)
+        const gridCellW = TILE * 2.5;
+        const gridCellH = TILE * 1.5;
+        const gridCols = Math.floor((canvas.width - TILE * 2) / gridCellW);
+        const gridRows = Math.floor((canvas.height - TILE * 5) / gridCellH);
+        const usedCells = new Set();
         
-        // Create horizontal words
-        for (let row = 2; row < MAP_H - 3; row += 2) {
-            for (let col = 0; col < MAP_W - 3; col += 4) {
-                if (wordIndex >= shuffledWords.length) break;
-                if (Math.random() > 0.6) continue; // Random gaps
+        for (let i = 0; i < shuffledWords.length && i < gridCols * gridRows * 0.4; i++) {
+            const word = shuffledWords[i];
+            let placed = false;
+            let attempts = 0;
+            
+            while (!placed && attempts < 20) {
+                const col = Math.floor(Math.random() * gridCols);
+                const row = Math.floor(Math.random() * (gridRows - 2)); // Keep away from base
+                const cellKey = `${col}-${row}`;
                 
-                const word = shuffledWords[wordIndex++];
-                const wordWidth = Math.max(TILE * 1.5, word.primary.length * 14 + 20);
-                
-                wordBricks.push({
-                    x: col * TILE + 20,
-                    y: row * TILE + 10,
-                    width: wordWidth,
-                    height: TILE * 0.6,
-                    word: word.primary,
-                    definition: word.definition,
-                    health: 1,
-                    color: colors[Math.floor(Math.random() * colors.length)],
-                    vertical: false
-                });
+                if (!usedCells.has(cellKey)) {
+                    usedCells.add(cellKey);
+                    const isVertical = Math.random() > 0.6;
+                    
+                    wordBricks.push({
+                        x: TILE + col * gridCellW,
+                        y: TILE + row * gridCellH,
+                        width: isVertical ? TILE * 0.8 : Math.min(gridCellW - 10, word.primary.length * 12 + 20),
+                        height: isVertical ? gridCellH - 10 : TILE * 0.6,
+                        word: word.primary,
+                        definition: word.definition,
+                        health: 1,
+                        color: colors[i % colors.length],
+                        vertical: isVertical
+                    });
+                    placed = true;
+                }
+                attempts++;
             }
-        }
-        
-        // Add more scattered words
-        for (let i = 0; i < 8 && wordIndex < shuffledWords.length; i++) {
-            const word = shuffledWords[wordIndex++];
-            const isVertical = Math.random() > 0.5;
-            const x = TILE + Math.random() * (canvas.width - TILE * 4);
-            const y = TILE * 2 + Math.random() * (canvas.height - TILE * 6);
-            
-            wordBricks.push({
-                x,
-                y,
-                width: isVertical ? TILE * 0.7 : Math.max(TILE, word.primary.length * 12 + 20),
-                height: isVertical ? Math.min(word.primary.length * 16 + 20, TILE * 2.5) : TILE * 0.5,
-                word: word.primary,
-                definition: word.definition,
-                health: 1,
-                color: colors[Math.floor(Math.random() * colors.length)],
-                vertical: isVertical
-            });
         }
 
         // Place base at bottom center
@@ -521,14 +496,13 @@ export default function TankCity({ onExit }) {
                 const dx = state.player.x - enemy.x;
                 const dy = state.player.y - enemy.y;
 
-                // Shoot when player is roughly aligned
-                const aligned = (Math.abs(dx) < TILE * 1.5 || Math.abs(dy) < TILE * 1.5);
-                if (enemy.shootTimer <= 0 && (aligned || Math.random() > 0.8)) {
+                // Shoot in the direction tank is facing
+                if (enemy.shootTimer <= 0) {
                     shoot(enemy, false);
                     enemy.shootTimer = 80 + Math.random() * 60;
                 }
 
-                // Slow movement - keep moving in same direction until blocked
+                // Always move in the direction the tank is pointing
                 let moveX = 0, moveY = 0;
                 if (enemy.dir === 0) moveY = -enemy.speed;
                 else if (enemy.dir === 1) moveX = enemy.speed;
@@ -539,7 +513,6 @@ export default function TankCity({ onExit }) {
                 const newY = enemy.y + moveY;
 
                 if (canMove(newX, newY, TILE, enemy)) {
-                    // Keep moving in same direction
                     enemy.x = newX;
                     enemy.y = newY;
                 } else {
@@ -547,7 +520,6 @@ export default function TankCity({ onExit }) {
                     const leftTurn = (enemy.dir + 3) % 4;
                     const rightTurn = (enemy.dir + 1) % 4;
                     
-                    // Check which turn is clear
                     const leftClear = canMove(
                         enemy.x + (leftTurn === 1 ? enemy.speed : leftTurn === 3 ? -enemy.speed : 0),
                         enemy.y + (leftTurn === 0 ? -enemy.speed : leftTurn === 2 ? enemy.speed : 0),
@@ -566,7 +538,6 @@ export default function TankCity({ onExit }) {
                     } else if (leftClear && rightClear) {
                         enemy.dir = Math.random() > 0.5 ? leftTurn : rightTurn;
                     }
-                    // If both blocked, stays in place until next frame
                 }
             }
         };
@@ -715,31 +686,18 @@ export default function TankCity({ onExit }) {
                 ctx.stroke();
             }
 
-            // Draw word bricks with neon glow effect
+            // Draw word bricks
             for (const brick of wordBricks) {
                 if (brick.health <= 0) continue;
 
-                // Strong neon glow
-                ctx.shadowBlur = 20;
-                ctx.shadowColor = brick.color;
-
-                // Draw glow layer
-                ctx.strokeStyle = brick.color;
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.roundRect(brick.x, brick.y, brick.width, brick.height, 4);
-                ctx.stroke();
-
-                // Fill with darker version
-                ctx.fillStyle = brick.color + '30';
-                ctx.fill();
-                ctx.shadowBlur = 0;
-
-                // Word text with neon effect
-                ctx.save();
                 ctx.fillStyle = brick.color;
-                ctx.shadowBlur = 15;
-                ctx.shadowColor = brick.color;
+                ctx.beginPath();
+                ctx.roundRect(brick.x, brick.y, brick.width, brick.height, 6);
+                ctx.fill();
+
+                // Word text
+                ctx.save();
+                ctx.fillStyle = '#ffffff';
                 ctx.font = 'bold 12px Inter, sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
@@ -752,54 +710,28 @@ export default function TankCity({ onExit }) {
                     ctx.fillText(brick.word.toUpperCase(), brick.x + brick.width/2, brick.y + brick.height/2);
                 }
                 ctx.restore();
-                ctx.shadowBlur = 0;
             }
 
             // Draw base with protective layer and topic title
             if (!state.baseDestroyed) {
                 // Protective layer around base (brick wall)
                 ctx.fillStyle = '#8B4513';
-                ctx.shadowBlur = 5;
-                ctx.shadowColor = '#8B4513';
                 const wallThickness = 12;
-                // Top wall
                 ctx.fillRect(baseX - wallThickness, baseY - wallThickness, TILE * 2 + wallThickness * 2, wallThickness);
-                // Left wall
                 ctx.fillRect(baseX - wallThickness, baseY, wallThickness, TILE * 1.5);
-                // Right wall
                 ctx.fillRect(baseX + TILE * 2, baseY, wallThickness, TILE * 1.5);
-                ctx.shadowBlur = 0;
-                
-                // Brick pattern on walls
-                ctx.strokeStyle = '#5a3510';
-                ctx.lineWidth = 1;
-                for (let i = 0; i < 5; i++) {
-                    ctx.strokeRect(baseX - wallThickness + i * 35, baseY - wallThickness, 35, wallThickness);
-                }
                 
                 // Draw topic title above base
                 ctx.fillStyle = '#ffffff';
-                ctx.shadowBlur = 30;
-                ctx.shadowColor = '#ff00ff';
-                ctx.font = 'bold 42px Inter, sans-serif';
+                ctx.font = 'bold 36px Inter, sans-serif';
                 ctx.textAlign = 'center';
-                ctx.fillText(currentTopic.toUpperCase(), canvas.width / 2, baseY - 50);
+                ctx.fillText(currentTopic.toUpperCase(), canvas.width / 2, baseY - 40);
                 
-                // Second line with neon glow
-                ctx.shadowColor = '#00ffff';
-                ctx.font = 'bold 28px Inter, sans-serif';
-                ctx.fillStyle = '#00ffff';
-                ctx.fillText(currentTopic.toLowerCase(), canvas.width / 2, baseY - 18);
-                ctx.shadowBlur = 0;
-                
-                // Base glow
-                ctx.fillStyle = '#ffd700';
-                ctx.shadowBlur = 30;
-                ctx.shadowColor = '#ffd700';
+                // Base
+                ctx.fillStyle = '#8b5cf6';
                 ctx.beginPath();
                 ctx.roundRect(baseX, baseY, TILE * 2, TILE * 1.5, 10);
                 ctx.fill();
-                ctx.shadowBlur = 0;
                 
                 // Draw logo if loaded
                 if (imagesRef.current.logo) {
