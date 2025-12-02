@@ -20,15 +20,15 @@ const TABS = [
 const BOARD_WIDTH = 10;
 const BOARD_HEIGHT = 20;
 
-// 3D glowing colors matching reference image
+// Vibrant jungle-style colors
 const PIECES = [
-    { shape: [[1,1,1,1]], color: '#00bfff', glow: '#00ffff', name: 'I' },  // Cyan/Blue
-    { shape: [[1,1],[1,1]], color: '#ffd700', glow: '#ffff00', name: 'O' },  // Yellow/Gold
-    { shape: [[0,1,0],[1,1,1]], color: '#ff00ff', glow: '#ff66ff', name: 'T' },  // Magenta/Pink
-    { shape: [[0,1,1],[1,1,0]], color: '#00ff00', glow: '#66ff66', name: 'S' },  // Green
-    { shape: [[1,1,0],[0,1,1]], color: '#ff0000', glow: '#ff6666', name: 'Z' },  // Red
-    { shape: [[1,0,0],[1,1,1]], color: '#0066ff', glow: '#3399ff', name: 'J' },  // Blue
-    { shape: [[0,0,1],[1,1,1]], color: '#ff6600', glow: '#ff9933', name: 'L' }   // Orange
+    { shape: [[1,1,1,1]], color: '#00bcd4', glow: '#4dd0e1', name: 'I' },  // Cyan
+    { shape: [[1,1],[1,1]], color: '#ffeb3b', glow: '#fff176', name: 'O' },  // Yellow
+    { shape: [[0,1,0],[1,1,1]], color: '#e91e63', glow: '#f06292', name: 'T' },  // Pink
+    { shape: [[0,1,1],[1,1,0]], color: '#4caf50', glow: '#81c784', name: 'S' },  // Green
+    { shape: [[1,1,0],[0,1,1]], color: '#f44336', glow: '#e57373', name: 'Z' },  // Red
+    { shape: [[1,0,0],[1,1,1]], color: '#2196f3', glow: '#64b5f6', name: 'J' },  // Blue
+    { shape: [[0,0,1],[1,1,1]], color: '#ff9800', glow: '#ffb74d', name: 'L' }   // Orange
 ];
 
 export default function TetrisGalaxy({ onExit }) {
@@ -158,11 +158,215 @@ export default function TetrisGalaxy({ onExit }) {
         updateSize();
         window.addEventListener('resize', updateSize);
 
-        // Calculate cell size based on screen
+        // Calculate cell size based on screen - prioritize game size
         const getCellSize = () => {
-            const maxHeight = canvas.height - 100;
-            const maxWidth = (canvas.width - 300) * 0.6;
+            const maxHeight = canvas.height - 80;
+            const maxWidth = canvas.width * 0.5;
             return Math.floor(Math.min(maxHeight / BOARD_HEIGHT, maxWidth / BOARD_WIDTH));
+        };
+
+        // Draw jungle background with animals
+        const drawJungleBackground = () => {
+            // Sky gradient
+            const skyGrad = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            skyGrad.addColorStop(0, '#e8f5e9');
+            skyGrad.addColorStop(0.3, '#f1f8e9');
+            skyGrad.addColorStop(1, '#c8e6c9');
+            ctx.fillStyle = skyGrad;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Ground
+            ctx.fillStyle = '#8bc34a';
+            ctx.fillRect(0, canvas.height - 60, canvas.width, 60);
+            ctx.fillStyle = '#689f38';
+            ctx.fillRect(0, canvas.height - 30, canvas.width, 30);
+
+            // Trees and leaves (left side)
+            drawTree(50, canvas.height - 60, 0.8);
+            drawTree(-30, canvas.height - 40, 1.2);
+            
+            // Trees and leaves (right side)
+            drawTree(canvas.width - 80, canvas.height - 60, 0.9);
+            drawTree(canvas.width + 20, canvas.height - 50, 1.1);
+
+            // Top leaves/canopy
+            drawCanopy();
+
+            // Plants at bottom
+            drawPlants();
+
+            // Animals
+            drawGiraffe(80, canvas.height - 180, 0.6);
+            drawGiraffe(canvas.width - 120, canvas.height - 200, 0.7);
+            drawButterfly(150, 200, '#f44336');
+            drawButterfly(canvas.width - 180, 150, '#2196f3');
+            drawButterfly(canvas.width / 2 - 100, 120, '#ff9800');
+            drawBird(canvas.width - 200, 180, '#4caf50');
+            drawBird(180, 280, '#e91e63');
+        };
+
+        const drawTree = (x, y, scale) => {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.scale(scale, scale);
+            
+            // Trunk
+            ctx.fillStyle = '#5d4037';
+            ctx.fillRect(-15, -100, 30, 120);
+            
+            // Branches
+            ctx.fillStyle = '#4caf50';
+            for (let i = 0; i < 5; i++) {
+                ctx.beginPath();
+                ctx.ellipse(-60 + i * 30, -120 - i * 20, 40, 25, 0, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            ctx.restore();
+        };
+
+        const drawCanopy = () => {
+            ctx.fillStyle = '#43a047';
+            // Top left leaves
+            for (let i = 0; i < 8; i++) {
+                ctx.beginPath();
+                ctx.ellipse(i * 60, 30, 50, 40, 0.3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            // Top right leaves
+            for (let i = 0; i < 8; i++) {
+                ctx.beginPath();
+                ctx.ellipse(canvas.width - i * 60, 40, 45, 35, -0.3, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // Hanging leaves
+            ctx.fillStyle = '#66bb6a';
+            for (let i = 0; i < 12; i++) {
+                const lx = 50 + i * 80;
+                ctx.beginPath();
+                ctx.moveTo(lx, 0);
+                ctx.quadraticCurveTo(lx + 20, 60, lx - 10, 80);
+                ctx.quadraticCurveTo(lx - 25, 50, lx, 0);
+                ctx.fill();
+            }
+        };
+
+        const drawPlants = () => {
+            ctx.fillStyle = '#2e7d32';
+            // Left plants
+            for (let i = 0; i < 4; i++) {
+                const px = 20 + i * 40;
+                ctx.beginPath();
+                ctx.moveTo(px, canvas.height - 60);
+                ctx.quadraticCurveTo(px - 30, canvas.height - 150, px + 10, canvas.height - 180);
+                ctx.quadraticCurveTo(px + 20, canvas.height - 140, px + 5, canvas.height - 60);
+                ctx.fill();
+            }
+            // Right plants
+            for (let i = 0; i < 4; i++) {
+                const px = canvas.width - 40 - i * 40;
+                ctx.beginPath();
+                ctx.moveTo(px, canvas.height - 60);
+                ctx.quadraticCurveTo(px + 30, canvas.height - 140, px - 10, canvas.height - 170);
+                ctx.quadraticCurveTo(px - 20, canvas.height - 130, px - 5, canvas.height - 60);
+                ctx.fill();
+            }
+        };
+
+        const drawGiraffe = (x, y, scale) => {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.scale(scale, scale);
+            
+            // Body
+            ctx.fillStyle = '#ff9800';
+            ctx.beginPath();
+            ctx.ellipse(0, 80, 35, 25, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Neck
+            ctx.fillRect(-8, -40, 16, 120);
+            
+            // Head
+            ctx.beginPath();
+            ctx.ellipse(0, -50, 18, 15, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Spots
+            ctx.fillStyle = '#e65100';
+            ctx.beginPath();
+            ctx.arc(-5, 20, 6, 0, Math.PI * 2);
+            ctx.arc(5, 50, 5, 0, Math.PI * 2);
+            ctx.arc(-3, 80, 8, 0, Math.PI * 2);
+            ctx.arc(15, 75, 6, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Ears
+            ctx.fillStyle = '#ff9800';
+            ctx.beginPath();
+            ctx.ellipse(-15, -55, 6, 10, -0.4, 0, Math.PI * 2);
+            ctx.ellipse(15, -55, 6, 10, 0.4, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Eyes
+            ctx.fillStyle = '#000';
+            ctx.beginPath();
+            ctx.arc(-6, -52, 3, 0, Math.PI * 2);
+            ctx.arc(6, -52, 3, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Legs
+            ctx.fillStyle = '#ff9800';
+            ctx.fillRect(-25, 100, 8, 40);
+            ctx.fillRect(17, 100, 8, 40);
+            
+            ctx.restore();
+        };
+
+        const drawButterfly = (x, y, color) => {
+            ctx.save();
+            ctx.translate(x, y);
+            
+            ctx.fillStyle = color;
+            // Wings
+            ctx.beginPath();
+            ctx.ellipse(-12, 0, 15, 10, -0.3, 0, Math.PI * 2);
+            ctx.ellipse(12, 0, 15, 10, 0.3, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Body
+            ctx.fillStyle = '#333';
+            ctx.fillRect(-2, -8, 4, 16);
+            
+            ctx.restore();
+        };
+
+        const drawBird = (x, y, color) => {
+            ctx.save();
+            ctx.translate(x, y);
+            
+            ctx.fillStyle = color;
+            // Body
+            ctx.beginPath();
+            ctx.ellipse(0, 0, 12, 8, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Wing
+            ctx.beginPath();
+            ctx.moveTo(0, -5);
+            ctx.quadraticCurveTo(-20, -20, -5, 0);
+            ctx.fill();
+            
+            // Beak
+            ctx.fillStyle = '#ff9800';
+            ctx.beginPath();
+            ctx.moveTo(12, 0);
+            ctx.lineTo(20, 2);
+            ctx.lineTo(12, 4);
+            ctx.fill();
+            
+            ctx.restore();
         };
 
         // Game state
@@ -210,63 +414,56 @@ export default function TetrisGalaxy({ onExit }) {
             };
         };
 
-        // Draw 3D glowing block like reference image
+        // Draw colorful textured block like jungle reference
         const draw3DBlock = (x, y, size, color, glow, word) => {
-            const padding = 3;
-            const radius = size * 0.15;
+            const padding = 2;
+            const radius = size * 0.12;
             const innerX = x + padding;
             const innerY = y + padding;
             const innerSize = size - padding * 2;
 
-            // Outer glow
-            ctx.shadowColor = glow;
-            ctx.shadowBlur = 20;
-            ctx.shadowOffsetX = 0;
-            ctx.shadowOffsetY = 0;
-
-            // Black border/frame
-            ctx.fillStyle = '#1a1a1a';
-            ctx.beginPath();
-            ctx.roundRect(x, y, size, size, radius);
-            ctx.fill();
-
             // Main block with gradient
-            const gradient = ctx.createRadialGradient(
-                innerX + innerSize * 0.3, innerY + innerSize * 0.3, 0,
-                innerX + innerSize * 0.5, innerY + innerSize * 0.5, innerSize * 0.8
-            );
+            const gradient = ctx.createLinearGradient(innerX, innerY, innerX + innerSize, innerY + innerSize);
             gradient.addColorStop(0, glow);
             gradient.addColorStop(0.5, color);
-            gradient.addColorStop(1, shadeColor(color, -30));
+            gradient.addColorStop(1, shadeColor(color, -20));
 
             ctx.fillStyle = gradient;
             ctx.beginPath();
-            ctx.roundRect(innerX, innerY, innerSize, innerSize, radius * 0.8);
+            ctx.roundRect(innerX, innerY, innerSize, innerSize, radius);
             ctx.fill();
 
-            // Inner highlight (top-left glow)
-            const highlightGrad = ctx.createRadialGradient(
-                innerX + innerSize * 0.3, innerY + innerSize * 0.3, 0,
-                innerX + innerSize * 0.5, innerY + innerSize * 0.5, innerSize * 0.5
-            );
-            highlightGrad.addColorStop(0, 'rgba(255,255,255,0.6)');
-            highlightGrad.addColorStop(0.5, 'rgba(255,255,255,0.1)');
-            highlightGrad.addColorStop(1, 'rgba(255,255,255,0)');
-            
-            ctx.fillStyle = highlightGrad;
+            // Texture dots
+            ctx.fillStyle = 'rgba(255,255,255,0.15)';
+            for (let i = 0; i < 3; i++) {
+                for (let j = 0; j < 3; j++) {
+                    ctx.beginPath();
+                    ctx.arc(
+                        innerX + innerSize * 0.25 + i * innerSize * 0.25,
+                        innerY + innerSize * 0.25 + j * innerSize * 0.25,
+                        2, 0, Math.PI * 2
+                    );
+                    ctx.fill();
+                }
+            }
+
+            // Top highlight
+            ctx.fillStyle = 'rgba(255,255,255,0.3)';
             ctx.beginPath();
-            ctx.roundRect(innerX, innerY, innerSize, innerSize, radius * 0.8);
+            ctx.roundRect(innerX + 2, innerY + 2, innerSize - 4, innerSize * 0.3, radius * 0.5);
             ctx.fill();
 
-            ctx.shadowBlur = 0;
-
-            // Word text
+            // Word text - one word per block, larger
             if (word) {
-                ctx.fillStyle = '#000';
-                ctx.font = `bold ${Math.max(8, size * 0.25)}px Arial`;
+                ctx.fillStyle = '#fff';
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 2;
+                const fontSize = Math.max(10, size * 0.35);
+                ctx.font = `bold ${fontSize}px Arial`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText(word.substring(0, 4), x + size / 2, y + size / 2);
+                ctx.strokeText(word.substring(0, 5), x + size / 2, y + size / 2);
+                ctx.fillText(word.substring(0, 5), x + size / 2, y + size / 2);
             }
         };
 
@@ -465,26 +662,14 @@ export default function TetrisGalaxy({ onExit }) {
             const CELL_SIZE = getCellSize();
             const gameWidth = BOARD_WIDTH * CELL_SIZE;
             const gameHeight = BOARD_HEIGHT * CELL_SIZE;
-            const offsetX = Math.floor((canvas.width - gameWidth - 250) / 2);
-            const offsetY = Math.floor((canvas.height - gameHeight) / 2);
+            const offsetX = Math.floor((canvas.width - gameWidth) / 2);
+            const offsetY = Math.floor((canvas.height - gameHeight) / 2) + 20;
 
-            // Dark gradient background like reference
-            const bgGrad = ctx.createRadialGradient(
-                canvas.width / 2, canvas.height / 2, 0,
-                canvas.width / 2, canvas.height / 2, canvas.width * 0.7
-            );
-            bgGrad.addColorStop(0, '#3a3a2a');
-            bgGrad.addColorStop(0.5, '#2a2a1a');
-            bgGrad.addColorStop(1, '#1a1a0a');
-            ctx.fillStyle = bgGrad;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            // Draw jungle background first
+            drawJungleBackground();
 
-            // Subtle floor reflection
-            ctx.fillStyle = 'rgba(255,255,255,0.02)';
-            ctx.fillRect(0, canvas.height * 0.85, canvas.width, canvas.height * 0.15);
-
-            // Board area (subtle dark background)
-            ctx.fillStyle = 'rgba(0,0,0,0.3)';
+            // Semi-transparent game area background
+            ctx.fillStyle = 'rgba(255,255,255,0.1)';
             ctx.fillRect(offsetX - 5, offsetY - 5, gameWidth + 10, gameHeight + 10);
 
             // Draw board with 3D blocks
@@ -554,145 +739,73 @@ export default function TetrisGalaxy({ onExit }) {
                 }
             }
 
-            // Sidebar
-            const sideX = offsetX + gameWidth + 30;
-
-            // Title with glow
-            ctx.shadowColor = '#0ff';
-            ctx.shadowBlur = 15;
-            ctx.fillStyle = '#0ff';
-            ctx.font = 'bold 24px Arial';
-            ctx.textAlign = 'left';
-            ctx.fillText('TETRIS GALAXY', offsetX, offsetY - 20);
-            ctx.shadowBlur = 0;
-
-            // Topic
-            ctx.fillStyle = '#888';
+            // Title at top center
+            ctx.fillStyle = '#2e7d32';
+            ctx.font = 'bold 28px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('TETRIS GALAXY', canvas.width / 2, 35);
+            ctx.fillStyle = '#4caf50';
             ctx.font = '14px Arial';
-            ctx.fillText(currentTopic || '', sideX, offsetY - 20);
+            ctx.fillText(currentTopic || '', canvas.width / 2, 55);
 
-            // Next piece panel
-            ctx.fillStyle = 'rgba(0,0,0,0.5)';
-            ctx.fillRect(sideX - 10, offsetY, 200, 120);
-            ctx.strokeStyle = '#444';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(sideX - 10, offsetY, 200, 120);
+            // Stats overlay at top
+            ctx.fillStyle = 'rgba(255,255,255,0.85)';
+            ctx.beginPath();
+            ctx.roundRect(offsetX, offsetY - 50, gameWidth, 40, 8);
+            ctx.fill();
 
-            ctx.fillStyle = '#fff';
-            ctx.font = 'bold 16px Arial';
-            ctx.fillText('NEXT', sideX, offsetY + 25);
+            ctx.fillStyle = '#333';
+            ctx.font = 'bold 14px Arial';
+            ctx.textAlign = 'left';
+            ctx.fillText(`SCORE: ${gameScore}`, offsetX + 15, offsetY - 25);
+            ctx.textAlign = 'center';
+            ctx.fillText(`LINES: ${gameLines}`, offsetX + gameWidth / 2, offsetY - 25);
+            ctx.textAlign = 'right';
+            ctx.fillText(`LEVEL: ${gameLevel}`, offsetX + gameWidth - 15, offsetY - 25);
+
+            // Next piece preview (top right of game)
+            const previewX = offsetX + gameWidth + 20;
+            const previewY = offsetY;
+            ctx.fillStyle = 'rgba(255,255,255,0.85)';
+            ctx.beginPath();
+            ctx.roundRect(previewX, previewY, 100, 100, 8);
+            ctx.fill();
+
+            ctx.fillStyle = '#333';
+            ctx.font = 'bold 12px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('NEXT', previewX + 50, previewY + 18);
 
             if (nextPiece) {
-                const previewSize = 30;
-                const previewX = sideX + 10;
-                const previewY = offsetY + 40;
+                const pSize = 20;
+                const px = previewX + 50 - (nextPiece.shape[0].length * pSize) / 2;
+                const py = previewY + 35;
                 
                 nextPiece.shape.forEach((row, dy) => {
                     row.forEach((value, dx) => {
                         if (value) {
-                            draw3DBlock(
-                                previewX + dx * previewSize,
-                                previewY + dy * previewSize,
-                                previewSize - 2,
-                                nextPiece.color,
-                                nextPiece.glow,
-                                null
-                            );
+                            draw3DBlock(px + dx * pSize, py + dy * pSize, pSize - 1, nextPiece.color, nextPiece.glow, null);
                         }
                     });
                 });
-                ctx.fillStyle = '#aaa';
-                ctx.font = '12px Arial';
-                ctx.fillText(nextPiece.word, sideX, offsetY + 110);
             }
 
-            // Stats panels
-            const statsY = offsetY + 140;
-            
-            // Score
-            ctx.fillStyle = 'rgba(0,0,0,0.5)';
-            ctx.fillRect(sideX - 10, statsY, 200, 60);
-            ctx.strokeStyle = '#0ff';
-            ctx.lineWidth = 1;
-            ctx.strokeRect(sideX - 10, statsY, 200, 60);
-            ctx.fillStyle = '#888';
-            ctx.font = 'bold 14px Arial';
-            ctx.fillText('SCORE', sideX, statsY + 20);
-            ctx.shadowColor = '#0ff';
-            ctx.shadowBlur = 10;
-            ctx.fillStyle = '#0ff';
-            ctx.font = 'bold 28px Arial';
-            ctx.fillText(gameScore.toString(), sideX, statsY + 50);
-            ctx.shadowBlur = 0;
-
-            // Lines
-            ctx.fillStyle = 'rgba(0,0,0,0.5)';
-            ctx.fillRect(sideX - 10, statsY + 70, 95, 60);
-            ctx.strokeStyle = '#0f0';
-            ctx.strokeRect(sideX - 10, statsY + 70, 95, 60);
-            ctx.fillStyle = '#888';
-            ctx.font = 'bold 12px Arial';
-            ctx.fillText('LINES', sideX, statsY + 90);
-            ctx.shadowColor = '#0f0';
-            ctx.shadowBlur = 10;
-            ctx.fillStyle = '#0f0';
-            ctx.font = 'bold 24px Arial';
-            ctx.fillText(gameLines.toString(), sideX, statsY + 118);
-            ctx.shadowBlur = 0;
-
-            // Level
-            ctx.fillStyle = 'rgba(0,0,0,0.5)';
-            ctx.fillRect(sideX + 95, statsY + 70, 95, 60);
-            ctx.strokeStyle = '#f0f';
-            ctx.strokeRect(sideX + 95, statsY + 70, 95, 60);
-            ctx.fillStyle = '#888';
-            ctx.font = 'bold 12px Arial';
-            ctx.fillText('LEVEL', sideX + 105, statsY + 90);
-            ctx.shadowColor = '#f0f';
-            ctx.shadowBlur = 10;
-            ctx.fillStyle = '#f0f';
-            ctx.font = 'bold 24px Arial';
-            ctx.fillText(gameLevel.toString(), sideX + 105, statsY + 118);
-            ctx.shadowBlur = 0;
-
-            // Definition display
+            // Definition display (bottom of screen)
             if (currentDefinition) {
-                const defY = statsY + 150;
-                ctx.fillStyle = 'rgba(0,0,0,0.8)';
-                ctx.fillRect(sideX - 10, defY, 200, 90);
-                ctx.shadowColor = '#0ff';
-                ctx.shadowBlur = 15;
-                ctx.strokeStyle = '#0ff';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(sideX - 10, defY, 200, 90);
-                ctx.shadowBlur = 0;
+                ctx.fillStyle = 'rgba(255,255,255,0.9)';
+                ctx.beginPath();
+                ctx.roundRect(offsetX, canvas.height - 80, gameWidth, 60, 10);
+                ctx.fill();
 
-                ctx.fillStyle = '#0ff';
-                ctx.font = 'bold 16px Arial';
-                ctx.fillText(currentDefinition.word, sideX, defY + 25);
+                ctx.fillStyle = '#e91e63';
+                ctx.font = 'bold 18px Arial';
+                ctx.textAlign = 'left';
+                ctx.fillText(currentDefinition.word, offsetX + 20, canvas.height - 50);
 
-                ctx.fillStyle = '#fff';
-                ctx.font = '12px Arial';
-                const words = currentDefinition.definition.split(' ');
-                let line = '';
-                let lineY = defY + 50;
-                words.forEach(word => {
-                    if ((line + word).length > 24) {
-                        ctx.fillText(line, sideX, lineY);
-                        line = word + ' ';
-                        lineY += 16;
-                    } else {
-                        line += word + ' ';
-                    }
-                });
-                ctx.fillText(line, sideX, lineY);
+                ctx.fillStyle = '#333';
+                ctx.font = '14px Arial';
+                ctx.fillText(currentDefinition.definition, offsetX + 20, canvas.height - 28);
             }
-
-            // Controls hint
-            ctx.fillStyle = '#555';
-            ctx.font = '11px Arial';
-            const ctrlY = canvas.height - 40;
-            ctx.fillText('← → Move | ↑ Rotate | ↓ Drop | Space Hard Drop | P Pause', sideX - 10, ctrlY);
 
             // Paused overlay
             if (paused && !gameOver) {
