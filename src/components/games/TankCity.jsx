@@ -420,18 +420,22 @@ export default function TankCity({ onExit }) {
         };
 
         const addFloatingText = (x, y, text, color, bonus) => {
-            // Star Wars style crawl - start from bottom center
+            // Star Wars style crawl - queue if there's already one showing
+            if (state.floatingTexts.length > 0) {
+                state.textQueue = state.textQueue || [];
+                state.textQueue.push({ text, color, bonus });
+                return;
+            }
             state.floatingTexts.push({
                 x: canvas.width / 2,
-                y: canvas.height - 50,
-                vy: -1.5,
+                y: canvas.height + 50,
+                vy: -1.2,
                 text,
                 bonus,
-                life: 300,
-                maxLife: 300,
+                life: 400,
+                maxLife: 400,
                 color,
-                startY: canvas.height - 50,
-                scale: 1,
+                startY: canvas.height + 50,
             });
         };
 
@@ -761,8 +765,24 @@ export default function TankCity({ onExit }) {
             state.floatingTexts = state.floatingTexts.filter(ft => {
                 ft.y += ft.vy;
                 ft.life--;
-                return ft.life > 0;
+                return ft.life > 0 && ft.y > -100;
             });
+            
+            // Process queue when current text is done
+            if (state.floatingTexts.length === 0 && state.textQueue?.length > 0) {
+                const next = state.textQueue.shift();
+                state.floatingTexts.push({
+                    x: canvas.width / 2,
+                    y: canvas.height + 50,
+                    vy: -1.2,
+                    text: next.text,
+                    bonus: next.bonus,
+                    life: 400,
+                    maxLife: 400,
+                    color: next.color,
+                    startY: canvas.height + 50,
+                });
+            }
         };
 
         const drawTank = (tank, image, dir) => {
@@ -943,20 +963,21 @@ export default function TankCity({ onExit }) {
             }
             ctx.globalAlpha = 1;
 
-            // Draw floating texts - Star Wars crawl style
+            // Draw floating texts - Star Wars crawl style from bottom to top
             for (const ft of state.floatingTexts) {
                 const travelDistance = ft.startY - ft.y;
-                const maxTravel = canvas.height - 100;
-                const progress = Math.min(1, travelDistance / maxTravel);
+                const maxTravel = canvas.height + 150;
+                const progress = Math.min(1, Math.max(0, travelDistance / maxTravel));
                 
-                // Perspective scale - gets smaller as it goes up
-                const scale = Math.max(0.3, 1 - progress * 0.7);
-                const alpha = Math.max(0, 1 - progress);
+                // Perspective scale - starts large at bottom, shrinks toward top
+                const scale = Math.max(0.2, 1.2 - progress * 1.0);
+                // Fade out near top
+                const alpha = progress > 0.8 ? Math.max(0, 1 - (progress - 0.8) * 5) : 1;
                 
                 ctx.save();
                 ctx.globalAlpha = alpha;
                 ctx.translate(ft.x, ft.y);
-                ctx.scale(scale, scale * 0.8); // Slight vertical squish for perspective
+                ctx.scale(scale, scale * 0.7); // Perspective squish
                 
                 // Split text into word and definition
                 const parts = ft.text.split(': ');
@@ -964,20 +985,20 @@ export default function TankCity({ onExit }) {
                 const def = parts[1] || '';
                 
                 ctx.fillStyle = ft.color;
-                ctx.font = 'bold 24px Inter';
+                ctx.font = 'bold 28px Inter';
                 ctx.textAlign = 'center';
                 ctx.fillText(word, 0, 0);
                 
                 if (def) {
                     ctx.fillStyle = '#e2e8f0';
-                    ctx.font = '18px Inter';
-                    ctx.fillText(def, 0, 28);
+                    ctx.font = '16px Inter';
+                    ctx.fillText(def, 0, 32);
                 }
                 
                 if (ft.bonus > 0) {
                     ctx.fillStyle = '#ffd700';
-                    ctx.font = 'bold 20px Inter';
-                    ctx.fillText(`+${ft.bonus}`, 0, def ? 56 : 28);
+                    ctx.font = 'bold 18px Inter';
+                    ctx.fillText(`+${ft.bonus}`, 0, def ? 58 : 32);
                 }
                 
                 ctx.restore();

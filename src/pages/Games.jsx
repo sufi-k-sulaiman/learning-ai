@@ -67,8 +67,8 @@ export default function Games() {
                       <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center mx-auto mb-4">
                           <Shield className="w-8 h-8 text-white" />
                       </div>
-                      <h2 className="text-xl font-bold text-gray-900 mb-2">Tank City</h2>
-                      <p className="text-gray-500 text-sm mb-4 flex-grow">Classic tank battle - defend your base from enemies!</p>
+                      <h2 className="text-xl font-bold text-gray-900 mb-2">Cosmic Tank</h2>
+                      <p className="text-gray-500 text-sm mb-4 flex-grow">Space tank battle - defend your base from enemies!</p>
                       <Button onClick={() => setActiveGame('tank-city')} size="lg" className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700">
                           Play Now
                       </Button>
