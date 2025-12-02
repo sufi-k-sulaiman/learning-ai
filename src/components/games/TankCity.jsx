@@ -11,8 +11,10 @@ import { LOGO_URL } from '@/components/NavigationConfig';
 
 // Tank images
 const PLAYER_TANK = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/dca90a2df_tank1.png';
-const ENEMY_TANK_1 = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/7291baacc_tank2.png';
-const ENEMY_TANK_2 = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/b475c114e_tank3.png';
+const ENEMY_TANK_1 = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/be5b65846_tank2.png';
+const ENEMY_TANK_2 = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/f8e40db27_tank3.png';
+const ENEMY_TANK_3 = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/7870c2844_tank4.png';
+const ENEMY_TANK_4 = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/6f8df8187_tank5.png';
 const BASE_LOGO = 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/1a9bef8b1_1c-logo.png';
 
 const TILE = 48; // 40% smaller tanks
@@ -74,9 +76,11 @@ export default function TankCity({ onExit }) {
             loadImage(PLAYER_TANK),
             loadImage(ENEMY_TANK_1),
             loadImage(ENEMY_TANK_2),
+            loadImage(ENEMY_TANK_3),
+            loadImage(ENEMY_TANK_4),
             loadImage(BASE_LOGO),
-        ]).then(([player, enemy1, enemy2, logo]) => {
-            imagesRef.current = { player, enemy1, enemy2, logo };
+        ]).then(([player, enemy1, enemy2, enemy3, enemy4, logo]) => {
+            imagesRef.current = { player, enemy1, enemy2, enemy3, enemy4, logo };
         });
     }, []);
 
@@ -204,8 +208,8 @@ export default function TankCity({ onExit }) {
         const usedAreas = [];
         const checkOverlap = (x, y, w, h) => {
             for (const area of usedAreas) {
-                if (x < area.x + area.w + 5 && x + w + 5 > area.x &&
-                    y < area.y + area.h + 5 && y + h + 5 > area.y) {
+                if (x < area.x + area.w + 8 && x + w + 8 > area.x &&
+                    y < area.y + area.h + 8 && y + h + 8 > area.y) {
                     return true;
                 }
             }
@@ -213,21 +217,22 @@ export default function TankCity({ onExit }) {
         };
         
         let wordIdx = 0;
-        const fontSize = [10, 12, 14, 16, 11, 13]; // Varying sizes
+        const fontSize = [14, 16, 18, 20, 15, 17]; // Bigger sizes
         
         // Fill the playable area with words
-        for (let attempt = 0; attempt < 200 && wordIdx < shuffledWords.length; attempt++) {
+        for (let attempt = 0; attempt < 300 && wordIdx < shuffledWords.length; attempt++) {
             const word = shuffledWords[wordIdx];
-            const isVertical = Math.random() > 0.6;
+            const isVertical = Math.random() > 0.65;
             const size = fontSize[wordIdx % fontSize.length];
             
             let wordW, wordH;
             if (isVertical) {
-                wordW = size + 8;
-                wordH = word.primary.length * (size * 0.8) + 10;
+                // Vertical: stacked letters
+                wordW = size + 16;
+                wordH = word.primary.length * (size + 2) + 16;
             } else {
-                wordW = word.primary.length * (size * 0.7) + 16;
-                wordH = size + 10;
+                wordW = word.primary.length * (size * 0.65) + 24;
+                wordH = size + 16;
             }
             
             // Random position in play area
@@ -305,7 +310,7 @@ export default function TankCity({ onExit }) {
                 dir: 2, // Start facing down
                 speed: 0.8 + Math.random() * 0.4, // Slower speed
                 shootTimer: 60 + Math.random() * 60,
-                type: Math.random() > 0.5 ? 1 : 2,
+                type: Math.floor(Math.random() * 4) + 1, // 1-4 for different tanks
                 health: 1,
             });
             state.enemiesTotal--;
@@ -718,25 +723,39 @@ export default function TankCity({ onExit }) {
                 ctx.fill();
             }
 
-            // Draw word cloud maze
+            // Draw word cloud maze with backgrounds
             for (const brick of wordBricks) {
                 if (brick.health <= 0) continue;
 
-                const fontSize = brick.fontSize || 12;
+                const fontSize = brick.fontSize || 14;
 
-                // Draw word - white text on dark background like reference
+                // Draw background
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+                ctx.beginPath();
+                ctx.roundRect(brick.x, brick.y, brick.width, brick.height, 4);
+                ctx.fill();
+
+                // Draw colored border
+                ctx.strokeStyle = brick.color;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.roundRect(brick.x, brick.y, brick.width, brick.height, 4);
+                ctx.stroke();
+
                 ctx.fillStyle = brick.color;
                 ctx.font = `bold ${fontSize}px Inter, sans-serif`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
 
                 if (brick.vertical) {
-                    // Draw vertical word
-                    ctx.save();
-                    ctx.translate(brick.x + brick.width/2, brick.y + brick.height/2);
-                    ctx.rotate(-Math.PI / 2);
-                    ctx.fillText(brick.word.toUpperCase(), 0, 0);
-                    ctx.restore();
+                    // Draw vertical word as stacked letters (transposed, readable)
+                    const letters = brick.word.toUpperCase().split('');
+                    const letterHeight = fontSize + 2;
+                    const startY = brick.y + 10;
+
+                    letters.forEach((letter, i) => {
+                        ctx.fillText(letter, brick.x + brick.width/2, startY + i * letterHeight + fontSize/2);
+                    });
                 } else {
                     // Draw horizontal word
                     ctx.fillText(brick.word.toUpperCase(), brick.x + brick.width/2, brick.y + brick.height/2);
@@ -789,7 +808,8 @@ export default function TankCity({ onExit }) {
             drawTank(state.player, imagesRef.current.player, state.player.dir);
             
             for (const enemy of state.enemies) {
-                const img = enemy.type === 1 ? imagesRef.current.enemy1 : imagesRef.current.enemy2;
+                const enemyImages = [imagesRef.current.enemy1, imagesRef.current.enemy2, imagesRef.current.enemy3, imagesRef.current.enemy4];
+                const img = enemyImages[(enemy.type - 1) % 4];
                 drawTank(enemy, img, enemy.dir);
             }
 
@@ -814,16 +834,21 @@ export default function TankCity({ onExit }) {
             }
             ctx.globalAlpha = 1;
 
-            // Draw floating texts
+            // Draw floating texts - fade from bottom to top
             for (const ft of state.floatingTexts) {
-                ctx.globalAlpha = Math.min(1, ft.life / 60);
+                // Calculate fade based on vertical position (starts at bottom, fades at top)
+                const travelDistance = ft.startY - ft.y;
+                const maxTravel = canvas.height - 150;
+                const fadeProgress = Math.min(1, travelDistance / maxTravel);
+                ctx.globalAlpha = 1 - fadeProgress;
+                
                 ctx.fillStyle = ft.color;
-                ctx.font = 'bold 18px Inter';
+                ctx.font = 'bold 20px Inter';
                 ctx.textAlign = 'center';
                 ctx.fillText(ft.text, ft.x, ft.y);
                 if (ft.bonus > 0) {
                     ctx.fillStyle = '#ffd700';
-                    ctx.fillText(`+${ft.bonus}`, ft.x, ft.y + 22);
+                    ctx.fillText(`+${ft.bonus}`, ft.x, ft.y + 24);
                 }
             }
             ctx.globalAlpha = 1;
