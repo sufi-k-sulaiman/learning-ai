@@ -19,16 +19,16 @@ const TABS = [
 
 const BOARD_WIDTH = 10;
 const BOARD_HEIGHT = 20;
-const CELL_SIZE = 28;
 
+// 3D glowing colors matching reference image
 const PIECES = [
-    { shape: [[1,1,1,1]], color: '#00f0f0', name: 'I' },
-    { shape: [[1,1],[1,1]], color: '#f0f000', name: 'O' },
-    { shape: [[0,1,0],[1,1,1]], color: '#a000f0', name: 'T' },
-    { shape: [[0,1,1],[1,1,0]], color: '#00f000', name: 'S' },
-    { shape: [[1,1,0],[0,1,1]], color: '#f00000', name: 'Z' },
-    { shape: [[1,0,0],[1,1,1]], color: '#0000f0', name: 'J' },
-    { shape: [[0,0,1],[1,1,1]], color: '#f0a000', name: 'L' }
+    { shape: [[1,1,1,1]], color: '#00bfff', glow: '#00ffff', name: 'I' },  // Cyan/Blue
+    { shape: [[1,1],[1,1]], color: '#ffd700', glow: '#ffff00', name: 'O' },  // Yellow/Gold
+    { shape: [[0,1,0],[1,1,1]], color: '#ff00ff', glow: '#ff66ff', name: 'T' },  // Magenta/Pink
+    { shape: [[0,1,1],[1,1,0]], color: '#00ff00', glow: '#66ff66', name: 'S' },  // Green
+    { shape: [[1,1,0],[0,1,1]], color: '#ff0000', glow: '#ff6666', name: 'Z' },  // Red
+    { shape: [[1,0,0],[1,1,1]], color: '#0066ff', glow: '#3399ff', name: 'J' },  // Blue
+    { shape: [[0,0,1],[1,1,1]], color: '#ff6600', glow: '#ff9933', name: 'L' }   // Orange
 ];
 
 export default function TetrisGalaxy({ onExit }) {
@@ -150,12 +150,20 @@ export default function TetrisGalaxy({ onExit }) {
         let animationFrameId;
         let gameRunning = true;
 
-        // Set canvas size
-        const gameWidth = BOARD_WIDTH * CELL_SIZE;
-        const gameHeight = BOARD_HEIGHT * CELL_SIZE;
-        const sidebarWidth = 200;
-        canvas.width = gameWidth + sidebarWidth + 40;
-        canvas.height = gameHeight + 60;
+        // Fullscreen responsive sizing
+        const updateSize = () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        };
+        updateSize();
+        window.addEventListener('resize', updateSize);
+
+        // Calculate cell size based on screen
+        const getCellSize = () => {
+            const maxHeight = canvas.height - 100;
+            const maxWidth = (canvas.width - 300) * 0.6;
+            return Math.floor(Math.min(maxHeight / BOARD_HEIGHT, maxWidth / BOARD_WIDTH));
+        };
 
         // Game state
         const board = Array(BOARD_HEIGHT).fill().map(() => Array(BOARD_WIDTH).fill(null));
@@ -193,12 +201,83 @@ export default function TetrisGalaxy({ onExit }) {
             return {
                 shape: piece.shape.map(row => [...row]),
                 color: piece.color,
+                glow: piece.glow,
                 name: piece.name,
                 word: word.word,
                 definition: word.definition,
                 x: Math.floor(BOARD_WIDTH / 2) - Math.floor(piece.shape[0].length / 2),
                 y: 0
             };
+        };
+
+        // Draw 3D glowing block like reference image
+        const draw3DBlock = (x, y, size, color, glow, word) => {
+            const padding = 3;
+            const radius = size * 0.15;
+            const innerX = x + padding;
+            const innerY = y + padding;
+            const innerSize = size - padding * 2;
+
+            // Outer glow
+            ctx.shadowColor = glow;
+            ctx.shadowBlur = 20;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+
+            // Black border/frame
+            ctx.fillStyle = '#1a1a1a';
+            ctx.beginPath();
+            ctx.roundRect(x, y, size, size, radius);
+            ctx.fill();
+
+            // Main block with gradient
+            const gradient = ctx.createRadialGradient(
+                innerX + innerSize * 0.3, innerY + innerSize * 0.3, 0,
+                innerX + innerSize * 0.5, innerY + innerSize * 0.5, innerSize * 0.8
+            );
+            gradient.addColorStop(0, glow);
+            gradient.addColorStop(0.5, color);
+            gradient.addColorStop(1, shadeColor(color, -30));
+
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.roundRect(innerX, innerY, innerSize, innerSize, radius * 0.8);
+            ctx.fill();
+
+            // Inner highlight (top-left glow)
+            const highlightGrad = ctx.createRadialGradient(
+                innerX + innerSize * 0.3, innerY + innerSize * 0.3, 0,
+                innerX + innerSize * 0.5, innerY + innerSize * 0.5, innerSize * 0.5
+            );
+            highlightGrad.addColorStop(0, 'rgba(255,255,255,0.6)');
+            highlightGrad.addColorStop(0.5, 'rgba(255,255,255,0.1)');
+            highlightGrad.addColorStop(1, 'rgba(255,255,255,0)');
+            
+            ctx.fillStyle = highlightGrad;
+            ctx.beginPath();
+            ctx.roundRect(innerX, innerY, innerSize, innerSize, radius * 0.8);
+            ctx.fill();
+
+            ctx.shadowBlur = 0;
+
+            // Word text
+            if (word) {
+                ctx.fillStyle = '#000';
+                ctx.font = `bold ${Math.max(8, size * 0.25)}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(word.substring(0, 4), x + size / 2, y + size / 2);
+            }
+        };
+
+        // Helper to darken color
+        const shadeColor = (color, percent) => {
+            const num = parseInt(color.replace('#', ''), 16);
+            const amt = Math.round(2.55 * percent);
+            const R = Math.max(0, Math.min(255, (num >> 16) + amt));
+            const G = Math.max(0, Math.min(255, ((num >> 8) & 0x00FF) + amt));
+            const B = Math.max(0, Math.min(255, (num & 0x0000FF) + amt));
+            return `rgb(${R},${G},${B})`;
         };
 
         const collision = (piece, offsetX = 0, offsetY = 0) => {
@@ -220,7 +299,8 @@ export default function TetrisGalaxy({ onExit }) {
                         const y = currentPiece.y + dy;
                         if (y >= 0) {
                             board[y][x] = { 
-                                color: currentPiece.color, 
+                                color: currentPiece.color,
+                                glow: currentPiece.glow,
                                 word: currentPiece.word,
                                 definition: currentPiece.definition
                             };
@@ -382,75 +462,49 @@ export default function TetrisGalaxy({ onExit }) {
 
         // Draw function
         const draw = () => {
-            const offsetX = 20;
-            const offsetY = 50;
+            const CELL_SIZE = getCellSize();
+            const gameWidth = BOARD_WIDTH * CELL_SIZE;
+            const gameHeight = BOARD_HEIGHT * CELL_SIZE;
+            const offsetX = Math.floor((canvas.width - gameWidth - 250) / 2);
+            const offsetY = Math.floor((canvas.height - gameHeight) / 2);
 
-            // Background
-            ctx.fillStyle = '#0a0a1a';
+            // Dark gradient background like reference
+            const bgGrad = ctx.createRadialGradient(
+                canvas.width / 2, canvas.height / 2, 0,
+                canvas.width / 2, canvas.height / 2, canvas.width * 0.7
+            );
+            bgGrad.addColorStop(0, '#3a3a2a');
+            bgGrad.addColorStop(0.5, '#2a2a1a');
+            bgGrad.addColorStop(1, '#1a1a0a');
+            ctx.fillStyle = bgGrad;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Stars
-            for (let i = 0; i < 50; i++) {
-                ctx.fillStyle = `rgba(255,255,255,${0.3 + Math.random() * 0.5})`;
-                ctx.beginPath();
-                ctx.arc(
-                    (i * 37) % canvas.width,
-                    (i * 23) % canvas.height,
-                    Math.random() * 1.5,
-                    0, Math.PI * 2
-                );
-                ctx.fill();
-            }
+            // Subtle floor reflection
+            ctx.fillStyle = 'rgba(255,255,255,0.02)';
+            ctx.fillRect(0, canvas.height * 0.85, canvas.width, canvas.height * 0.15);
 
-            // Board background
-            ctx.fillStyle = '#111';
-            ctx.fillRect(offsetX, offsetY, gameWidth, gameHeight);
-            ctx.strokeStyle = '#333';
-            ctx.lineWidth = 2;
-            ctx.strokeRect(offsetX, offsetY, gameWidth, gameHeight);
+            // Board area (subtle dark background)
+            ctx.fillStyle = 'rgba(0,0,0,0.3)';
+            ctx.fillRect(offsetX - 5, offsetY - 5, gameWidth + 10, gameHeight + 10);
 
-            // Draw grid
-            ctx.strokeStyle = '#222';
-            ctx.lineWidth = 1;
-            for (let x = 0; x <= BOARD_WIDTH; x++) {
-                ctx.beginPath();
-                ctx.moveTo(offsetX + x * CELL_SIZE, offsetY);
-                ctx.lineTo(offsetX + x * CELL_SIZE, offsetY + gameHeight);
-                ctx.stroke();
-            }
-            for (let y = 0; y <= BOARD_HEIGHT; y++) {
-                ctx.beginPath();
-                ctx.moveTo(offsetX, offsetY + y * CELL_SIZE);
-                ctx.lineTo(offsetX + gameWidth, offsetY + y * CELL_SIZE);
-                ctx.stroke();
-            }
-
-            // Draw board
+            // Draw board with 3D blocks
             for (let y = 0; y < BOARD_HEIGHT; y++) {
                 for (let x = 0; x < BOARD_WIDTH; x++) {
                     if (board[y][x]) {
                         const cell = board[y][x];
-                        ctx.fillStyle = cell.color;
-                        ctx.fillRect(
-                            offsetX + x * CELL_SIZE + 1,
-                            offsetY + y * CELL_SIZE + 1,
-                            CELL_SIZE - 2,
-                            CELL_SIZE - 2
-                        );
-                        // Word label
-                        ctx.fillStyle = '#fff';
-                        ctx.font = 'bold 8px Arial';
-                        ctx.textAlign = 'center';
-                        ctx.fillText(
-                            cell.word.substring(0, 4),
-                            offsetX + x * CELL_SIZE + CELL_SIZE / 2,
-                            offsetY + y * CELL_SIZE + CELL_SIZE / 2 + 3
+                        draw3DBlock(
+                            offsetX + x * CELL_SIZE,
+                            offsetY + y * CELL_SIZE,
+                            CELL_SIZE,
+                            cell.color,
+                            cell.glow,
+                            cell.word
                         );
                     }
                 }
             }
 
-            // Draw current piece
+            // Draw current piece with 3D blocks
             if (currentPiece && !gameOver) {
                 currentPiece.shape.forEach((row, dy) => {
                     row.forEach((value, dx) => {
@@ -458,114 +512,175 @@ export default function TetrisGalaxy({ onExit }) {
                             const x = currentPiece.x + dx;
                             const y = currentPiece.y + dy;
                             if (y >= 0) {
-                                ctx.fillStyle = currentPiece.color;
-                                ctx.fillRect(
-                                    offsetX + x * CELL_SIZE + 1,
-                                    offsetY + y * CELL_SIZE + 1,
-                                    CELL_SIZE - 2,
-                                    CELL_SIZE - 2
-                                );
-                                // Word on piece
-                                ctx.fillStyle = '#fff';
-                                ctx.font = 'bold 8px Arial';
-                                ctx.textAlign = 'center';
-                                ctx.fillText(
-                                    currentPiece.word.substring(0, 4),
-                                    offsetX + x * CELL_SIZE + CELL_SIZE / 2,
-                                    offsetY + y * CELL_SIZE + CELL_SIZE / 2 + 3
+                                draw3DBlock(
+                                    offsetX + x * CELL_SIZE,
+                                    offsetY + y * CELL_SIZE,
+                                    CELL_SIZE,
+                                    currentPiece.color,
+                                    currentPiece.glow,
+                                    currentPiece.word
                                 );
                             }
                         }
                     });
                 });
+
+                // Ghost piece (drop preview)
+                let ghostY = currentPiece.y;
+                while (!collision(currentPiece, 0, ghostY - currentPiece.y + 1)) {
+                    ghostY++;
+                }
+                if (ghostY !== currentPiece.y) {
+                    ctx.globalAlpha = 0.3;
+                    currentPiece.shape.forEach((row, dy) => {
+                        row.forEach((value, dx) => {
+                            if (value) {
+                                const x = currentPiece.x + dx;
+                                const y = ghostY + dy;
+                                if (y >= 0) {
+                                    draw3DBlock(
+                                        offsetX + x * CELL_SIZE,
+                                        offsetY + y * CELL_SIZE,
+                                        CELL_SIZE,
+                                        currentPiece.color,
+                                        currentPiece.glow,
+                                        null
+                                    );
+                                }
+                            }
+                        });
+                    });
+                    ctx.globalAlpha = 1;
+                }
             }
 
             // Sidebar
-            const sideX = offsetX + gameWidth + 20;
+            const sideX = offsetX + gameWidth + 30;
 
-            // Title
+            // Title with glow
+            ctx.shadowColor = '#0ff';
+            ctx.shadowBlur = 15;
             ctx.fillStyle = '#0ff';
-            ctx.font = 'bold 18px Arial';
+            ctx.font = 'bold 24px Arial';
             ctx.textAlign = 'left';
-            ctx.fillText('TETRIS GALAXY', offsetX, 35);
+            ctx.fillText('TETRIS GALAXY', offsetX, offsetY - 20);
+            ctx.shadowBlur = 0;
 
             // Topic
             ctx.fillStyle = '#888';
-            ctx.font = '12px Arial';
-            ctx.fillText(currentTopic || '', sideX, 30);
+            ctx.font = '14px Arial';
+            ctx.fillText(currentTopic || '', sideX, offsetY - 20);
 
-            // Next piece
+            // Next piece panel
+            ctx.fillStyle = 'rgba(0,0,0,0.5)';
+            ctx.fillRect(sideX - 10, offsetY, 200, 120);
+            ctx.strokeStyle = '#444';
+            ctx.lineWidth = 2;
+            ctx.strokeRect(sideX - 10, offsetY, 200, 120);
+
             ctx.fillStyle = '#fff';
-            ctx.font = 'bold 14px Arial';
-            ctx.fillText('NEXT', sideX, 60);
+            ctx.font = 'bold 16px Arial';
+            ctx.fillText('NEXT', sideX, offsetY + 25);
 
             if (nextPiece) {
-                const previewX = sideX;
-                const previewY = 70;
-                ctx.fillStyle = '#222';
-                ctx.fillRect(previewX, previewY, 100, 60);
+                const previewSize = 30;
+                const previewX = sideX + 10;
+                const previewY = offsetY + 40;
                 
                 nextPiece.shape.forEach((row, dy) => {
                     row.forEach((value, dx) => {
                         if (value) {
-                            ctx.fillStyle = nextPiece.color;
-                            ctx.fillRect(
-                                previewX + 10 + dx * 20,
-                                previewY + 10 + dy * 20,
-                                18, 18
+                            draw3DBlock(
+                                previewX + dx * previewSize,
+                                previewY + dy * previewSize,
+                                previewSize - 2,
+                                nextPiece.color,
+                                nextPiece.glow,
+                                null
                             );
                         }
                     });
                 });
-                ctx.fillStyle = '#fff';
-                ctx.font = '10px Arial';
-                ctx.fillText(nextPiece.word, previewX + 5, previewY + 55);
+                ctx.fillStyle = '#aaa';
+                ctx.font = '12px Arial';
+                ctx.fillText(nextPiece.word, sideX, offsetY + 110);
             }
 
-            // Stats
-            ctx.fillStyle = '#fff';
+            // Stats panels
+            const statsY = offsetY + 140;
+            
+            // Score
+            ctx.fillStyle = 'rgba(0,0,0,0.5)';
+            ctx.fillRect(sideX - 10, statsY, 200, 60);
+            ctx.strokeStyle = '#0ff';
+            ctx.lineWidth = 1;
+            ctx.strokeRect(sideX - 10, statsY, 200, 60);
+            ctx.fillStyle = '#888';
             ctx.font = 'bold 14px Arial';
-            ctx.fillText('SCORE', sideX, 160);
+            ctx.fillText('SCORE', sideX, statsY + 20);
+            ctx.shadowColor = '#0ff';
+            ctx.shadowBlur = 10;
             ctx.fillStyle = '#0ff';
-            ctx.font = 'bold 20px Arial';
-            ctx.fillText(gameScore.toString(), sideX, 185);
+            ctx.font = 'bold 28px Arial';
+            ctx.fillText(gameScore.toString(), sideX, statsY + 50);
+            ctx.shadowBlur = 0;
 
-            ctx.fillStyle = '#fff';
-            ctx.font = 'bold 14px Arial';
-            ctx.fillText('LINES', sideX, 220);
+            // Lines
+            ctx.fillStyle = 'rgba(0,0,0,0.5)';
+            ctx.fillRect(sideX - 10, statsY + 70, 95, 60);
+            ctx.strokeStyle = '#0f0';
+            ctx.strokeRect(sideX - 10, statsY + 70, 95, 60);
+            ctx.fillStyle = '#888';
+            ctx.font = 'bold 12px Arial';
+            ctx.fillText('LINES', sideX, statsY + 90);
+            ctx.shadowColor = '#0f0';
+            ctx.shadowBlur = 10;
             ctx.fillStyle = '#0f0';
-            ctx.font = 'bold 20px Arial';
-            ctx.fillText(gameLines.toString(), sideX, 245);
+            ctx.font = 'bold 24px Arial';
+            ctx.fillText(gameLines.toString(), sideX, statsY + 118);
+            ctx.shadowBlur = 0;
 
-            ctx.fillStyle = '#fff';
-            ctx.font = 'bold 14px Arial';
-            ctx.fillText('LEVEL', sideX, 280);
+            // Level
+            ctx.fillStyle = 'rgba(0,0,0,0.5)';
+            ctx.fillRect(sideX + 95, statsY + 70, 95, 60);
+            ctx.strokeStyle = '#f0f';
+            ctx.strokeRect(sideX + 95, statsY + 70, 95, 60);
+            ctx.fillStyle = '#888';
+            ctx.font = 'bold 12px Arial';
+            ctx.fillText('LEVEL', sideX + 105, statsY + 90);
+            ctx.shadowColor = '#f0f';
+            ctx.shadowBlur = 10;
             ctx.fillStyle = '#f0f';
-            ctx.font = 'bold 20px Arial';
-            ctx.fillText(gameLevel.toString(), sideX, 305);
+            ctx.font = 'bold 24px Arial';
+            ctx.fillText(gameLevel.toString(), sideX + 105, statsY + 118);
+            ctx.shadowBlur = 0;
 
             // Definition display
             if (currentDefinition) {
-                ctx.fillStyle = 'rgba(0,0,0,0.9)';
-                ctx.fillRect(sideX - 10, 330, 180, 80);
+                const defY = statsY + 150;
+                ctx.fillStyle = 'rgba(0,0,0,0.8)';
+                ctx.fillRect(sideX - 10, defY, 200, 90);
+                ctx.shadowColor = '#0ff';
+                ctx.shadowBlur = 15;
                 ctx.strokeStyle = '#0ff';
                 ctx.lineWidth = 2;
-                ctx.strokeRect(sideX - 10, 330, 180, 80);
+                ctx.strokeRect(sideX - 10, defY, 200, 90);
+                ctx.shadowBlur = 0;
 
                 ctx.fillStyle = '#0ff';
-                ctx.font = 'bold 14px Arial';
-                ctx.fillText(currentDefinition.word, sideX, 355);
+                ctx.font = 'bold 16px Arial';
+                ctx.fillText(currentDefinition.word, sideX, defY + 25);
 
                 ctx.fillStyle = '#fff';
-                ctx.font = '11px Arial';
+                ctx.font = '12px Arial';
                 const words = currentDefinition.definition.split(' ');
                 let line = '';
-                let lineY = 375;
+                let lineY = defY + 50;
                 words.forEach(word => {
-                    if ((line + word).length > 22) {
+                    if ((line + word).length > 24) {
                         ctx.fillText(line, sideX, lineY);
                         line = word + ' ';
-                        lineY += 14;
+                        lineY += 16;
                     } else {
                         line += word + ' ';
                     }
@@ -575,10 +690,9 @@ export default function TetrisGalaxy({ onExit }) {
 
             // Controls hint
             ctx.fillStyle = '#555';
-            ctx.font = '10px Arial';
-            ctx.fillText('← → Move | ↑ Rotate', sideX, 440);
-            ctx.fillText('↓ Drop | Space Hard Drop', sideX, 455);
-            ctx.fillText('P Pause | ESC Exit', sideX, 470);
+            ctx.font = '11px Arial';
+            const ctrlY = canvas.height - 40;
+            ctx.fillText('← → Move | ↑ Rotate | ↓ Drop | Space Hard Drop | P Pause', sideX - 10, ctrlY);
 
             // Paused overlay
             if (paused && !gameOver) {
@@ -657,6 +771,7 @@ export default function TetrisGalaxy({ onExit }) {
 
         return () => {
             gameRunning = false;
+            window.removeEventListener('resize', updateSize);
             window.removeEventListener('keydown', handleKeyDown);
             window.removeEventListener('keyup', handleKeyUp);
             canvas.removeEventListener('touchstart', handleTouchStart);
@@ -696,13 +811,13 @@ export default function TetrisGalaxy({ onExit }) {
     // Game screen
     if (screen === 'game') {
         return (
-            <div className="fixed inset-0 bg-[#0a0a1a] z-[9999] flex items-center justify-center">
-                <canvas ref={canvasRef} className="block touch-none" />
+            <div className="fixed inset-0 z-[9999]">
+                <canvas ref={canvasRef} className="block w-full h-full touch-none" />
                 <div className="absolute top-4 right-4 flex gap-2">
-                    <Button onClick={toggleFullscreen} className="bg-cyan-600 hover:bg-cyan-700" size="sm">
+                    <Button onClick={toggleFullscreen} className="bg-cyan-600/80 hover:bg-cyan-700 backdrop-blur" size="sm">
                         {fullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
                     </Button>
-                    <Button onClick={() => setScreen('title')} className="bg-gray-600 hover:bg-gray-700" size="sm">
+                    <Button onClick={() => setScreen('title')} className="bg-gray-600/80 hover:bg-gray-700 backdrop-blur" size="sm">
                         <X className="w-4 h-4 mr-1" /> Exit
                     </Button>
                 </div>
