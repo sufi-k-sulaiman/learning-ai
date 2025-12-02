@@ -49,27 +49,39 @@ export default function Games() {
                     <p className="text-gray-500">Gamified Learning</p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {/* Space Battle Game Card */}
-                  <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm text-center flex flex-col">
-                      <div className="w-20 h-20 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center mx-auto mb-4">
-                          <Rocket className="w-10 h-10 text-white" />
+                  <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm text-center flex flex-col">
+                      <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                          <Rocket className="w-8 h-8 text-white" />
                       </div>
-                      <h2 className="text-2xl font-bold text-gray-900 mb-2">Space Battle</h2>
-                      <p className="text-gray-500 mb-6 flex-grow">Destroy alien ships and test your knowledge!</p>
+                      <h2 className="text-xl font-bold text-gray-900 mb-2">Space Battle</h2>
+                      <p className="text-gray-500 text-sm mb-4 flex-grow">Destroy alien ships and test your knowledge!</p>
                       <Button onClick={() => setActiveGame('space-battle')} size="lg" className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700">
                           Play Now
                       </Button>
                   </div>
 
                   {/* Word Shooter Game Card */}
-                  <div className="bg-white rounded-2xl p-8 border border-gray-200 shadow-sm text-center flex flex-col">
-                      <div className="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center mx-auto mb-4">
-                          <Target className="w-10 h-10 text-white" />
+                  <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm text-center flex flex-col">
+                      <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                          <Target className="w-8 h-8 text-white" />
                       </div>
-                      <h2 className="text-2xl font-bold text-gray-900 mb-2">Word Shooter</h2>
-                      <p className="text-gray-500 mb-6 flex-grow">Gamified vocabulary learning with AI-powered word sets.</p>
+                      <h2 className="text-xl font-bold text-gray-900 mb-2">Word Shooter</h2>
+                      <p className="text-gray-500 text-sm mb-4 flex-grow">Gamified vocabulary learning with AI-powered word sets.</p>
                       <Button onClick={() => setActiveGame('word-shooter')} size="lg" className="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700">
+                          Play Now
+                      </Button>
+                  </div>
+
+                  {/* Tank City Game Card */}
+                  <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-sm text-center flex flex-col">
+                      <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center mx-auto mb-4">
+                          <Shield className="w-8 h-8 text-white" />
+                      </div>
+                      <h2 className="text-xl font-bold text-gray-900 mb-2">Tank City</h2>
+                      <p className="text-gray-500 text-sm mb-4 flex-grow">Classic tank battle - defend your base from enemies!</p>
+                      <Button onClick={() => setActiveGame('tank-city')} size="lg" className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700">
                           Play Now
                       </Button>
                   </div>
