@@ -199,40 +199,35 @@ export default function TankCity({ onExit }) {
         const colors = ['#8b5cf6', '#10b981', '#f59e0b', '#ef4444', '#3b82f6', '#ec4899', '#06b6d4', '#a855f7'];
         let wordIndex = 0;
         
-        // Create grid-based word placement (no overlaps)
-        const gridCellW = TILE * 2.5;
-        const gridCellH = TILE * 1.5;
-        const gridCols = Math.floor((canvas.width - TILE * 2) / gridCellW);
-        const gridRows = Math.floor((canvas.height - TILE * 5) / gridCellH);
-        const usedCells = new Set();
+        // Create maze-like word pattern
+        const wordHeight = TILE * 0.6;
+        const wordSpacing = TILE * 0.4;
+        const mazeRows = Math.floor((canvas.height - TILE * 6) / (wordHeight + wordSpacing));
+        const startY = TILE;
         
-        for (let i = 0; i < shuffledWords.length && i < gridCols * gridRows * 0.4; i++) {
-            const word = shuffledWords[i];
-            let placed = false;
-            let attempts = 0;
+        let wordIdx = 0;
+        for (let row = 0; row < mazeRows && wordIdx < shuffledWords.length; row++) {
+            const y = startY + row * (wordHeight + wordSpacing);
+            let x = TILE + (row % 2) * TILE; // Offset alternate rows for maze effect
             
-            while (!placed && attempts < 20) {
-                const col = Math.floor(Math.random() * gridCols);
-                const row = Math.floor(Math.random() * (gridRows - 2)); // Keep away from base
-                const cellKey = `${col}-${row}`;
+            while (x < canvas.width - TILE * 3 && wordIdx < shuffledWords.length) {
+                const word = shuffledWords[wordIdx];
+                const wordWidth = Math.max(TILE, word.primary.length * 8 + 16);
                 
-                if (!usedCells.has(cellKey)) {
-                    usedCells.add(cellKey);
-                    const isVertical = Math.random() > 0.6;
-                    
-                    wordBricks.push({
-                        x: TILE + col * gridCellW,
-                        y: TILE + row * gridCellH,
-                        width: Math.min(gridCellW - 10, word.primary.length * 10 + 20),
-                        height: TILE * 0.5,
-                        word: word.primary,
-                        definition: word.definition,
-                        health: 1,
-                        color: colors[i % colors.length]
-                    });
-                    placed = true;
-                }
-                attempts++;
+                wordBricks.push({
+                    x: x,
+                    y: y,
+                    width: wordWidth,
+                    height: wordHeight,
+                    word: word.primary,
+                    definition: word.definition,
+                    health: 1,
+                    color: colors[wordIdx % colors.length],
+                    startY: y // Store original Y for animation
+                });
+                
+                x += wordWidth + wordSpacing;
+                wordIdx++;
             }
         }
 
@@ -256,6 +251,7 @@ export default function TankCity({ onExit }) {
             lives: 3,
             enemiesLeft: 5,
             enemiesTotal: 5,
+            shieldHealth: 3, // 3 layer shield
             wordsDestroyed: 0,
             totalWords: wordBricks.length,
             spawnTimer: 0,
@@ -580,7 +576,18 @@ export default function TankCity({ onExit }) {
                     }
                 }
 
-                // Check base collision
+                // Check shield/base collision
+                const distToBase = Math.sqrt(
+                    Math.pow(bullet.x - (baseX + TILE), 2) + 
+                    Math.pow(bullet.y - (baseY + TILE * 0.75), 2)
+                );
+                
+                if (distToBase < TILE * 1.8 && state.shieldHealth > 0 && !bullet.friendly) {
+                    state.shieldHealth--;
+                    spawnParticles(bullet.x, bullet.y, '#00ddff', 20);
+                    return false;
+                }
+                
                 if (bullet.x > baseX && bullet.x < baseX + TILE * 2 &&
                     bullet.y > baseY && bullet.y < baseY + TILE * 1.5) {
                     state.baseDestroyed = true;
@@ -689,49 +696,69 @@ export default function TankCity({ onExit }) {
                 ctx.fill();
             }
 
-            // Draw word bricks
+            // Animate words moving up (maze in space effect)
+            const scrollSpeed = 0.3;
+            const time = Date.now() * 0.001;
+
+            // Draw word bricks with background
             for (const brick of wordBricks) {
                 if (brick.health <= 0) continue;
 
+                // Animate Y position (moving up slowly)
+                const animY = brick.y - (time * scrollSpeed * 10) % 20;
+
+                // Background glow
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+                ctx.beginPath();
+                ctx.roundRect(brick.x - 2, animY - 2, brick.width + 4, brick.height + 4, 4);
+                ctx.fill();
+
+                // Word block
                 ctx.fillStyle = brick.color;
                 ctx.beginPath();
-                ctx.roundRect(brick.x, brick.y, brick.width, brick.height, 6);
+                ctx.roundRect(brick.x, animY, brick.width, brick.height, 4);
                 ctx.fill();
 
                 // Word text
-                ctx.save();
                 ctx.fillStyle = '#ffffff';
-                ctx.font = 'bold 12px Inter, sans-serif';
+                ctx.font = 'bold 11px Inter, sans-serif';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
+                ctx.fillText(brick.word.toUpperCase(), brick.x + brick.width/2, animY + brick.height/2);
 
-                // All words horizontal (transposed vertical words)
-                ctx.fillText(brick.word.toUpperCase(), brick.x + brick.width/2, brick.y + brick.height/2);
-                ctx.restore();
+                // Update brick Y for collision
+                brick.currentY = animY;
             }
 
-            // Draw base with shield and topic title
+            // Draw base with 3-layer shield and topic title
             if (!state.baseDestroyed) {
-                // Energy shield around base
                 const shieldPulse = Math.sin(Date.now() * 0.005) * 0.3 + 0.7;
-                ctx.strokeStyle = `rgba(0, 200, 255, ${shieldPulse * 0.8})`;
-                ctx.lineWidth = 3;
-                ctx.beginPath();
-                ctx.arc(baseX + TILE, baseY + TILE * 0.75, TILE * 1.8, 0, Math.PI * 2);
-                ctx.stroke();
+                const shieldColors = ['#ff4444', '#ffaa00', '#00ddff'];
                 
-                // Inner shield glow
-                ctx.strokeStyle = `rgba(100, 220, 255, ${shieldPulse * 0.4})`;
-                ctx.lineWidth = 8;
-                ctx.beginPath();
-                ctx.arc(baseX + TILE, baseY + TILE * 0.75, TILE * 1.6, 0, Math.PI * 2);
-                ctx.stroke();
+                // Draw shield layers based on health
+                for (let i = 0; i < state.shieldHealth; i++) {
+                    const radius = TILE * 1.8 - i * 8;
+                    const alpha = shieldPulse * (0.6 - i * 0.15);
+                    
+                    ctx.strokeStyle = shieldColors[2 - i];
+                    ctx.globalAlpha = alpha;
+                    ctx.lineWidth = 4 - i;
+                    ctx.beginPath();
+                    ctx.arc(baseX + TILE, baseY + TILE * 0.75, radius, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+                ctx.globalAlpha = 1;
                 
                 // Draw topic title above base
                 ctx.fillStyle = '#ffffff';
-                ctx.font = 'bold 28px Inter, sans-serif';
+                ctx.font = 'bold 24px Inter, sans-serif';
                 ctx.textAlign = 'center';
-                ctx.fillText(currentTopic.toUpperCase(), canvas.width / 2, baseY - 30);
+                ctx.fillText(currentTopic.toUpperCase(), canvas.width / 2, baseY - 25);
+                
+                // Shield health indicator
+                ctx.font = '12px Inter, sans-serif';
+                ctx.fillStyle = '#00ddff';
+                ctx.fillText(`SHIELD: ${state.shieldHealth}/3`, canvas.width / 2, baseY - 8);
                 
                 // Base
                 ctx.fillStyle = '#8b5cf6';
@@ -739,9 +766,14 @@ export default function TankCity({ onExit }) {
                 ctx.roundRect(baseX, baseY, TILE * 2, TILE * 1.5, 8);
                 ctx.fill();
                 
-                // Draw logo if loaded
+                // Draw logo without background (clip to circle)
                 if (imagesRef.current.logo) {
-                    ctx.drawImage(imagesRef.current.logo, baseX + 10, baseY + 8, TILE * 2 - 20, TILE * 1.5 - 16);
+                    ctx.save();
+                    ctx.beginPath();
+                    ctx.arc(baseX + TILE, baseY + TILE * 0.75, TILE * 0.6, 0, Math.PI * 2);
+                    ctx.clip();
+                    ctx.drawImage(imagesRef.current.logo, baseX + TILE * 0.4, baseY + TILE * 0.15, TILE * 1.2, TILE * 1.2);
+                    ctx.restore();
                 }
             }
 
