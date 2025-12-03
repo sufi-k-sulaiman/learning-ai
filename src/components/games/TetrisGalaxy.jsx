@@ -455,7 +455,7 @@ export default function TetrisGalaxy({ onExit }) {
             ctx.fill();
         };
 
-        // Draw word and definition on falling piece
+        // Draw word and definition next to falling piece
         const drawPieceWord = (piece, offsetX, offsetY, cellSize) => {
             if (!piece.word) return;
             
@@ -472,33 +472,59 @@ export default function TetrisGalaxy({ onExit }) {
                 });
             });
 
-            const centerX = offsetX + (piece.x + (minX + maxX + 1) / 2) * cellSize;
-            const centerY = offsetY + (piece.y + (minY + maxY + 1) / 2) * cellSize;
-            const pieceWidth = (maxX - minX + 1) * cellSize;
-            const pieceHeight = (maxY - minY + 1) * cellSize;
+            const pieceRightX = offsetX + (piece.x + maxX + 1) * cellSize;
+            const pieceCenterY = offsetY + (piece.y + (minY + maxY + 1) / 2) * cellSize;
 
-            // Background for text
-            const textBgWidth = Math.max(pieceWidth + 20, 120);
-            const textBgHeight = pieceHeight + 30;
-            ctx.fillStyle = 'rgba(0,0,0,0.7)';
+            // Position text box to the right of the piece
+            const textBoxX = pieceRightX + 15;
+            const textBoxWidth = 180;
+            
+            // Wrap definition into lines
+            const wrapText = (text, maxWidth) => {
+                const words = (text || '').split(' ');
+                const lines = [];
+                let currentLine = '';
+                ctx.font = '13px Arial';
+                
+                for (const word of words) {
+                    const testLine = currentLine ? currentLine + ' ' + word : word;
+                    const metrics = ctx.measureText(testLine);
+                    if (metrics.width > maxWidth && currentLine) {
+                        lines.push(currentLine);
+                        currentLine = word;
+                    } else {
+                        currentLine = testLine;
+                    }
+                }
+                if (currentLine) lines.push(currentLine);
+                return lines.slice(0, 3); // Max 3 lines
+            };
+
+            const defLines = wrapText(piece.definition, textBoxWidth - 20);
+            const textBoxHeight = 30 + defLines.length * 18;
+
+            // Background
+            ctx.fillStyle = 'rgba(0,0,0,0.8)';
             ctx.beginPath();
-            ctx.roundRect(centerX - textBgWidth/2, centerY - textBgHeight/2, textBgWidth, textBgHeight, 8);
+            ctx.roundRect(textBoxX, pieceCenterY - textBoxHeight/2, textBoxWidth, textBoxHeight, 10);
             ctx.fill();
+            ctx.strokeStyle = '#4dd0e1';
+            ctx.lineWidth = 2;
+            ctx.stroke();
 
             // Word
-            const wordFontSize = Math.max(16, cellSize * 0.6);
-            ctx.font = `bold ${wordFontSize}px Arial`;
-            ctx.textAlign = 'center';
-            ctx.textBaseline = 'middle';
+            ctx.font = 'bold 18px Arial';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
             ctx.fillStyle = '#4dd0e1';
-            ctx.fillText(piece.word, centerX, centerY - 10);
+            ctx.fillText(piece.word, textBoxX + 12, pieceCenterY - textBoxHeight/2 + 8);
 
-            // Definition (truncated)
-            const defFontSize = Math.max(10, cellSize * 0.35);
-            ctx.font = `${defFontSize}px Arial`;
+            // Definition lines
+            ctx.font = '13px Arial';
             ctx.fillStyle = '#fff';
-            const shortDef = piece.definition?.length > 30 ? piece.definition.substring(0, 30) + '...' : piece.definition;
-            ctx.fillText(shortDef || '', centerX, centerY + 12);
+            defLines.forEach((line, i) => {
+                ctx.fillText(line, textBoxX + 12, pieceCenterY - textBoxHeight/2 + 30 + i * 18);
+            });
         };
 
         const shadeColor = (color, percent) => {
