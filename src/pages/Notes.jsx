@@ -81,6 +81,17 @@ function NoteCard({ note, onClick, formatDate }) {
 }
 
 export default function Notes() {
+    // Update URL for display only (aesthetic, not parsed)
+    const updateUrl = (noteTitle) => {
+        const basePath = window.location.pathname;
+        if (noteTitle) {
+            const titleSlug = noteTitle.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase().substring(0, 50);
+            window.history.pushState({}, '', `${basePath}/${titleSlug}`);
+        } else {
+            window.history.pushState({}, '', basePath);
+        }
+    };
+
     useEffect(() => {
         document.title = 'Smarter Writing with AI Powered Notes';
         document.querySelector('meta[name="description"]')?.setAttribute('content', 'Notes helps organize ideas, streamline writing, and boost productivity effectively.');
@@ -140,6 +151,7 @@ export default function Notes() {
         setEditorContent('');
         setNoteTitle('');
         setNoteTags([]);
+        updateUrl(null);
     };
 
     const openNewNote = (template = null) => {
@@ -158,6 +170,7 @@ export default function Notes() {
         setEditorContent(note.content || '');
         setNoteTags(note.tags || []);
         setShowEditor(true);
+        updateUrl(note.title);
     };
 
     const saveNote = () => {

@@ -8,28 +8,56 @@ import TetrisGalaxy from '@/components/games/TetrisGalaxy';
 import { Button } from '@/components/ui/button';
 
 export default function Games() {
+    // Update URL for display only (aesthetic, not parsed)
+    const updateUrl = (game) => {
+        const basePath = window.location.pathname;
+        if (game) {
+            window.history.pushState({ game }, '', `${basePath}/${game}`);
+        } else {
+            window.history.pushState({}, '', basePath);
+        }
+    };
+
     useEffect(() => {
         document.title = 'AI powered Gamification Games for smarter learning';
         document.querySelector('meta[name="description"]')?.setAttribute('content', 'Space battle and Word shooters makes education engaging, interactive, and boosts learning.');
         document.querySelector('meta[name="keywords"]')?.setAttribute('content', 'Gamification, educational games');
+        
+        // Handle browser back/forward - restore from history state only
+        const handlePopState = (event) => {
+            const state = event.state || {};
+            setActiveGame(state.game || null);
+        };
+        window.addEventListener('popstate', handlePopState);
+        return () => window.removeEventListener('popstate', handlePopState);
     }, []);
 
     const [activeGame, setActiveGame] = useState(null);
+    
+    const selectGame = (game) => {
+        setActiveGame(game);
+        updateUrl(game);
+    };
+    
+    const exitGame = () => {
+        setActiveGame(null);
+        updateUrl(null);
+    };
 
     if (activeGame === 'space-battle') {
-        return <SpaceBattleGame onExit={() => setActiveGame(null)} />;
+        return <SpaceBattleGame onExit={exitGame} />;
     }
     
     if (activeGame === 'word-shooter') {
-        return <WordShooter onExit={() => setActiveGame(null)} />;
+        return <WordShooter onExit={exitGame} />;
     }
 
     if (activeGame === 'tank-city') {
-        return <TankCity onExit={() => setActiveGame(null)} />;
+        return <TankCity onExit={exitGame} />;
     }
 
     if (activeGame === 'tetris-galaxy') {
-        return <TetrisGalaxy onExit={() => setActiveGame(null)} />;
+        return <TetrisGalaxy onExit={exitGame} />;
     }
 
     return (
@@ -50,7 +78,7 @@ export default function Games() {
                       </div>
                       <h2 className="text-xl font-bold text-gray-900 mb-2">Space Battle</h2>
                       <p className="text-gray-500 text-sm mb-4 flex-grow">Destroy alien ships and test your knowledge!</p>
-                      <Button onClick={() => setActiveGame('space-battle')} size="lg" className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700">
+                      <Button onClick={() => selectGame('space-battle')} size="lg" className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700">
                           Play Now
                       </Button>
                   </div>
@@ -62,7 +90,7 @@ export default function Games() {
                       </div>
                       <h2 className="text-xl font-bold text-gray-900 mb-2">Word Shooter</h2>
                       <p className="text-gray-500 text-sm mb-4 flex-grow">Gamified vocabulary learning with AI-powered word sets.</p>
-                      <Button onClick={() => setActiveGame('word-shooter')} size="lg" className="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700">
+                      <Button onClick={() => selectGame('word-shooter')} size="lg" className="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700">
                           Play Now
                       </Button>
                   </div>
@@ -74,7 +102,7 @@ export default function Games() {
                       </div>
                       <h2 className="text-xl font-bold text-gray-900 mb-2">Cosmic Tank</h2>
                       <p className="text-gray-500 text-sm mb-4 flex-grow">Space tank battle - defend your base from enemies!</p>
-                      <Button onClick={() => setActiveGame('tank-city')} size="lg" className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700">
+                      <Button onClick={() => selectGame('tank-city')} size="lg" className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700">
                           Play Now
                       </Button>
                   </div>
@@ -86,7 +114,7 @@ export default function Games() {
                       </div>
                       <h2 className="text-xl font-bold text-gray-900 mb-2">Tetris Galaxy</h2>
                       <p className="text-gray-500 text-sm mb-4 flex-grow">Stack word blocks and learn vocabulary as you clear lines!</p>
-                      <Button onClick={() => setActiveGame('tetris-galaxy')} size="lg" className="w-full bg-gradient-to-r from-cyan-500 to-teal-600 hover:from-cyan-600 hover:to-teal-700">
+                      <Button onClick={() => selectGame('tetris-galaxy')} size="lg" className="w-full bg-gradient-to-r from-cyan-500 to-teal-600 hover:from-cyan-600 hover:to-teal-700">
                           Play Now
                       </Button>
                   </div>

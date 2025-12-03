@@ -20,6 +20,17 @@ const TASK_CATEGORIES = [
 ];
 
 const TasksPage = () => {
+  // Update URL for display only (aesthetic, not parsed)
+  const updateUrl = (taskTitle) => {
+    const basePath = window.location.pathname;
+    if (taskTitle) {
+      const titleSlug = taskTitle.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase().substring(0, 50);
+      window.history.pushState({}, '', `${basePath}/${titleSlug}`);
+    } else {
+      window.history.pushState({}, '', basePath);
+    }
+  };
+
   useEffect(() => {
     document.title = 'Tasks manager for smarter workflows and productivity';
     document.querySelector('meta[name="description"]')?.setAttribute('content', 'Tasks management software with Ai streamlines workflows, boosts productivity.');
@@ -78,9 +89,11 @@ const TasksPage = () => {
   const handleOpenModal = (task = null) => {
     if (task) {
         setSelectedTask(task);
+        updateUrl(task.title);
     } else {
         const defaultCategory = menuItems.find(item => item.page === 'Tasks')?.label || 'Tasks';
         setSelectedTask({ title: '', description: '', category: defaultCategory, priority: 'medium', status: 'todo', attachments: [] });
+        updateUrl('new-task');
     }
     setIsModalOpen(true);
   };
@@ -88,6 +101,7 @@ const TasksPage = () => {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedTask(null);
+    updateUrl(null);
   };
 
   const handleSaveTask = (taskData) => {
