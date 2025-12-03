@@ -4,6 +4,7 @@ import { Globe, Paperclip, Mic, MicOff, X, Loader2, Check, FileText, Image as Im
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LOGO_URL } from '@/components/NavigationConfig';
 import ReactMarkdown from 'react-markdown';
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -169,6 +170,10 @@ export default function Qwirey() {
     
     // Image preview modal
     const [previewImage, setPreviewImage] = useState(null);
+    
+    // Writing style for Long format
+    const [writingStyle, setWritingStyle] = useState('default');
+    const [styleLoading, setStyleLoading] = useState(false);
 
     // Initialize speech recognition
     useEffect(() => {
@@ -596,6 +601,45 @@ export default function Qwirey() {
         handleSubmit(question);
     };
 
+    const handleStyleChange = async (style) => {
+        if (style === writingStyle || !result?.longData?.paragraphs) return;
+        
+        setWritingStyle(style);
+        if (style === 'default') return; // Keep original
+        
+        setStyleLoading(true);
+        try {
+            const styleInstructions = {
+                persuasive: 'Rewrite this content in a persuasive, compelling style that convinces the reader. Use emotional appeals, strong arguments, and call-to-action language.',
+                technical: 'Rewrite this content in a technical, precise style with accurate terminology, data-focused language, and professional tone.',
+                journalistic: 'Rewrite this content in a journalistic style with an inverted pyramid structure, objective tone, and clear factual reporting.',
+                creative: 'Rewrite this content in a creative, engaging style with vivid imagery, storytelling elements, and dynamic language.'
+            };
+            
+            const originalText = result.longData.paragraphs.join('\n\n');
+            
+            const response = await base44.integrations.Core.InvokeLLM({
+                prompt: `${styleInstructions[style]}\n\nOriginal content:\n${originalText}\n\nRewrite into 6-8 paragraphs maintaining all the key information but transforming the writing style.`,
+                response_json_schema: {
+                    type: "object",
+                    properties: {
+                        paragraphs: { type: "array", items: { type: "string" } }
+                    }
+                }
+            });
+            
+            setResult(prev => ({
+                ...prev,
+                longData: { ...prev.longData, paragraphs: response.paragraphs },
+                originalLongData: prev.originalLongData || prev.longData
+            }));
+        } catch (error) {
+            console.error('Style rewrite failed:', error);
+        } finally {
+            setStyleLoading(false);
+        }
+    };
+
     const handleFormatChange = async (newFormat) => {
         setResponseFormat(newFormat);
         
@@ -997,10 +1041,27 @@ export default function Qwirey() {
                                     
                                     {/* LONG FORMAT */}
                                     {responseFormat === 'long' && result.longData && (
-                                        <div className="prose prose-sm max-w-none text-gray-700 space-y-6">
-                                            {result.longData.paragraphs?.map((para, i) => (
-                                                <p key={i} className="text-gray-700 leading-relaxed"><TextWithLinks text={para} /></p>
-                                            ))}
+                                        <div className="space-y-4">
+                                            <div className="flex items-center gap-3">
+                                                <Select value={writingStyle} onValueChange={handleStyleChange} disabled={styleLoading}>
+                                                    <SelectTrigger className="w-40">
+                                                        <SelectValue placeholder="Writing Style" />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="default">Default</SelectItem>
+                                                        <SelectItem value="persuasive">Persuasive</SelectItem>
+                                                        <SelectItem value="technical">Technical</SelectItem>
+                                                        <SelectItem value="journalistic">Journalistic</SelectItem>
+                                                        <SelectItem value="creative">Creative</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                                {styleLoading && <Loader2 className="w-4 h-4 animate-spin text-purple-600" />}
+                                            </div>
+                                            <div className="prose prose-sm max-w-none text-gray-700 space-y-6">
+                                                {result.longData.paragraphs?.map((para, i) => (
+                                                    <p key={i} className="text-gray-700 leading-relaxed"><TextWithLinks text={para} /></p>
+                                                ))}
+                                            </div>
                                         </div>
                                     )}
                                     
