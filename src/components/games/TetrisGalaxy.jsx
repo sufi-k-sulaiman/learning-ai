@@ -229,6 +229,8 @@ export default function TetrisGalaxy({ onExit }) {
         const drawDolphin = (x, y, scale, timeOffset) => {
             const time = Date.now() * 0.001;
             const bobY = Math.sin(time + timeOffset * 0.001) * 15;
+            // Don't draw dolphin in the right panel area
+            if (x > canvas.width - 200) return;
             ctx.save();
             ctx.translate(x, y + bobY);
             ctx.scale(scale, Math.abs(scale));
@@ -332,6 +334,8 @@ export default function TetrisGalaxy({ onExit }) {
         const drawFish = (x, y, scale, color) => {
             const time = Date.now() * 0.005;
             const swimX = Math.sin(time) * 20;
+            // Don't draw fish in the right panel area
+            if (x + swimX > canvas.width - 200) return;
             ctx.save();
             ctx.translate(x + swimX, y);
             ctx.scale(scale, scale);
@@ -717,10 +721,16 @@ export default function TetrisGalaxy({ onExit }) {
             const panelY = offsetY;
             const panelWidth = 130;
 
-            // Next piece box
-            ctx.fillStyle = 'rgba(0,0,0,0.7)';
+            // Panel background to block sea creatures
+            ctx.fillStyle = 'rgba(0,50,80,0.95)';
             ctx.beginPath();
-            ctx.roundRect(panelX, panelY, panelWidth, 120, 12);
+            ctx.roundRect(panelX - 5, panelY - 5, panelWidth + 10, 340, 15);
+            ctx.fill();
+
+            // Next piece box
+            ctx.fillStyle = 'rgba(0,30,50,0.9)';
+            ctx.beginPath();
+            ctx.roundRect(panelX, panelY, panelWidth, 100, 12);
             ctx.fill();
             ctx.strokeStyle = '#4dd0e1';
             ctx.lineWidth = 2;
@@ -729,27 +739,27 @@ export default function TetrisGalaxy({ onExit }) {
             ctx.fillStyle = '#4dd0e1';
             ctx.font = 'bold 16px Arial';
             ctx.textAlign = 'center';
-            ctx.fillText('NEXT', panelX + panelWidth/2, panelY + 22);
+            ctx.fillText('NEXT', panelX + panelWidth/2, panelY + 20);
 
             if (nextPiece) {
-                const pSize = 20;
+                const pSize = 18;
                 const px = panelX + panelWidth/2 - (nextPiece.shape[0].length * pSize) / 2;
-                const py = panelY + 35;
+                const py = panelY + 30;
                 nextPiece.shape.forEach((row, dy) => {
                     row.forEach((value, dx) => {
                         if (value) draw3DBlock(px + dx * pSize, py + dy * pSize, pSize - 1, nextPiece.color, nextPiece.glow);
                     });
                 });
                 ctx.fillStyle = nextPiece.glow;
-                ctx.font = 'bold 12px Arial';
-                ctx.fillText(nextPiece.word, panelX + panelWidth/2, panelY + 108);
+                ctx.font = 'bold 11px Arial';
+                ctx.fillText(nextPiece.word, panelX + panelWidth/2, panelY + 90);
             }
 
             // Stats boxes below next piece
-            const statsY = panelY + 135;
+            const statsY = panelY + 110;
 
             // Score
-            ctx.fillStyle = 'rgba(0,0,0,0.7)';
+            ctx.fillStyle = 'rgba(0,30,50,0.9)';
             ctx.beginPath();
             ctx.roundRect(panelX, statsY, panelWidth, 55, 10);
             ctx.fill();
@@ -759,11 +769,11 @@ export default function TetrisGalaxy({ onExit }) {
             ctx.fillStyle = '#ffeb3b';
             ctx.font = 'bold 12px Arial';
             ctx.fillText('SCORE', panelX + panelWidth/2, statsY + 18);
-            ctx.font = 'bold 24px Arial';
-            ctx.fillText(gameScore.toString(), panelX + panelWidth/2, statsY + 43);
+            ctx.font = 'bold 22px Arial';
+            ctx.fillText(gameScore.toString(), panelX + panelWidth/2, statsY + 42);
 
             // Lines
-            ctx.fillStyle = 'rgba(0,0,0,0.7)';
+            ctx.fillStyle = 'rgba(0,30,50,0.9)';
             ctx.beginPath();
             ctx.roundRect(panelX, statsY + 65, panelWidth, 55, 10);
             ctx.fill();
@@ -772,11 +782,11 @@ export default function TetrisGalaxy({ onExit }) {
             ctx.fillStyle = '#4caf50';
             ctx.font = 'bold 12px Arial';
             ctx.fillText('LINES', panelX + panelWidth/2, statsY + 83);
-            ctx.font = 'bold 24px Arial';
-            ctx.fillText(gameLines.toString(), panelX + panelWidth/2, statsY + 108);
+            ctx.font = 'bold 22px Arial';
+            ctx.fillText(gameLines.toString(), panelX + panelWidth/2, statsY + 107);
 
             // Level
-            ctx.fillStyle = 'rgba(0,0,0,0.7)';
+            ctx.fillStyle = 'rgba(0,30,50,0.9)';
             ctx.beginPath();
             ctx.roundRect(panelX, statsY + 130, panelWidth, 55, 10);
             ctx.fill();
@@ -785,8 +795,8 @@ export default function TetrisGalaxy({ onExit }) {
             ctx.fillStyle = '#e91e63';
             ctx.font = 'bold 12px Arial';
             ctx.fillText('LEVEL', panelX + panelWidth/2, statsY + 148);
-            ctx.font = 'bold 24px Arial';
-            ctx.fillText(gameLevel.toString(), panelX + panelWidth/2, statsY + 173);
+            ctx.font = 'bold 22px Arial';
+            ctx.fillText(gameLevel.toString(), panelX + panelWidth/2, statsY + 172);
 
             // Line clear message in center of screen
             if (lineClearMessage) {
