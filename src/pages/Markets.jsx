@@ -933,6 +933,18 @@ function generateStockData(stockInfo) {
 // Stock Markets
 
 export default function Markets() {
+    // Update URL for display only (aesthetic, not parsed)
+    const updateUrl = (stockTicker, filterType) => {
+        const basePath = window.location.pathname;
+        if (stockTicker) {
+            window.history.pushState({}, '', `${basePath}/${stockTicker}`);
+        } else if (filterType) {
+            window.history.pushState({}, '', `${basePath}/${filterType}`);
+        } else {
+            window.history.pushState({}, '', basePath);
+        }
+    };
+
     useEffect(() => {
         document.title = 'MarketsPro ai automated insights';
         document.querySelector('meta[name="description"]')?.setAttribute('content', 'MarketsPro delivers automated insights with AI stock predictions to empower smarter trading decisions.');
@@ -1043,7 +1055,11 @@ Return data for all ${stockBatch.length} stocks.`,
     };
 
     const refreshStocks = () => fetchStockData();
-    const handleStockClick = (stock) => { setSelectedStock(stock); setShowStockModal(true); };
+    const handleStockClick = (stock) => { 
+        setSelectedStock(stock); 
+        setShowStockModal(true); 
+        updateUrl(stock.ticker);
+    };
 
     const filteredStocks = useMemo(() => {
         let result = [...stocks];
@@ -1155,7 +1171,7 @@ Return data for all ${stockBatch.length} stocks.`,
                         {PRESET_FILTERS.map(preset => (
                             <button 
                                 key={preset.id} 
-                                onClick={() => setActivePreset(preset.id)} 
+                                onClick={() => { setActivePreset(preset.id); updateUrl(null, preset.id); }} 
                                 className={`group flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm transition-all duration-200 ${
                                     activePreset === preset.id 
                                         ? 'bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-500/25 scale-[1.02]' 
@@ -1231,7 +1247,7 @@ Return data for all ${stockBatch.length} stocks.`,
                 />
             )}
 
-            <StockDetailModal stock={selectedStock} isOpen={showStockModal} onClose={() => setShowStockModal(false)} />
+            <StockDetailModal stock={selectedStock} isOpen={showStockModal} onClose={() => { setShowStockModal(false); updateUrl(null); }} />
         </div>
     );
 }
