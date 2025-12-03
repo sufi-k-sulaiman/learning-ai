@@ -1113,12 +1113,17 @@ export default function Qwirey() {
                                     )}
                                     
                                     {/* REVIEWS FORMAT */}
-                                    {responseFormat === 'reviews' && result.reviewsData && result.reviewsData.reviews && (
+                                    {responseFormat === 'reviews' && result.reviewsData && (
                                         <div className="space-y-6">
                                             <div className="mb-6">
                                                 <h2 className="text-xl font-bold text-gray-900 mb-2">{result.reviewsData.title || 'User Reviews'}</h2>
                                                 <p className="text-gray-600 leading-relaxed"><TextWithLinks text={(result.reviewsData.intro || '').slice(0, 400)} /></p>
                                             </div>
+                                            {(!result.reviewsData.reviews || result.reviewsData.reviews.length === 0) ? (
+                                                <div className="text-center py-8 text-gray-500">
+                                                    <p>No reviews found for this topic. Try a different search term like a product name, service, or business.</p>
+                                                </div>
+                                            ) : (
                                             <div className="space-y-4">
                                                 {result.reviewsData.reviews.slice(0, 10).map((review, i) => (
                                                     <div key={i} className="bg-gray-50 rounded-xl p-5 border border-gray-200">
