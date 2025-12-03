@@ -1,5 +1,3 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.4';
-
 // Google Translate TTS (free, unofficial)
 async function googleTranslateTTS(text, lang = 'en') {
     const maxLength = 200;
