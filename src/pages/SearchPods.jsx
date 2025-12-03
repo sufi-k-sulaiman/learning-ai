@@ -341,6 +341,48 @@ export default function SearchPods() {
 
             setGenerationProgress(75);
 
+            // Check if we need to use Web Speech API fallback
+            if (ttsResponse?.data?.useWebSpeech) {
+                console.log('Using Web Speech API fallback');
+                const utterance = new SpeechSynthesisUtterance(cleanText);
+                utterance.lang = 'en-GB';
+                utterance.rate = 1;
+                
+                let wordIndex = 0;
+                utterance.onboundary = (event) => {
+                    if (event.name === 'word') {
+                        const words = cleanText.split(/\s+/);
+                        wordIndex = Math.min(wordIndex + 1, words.length - 1);
+                        const currentSentenceIdx = Math.floor((wordIndex / words.length) * sentences.length);
+                        setCurrentCaption(sentences[currentSentenceIdx] || '');
+                        setCaptionWords((sentences[currentSentenceIdx] || '').split(/\s+/));
+                    }
+                };
+                
+                utterance.onend = () => setIsPlaying(false);
+                
+                setGenerationProgress(100);
+                setIsGenerating(false);
+                setCurrentCaption(sentences[0] || 'Ready to play');
+                setCaptionWords((sentences[0] || '').split(/\s+/));
+                setDuration(cleanText.length / 15);
+                
+                audioRef.current = {
+                    play: () => { speechSynthesis.speak(utterance); setIsPlaying(true); },
+                    pause: () => { speechSynthesis.pause(); setIsPlaying(false); },
+                    resume: () => { speechSynthesis.resume(); setIsPlaying(true); },
+                    currentTime: 0,
+                    duration: cleanText.length / 15,
+                    volume: 1,
+                    playbackRate: 1,
+                    isWebSpeech: true
+                };
+                
+                speechSynthesis.speak(utterance);
+                setIsPlaying(true);
+                return;
+            }
+            
             if (!ttsResponse?.data?.audio) {
                 console.error('TTS response missing audio:', JSON.stringify(ttsResponse?.data || {}));
                 throw new Error(ttsResponse?.data?.error || 'No audio data received from TTS service');

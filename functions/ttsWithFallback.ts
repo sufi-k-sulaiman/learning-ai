@@ -198,7 +198,7 @@ Deno.serve(async (req) => {
                 console.log('ElevenLabs TTS failed:', elevenError.message);
                 errors.push(`ElevenLabs: ${elevenError.message}`);
                 
-                // Try EdgeTTS last
+                // Try EdgeTTS third
                 try {
                     console.log('Trying EdgeTTS...');
                     audioBytes = await edgeTTS(text, lang);
@@ -208,10 +208,13 @@ Deno.serve(async (req) => {
                     console.log('EdgeTTS failed:', edgeError.message);
                     errors.push(`Edge: ${edgeError.message}`);
                     
+                    // Return signal to use Web Speech API on client
                     return Response.json({ 
-                        error: 'All TTS services failed', 
-                        details: errors 
-                    }, { status: 500 });
+                        useWebSpeech: true,
+                        text: text,
+                        lang: lang,
+                        errors: errors
+                    });
                 }
             }
         }
