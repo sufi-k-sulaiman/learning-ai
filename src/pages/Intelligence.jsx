@@ -786,7 +786,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                 {/* Current Research */}
                 <div className="bg-white rounded-xl border border-gray-200 p-5">
                     <h3 className="font-semibold text-gray-900 mb-2">Current Research</h3>
-                    <p className="text-gray-600">{data?.currentResearch}</p>
+                    <p className="text-gray-600"><TextWithLinks text={data?.currentResearch} /></p>
                 </div>
             </div>
         </div>
