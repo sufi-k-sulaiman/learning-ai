@@ -1032,7 +1032,7 @@ export default function Qwirey() {
                                                       {styleLoading && <Loader2 className="w-4 h-4 animate-spin text-purple-600" />}
                                                   </div>
                                               )}
-                                              <Button variant="outline" size="sm" onClick={handleAddToNotes} className="text-purple-600 gap-1.5">
+                                              <Button variant="outline" onClick={handleAddToNotes} className="text-purple-600 gap-1.5 h-9">
                                                   {noteSaved ? <Check className="w-4 h-4 text-green-500" /> : <StickyNote className="w-4 h-4" />}
                                                   {noteSaved ? 'Saved' : 'Add to Notes'}
                                               </Button>
