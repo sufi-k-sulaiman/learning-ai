@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { 
     Brain, Loader2, ChevronRight, Sparkles,
     Globe, Mountain, Leaf, Zap, Star, Home,
-    Beaker, Calculator, FlaskConical, Users, Lightbulb, BookOpen, Atom, ExternalLink
+    Beaker, Calculator, FlaskConical, Users, Lightbulb, BookOpen, Atom, ExternalLink,
+    Factory, Truck, ShoppingCart, Plane, Heart, Building, Cpu, Wheat, GraduationCap
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { BarChart, Bar, PieChart, Pie, Cell, LineChart, Line, RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend } from 'recharts';
