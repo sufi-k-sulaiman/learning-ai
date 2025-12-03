@@ -347,6 +347,16 @@ export default function Qwirey() {
                 } else if (responseFormat === 'dynamic') {
                     apiCalls.push(
                         base44.integrations.Core.InvokeLLM({
+                            prompt: `For "${currentPrompt}", provide a comprehensive overview with exactly 4 detailed paragraphs. Each paragraph should be 3-4 sentences covering different aspects of the topic.`,
+                            add_context_from_internet: true,
+                            response_json_schema: {
+                                type: "object",
+                                properties: {
+                                    paragraphs: { type: "array", items: { type: "string" } }
+                                }
+                            }
+                        }),
+                        base44.integrations.Core.InvokeLLM({
                             prompt: `Generate 4 detailed image prompts related to: "${currentPrompt}". Each should be suitable for AI image generation.`,
                             response_json_schema: {
                                 type: "object",
@@ -406,7 +416,7 @@ export default function Qwirey() {
                 } else if (responseFormat === 'reviews') {
                     apiCalls.push(
                         base44.integrations.Core.InvokeLLM({
-                            prompt: `For "${currentPrompt}", generate exactly 5 realistic user reviews. Provide: a title for the reviews section, a brief intro (max 400 chars), and 5 reviews each with: reviewer name, rating 1-10, review text (2-3 sentences), a realistic date from last 6 months, and if available a source URL where the review was found.`,
+                            prompt: `Search the internet and find REAL user reviews for "${currentPrompt}". Provide: a title for the reviews section, a brief intro (max 400 chars), and exactly 10 real user reviews each with: reviewer name (actual username if available), rating 1-10, actual review text (2-3 sentences from the real review), the date it was posted, and the source URL where the review was found. Focus on finding actual reviews from sites like Amazon, Yelp, Google Reviews, Reddit, Trustpilot, G2, or other review platforms.`,
                             add_context_from_internet: true,
                             response_json_schema: {
                                 type: "object",
@@ -453,9 +463,12 @@ export default function Qwirey() {
                 } else if (responseFormat === 'long') {
                     resultData.longData = responses[1];
                 } else if (responseFormat === 'dynamic') {
-                    const imagesResponse = responses[1];
-                    const webDataResponse = responses[2];
-                    const dashboardDataResponse = responses[3];
+                    const dynamicTextResponse = responses[1];
+                    const imagesResponse = responses[2];
+                    const webDataResponse = responses[3];
+                    const dashboardDataResponse = responses[4];
+                    
+                    resultData.dynamicParagraphs = dynamicTextResponse?.paragraphs || [];
                     
                     const imagePrompts = imagesResponse?.imagePrompts?.slice(0, 4) || [];
                     const generatedImages = await Promise.all(
@@ -603,7 +616,17 @@ export default function Qwirey() {
         setFormatLoading(true);
         try {
             if (newFormat === 'dynamic' && !result.dashboardData) {
-                const [imagesResponse, webDataResponse, dashboardDataResponse] = await Promise.all([
+                const [dynamicTextResponse, imagesResponse, webDataResponse, dashboardDataResponse] = await Promise.all([
+                    base44.integrations.Core.InvokeLLM({
+                        prompt: `For "${currentPrompt}", provide a comprehensive overview with exactly 4 detailed paragraphs. Each paragraph should be 3-4 sentences covering different aspects of the topic.`,
+                        add_context_from_internet: true,
+                        response_json_schema: {
+                            type: "object",
+                            properties: {
+                                paragraphs: { type: "array", items: { type: "string" } }
+                            }
+                        }
+                    }),
                     base44.integrations.Core.InvokeLLM({
                         prompt: `Generate 4 detailed image prompts related to: "${currentPrompt}". Each should be suitable for AI image generation.`,
                         response_json_schema: {
@@ -655,6 +678,7 @@ export default function Qwirey() {
                 
                 setResult(prev => ({
                     ...prev,
+                    dynamicParagraphs: dynamicTextResponse?.paragraphs || [],
                     images: generatedImages.filter(Boolean),
                     chartData: webDataResponse?.hasChartData ? webDataResponse : null,
                     dashboardData: dashboardDataResponse
@@ -679,7 +703,7 @@ export default function Qwirey() {
                 setResult(prev => ({ ...prev, tabledData: tabledResponse }));
             } else if (newFormat === 'reviews' && !result.reviewsData) {
                 const reviewsResponse = await base44.integrations.Core.InvokeLLM({
-                    prompt: `For "${currentPrompt}", generate exactly 5 realistic user reviews. Provide: a title, a brief intro (max 400 chars), and 5 reviews each with: reviewer name, rating 1-10, review text (2-3 sentences), date, and if available a source URL.`,
+                    prompt: `Search the internet and find REAL user reviews for "${currentPrompt}". Provide: a title, a brief intro (max 400 chars), and exactly 10 real user reviews each with: reviewer name (actual username if available), rating 1-10, actual review text (2-3 sentences from the real review), the date it was posted, and the source URL where the review was found. Focus on finding actual reviews from sites like Amazon, Yelp, Google Reviews, Reddit, Trustpilot, G2, or other review platforms.`,
                     add_context_from_internet: true,
                     response_json_schema: {
                         type: "object",
@@ -1033,7 +1057,7 @@ export default function Qwirey() {
                                                 <p className="text-gray-600 leading-relaxed"><TextWithLinks text={(result.reviewsData.intro || '').slice(0, 400)} /></p>
                                             </div>
                                             <div className="space-y-4">
-                                                {result.reviewsData.reviews.slice(0, 5).map((review, i) => (
+                                                {result.reviewsData.reviews.slice(0, 10).map((review, i) => (
                                                     <div key={i} className="bg-gray-50 rounded-xl p-5 border border-gray-200">
                                                         <div className="flex items-start justify-between mb-3">
                                                             <div className="flex items-center gap-3">
@@ -1094,9 +1118,14 @@ export default function Qwirey() {
                                     {/* DYNAMIC FORMAT */}
                                     {responseFormat === 'dynamic' && (
                                         <div className="space-y-6">
-                                            <div className="prose prose-sm max-w-none text-gray-700">
-                                                <TextWithLinks text={result.text} />
-                                            </div>
+                                            {/* 4 Paragraphs of Text */}
+                                            {result.dynamicParagraphs?.length > 0 && (
+                                                <div className="prose prose-sm max-w-none text-gray-700 space-y-4">
+                                                    {result.dynamicParagraphs.slice(0, 4).map((para, i) => (
+                                                        <p key={i} className="text-gray-700 leading-relaxed"><TextWithLinks text={para} /></p>
+                                                    ))}
+                                                </div>
+                                            )}
                                             
                                             {result.type === 'qwirey' && result.dashboardData && (
                                                 <>
