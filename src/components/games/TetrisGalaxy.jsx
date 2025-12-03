@@ -263,6 +263,8 @@ export default function TetrisGalaxy({ onExit }) {
         let definitionTimer = 0;
         let lineClearMessage = null;
         let lineClearTimer = 0;
+        let explosionParticles = [];
+        let clearedLineY = [];
 
         const shuffle = (array) => {
             for (let i = array.length - 1; i > 0; i--) {
@@ -325,7 +327,7 @@ export default function TetrisGalaxy({ onExit }) {
             ctx.fill();
         };
 
-        // Draw word and definition above falling piece - no background
+        // Draw word and definition above falling piece - no glow
         const drawPieceWord = (piece, offsetX, offsetY, cellSize) => {
             if (!piece.word) return;
             
@@ -346,25 +348,19 @@ export default function TetrisGalaxy({ onExit }) {
             const pieceTopY = offsetY + piece.y * cellSize;
 
             // Position text above the piece
-            const textY = pieceTopY - 15;
+            const textY = pieceTopY - 10;
             
-            // Word with glow effect - matching piece color
-            ctx.shadowColor = piece.color;
-            ctx.shadowBlur = 12;
-            ctx.font = 'bold 24px Arial';
+            // Word first (no glow)
+            ctx.font = 'bold 22px Arial';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'bottom';
             ctx.fillStyle = '#fff';
             ctx.fillText(piece.word, pieceCenterX, textY);
-            ctx.shadowBlur = 0;
 
-            // Definition - above the word
-            ctx.shadowColor = 'rgba(0,0,0,0.5)';
-            ctx.shadowBlur = 4;
-            ctx.font = '14px Arial';
-            ctx.fillStyle = '#e9d5ff';
-            ctx.fillText(piece.definition, pieceCenterX, textY - 28);
-            ctx.shadowBlur = 0;
+            // Definition below the word
+            ctx.font = '13px Arial';
+            ctx.fillStyle = '#c4b5fd';
+            ctx.fillText(piece.definition, pieceCenterX, textY + 16);
         };
 
         const shadeColor = (color, percent) => {
@@ -409,18 +405,41 @@ export default function TetrisGalaxy({ onExit }) {
         const clearLines = () => {
             let linesCleared = 0;
             let allClearedWords = [];
+            let linesToClear = [];
             
+            // First pass: find lines to clear and create explosions
             for (let y = BOARD_HEIGHT - 1; y >= 0; y--) {
                 if (board[y].every(cell => cell !== null)) {
+                    linesToClear.push(y);
                     const lineWords = board[y].filter(cell => cell).map(cell => cell.word);
                     const uniqueWords = [...new Set(lineWords)];
                     allClearedWords.push(...uniqueWords);
                     
-                    board.splice(y, 1);
-                    board.unshift(Array(BOARD_WIDTH).fill(null));
-                    linesCleared++;
-                    y++;
+                    // Create explosion particles for this line
+                    for (let x = 0; x < BOARD_WIDTH; x++) {
+                        const cell = board[y][x];
+                        if (cell) {
+                            for (let p = 0; p < 6; p++) {
+                                explosionParticles.push({
+                                    x: x,
+                                    y: y,
+                                    vx: (Math.random() - 0.5) * 8,
+                                    vy: (Math.random() - 0.5) * 8 - 3,
+                                    color: cell.color,
+                                    life: 1,
+                                    size: Math.random() * 8 + 4
+                                });
+                            }
+                        }
+                    }
                 }
+            }
+            
+            // Remove cleared lines
+            for (let y of linesToClear) {
+                board.splice(y, 1);
+                board.unshift(Array(BOARD_WIDTH).fill(null));
+                linesCleared++;
             }
 
             if (linesCleared > 0) {
@@ -433,11 +452,11 @@ export default function TetrisGalaxy({ onExit }) {
                 setLines(gameLines);
                 setLevel(gameLevel);
 
-                // Create sentence from cleared words
+                // Create nice message from cleared words
                 const uniqueAllWords = [...new Set(allClearedWords)];
                 if (uniqueAllWords.length > 0) {
-                    lineClearMessage = `Words cleared: ${uniqueAllWords.join(', ')}`;
-                    lineClearTimer = 3000;
+                    lineClearMessage = uniqueAllWords.slice(0, 4).join(' • ');
+                    lineClearTimer = 4000;
                 }
             }
         };
@@ -608,27 +627,40 @@ export default function TetrisGalaxy({ onExit }) {
             ctx.font = 'bold 28px Arial';
             ctx.fillText(gameLevel.toString(), panelX + panelWidth/2, statsY + 170);
 
+            // Draw explosion particles
+            const CELL_SIZE_FOR_PARTICLES = getCellSize();
+            const particleOffsetX = Math.floor((canvas.width - BOARD_WIDTH * CELL_SIZE_FOR_PARTICLES) / 2);
+            const particleOffsetY = Math.floor((canvas.height - BOARD_HEIGHT * CELL_SIZE_FOR_PARTICLES) / 2) + 30;
+            
+            explosionParticles.forEach(particle => {
+                ctx.globalAlpha = particle.life;
+                ctx.fillStyle = particle.color;
+                ctx.beginPath();
+                ctx.arc(
+                    particleOffsetX + particle.x * CELL_SIZE_FOR_PARTICLES + CELL_SIZE_FOR_PARTICLES / 2,
+                    particleOffsetY + particle.y * CELL_SIZE_FOR_PARTICLES + CELL_SIZE_FOR_PARTICLES / 2,
+                    particle.size * particle.life,
+                    0, Math.PI * 2
+                );
+                ctx.fill();
+            });
+            ctx.globalAlpha = 1;
+
             // Line clear message in center of screen - no background/border
             if (lineClearMessage) {
-                const padding = 40;
+                const msgCenterY = canvas.height / 2;
                 
-                ctx.shadowColor = '#a78bfa';
-                ctx.shadowBlur = 15;
+                // Title
                 ctx.fillStyle = '#fff';
-                ctx.font = 'bold 28px Arial';
+                ctx.font = 'bold 32px Arial';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText('LINE CLEARED!', canvas.width / 2, canvas.height / 2 - 20);
-                ctx.shadowBlur = 0;
+                ctx.fillText('LINE CLEARED!', canvas.width / 2, msgCenterY - 30);
 
-                ctx.shadowColor = 'rgba(0,0,0,0.5)';
-                ctx.shadowBlur = 4;
-                ctx.fillStyle = '#e9d5ff';
-                ctx.font = '18px Arial';
-                // Wrap text with padding
-                const maxWidth = canvas.width - padding * 2;
-                ctx.fillText(lineClearMessage, canvas.width / 2, canvas.height / 2 + 15, maxWidth);
-                ctx.shadowBlur = 0;
+                // Words in a nice format
+                ctx.fillStyle = '#c4b5fd';
+                ctx.font = '20px Arial';
+                ctx.fillText(lineClearMessage, canvas.width / 2, msgCenterY + 10);
             }
 
             // Pause/Game Over overlays
@@ -672,6 +704,15 @@ export default function TetrisGalaxy({ onExit }) {
                 lineClearTimer -= deltaTime;
                 if (lineClearTimer <= 0) lineClearMessage = null;
             }
+            
+            // Update explosion particles
+            explosionParticles = explosionParticles.filter(p => {
+                p.x += p.vx * 0.05;
+                p.y += p.vy * 0.05;
+                p.vy += 0.2;
+                p.life -= 0.02;
+                return p.life > 0;
+            });
 
             if (!paused && !gameOver) {
                 dropCounter += deltaTime;
