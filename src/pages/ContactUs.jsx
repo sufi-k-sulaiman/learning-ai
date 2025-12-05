@@ -170,6 +170,84 @@ export default function ContactUs() {
                     </p>
                 </div>
 
+                {/* Office Locations */}
+                <div className="mb-8">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Our Offices</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
+                            <img 
+                                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/84ce07174_image.png" 
+                                alt="US Office Location"
+                                className="w-full h-40 object-cover"
+                            />
+                            <div className="p-6">
+                                <div className="flex items-start gap-3 mb-4">
+                                    <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0">
+                                        <MapPin className="w-5 h-5 text-purple-600" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-bold text-gray-900 mb-1">US Office</h3>
+                                        <p className="text-gray-600">United States</p>
+                                    </div>
+                                </div>
+                                <p className="text-gray-700 leading-relaxed">
+                                    1 Barbados Ave<br />
+                                    Tampa, FL 33606<br />
+                                    USA
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
+                            <img 
+                                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/e105e04db_image.png" 
+                                alt="Canada Office Location"
+                                className="w-full h-40 object-cover"
+                            />
+                            <div className="p-6">
+                                <div className="flex items-start gap-3 mb-4">
+                                    <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
+                                        <MapPin className="w-5 h-5 text-green-600" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-bold text-gray-900 mb-1">Canada Office</h3>
+                                        <p className="text-gray-600">Canada</p>
+                                    </div>
+                                </div>
+                                <p className="text-gray-700 leading-relaxed">
+                                    16950 Rue de l'Ambre<br />
+                                    Mirabel, QC J7N 0K4<br />
+                                    Canada
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
+                            <img 
+                                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/62ba724b0_image.png" 
+                                alt="UK Office Location"
+                                className="w-full h-40 object-cover"
+                            />
+                            <div className="p-6">
+                                <div className="flex items-start gap-3 mb-4">
+                                    <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+                                        <MapPin className="w-5 h-5 text-blue-600" />
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-bold text-gray-900 mb-1">UK Office</h3>
+                                        <p className="text-gray-600">United Kingdom</p>
+                                    </div>
+                                </div>
+                                <p className="text-gray-700 leading-relaxed">
+                                    49 Courtman Rd<br />
+                                    London N17 7HT<br />
+                                    UK
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 {/* Contact Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <ContactCard
@@ -202,63 +280,6 @@ export default function ContactUs() {
                       contactType="support"
                       defaultSubject="Support Request - 1cPublishing"
                     />
-                </div>
-
-                {/* Office Locations */}
-                <div className="mb-8">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Our Offices</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div className="bg-white rounded-2xl border border-gray-200 p-6 hover:shadow-lg transition-shadow">
-                            <div className="flex items-start gap-3 mb-4">
-                                <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0">
-                                    <MapPin className="w-5 h-5 text-purple-600" />
-                                </div>
-                                <div>
-                                    <h3 className="text-lg font-bold text-gray-900 mb-1">US Office</h3>
-                                    <p className="text-gray-600">United States</p>
-                                </div>
-                            </div>
-                            <p className="text-gray-700 leading-relaxed">
-                                1 Barbados Ave<br />
-                                Tampa, FL 33606<br />
-                                USA
-                            </p>
-                        </div>
-
-                        <div className="bg-white rounded-2xl border border-gray-200 p-6 hover:shadow-lg transition-shadow">
-                            <div className="flex items-start gap-3 mb-4">
-                                <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
-                                    <MapPin className="w-5 h-5 text-green-600" />
-                                </div>
-                                <div>
-                                    <h3 className="text-lg font-bold text-gray-900 mb-1">Canada Office</h3>
-                                    <p className="text-gray-600">Canada</p>
-                                </div>
-                            </div>
-                            <p className="text-gray-700 leading-relaxed">
-                                49 Courtman Rd<br />
-                                London N17 7HT<br />
-                                UK
-                            </p>
-                        </div>
-
-                        <div className="bg-white rounded-2xl border border-gray-200 p-6 hover:shadow-lg transition-shadow">
-                            <div className="flex items-start gap-3 mb-4">
-                                <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
-                                    <MapPin className="w-5 h-5 text-blue-600" />
-                                </div>
-                                <div>
-                                    <h3 className="text-lg font-bold text-gray-900 mb-1">UK Office</h3>
-                                    <p className="text-gray-600">United Kingdom</p>
-                                </div>
-                            </div>
-                            <p className="text-gray-700 leading-relaxed">
-                                49 Courtman Rd<br />
-                                London N17 7HT<br />
-                                UK
-                            </p>
-                        </div>
-                    </div>
                 </div>
 
             </div>
