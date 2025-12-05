@@ -84,8 +84,8 @@ export default function Header({ title, sidebarOpen, setSidebarOpen, children, c
                     )}
                 </div>
 
-                {/* Centered Search Bar - Hidden on specific pages (desktop only) */}
-                {!hideSearch ? (
+                {/* Centered Search Bar - Hidden on specific pages */}
+                {!hideSearch && (
                     <form onSubmit={handleSearch} className="flex-1 max-w-xl mx-auto" ref={searchRef}>
                         <div className="relative">
                             <input
@@ -124,14 +124,6 @@ export default function Header({ title, sidebarOpen, setSidebarOpen, children, c
                             )}
                         </div>
                     </form>
-                ) : (
-                    /* Show logo and tagline on mobile for pages without search */
-                    <div className="flex-1 flex justify-end md:hidden">
-                        <div className="text-right">
-                            <span className="text-lg font-bold text-gray-900">1cPublishing</span>
-                            <p className="text-xs font-medium text-purple-600">Artificial intelligence</p>
-                        </div>
-                    </div>
                 )}
 
                 <div className="flex-shrink-0">
