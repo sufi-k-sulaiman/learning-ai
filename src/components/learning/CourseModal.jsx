@@ -253,7 +253,7 @@ export default function CourseModal({ isOpen, onClose, topic, onComplete }) {
                                         <Zap className="w-4 h-4" />
                                         <span className="font-bold">{userXP} XP</span>
                                     </div>
-                                    <Button variant="ghost" size="icon" onClick={() => setIsFullscreen(!isFullscreen)} className="text-white hover:bg-white/20">
+                                    <Button variant="ghost" size="icon" onClick={() => setIsFullscreen(!isFullscreen)} className="text-white hover:bg-white/20 hidden md:flex">
                                         {isFullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
                                     </Button>
                                     <Button variant="ghost" size="icon" onClick={onClose} className="text-white hover:bg-white/20">
