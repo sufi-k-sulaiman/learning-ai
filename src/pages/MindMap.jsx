@@ -115,15 +115,15 @@ function TreeNode({ node, colorIndex = 0, onExplore, onLearn, depth = 0, nodeRef
                 </div>
             </div>
 
-            {/* Children - Triangular layout */}
+            {/* Children - Vertical on mobile, horizontal on desktop */}
             {hasChildren && isExpanded && (
                 <>
                     <div className="h-8" />
                     <div className="relative">
-                        <div className={`flex ${getSpacing()} justify-center`}>
+                        <div className={`flex flex-col md:flex-row gap-4 ${getSpacing()} justify-center items-center md:items-start`}>
                             {children.map((child, i) => (
                                 <div key={i} className="flex flex-col items-center">
-                                    <div className="h-6" />
+                                    <div className="h-6 hidden md:block" />
                                     <TreeNode
                                         node={child}
                                         colorIndex={colorIndex + i + 1 + depth * 2}
