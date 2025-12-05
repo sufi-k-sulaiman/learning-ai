@@ -181,20 +181,16 @@ export default function ContactUs() {
                                 className="w-full h-40 object-cover"
                             />
                             <div className="p-6">
-                                <div className="flex items-start gap-3 mb-3">
-                                    <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0">
-                                        <MapPin className="w-5 h-5 text-purple-600" />
+                                <div className="flex items-start gap-4 mb-4">
+                                    <div className="text-4xl">🇺🇸</div>
+                                    <div className="flex-1">
+                                        <h3 className="text-xl font-bold text-gray-900 mb-1">US Office</h3>
+                                        <p className="text-gray-600 mb-3">United States</p>
+                                        <div className="text-gray-700 space-y-1">
+                                            <p>1 Barbados Ave</p>
+                                            <p>Tampa, FL 33606</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                                            🇺🇸 US Office
-                                        </h3>
-                                        <p className="text-gray-600 text-sm mt-1">United States</p>
-                                    </div>
-                                </div>
-                                <div className="text-gray-700 text-sm space-y-0.5 mt-4">
-                                    <p>1 Barbados Ave</p>
-                                    <p>Tampa, FL 33606</p>
                                 </div>
                             </div>
                         </div>
@@ -206,20 +202,16 @@ export default function ContactUs() {
                                 className="w-full h-40 object-cover"
                             />
                             <div className="p-6">
-                                <div className="flex items-start gap-3 mb-3">
-                                    <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
-                                        <MapPin className="w-5 h-5 text-green-600" />
+                                <div className="flex items-start gap-4 mb-4">
+                                    <div className="text-4xl">🇨🇦</div>
+                                    <div className="flex-1">
+                                        <h3 className="text-xl font-bold text-gray-900 mb-1">Canada Office</h3>
+                                        <p className="text-gray-600 mb-3">Canada</p>
+                                        <div className="text-gray-700 space-y-1">
+                                            <p>16950 Rue de l'Ambre</p>
+                                            <p>Mirabel, QC J7N 0K4</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                                            🇨🇦 Canada Office
-                                        </h3>
-                                        <p className="text-gray-600 text-sm mt-1">Canada</p>
-                                    </div>
-                                </div>
-                                <div className="text-gray-700 text-sm space-y-0.5 mt-4">
-                                    <p>16950 Rue de l'Ambre</p>
-                                    <p>Mirabel, QC J7N 0K4</p>
                                 </div>
                             </div>
                         </div>
@@ -231,20 +223,16 @@ export default function ContactUs() {
                                 className="w-full h-40 object-cover"
                             />
                             <div className="p-6">
-                                <div className="flex items-start gap-3 mb-3">
-                                    <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
-                                        <MapPin className="w-5 h-5 text-blue-600" />
+                                <div className="flex items-start gap-4 mb-4">
+                                    <div className="text-4xl">🇬🇧</div>
+                                    <div className="flex-1">
+                                        <h3 className="text-xl font-bold text-gray-900 mb-1">UK Office</h3>
+                                        <p className="text-gray-600 mb-3">United Kingdom</p>
+                                        <div className="text-gray-700 space-y-1">
+                                            <p>49 Courtman Rd</p>
+                                            <p>London N17 7HT</p>
+                                        </div>
                                     </div>
-                                    <div>
-                                        <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                                            🇬🇧 UK Office
-                                        </h3>
-                                        <p className="text-gray-600 text-sm mt-1">United Kingdom</p>
-                                    </div>
-                                </div>
-                                <div className="text-gray-700 text-sm space-y-0.5 mt-4">
-                                    <p>49 Courtman Rd</p>
-                                    <p>London N17 7HT</p>
                                 </div>
                             </div>
                         </div>
