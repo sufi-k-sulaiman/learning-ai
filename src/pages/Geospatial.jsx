@@ -233,7 +233,7 @@ export default function Geospatial() {
                     {/* Map View Tabs - positioned on map */}
                     <div className="absolute top-4 left-4 z-[1000]">
                         <Tabs value={activeTab} onValueChange={setActiveTab}>
-                            <TabsList className="bg-white/95 backdrop-blur-sm shadow-lg border border-gray-200">
+                            <TabsList className="bg-white/95 backdrop-blur-sm shadow-lg border border-gray-200 grid grid-cols-2 md:flex md:flex-row h-auto gap-1 p-1">
                                 <TabsTrigger value="explore" className="gap-1.5 text-xs data-[state=active]:bg-purple-600 data-[state=active]:text-white">
                                     <Map className="w-3 h-3" /> Explore
                                 </TabsTrigger>
