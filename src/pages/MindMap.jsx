@@ -90,8 +90,8 @@ function TreeNode({ node, colorIndex = 0, onExplore, onLearn, depth = 0, nodeRef
     return (
         <div className="flex flex-col items-center" ref={selfRef}>
             {/* Node Card */}
-            <div className={`${color.bg} text-white rounded-lg md:rounded-xl px-3 py-3 md:px-5 md:py-4 shadow-lg min-w-[120px] md:min-w-[175px] max-w-[180px] md:max-w-[250px] text-center transition-all hover:scale-105 hover:shadow-xl`}>
-                <p className="font-semibold text-xs md:text-sm leading-tight mb-2 break-words">{node.name}</p>
+            <div className={`${color.bg} text-white rounded-lg md:rounded-xl px-4 py-4 md:px-6 md:py-5 shadow-lg min-w-[150px] md:min-w-[220px] max-w-[225px] md:max-w-[315px] text-center transition-all hover:scale-105 hover:shadow-xl`}>
+                <p className="font-semibold text-sm md:text-base leading-tight mb-2.5 break-words">{node.name}</p>
                 <div className="flex gap-1 md:gap-1.5 justify-center flex-wrap">
                     <button
                         onClick={(e) => { e.stopPropagation(); handleExplore(); }}
