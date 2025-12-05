@@ -1282,7 +1282,7 @@ export default function SpaceBattleGame({ onExit }) {
                             <p className="text-gray-400 text-sm mt-2">{Math.round(loadingProgress)}% complete</p>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-3 gap-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             {filteredTopics(generatedTopics[activeCategory] || []).slice(0, 9).map((topic, i) => {
                                 const icons = [Shield, Cpu, Globe, Atom, Code, TrendingUp, Brain, Lightbulb];
                                 const TopicIcon = icons[i % icons.length];
@@ -1300,7 +1300,7 @@ export default function SpaceBattleGame({ onExit }) {
                 </div>
 
                 {/* Feature cards */}
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     {[
                         { icon: Crosshair, title: 'FPS Combat', desc: 'First-person perspective with parallax depth', bgColor: 'bg-blue-100', iconColor: 'text-blue-600' },
                         { icon: Sparkles, title: 'Knowledge Quiz', desc: 'Answer questions after battle', bgColor: 'bg-purple-100', iconColor: 'text-purple-600' },

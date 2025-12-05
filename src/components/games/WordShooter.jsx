@@ -681,7 +681,7 @@ export default function WordShooter({ onExit }) {
               <p className="text-gray-400 text-sm mt-2">{Math.round(loadingProgress)}% complete</p>
             </div>
           ) : (
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {filteredTopics(generatedTopics[activeTab] || []).slice(0, 9).map((topic, i) => {
                 const tabInfo = TABS.find(t => t.id === activeTab);
                 const icons = [Sparkles, Globe, Cpu, Atom, Leaf, Brain, Lightbulb, TrendingUp];
@@ -699,7 +699,7 @@ export default function WordShooter({ onExit }) {
           )}
         </div>
 
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {[
             { icon: Layers, title: '3-Stage Chains', desc: 'Shoot word → related terms spawn → collect definition', bgColor: 'bg-blue-100', iconColor: 'text-blue-600' },
             { icon: Zap, title: 'Combo System', desc: 'Chain reactions multiply your score exponentially', bgColor: 'bg-purple-100', iconColor: 'text-purple-600' },
