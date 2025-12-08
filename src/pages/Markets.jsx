@@ -25,7 +25,7 @@ const FILTER_OPTIONS = {
     zscore: { label: 'Z-Score', options: ['Any', '3+', '2.5+', '2+'] },
 };
 
-const STOCK_DATA = [
+const ALL_TICKERS = [
     { ticker: 'AAPL', name: 'Apple Inc.', sector: 'Technology', industry: 'Consumer Electronics', marketCap: '2890' },
     { ticker: 'MSFT', name: 'Microsoft Corporation', sector: 'Technology', industry: 'Software', marketCap: '2780' },
     { ticker: 'GOOGL', name: 'Alphabet Inc.', sector: 'Technology', industry: 'Internet Services', marketCap: '1720' },
@@ -916,19 +916,7 @@ const STOCK_DATA = [
     { ticker: 'JLL', name: 'Jones Lang LaSalle', sector: 'Real Estate', industry: 'Real Estate Services', marketCap: '12' },
 ];
 
-function generateStockData(stockInfo) {
-    const basePrice = 50 + Math.random() * 450;
-    const change = (Math.random() - 0.5) * 10;
-    const moat = 45 + Math.floor(Math.random() * 50);
-    const roe = 8 + Math.floor(Math.random() * 30);
-    const pe = 10 + Math.floor(Math.random() * 35);
-    const zscore = 1.5 + Math.random() * 3;
-    const sgr = 5 + Math.floor(Math.random() * 25);
-    const history = [];
-    let price = basePrice * 0.85;
-    for (let i = 0; i < 20; i++) { price = price * (1 + (Math.random() - 0.48) * 0.03); history.push(Math.round(price * 100) / 100); }
-    return { ...stockInfo, price: Math.round(basePrice * 100) / 100, change: Math.round(change * 100) / 100, volume: `${(Math.random() * 50 + 5).toFixed(1)}M`, moat, sgr, roe, roic: roe - 2 + Math.floor(Math.random() * 5), roa: Math.floor(roe * 0.6), eps: Math.round((1 + Math.random() * 15) * 100) / 100, pe, peg: Math.round((pe / sgr) * 100) / 100, fcf: Math.floor(Math.random() * 5000) + 500, eva: 40 + Math.floor(Math.random() * 50), zscore: Math.round(zscore * 100) / 100, dividend: Math.round(Math.random() * 4 * 100) / 100, beta: Math.round((0.7 + Math.random() * 0.8) * 100) / 100, aiRating: 55 + Math.floor(Math.random() * 40), history };
-}
+const STOCK_DATA = ALL_TICKERS;
 
 // Stock Markets
 

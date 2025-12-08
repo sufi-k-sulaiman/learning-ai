@@ -90,14 +90,16 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
 
             switch (section) {
                 case 'overview':
-                    prompt = `Provide comprehensive overview for ${stock.ticker} (${stock.name}):
-- Company description (2-3 sentences)
-- Key competitive advantages
+                    prompt = `Provide REAL, CURRENT data for ${stock.ticker} (${stock.name}):
+- Brief company description
+- Top 3 competitive advantages
 - Main revenue streams
-- Recent major developments
-- 36-month price history data points (monthly)
-- MOAT breakdown: brand power, switching costs, network effects, cost advantages, intangibles (each 0-100)
-- Investment thesis summary`;
+- Latest major news/developments
+- 36 monthly price data points (last 3 years, realistic prices)
+- MOAT analysis: brand power, switching costs, network effects, cost advantages, intangibles (0-100 each)
+- Investment thesis (2-3 sentences)
+
+Use real market data.`;
                     schema = {
                         type: "object",
                         properties: {
@@ -137,14 +139,15 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
                     break;
 
                 case 'valuation':
-                    prompt = `Valuation analysis for ${stock.ticker}:
-- Fair value estimate
-- DCF valuation
-- Comparable company analysis
-- Historical valuation metrics
-- Valuation vs sector average
+                    prompt = `REAL valuation for ${stock.ticker} at current price $${stock.price}:
+- Fair value (DCF-based)
 - Margin of safety %
-- Valuation grade (A-F)`;
+- Sector average P/E
+- Grade (A-F)
+- 5 comparable companies with P/E ratios
+- 5-year historical P/E trend
+
+Use actual market data.`;
                     schema = {
                         type: "object",
                         properties: {
@@ -160,18 +163,19 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
                     break;
 
                 case 'fundamentals':
-                    prompt = `Fundamental analysis for ${stock.ticker}:
-- Revenue growth (5 year trend)
-- Earnings growth trend
-- Profit margins (gross, operating, net)
-- Balance sheet strength
-- Cash flow quality
-- Debt levels and coverage
-- Return metrics (ROE, ROA, ROIC)`;
+                    prompt = `REAL fundamentals for ${stock.ticker}:
+- 5-year revenue growth (yearly data with % growth)
+- 5-year earnings growth trend
+- Current profit margins (gross %, operating %, net %)
+- Debt-to-equity ratio
+- Interest coverage ratio
+- ROE, ROA, ROIC current values
+
+Provide accurate current financial data.`;
                     schema = {
                         type: "object",
                         properties: {
-                            revenueGrowth: { type: "array", items: { type: "object", properties: { year: { type: "string" }, growth: { type: "number" } } } },
+                            revenueGrowth: { type: "array", items: { type: "object", properties: { year: { type: "string" }, growth: { type: "number" }, revenue: { type: "number" } } } },
                             earningsGrowth: { type: "array", items: { type: "object", properties: { year: { type: "string" }, growth: { type: "number" } } } },
                             margins: { type: "object", properties: { gross: { type: "number" }, operating: { type: "number" }, net: { type: "number" } } },
                             balanceSheetScore: { type: "number" },
@@ -183,14 +187,18 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
                     break;
 
                 case 'technicals':
-                    prompt = `Technical analysis for ${stock.ticker}:
+                    prompt = `REAL technical analysis for ${stock.ticker} at $${stock.price}:
 - Current trend (bullish/bearish/neutral)
-- Support and resistance levels
-- Moving averages (50, 100, 200 day)
-- RSI, MACD signals
-- Volume analysis
-- Chart patterns detected
-- Technical rating (1-10)`;
+- 2-3 support levels
+- 2-3 resistance levels
+- Moving averages (50, 100, 200 day actual values)
+- RSI value (0-100)
+- MACD signal (bullish/bearish/neutral)
+- Volume trend
+- Recent chart patterns
+- Technical rating (1-10)
+
+Use real technical indicators.`;
                     schema = {
                         type: "object",
                         properties: {
@@ -321,11 +329,13 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
                     break;
 
                 case 'peers':
-                    prompt = `Peer comparison for ${stock.ticker}:
-                    - Top 5 competitor companies with ticker, name, market cap, P/E, ROE, and revenue growth
-                    - Industry average metrics
-                    - Competitive advantages vs peers
-                    - Market share comparison`;
+                    prompt = `REAL peer comparison for ${stock.ticker} in ${stock.industry}:
+- 5 actual competitor tickers with names, market caps, P/E, ROE, revenue growth %
+- Industry average P/E, ROE, growth
+- ${stock.name}'s competitive advantages vs peers
+- Approximate market share %
+
+Use real competitor data from ${stock.sector} sector.`;
                     schema = {
                         type: "object",
                         properties: {
@@ -338,11 +348,13 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
                     break;
 
                 case 'moat':
-                    prompt = `MOAT analysis for ${stock.ticker}:
-                    - Detailed breakdown: brand power, switching costs, network effects, cost advantages, scale advantage, regulatory moat (each 0-100)
-                    - Competitive position assessment
-                    - Competitive advantages (list 5-7 key advantages)
-                    - Investment thesis summary`;
+                    prompt = `REAL MOAT analysis for ${stock.ticker}:
+- Detailed scores (0-100): brand power, switching costs, network effects, cost advantages, scale advantage, regulatory moat
+- Competitive position in ${stock.industry}
+- 5-7 specific competitive advantages
+- Investment thesis
+
+Base on actual company strengths.`;
                     schema = {
                         type: "object",
                         properties: {
@@ -355,12 +367,15 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
                     break;
 
                 case 'bullbear':
-                    prompt = `Bull and Bear case analysis for ${stock.ticker}:
-                    - Top 5 bull case arguments with potential upside
-                    - Top 5 bear case arguments with potential downside
-                    - Bull case price target
-                    - Bear case price target
-                    - Probability assessment`;
+                    prompt = `REAL bull/bear case for ${stock.ticker} at $${stock.price}:
+- 5 specific bull case arguments
+- 5 specific bear case arguments  
+- Bull case price target
+- Bear case price target
+- Bull case probability %
+- Bear case probability %
+
+Base on actual market conditions and company specifics.`;
                     schema = {
                         type: "object",
                         properties: {
@@ -477,10 +492,7 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
 
         switch (activeNav) {
             case 'overview':
-                const priceData = data.priceHistory || Array.from({ length: 36 }, (_, i) => ({
-                    month: `M${i + 1}`,
-                    price: stock.price * (0.7 + Math.random() * 0.6)
-                }));
+                const priceData = data.priceHistory || [];
                 const startPrice = priceData[0]?.price || stock.price * 0.8;
                 const highPrice = Math.max(...priceData.map(p => p.price));
                 const lowPrice = Math.min(...priceData.map(p => p.price));
@@ -607,12 +619,12 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
             
             case 'moat':
                 const moatRadarData = [
-                    { subject: 'Brand', A: data.moatBreakdown?.brandPower || 73, fullMark: 100 },
-                    { subject: 'Switching', A: data.moatBreakdown?.switchingCosts || 87, fullMark: 100 },
-                    { subject: 'Network', A: data.moatBreakdown?.networkEffects || 65, fullMark: 100 },
-                    { subject: 'Cost', A: data.moatBreakdown?.costAdvantages || 45, fullMark: 100 },
-                    { subject: 'Scale', A: 68, fullMark: 100 },
-                    { subject: 'Regulation', A: 55, fullMark: 100 },
+                    { subject: 'Brand', A: data.moatBreakdown?.brandPower || 50, fullMark: 100 },
+                    { subject: 'Switching', A: data.moatBreakdown?.switchingCosts || 50, fullMark: 100 },
+                    { subject: 'Network', A: data.moatBreakdown?.networkEffects || 50, fullMark: 100 },
+                    { subject: 'Cost', A: data.moatBreakdown?.costAdvantages || 50, fullMark: 100 },
+                    { subject: 'Scale', A: data.moatBreakdown?.scaleAdvantage || 50, fullMark: 100 },
+                    { subject: 'Regulation', A: data.moatBreakdown?.regulatoryMoat || 50, fullMark: 100 },
                 ];
                 return (
                     <div className="space-y-6">
@@ -639,12 +651,12 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
                             <div className="bg-white rounded-2xl border border-gray-200 p-6">
                                 <h3 className="font-semibold text-gray-900 mb-4">Competitive Advantages</h3>
                                 <div className="space-y-3">
-                                    <MoatBar label="Brand Strength" value={data.moatBreakdown?.brandPower || 73} />
-                                    <MoatBar label="Switching Difficulty" value={data.moatBreakdown?.switchingCosts || 87} color="#10B981" />
-                                    <MoatBar label="Network Effect" value={data.moatBreakdown?.networkEffects || 65} />
-                                    <MoatBar label="Cost Advantage" value={data.moatBreakdown?.costAdvantages || 45} color="#F59E0B" />
-                                    <MoatBar label="Scale Advantage" value={68} color="#3B82F6" />
-                                    <MoatBar label="Regulatory Moat" value={55} color="#EC4899" />
+                                    <MoatBar label="Brand Strength" value={data.moatBreakdown?.brandPower || 50} />
+                                    <MoatBar label="Switching Difficulty" value={data.moatBreakdown?.switchingCosts || 50} color="#10B981" />
+                                    <MoatBar label="Network Effect" value={data.moatBreakdown?.networkEffects || 50} />
+                                    <MoatBar label="Cost Advantage" value={data.moatBreakdown?.costAdvantages || 50} color="#F59E0B" />
+                                    <MoatBar label="Scale Advantage" value={data.moatBreakdown?.scaleAdvantage || 50} color="#3B82F6" />
+                                    <MoatBar label="Regulatory Moat" value={data.moatBreakdown?.regulatoryMoat || 50} color="#EC4899" />
                                 </div>
                             </div>
                         </div>
@@ -714,7 +726,7 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
                                     <div className="pt-3 border-t border-gray-100">
                                         <p className="text-xs text-gray-500 mb-2">Full Analysis Available</p>
                                         <ul className="space-y-1.5">
-                                            {(data.advantages || ['Strong brand recognition', 'High switching costs', 'Network effects present']).map((adv, i) => (
+                                            {(data.advantages || []).slice(0, 3).map((adv, i) => (
                                                 <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
                                                     <span className="w-1.5 h-1.5 rounded-full bg-green-500 mt-2 flex-shrink-0" />
                                                     {adv}
@@ -1013,19 +1025,13 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
                 );
 
             case 'fundamentals':
-                const revenueData = data.revenueGrowth || [
-                    { year: '2020', growth: 12, revenue: 78 },
-                    { year: '2021', growth: 18, revenue: 92 },
-                    { year: '2022', growth: 15, revenue: 106 },
-                    { year: '2023', growth: 22, revenue: 129 },
-                    { year: '2024', growth: 28, revenue: 165 }
-                ];
+                const revenueData = data.revenueGrowth || [];
                 const marginTrends = [
-                    { year: '2020', gross: 38, operating: 24, net: 15 },
-                    { year: '2021', gross: 40, operating: 26, net: 16 },
-                    { year: '2022', gross: 41, operating: 27, net: 17 },
-                    { year: '2023', gross: 42, operating: 28, net: 18 },
-                    { year: '2024', gross: 42, operating: 28, net: 18 }
+                    { year: '2020', gross: data.margins?.gross - 4 || 38, operating: data.margins?.operating - 4 || 24, net: data.margins?.net - 3 || 15 },
+                    { year: '2021', gross: data.margins?.gross - 2 || 40, operating: data.margins?.operating - 2 || 26, net: data.margins?.net - 2 || 16 },
+                    { year: '2022', gross: data.margins?.gross - 1 || 41, operating: data.margins?.operating - 1 || 27, net: data.margins?.net - 1 || 17 },
+                    { year: '2023', gross: data.margins?.gross || 42, operating: data.margins?.operating || 28, net: data.margins?.net || 18 },
+                    { year: '2024', gross: data.margins?.gross || 42, operating: data.margins?.operating || 28, net: data.margins?.net || 18 }
                 ];
                 const competitivePos = [
                     { category: 'Brand', score: 85 },
@@ -1230,12 +1236,12 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
                 );
 
             case 'technicals':
-                const priceActionData = stock.history?.slice(-20).map((p, i) => ({
+                const priceActionData = data.priceHistory?.slice(-20).map((p, i) => ({
                     day: `D${i + 1}`,
-                    price: p,
-                    ma50: data.ma50 || stock.price * 0.95,
-                    support: stock.price * 0.92,
-                    resistance: stock.price * 1.08
+                    price: p.price || p,
+                    ma50: data.ma50,
+                    support: data.support?.[0],
+                    resistance: data.resistance?.[0]
                 })) || [];
                 return (
                     <div className="space-y-6">
