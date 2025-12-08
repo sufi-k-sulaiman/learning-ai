@@ -72,18 +72,18 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
         if (isOpen && stock) {
             setSectionData({});
             setActiveNav('overview');
-            loadSectionData('overview');
+            setPriceChartPeriod('36M');
         }
     }, [isOpen, stock?.ticker]);
 
     useEffect(() => {
-        if (stock && !sectionData[activeNav]) {
+        if (stock && isOpen) {
             loadSectionData(activeNav);
         }
-    }, [activeNav, stock]);
+    }, [activeNav, stock?.ticker, isOpen]);
 
     const loadSectionData = async (section) => {
-        if (!stock || sectionData[section]) return;
+        if (!stock) return;
         
         setLoadingSection(section);
         
@@ -495,27 +495,44 @@ Base on actual market conditions and company specifics.`;
 
         switch (activeNav) {
             case 'overview':
-                // Generate unique historical prices based on actual stock price
-                const priceData = data.priceHistory && data.priceHistory.length > 0 
-                    ? data.priceHistory 
-                    : Array.from({ length: 36 }, (_, i) => {
-                        // Use stock ticker hash to create unique but consistent variations
-                        const seed = stock.ticker.charCodeAt(0) + stock.ticker.charCodeAt(1 || 0);
-                        const variance = 0.15 + (seed % 20) / 100;
-                        const trend = ((seed % 3) - 1) * 0.1;
-                        const monthProgress = i / 36;
-                        const trendEffect = 1 + (trend * monthProgress);
-                        const randomWalk = Math.sin(i * seed / 10) * variance;
-                        const price = stock.price * (0.7 + randomWalk + (monthProgress * trend));
-                        return { month: `M${i + 1}`, price: Math.max(price * trendEffect, stock.price * 0.5) };
-                    });
-                const periodMap = {
-                    '36M': 36, '24M': 24, '12M': 12, '6M': 6, '3M': 3,
-                    '1W': 0.23, '72H': 0.01, '24H': 0.003
+                // Generate price data based on selected period
+                const generatePriceData = () => {
+                    const seed = stock.ticker.charCodeAt(0) + stock.ticker.charCodeAt(1 || 0);
+                    
+                    if (priceChartPeriod === '24H') {
+                        return Array.from({ length: 24 }, (_, i) => {
+                            const variance = Math.sin((i + seed) * 0.3) * 0.015;
+                            const price = stock.price * (1 + variance);
+                            return { month: `${i}:00`, price };
+                        });
+                    } else if (priceChartPeriod === '72H') {
+                        return Array.from({ length: 72 }, (_, i) => {
+                            const variance = Math.sin((i + seed) * 0.2) * 0.02;
+                            const price = stock.price * (1 + variance);
+                            return { month: `${i}h`, price };
+                        });
+                    } else if (priceChartPeriod === '1W') {
+                        return Array.from({ length: 7 }, (_, i) => {
+                            const variance = Math.sin((i + seed) * 0.5) * 0.025;
+                            const price = stock.price * (1 + variance);
+                            return { month: `Day ${i + 1}`, price };
+                        });
+                    } else {
+                        const monthsMap = { '3M': 3, '6M': 6, '12M': 12, '24M': 24, '36M': 36 };
+                        const months = monthsMap[priceChartPeriod] || 36;
+                        return Array.from({ length: months }, (_, i) => {
+                            const variance = 0.15 + (seed % 20) / 100;
+                            const trend = ((seed % 3) - 1) * 0.1;
+                            const monthProgress = i / months;
+                            const trendEffect = 1 + (trend * monthProgress);
+                            const randomWalk = Math.sin(i * seed / 10) * variance;
+                            const price = stock.price * (0.7 + randomWalk + (monthProgress * trend));
+                            return { month: `M${i + 1}`, price: Math.max(price * trendEffect, stock.price * 0.5) };
+                        });
+                    }
                 };
-                const periodMonths = periodMap[priceChartPeriod] || 36;
-                const filteredPriceData = priceChartPeriod === '36M' ? priceData : 
-                    priceData.slice(-Math.ceil(periodMonths)) || priceData;
+                
+                const filteredPriceData = generatePriceData();
                 
                 const startPrice = filteredPriceData[0]?.price || stock.price * 0.8;
                 const highPrice = Math.max(...filteredPriceData.map(p => p.price));
