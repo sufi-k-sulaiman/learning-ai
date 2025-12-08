@@ -70,9 +70,11 @@ export default function StockDetailModal({ stock, isOpen, onClose }) {
 
     useEffect(() => {
         if (isOpen && stock) {
+            setSectionData({});
+            setActiveNav('overview');
             loadSectionData('overview');
         }
-    }, [isOpen, stock]);
+    }, [isOpen, stock?.ticker]);
 
     useEffect(() => {
         if (stock && !sectionData[activeNav]) {
