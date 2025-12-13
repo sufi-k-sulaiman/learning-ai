@@ -69,7 +69,7 @@ const cleanHtmlFromText = (text) => {
 // Store for generated image URLs with category prefix
 const imageCache = new Map();
 let currentCacheKey = '';
-const updateCallbacks = new Set();
+const updateCallbacks = new Map();
 
 const generateImagesInBackground = async (articles, cacheKey) => {
     currentCacheKey = cacheKey;
@@ -84,8 +84,8 @@ const generateImagesInBackground = async (articles, cacheKey) => {
             response.data.images.forEach((url, index) => {
                 if (url) {
                     imageCache.set(`${cacheKey}-${index}`, url);
-                    // Notify all cards that images are ready
-                    updateCallbacks.forEach(cb => cb());
+                    const callback = updateCallbacks.get(`${cacheKey}-${index}`);
+                    if (callback) callback(url);
                 }
             });
             console.log(`Generated ${response.data.images.filter(Boolean).length} images`);
@@ -96,17 +96,14 @@ const generateImagesInBackground = async (articles, cacheKey) => {
 };
 
 const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey }) => {
-    const [imageUrl, setImageUrl] = useState(preloadedImageUrl || null);
-    const [imageLoading, setImageLoading] = useState(index < 12 && !preloadedImageUrl);
-    const [, forceUpdate] = useState({});
+    const [imageUrl, setImageUrl] = useState(preloadedImageUrl || imageCache.get(`${cacheKey}-${index}`) || null);
+    const [imageLoading, setImageLoading] = useState(index < 12 && !preloadedImageUrl && !imageCache.get(`${cacheKey}-${index}`));
     
     const cleanTitle = cleanHtmlFromText(article.title);
     const cleanDescription = cleanHtmlFromText(article.description);
 
     useEffect(() => {
-        // Reset state when cache key changes
-        setImageUrl(null);
-        setImageLoading(index < 12);
+        const key = `${cacheKey}-${index}`;
         
         if (preloadedImageUrl) {
             setImageUrl(preloadedImageUrl);
@@ -114,42 +111,35 @@ const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey 
             return;
         }
         
-        // Skip image generation for articles beyond the limit
         if (index >= 12) {
             setImageLoading(false);
             return;
         }
         
-        // Check cache and subscribe to updates
-        const checkCache = () => {
-            const cachedUrl = imageCache.get(`${cacheKey}-${index}`);
-            if (cachedUrl && cachedUrl !== imageUrl) {
-                setImageUrl(cachedUrl);
-                setImageLoading(false);
-                return true;
-            }
-            return false;
+        // Check if already in cache
+        const cached = imageCache.get(key);
+        if (cached) {
+            setImageUrl(cached);
+            setImageLoading(false);
+            return;
+        }
+        
+        // Subscribe to this specific image update
+        const updateCallback = (url) => {
+            setImageUrl(url);
+            setImageLoading(false);
         };
+        updateCallbacks.set(key, updateCallback);
         
-        // Initial check
-        if (checkCache()) return;
-        
-        // Subscribe to cache updates
-        const updateCallback = () => {
-            checkCache();
-        };
-        updateCallbacks.add(updateCallback);
-        
-        // Timeout after 60 seconds
         const timeout = setTimeout(() => {
             setImageLoading(false);
         }, 60000);
         
         return () => {
-            updateCallbacks.delete(updateCallback);
+            updateCallbacks.delete(key);
             clearTimeout(timeout);
         };
-    }, [index, preloadedImageUrl, cacheKey, imageUrl]);
+    }, [index, preloadedImageUrl, cacheKey]);
 
     return (
         <a 
