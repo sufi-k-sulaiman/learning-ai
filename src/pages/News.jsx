@@ -21,13 +21,13 @@ const NewsGrid = ({ news }) => {
     // RSS feeds provide real URLs - no validation needed
     const articles = news.slice(0, ARTICLES_PER_CATEGORY);
 
-    // Start batch image generation when articles load - use stringified news as dependency
+    // Generate images in background when articles load
     const newsKey = JSON.stringify(news.map(a => a.title).slice(0, 3));
     useEffect(() => {
         imageCache.clear();
         currentCacheKey = newsKey;
         if (articles.length > 0) {
-            generateImageBatch(articles, newsKey);
+            generateImagesInBackground(articles, newsKey);
         }
     }, [newsKey]);
 
@@ -66,70 +66,30 @@ const cleanHtmlFromText = (text) => {
         .trim();
 };
 
-const MAX_IMAGES_TO_GENERATE = 8; // Only generate images for first 8 articles
-const BATCH_SIZE = 4; // Generate 4 images per batch
-const BATCH_DELAY = 2000; // 2 seconds between batches
-const MAX_RETRIES = 2; // Retry failed images up to 2 times
-
-// Store for batch-generated image URLs with category prefix
+// Store for generated image URLs with category prefix
 const imageCache = new Map();
 let currentCacheKey = '';
 
-const generateImageBatch = async (articles, cacheKey) => {
+const generateImagesInBackground = async (articles, cacheKey) => {
     currentCacheKey = cacheKey;
-    const batches = [];
-    for (let i = 0; i < Math.min(articles.length, MAX_IMAGES_TO_GENERATE); i += BATCH_SIZE) {
-        batches.push(articles.slice(i, i + BATCH_SIZE));
-    }
     
-    console.log(`Starting batch generation: ${batches.length} batches of ${BATCH_SIZE} images`);
-    
-    for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
-        const batch = batches[batchIndex];
-        
-        // Wait between batches (except first)
-        if (batchIndex > 0) {
-            await new Promise(resolve => setTimeout(resolve, BATCH_DELAY));
-        }
-        
-        console.log(`Processing batch ${batchIndex + 1}/${batches.length}`);
-        
-        // Generate all images in this batch with retry logic
-        const promises = batch.map(async (article, idx) => {
-            const globalIndex = batchIndex * BATCH_SIZE + idx;
-            const cleanTitle = cleanHtmlFromText(article.title);
-            
-            // Retry logic
-            for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
-                try {
-                    // Check if cache key still matches (topic hasn't changed)
-                    if (currentCacheKey !== cacheKey) return null;
-                    
-                    const result = await base44.integrations.Core.GenerateImage({
-                        prompt: `Professional news photography depicting: ${cleanTitle}. Photorealistic, editorial style, high quality, no text or words, no logos`
-                    });
-                    
-                    if (result?.url && currentCacheKey === cacheKey) {
-                        imageCache.set(`${cacheKey}-${globalIndex}`, result.url);
-                        console.log(`Image ${globalIndex} generated successfully${attempt > 0 ? ` (retry ${attempt})` : ''}`);
-                        return result.url;
-                    }
-                } catch (error) {
-                    console.log(`Image ${globalIndex} attempt ${attempt + 1} failed:`, error.message);
-                    if (attempt < MAX_RETRIES) {
-                        // Wait before retry
-                        await new Promise(resolve => setTimeout(resolve, 2000));
-                    }
-                }
-            }
-            console.log(`Image ${globalIndex} failed after ${MAX_RETRIES + 1} attempts`);
-            return null;
+    try {
+        console.log('Generating images in backend...');
+        const response = await base44.functions.invoke('generateNewsImages', {
+            articles: articles.slice(0, 8).map(a => ({ title: a.title }))
         });
         
-        await Promise.all(promises);
-        console.log(`Batch ${batchIndex + 1} complete`);
+        if (response.data?.images && currentCacheKey === cacheKey) {
+            response.data.images.forEach((url, index) => {
+                if (url) {
+                    imageCache.set(`${cacheKey}-${index}`, url);
+                }
+            });
+            console.log(`Generated ${response.data.images.filter(Boolean).length} images`);
+        }
+    } catch (error) {
+        console.error('Image generation failed:', error);
     }
-    console.log('All batches complete');
 };
 
 const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey }) => {
@@ -151,7 +111,7 @@ const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey 
         }
         
         // Skip image generation for articles beyond the limit
-        if (index >= MAX_IMAGES_TO_GENERATE) {
+        if (index >= 8) {
             setImageLoading(false);
             return;
         }
