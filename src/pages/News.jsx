@@ -66,9 +66,10 @@ const cleanHtmlFromText = (text) => {
         .trim();
 };
 
-const MAX_IMAGES_TO_GENERATE = 12; // Only generate images for first 12 articles
+const MAX_IMAGES_TO_GENERATE = 8; // Only generate images for first 8 articles
 const BATCH_SIZE = 2; // Generate 2 images per batch
 const BATCH_DELAY = 4000; // 4 seconds between batches
+const MAX_RETRIES = 2; // Retry failed images up to 2 times
 
 // Store for batch-generated image URLs with category prefix
 const imageCache = new Map();
@@ -84,21 +85,22 @@ const generateImageBatch = async (articles, cacheKey) => {
     console.log(`Starting batch generation: ${batches.length} batches of ${BATCH_SIZE} images`);
     
     for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
-        try {
-            const batch = batches[batchIndex];
+        const batch = batches[batchIndex];
+        
+        // Wait between batches (except first)
+        if (batchIndex > 0) {
+            await new Promise(resolve => setTimeout(resolve, BATCH_DELAY));
+        }
+        
+        console.log(`Processing batch ${batchIndex + 1}/${batches.length}`);
+        
+        // Generate all images in this batch with retry logic
+        const promises = batch.map(async (article, idx) => {
+            const globalIndex = batchIndex * BATCH_SIZE + idx;
+            const cleanTitle = cleanHtmlFromText(article.title);
             
-            // Wait between batches (except first)
-            if (batchIndex > 0) {
-                await new Promise(resolve => setTimeout(resolve, BATCH_DELAY));
-            }
-            
-            console.log(`Processing batch ${batchIndex + 1}/${batches.length}`);
-            
-            // Generate all images in this batch in parallel
-            const promises = batch.map(async (article, idx) => {
-                const globalIndex = batchIndex * BATCH_SIZE + idx;
-                const cleanTitle = cleanHtmlFromText(article.title);
-                
+            // Retry logic
+            for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
                 try {
                     // Check if cache key still matches (topic hasn't changed)
                     if (currentCacheKey !== cacheKey) return null;
@@ -106,24 +108,26 @@ const generateImageBatch = async (articles, cacheKey) => {
                     const result = await base44.integrations.Core.GenerateImage({
                         prompt: `Professional news photography depicting: ${cleanTitle}. Photorealistic, editorial style, high quality, no text or words, no logos`
                     });
+                    
                     if (result?.url && currentCacheKey === cacheKey) {
                         imageCache.set(`${cacheKey}-${globalIndex}`, result.url);
-                        console.log(`Image ${globalIndex} generated successfully`);
+                        console.log(`Image ${globalIndex} generated successfully${attempt > 0 ? ` (retry ${attempt})` : ''}`);
                         return result.url;
                     }
-                    return null;
                 } catch (error) {
-                    console.log(`Image ${globalIndex} failed:`, error.message);
-                    return null;
+                    console.log(`Image ${globalIndex} attempt ${attempt + 1} failed:`, error.message);
+                    if (attempt < MAX_RETRIES) {
+                        // Wait before retry
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                    }
                 }
-            });
-            
-            await Promise.all(promises);
-            console.log(`Batch ${batchIndex + 1} complete`);
-        } catch (error) {
-            console.error(`Batch ${batchIndex + 1} error:`, error);
-            // Continue to next batch even if this one fails
-        }
+            }
+            console.log(`Image ${globalIndex} failed after ${MAX_RETRIES + 1} attempts`);
+            return null;
+        });
+        
+        await Promise.all(promises);
+        console.log(`Batch ${batchIndex + 1} complete`);
     }
     console.log('All batches complete');
 };
