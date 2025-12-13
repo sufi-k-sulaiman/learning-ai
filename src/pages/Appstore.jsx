@@ -92,7 +92,7 @@ export default function Appstore() {
                                         <ul className="grid grid-cols-2 gap-2">
                                             {app.features.map((feature, i) => (
                                                 <li key={i} className="flex items-center gap-2 text-sm text-gray-600">
-                                                    <Star className="w-3 h-3 text-yellow-500 fill-yellow-500 flex-shrink-0" />
+                                                    <Star className="w-3 h-3 text-purple-500 fill-purple-500 flex-shrink-0" />
                                                     <span className="line-clamp-1">{feature}</span>
                                                 </li>
                                             ))}
@@ -106,7 +106,7 @@ export default function Appstore() {
                                         rel="noopener noreferrer"
                                         className="block"
                                     >
-                                        <Button className={`w-full bg-gradient-to-r ${app.color} hover:opacity-90 text-white font-semibold py-3`}>
+                                        <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3">
                                             <Download className="w-4 h-4 mr-2" />
                                             Download on App Store
                                             <ExternalLink className="w-4 h-4 ml-2" />
@@ -130,7 +130,7 @@ export default function Appstore() {
                     </p>
                     <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-500">
                         <span className="flex items-center gap-1">
-                            <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
+                            <Star className="w-4 h-4 text-purple-500 fill-purple-500" />
                             Free to download
                         </span>
                         <span>•</span>
