@@ -22,6 +22,7 @@ import ContactUs from './pages/ContactUs';
 import News from './pages/News';
 import NotFound from './pages/NotFound';
 import Privacy from './pages/Privacy';
+import Appstore from './pages/Appstore';
 import __Layout from './Layout.jsx';
 
 
@@ -50,6 +51,7 @@ export const PAGES = {
     "News": News,
     "NotFound": NotFound,
     "Privacy": Privacy,
+    "Appstore": Appstore,
 }
 
 export const pagesConfig = {
