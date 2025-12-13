@@ -94,7 +94,7 @@ const generateImagesInBackground = async (articles, cacheKey) => {
 
 const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey }) => {
     const [imageUrl, setImageUrl] = useState(preloadedImageUrl || null);
-    const [imageLoading, setImageLoading] = useState(index < MAX_IMAGES_TO_GENERATE && !preloadedImageUrl);
+    const [imageLoading, setImageLoading] = useState(index < 8 && !preloadedImageUrl);
     
     const cleanTitle = cleanHtmlFromText(article.title);
     const cleanDescription = cleanHtmlFromText(article.description);
@@ -102,7 +102,7 @@ const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey 
     useEffect(() => {
         // Reset state when cache key changes
         setImageUrl(null);
-        setImageLoading(index < MAX_IMAGES_TO_GENERATE);
+        setImageLoading(index < 8);
         
         if (preloadedImageUrl) {
             setImageUrl(preloadedImageUrl);
