@@ -76,7 +76,7 @@ const generateImagesInBackground = async (articles, cacheKey) => {
     try {
         console.log('Generating images in backend...');
         const response = await base44.functions.invoke('generateNewsImages', {
-            articles: articles.slice(0, 8).map(a => ({ title: a.title }))
+            articles: articles.slice(0, 12).map(a => ({ title: a.title }))
         });
         
         if (response.data?.images && currentCacheKey === cacheKey) {
@@ -94,7 +94,7 @@ const generateImagesInBackground = async (articles, cacheKey) => {
 
 const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey }) => {
     const [imageUrl, setImageUrl] = useState(preloadedImageUrl || null);
-    const [imageLoading, setImageLoading] = useState(index < 8 && !preloadedImageUrl);
+    const [imageLoading, setImageLoading] = useState(index < 12 && !preloadedImageUrl);
     
     const cleanTitle = cleanHtmlFromText(article.title);
     const cleanDescription = cleanHtmlFromText(article.description);
@@ -102,7 +102,7 @@ const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey 
     useEffect(() => {
         // Reset state when cache key changes
         setImageUrl(null);
-        setImageLoading(index < 8);
+        setImageLoading(index < 12);
         
         if (preloadedImageUrl) {
             setImageUrl(preloadedImageUrl);
@@ -111,7 +111,7 @@ const NewsCardSimple = ({ article, index, imageUrl: preloadedImageUrl, cacheKey 
         }
         
         // Skip image generation for articles beyond the limit
-        if (index >= 8) {
+        if (index >= 12) {
             setImageLoading(false);
             return;
         }

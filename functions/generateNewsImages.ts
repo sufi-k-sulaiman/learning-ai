@@ -9,13 +9,14 @@ Deno.serve(async (req) => {
             return Response.json({ error: 'Invalid articles array' }, { status: 400 });
         }
         
-        // Generate up to 8 images, 4 at a time
-        const maxImages = Math.min(articles.length, 8);
-        const batchSize = 4;
+        // Generate up to 12 images: first 8, then 4 more
+        const maxImages = Math.min(articles.length, 12);
         const results = [];
         
-        for (let i = 0; i < maxImages; i += batchSize) {
-            const batch = articles.slice(i, Math.min(i + batchSize, maxImages));
+        // First batch: 8 images
+        const firstBatchSize = Math.min(8, maxImages);
+        for (let i = 0; i < firstBatchSize; i += 4) {
+            const batch = articles.slice(i, Math.min(i + 4, firstBatchSize));
             
             const imagePromises = batch.map(async (article) => {
                 const cleanTitle = article.title
@@ -39,10 +40,37 @@ Deno.serve(async (req) => {
             const batchResults = await Promise.all(imagePromises);
             results.push(...batchResults);
             
-            // Small delay between batches
-            if (i + batchSize < maxImages) {
+            if (i + 4 < firstBatchSize) {
                 await new Promise(resolve => setTimeout(resolve, 1000));
             }
+        }
+        
+        // Second batch: 4 more images if available
+        if (maxImages > 8) {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            const secondBatch = articles.slice(8, maxImages);
+            
+            const imagePromises = secondBatch.map(async (article) => {
+                const cleanTitle = article.title
+                    .replace(/<[^>]*>/g, '')
+                    .replace(/&[^;]+;/g, ' ')
+                    .replace(/https?:\/\/[^\s]+/g, '')
+                    .replace(/\s+/g, ' ')
+                    .trim();
+                
+                try {
+                    const result = await base44.integrations.Core.GenerateImage({
+                        prompt: `Professional news photography depicting: ${cleanTitle}. Photorealistic, editorial style, high quality, no text or words, no logos`
+                    });
+                    return result?.url || null;
+                } catch (error) {
+                    console.error('Image generation failed:', error);
+                    return null;
+                }
+            });
+            
+            const batchResults = await Promise.all(imagePromises);
+            results.push(...batchResults);
         }
         
         return Response.json({ images: results });
