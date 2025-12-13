@@ -14,7 +14,7 @@ export default function Appstore() {
             name: 'SearchPods',
             tagline: 'AI-Powered Podcast Discovery',
             description: 'Transform the way you discover podcasts with AI-generated audio content on any topic. SearchPods uses advanced AI to create personalized podcast episodes tailored to your interests, delivering knowledge in an engaging audio format wherever you go.',
-            thumbnail: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/searchpods-thumb.png',
+            thumbnail: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/649241119_image.png',
             link: 'https://apps.apple.com/app/searchpods/id6756348023',
             color: 'from-cyan-600 to-blue-600',
             features: ['AI-generated podcasts', 'Any topic on demand', 'Offline listening', 'Smart recommendations']
@@ -23,7 +23,7 @@ export default function Appstore() {
             name: 'Neural MindMap',
             tagline: 'Visual Knowledge Mapping',
             description: 'Organize your thoughts and ideas with AI-powered mind mapping. Neural MindMap helps you create beautiful, interactive mind maps that enhance learning, brainstorming, and project planning. Perfect for students, professionals, and creative thinkers.',
-            thumbnail: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/mindmap-thumb.png',
+            thumbnail: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/4020f05d1_image.png',
             link: 'https://apps.apple.com/app/neural-mindmap/id6756198559',
             color: 'from-purple-600 to-pink-600',
             features: ['AI-powered suggestions', 'Beautiful visualizations', 'Real-time collaboration', 'Export & share']
@@ -32,7 +32,7 @@ export default function Appstore() {
             name: 'RoutineOps',
             tagline: 'Smart Daily Operations',
             description: 'Streamline your daily routines and boost productivity with intelligent task management. RoutineOps combines AI insights with intuitive design to help you build better habits, manage tasks efficiently, and achieve your goals consistently.',
-            thumbnail: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/routineops-thumb.png',
+            thumbnail: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/04ff8c071_image.png',
             link: 'https://apps.apple.com/app/routineops/id6756257586',
             color: 'from-green-600 to-emerald-600',
             features: ['Smart scheduling', 'Habit tracking', 'AI productivity tips', 'Progress analytics']
@@ -58,10 +58,12 @@ export default function Appstore() {
                     {apps.map((app, index) => (
                         <div key={index} className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-2xl transition-all duration-300 hover:-translate-y-1">
                             {/* App Thumbnail */}
-                            <div className={`relative h-64 bg-gradient-to-br ${app.color} flex items-center justify-center`}>
-                                <div className="w-40 h-40 bg-white/10 rounded-3xl backdrop-blur-sm flex items-center justify-center">
-                                    <Smartphone className="w-20 h-20 text-white" />
-                                </div>
+                            <div className={`relative h-64 bg-gradient-to-br ${app.color} flex items-center justify-center overflow-hidden`}>
+                                <img 
+                                    src={app.thumbnail} 
+                                    alt={`${app.name} screenshot`}
+                                    className="h-full w-auto object-contain"
+                                />
                             </div>
 
                             {/* App Info */}
