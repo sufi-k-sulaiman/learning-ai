@@ -141,11 +141,16 @@ const TextWithLinks = ({ text }) => {
 export default function Qwirey() {
     // Update URL for display only (aesthetic, not parsed)
     const updateUrl = (query, format) => {
-        const basePath = window.location.pathname;
         if (query) {
-            const querySlug = query.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase().substring(0, 50);
-            const formatSlug = format !== 'short' ? `/${format}` : '';
-            window.history.pushState({}, '', `${basePath}/${querySlug}${formatSlug}`);
+            try {
+                const basePath = window.location.pathname.replace(/\/$/, ''); // Remove trailing slash
+                const querySlug = query.replace(/[^a-zA-Z0-9\s]/g, '').replace(/\s+/g, '-').toLowerCase().substring(0, 50);
+                const formatSlug = format !== 'short' ? `-${format}` : '';
+                const newPath = `${basePath}/${querySlug}${formatSlug}`;
+                window.history.replaceState({}, '', newPath);
+            } catch (e) {
+                console.error('URL update error:', e);
+            }
         }
     };
 
