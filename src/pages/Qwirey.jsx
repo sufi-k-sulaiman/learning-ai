@@ -310,7 +310,7 @@ export default function Qwirey() {
         const formatInstructions = {
             dynamic: 'Provide a helpful, informative response about the topic. Be clear and concise.',
             short: 'CRITICAL: Your response MUST be between 160 and 280 characters. Then add exactly 5 bullet points with key facts (each bullet under 60 chars). Format: First a short blurb (160-280 chars), then 5 bullets starting with •',
-            long: 'IMPORTANT: Provide a detailed response with 6-8 well-spaced paragraphs. Add TWO line breaks between each paragraph for clear separation. Include thorough explanations and examples.',
+            long: 'CRITICAL: Generate EXACTLY 1400-1500 words total. Write EXACTLY 12 paragraphs, each 120-130 words. Explore each aspect in great depth with examples, explanations, and analysis.',
             tabled: 'Provide a 2 sentence summary. Then provide structured data for a comparison with 4-5 items. Each item needs: name, pros (2-3 points), cons (2-3 points), and a rating out of 10.',
             reviews: 'Provide a brief intro sentence. Then provide 5 realistic user reviews with: reviewer name, rating (1-10), review text (2-3 sentences), and date.'
         };
@@ -877,7 +877,21 @@ I need 10 reviews with: title, intro, and reviews array (name, rating 1-10, text
                 setResult(prev => ({ ...prev, shortData: shortResponse }));
             } else if (newFormat === 'long' && !result.longData) {
                 const longResponse = await base44.integrations.Core.InvokeLLM({
-                    prompt: `For "${currentPrompt}", provide a DETAILED response with 6-8 well-developed paragraphs. Include thorough explanations and examples.`,
+                    prompt: `CRITICAL: Generate EXACTLY 1400-1500 words total for "${currentPrompt}".
+
+            Write EXACTLY 12 paragraphs. Each paragraph MUST be 120-130 words (count carefully!).
+
+            For EACH paragraph:
+            - Explore ONE distinct aspect in great depth
+            - Include multiple examples and explanations
+            - Add theoretical frameworks or historical context
+            - Provide comparative analysis where relevant
+            - Discuss implications and consequences
+            - Present different perspectives
+
+            Make each paragraph substantial and information-rich. Expand ideas thoroughly. Use formal academic tone. Focus on concepts and principles, not products or brands.
+
+            WORD COUNT IS CRITICAL: 1400-1500 words total. If unsure, write MORE detail rather than less.`,
                     add_context_from_internet: true,
                     response_json_schema: {
                         type: "object",
