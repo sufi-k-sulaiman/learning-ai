@@ -967,7 +967,7 @@ export default function Markets() {
         
         try {
             const currentCount = stocks.length;
-            const batch = STOCK_DATA.slice(currentCount, currentCount + 20);
+            const batch = STOCK_DATA.slice(currentCount, currentCount + 60);
             
             if (batch.length === 0) {
                 setHasMore(false);
