@@ -221,6 +221,96 @@ export default function StockSectionContent({
                                   )}
                               </div>
 
+                              {data.revenueProfit && data.marginTrends && (
+                                  <div className="grid grid-cols-2 gap-6">
+                                      <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                                          <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                              <TrendingUp className="w-5 h-5 text-green-600" /> Revenue & Profit Growth
+                                          </h3>
+                                          <div className="h-64">
+                                              <ResponsiveContainer width="100%" height="100%">
+                                                  <BarChart data={data.revenueProfit}>
+                                                      <XAxis dataKey="year" tick={{ fontSize: 11 }} />
+                                                      <YAxis yAxisId="left" tick={{ fontSize: 10 }} tickFormatter={(v) => `$${v}B`} />
+                                                      <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 10 }} tickFormatter={(v) => `$${v}B`} />
+                                                      <Tooltip />
+                                                      <Bar yAxisId="left" dataKey="revenue" fill="#10B981" radius={[4, 4, 0, 0]} name="Revenue" />
+                                                      <Bar yAxisId="right" dataKey="profit" fill="#8B5CF6" radius={[4, 4, 0, 0]} name="Profit" />
+                                                  </BarChart>
+                                              </ResponsiveContainer>
+                                          </div>
+                                      </div>
+
+                                      <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                                          <h3 className="font-semibold text-gray-900 mb-4">Margin Trends</h3>
+                                          <div className="h-64">
+                                              <ResponsiveContainer width="100%" height="100%">
+                                                  <ReLineChart data={data.marginTrends}>
+                                                      <XAxis dataKey="year" tick={{ fontSize: 11 }} />
+                                                      <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `${v}%`} />
+                                                      <Tooltip formatter={(v) => [`${v}%`, '']} />
+                                                      <Line type="monotone" dataKey="grossMargin" stroke="#10B981" strokeWidth={2} dot={{ r: 4 }} name="Gross" />
+                                                      <Line type="monotone" dataKey="operatingMargin" stroke="#3B82F6" strokeWidth={2} dot={{ r: 4 }} name="Operating" />
+                                                      <Line type="monotone" dataKey="netMargin" stroke="#8B5CF6" strokeWidth={2} dot={{ r: 4 }} name="Net" />
+                                                  </ReLineChart>
+                                              </ResponsiveContainer>
+                                          </div>
+                                          <div className="flex justify-center gap-4 mt-2">
+                                              <span className="flex items-center gap-1 text-xs"><div className="w-3 h-3 rounded-full bg-green-500" /> Gross</span>
+                                              <span className="flex items-center gap-1 text-xs"><div className="w-3 h-3 rounded-full bg-blue-500" /> Operating</span>
+                                              <span className="flex items-center gap-1 text-xs"><div className="w-3 h-3 rounded-full bg-purple-500" /> Net</span>
+                                          </div>
+                                      </div>
+                                  </div>
+                              )}
+
+                              {data.cashFlowQuality && data.competitivePosition && (
+                                  <div className="grid grid-cols-2 gap-6">
+                                      <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                                          <h3 className="font-semibold text-gray-900 mb-6">Cash Flow Quality</h3>
+                                          <div className="space-y-6">
+                                              <div className="flex items-center justify-between">
+                                                  <span className="text-gray-600">Operating Cash Flow</span>
+                                                  <span className={`font-bold ${data.cashFlowQuality.operatingCashFlowStatus === 'Positive' ? 'text-green-600' : 'text-red-600'}`}>
+                                                      {data.cashFlowQuality.operatingCashFlowStatus}
+                                                  </span>
+                                              </div>
+                                              <div className="flex items-center justify-between">
+                                                  <span className="text-gray-600">FCF Yield</span>
+                                                  <span className="text-2xl font-bold text-gray-900">{data.cashFlowQuality.fcfYield}%</span>
+                                              </div>
+                                              <div className="flex items-center justify-between">
+                                                  <span className="text-gray-600">Revenue Diversified</span>
+                                                  <span className={`font-bold ${data.cashFlowQuality.revenueDiversified === 'Yes' ? 'text-green-600' : 'text-orange-600'}`}>
+                                                      {data.cashFlowQuality.revenueDiversified}
+                                                  </span>
+                                              </div>
+                                          </div>
+                                      </div>
+
+                                      <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                                          <h3 className="font-semibold text-gray-900 mb-4">Competitive Position</h3>
+                                          <div className="space-y-4">
+                                              {Object.entries(data.competitivePosition).map(([key, value]) => (
+                                                  <div key={key}>
+                                                      <div className="flex justify-between text-sm mb-2">
+                                                          <span className="text-gray-600 capitalize">{key}</span>
+                                                          <span className="font-bold text-gray-900">{value}</span>
+                                                      </div>
+                                                      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                                                          <div 
+                                                              className="h-full rounded-full bg-green-500 transition-all" 
+                                                              style={{ width: `${value}%` }} 
+                                                          />
+                                                      </div>
+                                                  </div>
+                                              ))}
+                                              <p className="text-xs text-gray-500 mt-4">Strong across categories</p>
+                                          </div>
+                                      </div>
+                                  </div>
+                              )}
+
                               {(data.catalysts || data.risks) && (
                                   <div className="grid grid-cols-2 gap-6">
                                       {data.catalysts && data.catalysts.length > 0 && (

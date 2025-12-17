@@ -165,7 +165,7 @@ export default function StockDetail() {
                     break;
 
                 case 'investor-moat':
-                    prompt = `Combined investor MOAT analysis for ${stock.ticker}: Investment recommendation (Buy/Hold/Sell), confidence %, price targets (low/mid/high), key catalysts (3-5), risks (3-5), MOAT scores 0-100 for: brand power, switching costs, network effects, cost advantages, scale advantage, regulatory moat, competitive advantages (3-5), investment thesis`;
+                    prompt = `Complete MOAT analysis for ${stock.ticker}: Investment recommendation (Buy/Hold/Sell), confidence %, price targets (low/mid/high), key catalysts (3-5), risks (3-5), MOAT scores 0-100 for: brand power, switching costs, network effects, cost advantages, scale advantage, regulatory moat, competitive advantages (3-5), investment thesis, 5-year revenue/profit data (year, revenue $B, profit $B), 5-year margin trends (year, grossMargin %, operatingMargin %, netMargin %), cash flow quality (operatingCashFlowStatus: Positive/Negative, fcfYield %, revenueDiversified: Yes/No), competitive position scores 0-100 (brand, technology, distribution, pricing, customerBase)`;
                     schema = {
                         type: "object",
                         properties: {
@@ -176,7 +176,11 @@ export default function StockDetail() {
                             risks: { type: "array", items: { type: "string" } },
                             moatBreakdown: { type: "object", properties: { brandPower: { type: "number" }, switchingCosts: { type: "number" }, networkEffects: { type: "number" }, costAdvantages: { type: "number" }, scaleAdvantage: { type: "number" }, regulatoryMoat: { type: "number" } } },
                             advantages: { type: "array", items: { type: "string" } },
-                            thesis: { type: "string" }
+                            thesis: { type: "string" },
+                            revenueProfit: { type: "array", items: { type: "object", properties: { year: { type: "string" }, revenue: { type: "number" }, profit: { type: "number" } } } },
+                            marginTrends: { type: "array", items: { type: "object", properties: { year: { type: "string" }, grossMargin: { type: "number" }, operatingMargin: { type: "number" }, netMargin: { type: "number" } } } },
+                            cashFlowQuality: { type: "object", properties: { operatingCashFlowStatus: { type: "string" }, fcfYield: { type: "number" }, revenueDiversified: { type: "string" } } },
+                            competitivePosition: { type: "object", properties: { brand: { type: "number" }, technology: { type: "number" }, distribution: { type: "number" }, pricing: { type: "number" }, customerBase: { type: "number" } } }
                         }
                     };
                     break;
