@@ -1155,9 +1155,9 @@ Use real market data. Return ALL ${batch.length} stocks.`,
 
             {/* Premium Filter Bar */}
             <div className="bg-gradient-to-r from-slate-50 via-white to-purple-50 rounded-2xl border border-gray-200/60 shadow-sm p-4 mb-4">
-                <div className="flex flex-col lg:flex-row gap-4">
+                <div className="flex items-center gap-2 flex-wrap">
                     {/* Search Bar */}
-                    <div className="relative flex-shrink-0 w-full lg:w-72">
+                    <div className="relative flex-shrink-0 w-64">
                         <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-indigo-500/10 rounded-xl blur-sm"></div>
                         <div className="relative">
                             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-500" />
@@ -1181,7 +1181,7 @@ Use real market data. Return ALL ${batch.length} stocks.`,
                     
                     {/* Preset Filters Dropdown */}
                     <Select value={activePreset} onValueChange={setActivePreset}>
-                        <SelectTrigger className="w-48 h-11 bg-gradient-to-r from-purple-600 to-indigo-600 text-white border-0 shadow-lg shadow-purple-500/25 hover:shadow-xl transition-all">
+                        <SelectTrigger className="w-44 h-11 bg-gradient-to-r from-purple-600 to-indigo-600 text-white border-0 shadow-lg shadow-purple-500/25 hover:shadow-xl transition-all">
                             <div className="flex items-center gap-2">
                                 {PRESET_FILTERS.find(p => p.id === activePreset)?.icon && 
                                     React.createElement(PRESET_FILTERS.find(p => p.id === activePreset).icon, { className: "w-4 h-4" })
@@ -1200,10 +1200,8 @@ Use real market data. Return ALL ${batch.length} stocks.`,
                             ))}
                         </SelectContent>
                     </Select>
-                </div>
-
-                {/* Dropdown Filters Row */}
-                <div className="flex items-center gap-2 flex-wrap mt-4 pt-4 border-t border-gray-200/50">
+                    
+                    {/* Dropdown Filters */}
                     <FilterChips filters={filters} setFilters={setFilters} filterOptions={FILTER_OPTIONS} sectors={sectors} industries={industries} />
                     
                     <div className="flex items-center gap-2 ml-auto">
