@@ -364,9 +364,11 @@ export default function StockDetail() {
                 response_json_schema: schema
             });
 
+            console.log(`${section} response:`, response);
             setSectionData(prev => ({ ...prev, [section]: response }));
         } catch (error) {
-            console.error('Error loading section data:', error);
+            console.error(`Error loading ${section} data:`, error);
+            setSectionData(prev => ({ ...prev, [section]: { error: error.message } }));
         } finally {
             setLoadingSection(null);
         }

@@ -1200,6 +1200,14 @@ export default function StockSectionContent({
               );
 
         case 'legends': {
+              if (data.error) {
+                  return (
+                      <div className="text-center py-32">
+                          <AlertTriangle className="w-12 h-12 text-red-400 mx-auto mb-4" />
+                          <p className="text-red-600">Error loading frameworks: {data.error}</p>
+                      </div>
+                  );
+              }
               if (!data.frameworks || !data.frameworks.length) {
                   return <p className="text-gray-500 text-center py-32">Loading legendary frameworks...</p>;
               }
