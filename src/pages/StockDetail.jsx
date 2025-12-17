@@ -318,13 +318,17 @@ export default function StockDetail() {
                     break;
 
                 case 'legends':
-                    prompt = `Analyze ${stock.ticker} using 16 legendary investor frameworks. Stock metrics: MOAT=${stock.moat}, ROE=${stock.roe}%, PE=${stock.pe}, PEG=${stock.peg}, Z-Score=${stock.zscore}, Beta=${stock.beta}, Growth=${stock.sgr}%, ROIC=${stock.roic}%, ROA=${stock.roa}%. 
+                    prompt = `Analyze ${stock.ticker} through 8 legendary frameworks. Data: MOAT=${stock.moat}, ROE=${stock.roe}%, PE=${stock.pe}, Z-Score=${stock.zscore}, Growth=${stock.sgr}%. 
 
-For Warren Buffett, Peter Lynch, Benjamin Graham, Joel Greenblatt, Ray Dalio, Cathie Wood, George Soros, David Dreman, John Templeton, Aswath Damodaran, Stanley Druckenmiller, Carl Icahn, Seth Klarman, David Tepper, Jim Simons, John Bogle:
-
-Return array with: name, style, color(hex), verdict(2-3 words), philosophy(short), approach(short), keyMetrics(array of 4 strings), metrics array with 2-3 items each having: label, value(number), max(number), good(number), inverse(boolean).
-
-Use ACTUAL stock values for calculations.`;
+For Warren Buffett, Peter Lynch, Benjamin Graham, Joel Greenblatt, Ray Dalio, Cathie Wood, George Soros, John Templeton create:
+- name (string)
+- style (string, max 20 chars)
+- color (hex string)
+- verdict (string, max 15 chars)
+- philosophy (string, max 80 chars)
+- approach (string, max 100 chars)
+- keyMetrics (array of exactly 3 strings)
+- metrics (array of exactly 2 objects with: label, value, max, good, inverse)`;
                     schema = {
                         type: "object",
                         properties: {
@@ -350,16 +354,13 @@ Use ACTUAL stock values for calculations.`;
                                                     max: { type: "number" },
                                                     good: { type: "number" },
                                                     inverse: { type: "boolean" }
-                                                },
-                                                required: ["label", "value", "max", "good", "inverse"]
+                                                }
                                             }
                                         }
-                                    },
-                                    required: ["name", "style", "color", "verdict", "philosophy", "approach", "keyMetrics", "metrics"]
+                                    }
                                 }
                             }
-                        },
-                        required: ["frameworks"]
+                        }
                     };
                     break;
 
