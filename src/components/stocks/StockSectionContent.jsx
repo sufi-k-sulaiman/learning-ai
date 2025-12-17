@@ -981,7 +981,7 @@ export default function StockSectionContent({
                 </div>
             );
 
-        case 'legends':
+        case 'legends': {
             const legendaryFrameworks = [
                 { name: 'Warren Buffett', style: 'Value / MOAT', color: '#8B5CF6', metrics: [{ label: 'MOAT', value: stock.moat, max: 100, good: 70 }, { label: 'ROE', value: stock.roe, max: 40, good: 15 }], verdict: stock.moat >= 70 && stock.roe >= 15 ? 'Strong Buy' : stock.moat >= 50 ? 'Hold' : 'Avoid' },
                 { name: 'Peter Lynch', style: 'GARP', color: '#10B981', metrics: [{ label: 'PEG', value: stock.peg || 1.2, max: 3, good: 1, inverse: true }, { label: 'Growth', value: stock.sgr || 15, max: 40, good: 15 }], verdict: (stock.peg || 1.2) <= 1 ? 'Strong Buy' : (stock.peg || 1.2) <= 1.5 ? 'Buy' : 'Hold' },
@@ -1139,6 +1139,7 @@ export default function StockSectionContent({
                     </div>
                 </div>
             );
+        }
 
         default:
             return (
