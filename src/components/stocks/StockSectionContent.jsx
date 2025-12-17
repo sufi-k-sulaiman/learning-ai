@@ -604,94 +604,7 @@ export default function StockSectionContent({
 
 
 
-        case 'dividends':
-              return (
-                <div className="min-h-[600px] space-y-6">
-                    <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                        <h3 className="font-semibold text-gray-900 mb-4">Dividend Information</h3>
-                        {(data.yield || data.annualDividend) ? (
-                            <>
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                    {(data.yield || stock.dividend) && (
-                                        <div className="bg-green-50 rounded-xl p-4 text-center">
-                                            <p className="text-sm text-gray-500">Yield</p>
-                                            <p className="text-2xl font-bold text-green-600">{data.yield || stock.dividend}%</p>
-                                        </div>
-                                    )}
-                                    {data.annualDividend && (
-                                        <div className="bg-purple-50 rounded-xl p-4 text-center">
-                                            <p className="text-sm text-gray-500">Annual</p>
-                                            <p className="text-2xl font-bold text-purple-600">${data.annualDividend.toFixed(2)}</p>
-                                        </div>
-                                    )}
-                                    {data.growthRate && (
-                                        <div className="bg-blue-50 rounded-xl p-4 text-center">
-                                            <p className="text-sm text-gray-500">Growth</p>
-                                            <p className="text-2xl font-bold text-blue-600">{data.growthRate}%</p>
-                                        </div>
-                                    )}
-                                    {data.payoutRatio && (
-                                        <div className="bg-orange-50 rounded-xl p-4 text-center">
-                                            <p className="text-sm text-gray-500">Payout</p>
-                                            <p className="text-2xl font-bold text-orange-600">{data.payoutRatio}%</p>
-                                        </div>
-                                    )}
-                                </div>
-                                {data.history && data.history.length > 0 && (
-                                    <div className="h-48 mt-6">
-                                        <ResponsiveContainer width="100%" height="100%">
-                                            <ReLineChart data={data.history}>
-                                                <XAxis dataKey="year" tick={{ fontSize: 11 }} />
-                                                <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `$${v}`} />
-                                                <Tooltip formatter={(v) => [`$${v}`, 'Dividend']} />
-                                                <Line type="monotone" dataKey="dividend" stroke="#8B5CF6" strokeWidth={2} />
-                                            </ReLineChart>
-                                        </ResponsiveContainer>
-                                    </div>
-                                )}
-                            </>
-                        ) : <p className="text-gray-500 text-center py-12">Loading dividend data...</p>}
-                    </div>
-                </div>
-                );
 
-        case 'peers':
-            const peerData = data.peers || [];
-            return (
-                <div className="min-h-[600px] bg-white rounded-2xl border border-gray-200 p-6">
-                    <h3 className="font-semibold text-gray-900 mb-4">Peer Comparison</h3>
-                    {peerData.length > 0 ? (
-                        <div className="overflow-x-auto">
-                            <table className="w-full">
-                                <thead>
-                                    <tr className="border-b">
-                                        <th className="text-left py-3 px-2 text-sm font-medium text-gray-500">Ticker</th>
-                                        <th className="text-right py-3 px-2 text-sm font-medium text-gray-500">P/E</th>
-                                        <th className="text-right py-3 px-2 text-sm font-medium text-gray-500">ROE</th>
-                                        <th className="text-right py-3 px-2 text-sm font-medium text-gray-500">Growth</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr className="bg-purple-50 border-b">
-                                        <td className="py-3 px-2 font-bold text-purple-700">{stock.ticker}</td>
-                                        <td className="py-3 px-2 text-right">{stock.pe?.toFixed(1)}</td>
-                                        <td className="py-3 px-2 text-right">{stock.roe}%</td>
-                                        <td className="py-3 px-2 text-right">{stock.sgr}%</td>
-                                    </tr>
-                                    {peerData.map((peer, i) => (
-                                        <tr key={i} className="border-b">
-                                            <td className="py-3 px-2 font-medium">{peer.ticker}</td>
-                                            <td className="py-3 px-2 text-right">{peer.pe}</td>
-                                            <td className="py-3 px-2 text-right">{peer.roe}%</td>
-                                            <td className="py-3 px-2 text-right text-green-600">{peer.growth}%</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    ) : <p className="text-gray-500 text-center py-12">No peer data available</p>}
-                </div>
-            );
 
 
 
@@ -1180,54 +1093,138 @@ export default function StockSectionContent({
 
 
         case 'news':
+              const peerData = data.peers || [];
               return (
                   <div className="min-h-[600px] space-y-6">
-                      {data.news && data.news.length > 0 ? (
-                          <>
-                              <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                                  <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                      <FileText className="w-5 h-5 text-purple-600" /> Recent News
-                                  </h3>
-                                  <div className="space-y-4">
-                                      {data.news.map((n, i) => (
-                                          <div key={i} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-                                              <span className={`mt-1 w-2 h-2 rounded-full flex-shrink-0 ${
-                                                  n.sentiment === 'Positive' ? 'bg-green-500' :
-                                                  n.sentiment === 'Negative' ? 'bg-red-500' : 'bg-gray-400'
-                                              }`} />
-                                              <div className="flex-1">
-                                                  <p className="text-sm font-medium text-gray-900">{n.headline}</p>
-                                                  <p className="text-xs text-gray-500 mt-1">{n.date}</p>
-                                              </div>
-                                              {n.sentiment && (
-                                                  <span className={`px-2 py-0.5 text-xs rounded ${
-                                                      n.sentiment === 'Positive' ? 'bg-green-100 text-green-700' :
-                                                      n.sentiment === 'Negative' ? 'bg-red-100 text-red-700' : 'bg-gray-200 text-gray-600'
-                                                  }`}>
-                                                      {n.sentiment}
-                                                  </span>
-                                              )}
+                      {/* News */}
+                      {data.news && data.news.length > 0 && (
+                          <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                              <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                  <FileText className="w-5 h-5 text-purple-600" /> Recent News
+                              </h3>
+                              <div className="space-y-4">
+                                  {data.news.map((n, i) => (
+                                      <div key={i} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                                          <span className={`mt-1 w-2 h-2 rounded-full flex-shrink-0 ${
+                                              n.sentiment === 'Positive' ? 'bg-green-500' :
+                                              n.sentiment === 'Negative' ? 'bg-red-500' : 'bg-gray-400'
+                                          }`} />
+                                          <div className="flex-1">
+                                              <p className="text-sm font-medium text-gray-900">{n.headline}</p>
+                                              <p className="text-xs text-gray-500 mt-1">{n.date}</p>
                                           </div>
-                                      ))}
-                                  </div>
-                              </div>
-                              {data.upcomingEvents && data.upcomingEvents.length > 0 && (
-                                  <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                                      <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                          <Calendar className="w-4 h-4" /> Upcoming Events
-                                      </h4>
-                                      <div className="space-y-3">
-                                          {data.upcomingEvents.map((e, i) => (
-                                              <div key={i} className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
-                                                  <span className="text-sm text-gray-900">{e.event}</span>
-                                                  <span className="text-sm text-purple-600 font-medium">{e.date}</span>
-                                              </div>
-                                          ))}
+                                          {n.sentiment && (
+                                              <span className={`px-2 py-0.5 text-xs rounded ${
+                                                  n.sentiment === 'Positive' ? 'bg-green-100 text-green-700' :
+                                                  n.sentiment === 'Negative' ? 'bg-red-100 text-red-700' : 'bg-gray-200 text-gray-600'
+                                              }`}>
+                                                  {n.sentiment}
+                                              </span>
+                                          )}
                                       </div>
+                                  ))}
+                              </div>
+                          </div>
+                      )}
+
+                      {/* Upcoming Events */}
+                      {data.upcomingEvents && data.upcomingEvents.length > 0 && (
+                          <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                              <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                  <Calendar className="w-4 h-4" /> Upcoming Events
+                              </h4>
+                              <div className="space-y-3">
+                                  {data.upcomingEvents.map((e, i) => (
+                                      <div key={i} className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+                                          <span className="text-sm text-gray-900">{e.event}</span>
+                                          <span className="text-sm text-purple-600 font-medium">{e.date}</span>
+                                      </div>
+                                  ))}
+                              </div>
+                          </div>
+                      )}
+
+                      {/* Dividends */}
+                      {(data.yield || data.annualDividend) && (
+                          <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                              <h3 className="font-semibold text-gray-900 mb-4">Dividend Information</h3>
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                                  {(data.yield || stock.dividend) && (
+                                      <div className="bg-green-50 rounded-xl p-4 text-center">
+                                          <p className="text-sm text-gray-500">Yield</p>
+                                          <p className="text-2xl font-bold text-green-600">{data.yield || stock.dividend}%</p>
+                                      </div>
+                                  )}
+                                  {data.annualDividend && (
+                                      <div className="bg-purple-50 rounded-xl p-4 text-center">
+                                          <p className="text-sm text-gray-500">Annual</p>
+                                          <p className="text-2xl font-bold text-purple-600">${data.annualDividend.toFixed(2)}</p>
+                                      </div>
+                                  )}
+                                  {data.growthRate && (
+                                      <div className="bg-blue-50 rounded-xl p-4 text-center">
+                                          <p className="text-sm text-gray-500">Growth</p>
+                                          <p className="text-2xl font-bold text-blue-600">{data.growthRate}%</p>
+                                      </div>
+                                  )}
+                                  {data.payoutRatio && (
+                                      <div className="bg-orange-50 rounded-xl p-4 text-center">
+                                          <p className="text-sm text-gray-500">Payout</p>
+                                          <p className="text-2xl font-bold text-orange-600">{data.payoutRatio}%</p>
+                                      </div>
+                                  )}
+                              </div>
+                              {data.history && data.history.length > 0 && (
+                                  <div className="h-48">
+                                      <ResponsiveContainer width="100%" height="100%">
+                                          <ReLineChart data={data.history}>
+                                              <XAxis dataKey="year" tick={{ fontSize: 11 }} />
+                                              <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `$${v}`} />
+                                              <Tooltip formatter={(v) => [`$${v}`, 'Dividend']} />
+                                              <Line type="monotone" dataKey="dividend" stroke="#8B5CF6" strokeWidth={2} />
+                                          </ReLineChart>
+                                      </ResponsiveContainer>
                                   </div>
                               )}
-                          </>
-                      ) : <p className="text-gray-500 text-center py-32">Loading news data...</p>}
+                          </div>
+                      )}
+
+                      {/* Peers */}
+                      {peerData.length > 0 && (
+                          <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                              <h3 className="font-semibold text-gray-900 mb-4">Peer Comparison</h3>
+                              <div className="overflow-x-auto">
+                                  <table className="w-full">
+                                      <thead>
+                                          <tr className="border-b">
+                                              <th className="text-left py-3 px-2 text-sm font-medium text-gray-500">Ticker</th>
+                                              <th className="text-right py-3 px-2 text-sm font-medium text-gray-500">P/E</th>
+                                              <th className="text-right py-3 px-2 text-sm font-medium text-gray-500">ROE</th>
+                                              <th className="text-right py-3 px-2 text-sm font-medium text-gray-500">Growth</th>
+                                          </tr>
+                                      </thead>
+                                      <tbody>
+                                          <tr className="bg-purple-50 border-b">
+                                              <td className="py-3 px-2 font-bold text-purple-700">{stock.ticker}</td>
+                                              <td className="py-3 px-2 text-right">{stock.pe?.toFixed(1)}</td>
+                                              <td className="py-3 px-2 text-right">{stock.roe}%</td>
+                                              <td className="py-3 px-2 text-right">{stock.sgr}%</td>
+                                          </tr>
+                                          {peerData.map((peer, i) => (
+                                              <tr key={i} className="border-b">
+                                                  <td className="py-3 px-2 font-medium">{peer.ticker}</td>
+                                                  <td className="py-3 px-2 text-right">{peer.pe}</td>
+                                                  <td className="py-3 px-2 text-right">{peer.roe}%</td>
+                                                  <td className="py-3 px-2 text-right text-green-600">{peer.growth}%</td>
+                                              </tr>
+                                          ))}
+                                      </tbody>
+                                  </table>
+                              </div>
+                          </div>
+                      )}
+
+                      {!data.news && <p className="text-gray-500 text-center py-32">Loading news data...</p>}
                   </div>
               );
 

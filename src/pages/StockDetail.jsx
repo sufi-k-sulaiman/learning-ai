@@ -24,8 +24,6 @@ const NAV_ITEMS = [
     { id: 'financials', label: 'Financials', icon: DollarSign },
     { id: 'technicals', label: 'Technicals', icon: BarChart3 },
     { id: 'news', label: 'News & Events', icon: FileText },
-    { id: 'dividends', label: 'Dividends', icon: Percent },
-    { id: 'peers', label: 'Peers', icon: Users },
     { id: 'investor-reports', label: 'Investor Reports', icon: Building },
     { id: 'legends', label: 'Legends', icon: Award },
 ];
@@ -297,14 +295,18 @@ export default function StockDetail() {
                     break;
 
                 case 'news':
-                    prompt = `News for ${stock.ticker}: latest 5 news (headline, date, sentiment), upcoming events (2-3 with event/date), recent filings (3), management commentary highlights (2-3)`;
+                    prompt = `Complete news & market data for ${stock.ticker}: Latest 5 news (headline, date, sentiment), upcoming events (2-3 with event/date), Dividend info (yield %, annual dividend, growth rate, payout ratio, 5-year history), Peer comparison (5 competitors with ticker, name, P/E, ROE, growth %)`;
                     schema = {
                         type: "object",
                         properties: {
                             news: { type: "array", items: { type: "object", properties: { headline: { type: "string" }, date: { type: "string" }, sentiment: { type: "string" } } } },
                             upcomingEvents: { type: "array", items: { type: "object", properties: { event: { type: "string" }, date: { type: "string" } } } },
-                            filings: { type: "array", items: { type: "string" } },
-                            managementNotes: { type: "array", items: { type: "string" } }
+                            yield: { type: "number" },
+                            annualDividend: { type: "number" },
+                            growthRate: { type: "number" },
+                            payoutRatio: { type: "number" },
+                            history: { type: "array", items: { type: "object", properties: { year: { type: "string" }, dividend: { type: "number" } } } },
+                            peers: { type: "array", items: { type: "object", properties: { ticker: { type: "string" }, name: { type: "string" }, pe: { type: "number" }, roe: { type: "number" }, growth: { type: "number" } } } }
                         }
                     };
                     break;
