@@ -315,6 +315,29 @@ export default function StockDetail() {
                     };
                     break;
 
+                case 'financials':
+                    prompt = `Financial ratios for ${stock.ticker}: current P/E, PEG, ROE, ROIC, ROA, profit margins, liquidity ratios`;
+                    schema = {
+                        type: "object",
+                        properties: {
+                            pe: { type: "number" },
+                            peg: { type: "number" },
+                            roe: { type: "number" },
+                            roic: { type: "number" },
+                            roa: { type: "number" }
+                        }
+                    };
+                    break;
+
+                case 'simulator':
+                case 'reports':
+                case 'investor-relations':
+                case 'legends':
+                    // These don't need AI data loading
+                    setSectionData(prev => ({ ...prev, [section]: {} }));
+                    setLoadingSection(null);
+                    return;
+
                 default:
                     return;
             }
