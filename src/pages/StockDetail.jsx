@@ -330,11 +330,44 @@ export default function StockDetail() {
                     break;
 
                 case 'simulator':
+                    // Simulator doesn't need AI, just calculations
+                    setSectionData(prev => ({ ...prev, [section]: { loaded: true } }));
+                    setLoadingSection(null);
+                    return;
+
                 case 'reports':
+                    prompt = `Company reports for ${stock.ticker}: latest 3 annual reports (title, date, year), latest 4 quarterly reports (title, date, quarter), latest 3 investor presentations, latest 4 earnings releases with EPS`;
+                    schema = {
+                        type: "object",
+                        properties: {
+                            annualReports: { type: "array", items: { type: "object", properties: { title: { type: "string" }, date: { type: "string" }, year: { type: "string" } } } },
+                            quarterlyReports: { type: "array", items: { type: "object", properties: { title: { type: "string" }, date: { type: "string" }, quarter: { type: "string" } } } },
+                            investorPresentations: { type: "array", items: { type: "object", properties: { title: { type: "string" }, date: { type: "string" } } } },
+                            earningsReleases: { type: "array", items: { type: "object", properties: { title: { type: "string" }, date: { type: "string" }, eps: { type: "string" } } } }
+                        }
+                    };
+                    break;
+
                 case 'investor-relations':
+                    prompt = `Investor relations for ${stock.ticker}: fiscal year end, next earnings date, latest 3 annual reports (title, date, description), latest 4 quarterly reports, latest 3 investor presentations, latest 4 earnings releases, P&L statements (3 years with revenue/income), fiscal year data (3 years with revenue/earnings/assets)`;
+                    schema = {
+                        type: "object",
+                        properties: {
+                            fiscalYearEnd: { type: "string" },
+                            nextEarnings: { type: "string" },
+                            annualReports: { type: "array", items: { type: "object", properties: { title: { type: "string" }, date: { type: "string" }, description: { type: "string" } } } },
+                            quarterlyReports: { type: "array", items: { type: "object", properties: { title: { type: "string" }, date: { type: "string" }, description: { type: "string" } } } },
+                            investorPresentations: { type: "array", items: { type: "object", properties: { title: { type: "string" }, date: { type: "string" } } } },
+                            earningsReleases: { type: "array", items: { type: "object", properties: { title: { type: "string" }, date: { type: "string" } } } },
+                            plStatements: { type: "array", items: { type: "object", properties: { year: { type: "string" }, revenue: { type: "string" }, netIncome: { type: "string" } } } },
+                            fiscalYearData: { type: "array", items: { type: "object", properties: { year: { type: "string" }, revenue: { type: "string" }, earnings: { type: "string" }, assets: { type: "string" } } } }
+                        }
+                    };
+                    break;
+
                 case 'legends':
-                    // These don't need AI data loading
-                    setSectionData(prev => ({ ...prev, [section]: {} }));
+                    // Legends uses stock data directly, no AI needed
+                    setSectionData(prev => ({ ...prev, [section]: { loaded: true } }));
                     setLoadingSection(null);
                     return;
 

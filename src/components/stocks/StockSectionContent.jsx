@@ -241,13 +241,15 @@ export default function StockSectionContent({
                                 <ResponsiveContainer width="100%" height="100%">
                                     <BarChart data={data.revenueGrowth}>
                                         <XAxis dataKey="year" tick={{ fontSize: 11 }} />
-                                        <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `${v}%`} />
+                                        <YAxis yAxisId="left" tick={{ fontSize: 10 }} tickFormatter={(v) => `${v}%`} />
+                                        <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 10 }} tickFormatter={(v) => `$${v}B`} />
                                         <Tooltip />
-                                        <Bar dataKey="growth" fill="#10B981" radius={[4, 4, 0, 0]} />
+                                        <Bar yAxisId="right" dataKey="revenue" fill="#8B5CF6" radius={[4, 4, 0, 0]} name="Revenue" />
+                                        <Bar yAxisId="left" dataKey="growth" fill="#10B981" radius={[4, 4, 0, 0]} name="Growth %" />
                                     </BarChart>
                                 </ResponsiveContainer>
                             </div>
-                        ) : <p className="text-gray-500 text-center py-12">No revenue data available</p>}
+                        ) : <p className="text-gray-500 text-center py-12">Loading revenue data...</p>}
                     </div>
                     <div className="grid grid-cols-3 gap-4">
                         <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
@@ -259,10 +261,29 @@ export default function StockSectionContent({
                             <p className="text-2xl font-bold text-gray-900">{data.interestCoverage?.toFixed(1) || '12.5'}x</p>
                         </div>
                         <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
-                            <p className="text-sm text-gray-500">Net Margin</p>
-                            <p className="text-2xl font-bold text-green-600">{data.margins?.net || 18}%</p>
+                            <p className="text-sm text-gray-500">Gross Margin</p>
+                            <p className="text-2xl font-bold text-green-600">{data.margins?.gross || 42}%</p>
                         </div>
                     </div>
+                    {data.margins && (
+                        <div className="bg-white rounded-xl border border-gray-200 p-6">
+                            <h3 className="font-semibold text-gray-900 mb-4">Profit Margins</h3>
+                            <div className="grid grid-cols-3 gap-4">
+                                <div className="text-center">
+                                    <p className="text-sm text-gray-500">Gross</p>
+                                    <p className="text-3xl font-bold text-green-600">{data.margins.gross}%</p>
+                                </div>
+                                <div className="text-center">
+                                    <p className="text-sm text-gray-500">Operating</p>
+                                    <p className="text-3xl font-bold text-blue-600">{data.margins.operating}%</p>
+                                </div>
+                                <div className="text-center">
+                                    <p className="text-sm text-gray-500">Net</p>
+                                    <p className="text-3xl font-bold text-purple-600">{data.margins.net}%</p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             );
 
@@ -635,94 +656,211 @@ export default function StockSectionContent({
 
         case 'reports':
             return (
-                <div className="min-h-[600px] bg-white rounded-2xl border border-gray-200 p-6">
-                    <h3 className="font-semibold text-gray-900 mb-4">Company Reports</h3>
-                    <div className="space-y-3">
-                        <a href={`https://www.sec.gov/cgi-bin/browse-edgar?CIK=${stock.ticker}`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-purple-50">
-                            <div>
-                                <p className="font-medium text-gray-900">SEC Filings</p>
-                                <p className="text-sm text-gray-500">View all official filings</p>
-                            </div>
-                            <ExternalLink className="w-4 h-4 text-gray-400" />
-                        </a>
-                        <a href={`https://www.google.com/search?q=${stock.name}+investor+relations`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-blue-50">
-                            <div>
-                                <p className="font-medium text-gray-900">Investor Relations</p>
-                                <p className="text-sm text-gray-500">Company IR website</p>
-                            </div>
-                            <ExternalLink className="w-4 h-4 text-gray-400" />
-                        </a>
+                <div className="min-h-[600px] space-y-6">
+                    <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                        <h3 className="font-semibold text-gray-900 mb-4">Annual Reports</h3>
+                        <div className="space-y-2">
+                            {(data.annualReports || []).map((r, i) => (
+                                <a key={i} href={`https://www.sec.gov/cgi-bin/browse-edgar?CIK=${stock.ticker}&type=10-K`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-purple-50">
+                                    <div>
+                                        <p className="font-medium text-gray-900">{r.title}</p>
+                                        <p className="text-sm text-gray-500">{r.date}</p>
+                                    </div>
+                                    <Download className="w-4 h-4 text-gray-400" />
+                                </a>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                        <h3 className="font-semibold text-gray-900 mb-4">Quarterly Reports</h3>
+                        <div className="space-y-2">
+                            {(data.quarterlyReports || []).map((r, i) => (
+                                <div key={i} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                                    <div>
+                                        <p className="font-medium text-gray-900">{r.title}</p>
+                                        <p className="text-sm text-gray-500">{r.date}</p>
+                                    </div>
+                                    <Download className="w-4 h-4 text-gray-400" />
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
             );
 
         case 'investor-relations':
             return (
-                <div className="min-h-[600px] bg-white rounded-2xl border border-gray-200 p-6">
-                    <h3 className="font-semibold text-gray-900 mb-4">Investor Relations</h3>
-                    <div className="space-y-3">
-                        <a href={`https://www.sec.gov/cgi-bin/browse-edgar?CIK=${stock.ticker}&type=10-K`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-purple-50">
-                            <div className="flex items-center gap-3">
-                                <FileText className="w-5 h-5 text-purple-600" />
-                                <div>
-                                    <p className="font-medium text-gray-900">Annual Reports (10-K)</p>
-                                    <p className="text-sm text-gray-500">View comprehensive annual filings</p>
-                                </div>
+                <div className="min-h-[600px] space-y-6">
+                    <div className="bg-white rounded-xl border border-gray-200 p-5">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h2 className="text-lg font-bold text-gray-900">{stock.name} Investor Relations</h2>
+                                <p className="text-sm text-gray-500">{stock.ticker} • {stock.sector}</p>
                             </div>
-                            <ExternalLink className="w-4 h-4 text-gray-400" />
-                        </a>
-                        <a href={`https://www.sec.gov/cgi-bin/browse-edgar?CIK=${stock.ticker}&type=10-Q`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-blue-50">
-                            <div className="flex items-center gap-3">
-                                <FileText className="w-5 h-5 text-blue-600" />
-                                <div>
-                                    <p className="font-medium text-gray-900">Quarterly Reports (10-Q)</p>
-                                    <p className="text-sm text-gray-500">View quarterly filings</p>
-                                </div>
+                            <div className="text-right">
+                                <p className="text-xs text-gray-500">Fiscal Year End</p>
+                                <p className="text-sm font-semibold text-gray-900">{data.fiscalYearEnd || 'December 31'}</p>
+                                <p className="text-xs text-gray-400">Next: {data.nextEarnings || 'Jan 2025'}</p>
                             </div>
-                            <ExternalLink className="w-4 h-4 text-gray-400" />
-                        </a>
+                        </div>
+                    </div>
+                    <div className="bg-white rounded-xl border border-gray-200 p-6">
+                        <h3 className="font-semibold text-gray-900 mb-4">Annual Reports</h3>
+                        <div className="space-y-2">
+                            {(data.annualReports || []).map((r, i) => (
+                                <a key={i} href={`https://www.sec.gov/cgi-bin/browse-edgar?CIK=${stock.ticker}&type=10-K`} target="_blank" rel="noopener noreferrer" className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl hover:bg-purple-50 block">
+                                    <FileText className="w-5 h-5 text-purple-600 mt-0.5" />
+                                    <div className="flex-1">
+                                        <p className="font-medium text-gray-900">{r.title}</p>
+                                        <p className="text-sm text-gray-500">{r.date}</p>
+                                        <p className="text-xs text-gray-400 mt-1">{r.description}</p>
+                                    </div>
+                                    <ExternalLink className="w-4 h-4 text-gray-400 mt-1" />
+                                </a>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="bg-white rounded-xl border border-gray-200 p-6">
+                        <h3 className="font-semibold text-gray-900 mb-4">Fiscal Year Data</h3>
+                        {data.fiscalYearData && (
+                            <div className="overflow-x-auto">
+                                <table className="w-full">
+                                    <thead>
+                                        <tr className="border-b">
+                                            <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">Year</th>
+                                            <th className="text-right py-3 px-4 text-sm font-medium text-gray-500">Revenue</th>
+                                            <th className="text-right py-3 px-4 text-sm font-medium text-gray-500">Earnings</th>
+                                            <th className="text-right py-3 px-4 text-sm font-medium text-gray-500">Assets</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {data.fiscalYearData.map((fy, i) => (
+                                            <tr key={i} className="border-b">
+                                                <td className="py-3 px-4 font-medium">{fy.year}</td>
+                                                <td className="py-3 px-4 text-right">{fy.revenue}</td>
+                                                <td className="py-3 px-4 text-right text-green-600 font-medium">{fy.earnings}</td>
+                                                <td className="py-3 px-4 text-right">{fy.assets}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
                     </div>
                 </div>
             );
 
-        case 'legends':
+        case 'reports':
             return (
-                <div className="min-h-[600px] bg-white rounded-2xl border border-gray-200 p-6">
-                    <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                        <Award className="w-5 h-5 text-purple-600" /> Legendary Investor Frameworks
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="bg-purple-50 rounded-xl p-4">
-                            <p className="font-semibold text-gray-900 mb-2">Warren Buffett</p>
-                            <p className="text-sm text-gray-600">Value / MOAT Focus</p>
-                            <p className="mt-3 text-xs text-gray-500">MOAT: <span className="font-bold text-purple-600">{stock.moat}/100</span></p>
-                            <p className={`mt-2 px-3 py-1 rounded-full text-sm font-medium inline-block ${
-                                stock.moat >= 70 ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
-                            }`}>
-                                {stock.moat >= 70 ? 'Strong Buy' : 'Hold'}
-                            </p>
-                        </div>
-                        <div className="bg-green-50 rounded-xl p-4">
-                            <p className="font-semibold text-gray-900 mb-2">Peter Lynch</p>
-                            <p className="text-sm text-gray-600">GARP Strategy</p>
-                            <p className="mt-3 text-xs text-gray-500">PEG: <span className="font-bold text-green-600">{stock.peg?.toFixed(2) || '1.2'}</span></p>
-                            <p className={`mt-2 px-3 py-1 rounded-full text-sm font-medium inline-block ${
-                                (stock.peg || 1.2) <= 1 ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
-                            }`}>
-                                {(stock.peg || 1.2) <= 1 ? 'Strong Buy' : 'Buy'}
-                            </p>
-                        </div>
-                        <div className="bg-blue-50 rounded-xl p-4">
-                            <p className="font-semibold text-gray-900 mb-2">Benjamin Graham</p>
-                            <p className="text-sm text-gray-600">Deep Value</p>
-                            <p className="mt-3 text-xs text-gray-500">P/E: <span className="font-bold text-blue-600">{stock.pe?.toFixed(1)}</span></p>
-                            <p className={`mt-2 px-3 py-1 rounded-full text-sm font-medium inline-block ${
-                                stock.pe < 15 ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
-                            }`}>
-                                {stock.pe < 15 ? 'Value Play' : 'Not Cheap'}
-                            </p>
+                <div className="min-h-[600px] space-y-6">
+                    <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                        <h3 className="font-semibold text-gray-900 mb-4">Annual Reports</h3>
+                        <div className="space-y-2">
+                            {(data.annualReports || []).length > 0 ? data.annualReports.map((r, i) => (
+                                <a key={i} href={`https://www.sec.gov/cgi-bin/browse-edgar?CIK=${stock.ticker}&type=10-K`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-purple-50">
+                                    <div>
+                                        <p className="font-medium text-gray-900">{r.title}</p>
+                                        <p className="text-sm text-gray-500">{r.date}</p>
+                                    </div>
+                                    <Download className="w-4 h-4 text-gray-400" />
+                                </a>
+                            )) : <p className="text-gray-500 text-center py-8">Loading reports data...</p>}
                         </div>
                     </div>
+                    <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                        <h3 className="font-semibold text-gray-900 mb-4">Quarterly Reports</h3>
+                        <div className="space-y-2">
+                            {(data.quarterlyReports || []).length > 0 ? data.quarterlyReports.map((r, i) => (
+                                <div key={i} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                                    <div>
+                                        <p className="font-medium text-gray-900">{r.title}</p>
+                                        <p className="text-sm text-gray-500">{r.date}</p>
+                                    </div>
+                                    <Download className="w-4 h-4 text-gray-400" />
+                                </div>
+                            )) : <p className="text-gray-500 text-center py-8">Loading reports data...</p>}
+                        </div>
+                    </div>
+                    {data.earningsReleases && data.earningsReleases.length > 0 && (
+                        <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                            <h3 className="font-semibold text-gray-900 mb-4">Earnings Releases</h3>
+                            <div className="space-y-2">
+                                {data.earningsReleases.map((r, i) => (
+                                    <div key={i} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                                        <div>
+                                            <p className="font-medium text-gray-900">{r.title}</p>
+                                            <p className="text-sm text-gray-500">{r.date}</p>
+                                        </div>
+                                        <span className="text-sm font-bold text-green-600">{r.eps}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+
+        case 'investor-relations':
+            return (
+                <div className="min-h-[600px] space-y-6">
+                    <div className="bg-white rounded-xl border border-gray-200 p-5">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h2 className="text-lg font-bold text-gray-900">{stock.name} IR</h2>
+                                <p className="text-sm text-gray-500">{stock.ticker}</p>
+                            </div>
+                            <div className="text-right">
+                                <p className="text-xs text-gray-500">Fiscal Year End</p>
+                                <p className="text-sm font-semibold text-gray-900">{data.fiscalYearEnd || 'Dec 31'}</p>
+                                <p className="text-xs text-gray-400">Next: {data.nextEarnings || 'Jan 2025'}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {data.annualReports && data.annualReports.length > 0 && (
+                        <div className="bg-white rounded-xl border border-gray-200 p-6">
+                            <h3 className="font-semibold text-gray-900 mb-4">Annual Reports</h3>
+                            <div className="space-y-2">
+                                {data.annualReports.map((r, i) => (
+                                    <a key={i} href={`https://www.sec.gov/cgi-bin/browse-edgar?CIK=${stock.ticker}&type=10-K`} target="_blank" rel="noopener noreferrer" className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl hover:bg-purple-50 block">
+                                        <FileText className="w-5 h-5 text-purple-600 mt-0.5" />
+                                        <div className="flex-1">
+                                            <p className="font-medium text-gray-900">{r.title}</p>
+                                            <p className="text-sm text-gray-500">{r.date}</p>
+                                            {r.description && <p className="text-xs text-gray-400 mt-1">{r.description}</p>}
+                                        </div>
+                                        <ExternalLink className="w-4 h-4 text-gray-400 mt-1" />
+                                    </a>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                    {data.fiscalYearData && data.fiscalYearData.length > 0 && (
+                        <div className="bg-white rounded-xl border border-gray-200 p-6">
+                            <h3 className="font-semibold text-gray-900 mb-4">Fiscal Year Summary</h3>
+                            <div className="overflow-x-auto">
+                                <table className="w-full">
+                                    <thead>
+                                        <tr className="border-b">
+                                            <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">Year</th>
+                                            <th className="text-right py-3 px-4 text-sm font-medium text-gray-500">Revenue</th>
+                                            <th className="text-right py-3 px-4 text-sm font-medium text-gray-500">Earnings</th>
+                                            <th className="text-right py-3 px-4 text-sm font-medium text-gray-500">Assets</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {data.fiscalYearData.map((fy, i) => (
+                                            <tr key={i} className="border-b">
+                                                <td className="py-3 px-4 font-medium">{fy.year}</td>
+                                                <td className="py-3 px-4 text-right">{fy.revenue}</td>
+                                                <td className="py-3 px-4 text-right text-green-600 font-medium">{fy.earnings}</td>
+                                                <td className="py-3 px-4 text-right">{fy.assets}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    )}
                 </div>
             );
 
