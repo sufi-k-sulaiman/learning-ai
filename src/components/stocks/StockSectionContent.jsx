@@ -1206,43 +1206,19 @@ export default function StockSectionContent({
 
               const legendaryFrameworks = data.frameworks;
 
-            const legendRadarData = [
-                { 
-                    subject: 'Value', 
-                    Buffett: Math.min(100, ((stock.moat || 0) + (stock.roe || 0) * 2) / 2), 
-                    Lynch: Math.min(100, (stock.peg ? 100 / stock.peg : 50)), 
-                    Greenblatt: Math.min(100, (stock.roic || 0) * 2.5), 
-                    Graham: Math.min(100, stock.pe ? (40 / stock.pe) * 100 : 0) 
-                },
-                { 
-                    subject: 'Growth', 
-                    Buffett: Math.min(100, (stock.sgr || 0) * 3), 
-                    Lynch: Math.min(100, (stock.sgr || 0) * 4), 
-                    Greenblatt: Math.min(100, (stock.sgr || 0) * 3.5), 
-                    Graham: Math.min(100, (stock.sgr || 0) * 2) 
-                },
-                { 
-                    subject: 'Quality', 
-                    Buffett: Math.min(100, ((stock.moat || 0) + (stock.roe || 0) * 2.5) / 2), 
-                    Lynch: Math.min(100, ((stock.roe || 0) * 2 + (stock.moat || 0)) / 2), 
-                    Greenblatt: Math.min(100, (stock.roic || 0) * 3), 
-                    Graham: Math.min(100, (stock.zscore || 0) * 20 + (stock.roe || 0)) 
-                },
-                { 
-                    subject: 'Momentum', 
-                    Buffett: Math.min(100, Math.max(0, 50 + stock.change)), 
-                    Lynch: Math.min(100, Math.max(0, 50 + stock.change * 1.5)), 
-                    Greenblatt: Math.min(100, Math.max(0, 50 + stock.change * 1.2)), 
-                    Graham: Math.min(100, Math.max(0, 40 + stock.change * 0.5)) 
-                },
-                { 
-                    subject: 'Safety', 
-                    Buffett: Math.min(100, (stock.zscore || 0) * 20 + (stock.moat || 0) / 2), 
-                    Lynch: Math.min(100, (stock.zscore || 0) * 15), 
-                    Greenblatt: Math.min(100, (stock.zscore || 0) * 18), 
-                    Graham: Math.min(100, (stock.zscore || 0) * 25) 
-                }
-            ];
+            // Calculate radar data from framework metrics
+            const radarCategories = ['Value', 'Growth', 'Quality', 'Momentum', 'Safety'];
+            const legendRadarData = radarCategories.map(category => {
+                const radarPoint = { subject: category };
+                legendaryFrameworks.slice(0, 4).forEach(framework => {
+                    const categoryScore = framework.metrics.reduce((sum, m) => {
+                        const normalizedValue = m.inverse ? (m.max - m.value) / m.max * 100 : m.value / m.max * 100;
+                        return sum + normalizedValue;
+                    }, 0) / framework.metrics.length;
+                    radarPoint[framework.name.split(' ')[1] || framework.name.split(' ')[0]] = Math.round(categoryScore);
+                });
+                return radarPoint;
+            });
 
             const overallScores = legendaryFrameworks.map(l => ({
                 name: l.name.split(' ')[1] || l.name.split(' ')[0],
