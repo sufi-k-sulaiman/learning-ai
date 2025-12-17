@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
+import PageMeta from '@/components/PageMeta';
 import { Globe, Paperclip, Mic, MicOff, X, Loader2, Check, FileText, Image as ImageIcon, ExternalLink, ChevronRight, AlertTriangle, Download, Maximize2, StickyNote } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -154,11 +155,7 @@ export default function Qwirey() {
         }
     };
 
-    useEffect(() => {
-        document.title = 'Ai agent thats paradigm shifts and enchances your workflow.';
-        document.querySelector('meta[name="description"]')?.setAttribute('content', 'Agentic AI that adapts and enhances workflows, creating a new paradigm of productivity.');
-        document.querySelector('meta[name="keywords"]')?.setAttribute('content', 'AI agent, agentic AI');
-    }, []);
+
 
     const [prompt, setPrompt] = useState('');
     const [selectedModel, setSelectedModel] = useState('qwirey');
@@ -930,8 +927,14 @@ I need 10 reviews with: title, intro, and reviews array (name, rating 1-10, text
     };
 
     return (
-        <div className="min-h-screen bg-white p-4 md:p-8">
-            <div className="max-w-4xl mx-auto">
+        <>
+            <PageMeta 
+                title="Qwirey - AI Agent"
+                description="AI agent that paradigm shifts and enhances your workflow. Agentic AI that adapts to create a new paradigm of productivity."
+                keywords="AI agent, agentic AI, Qwirey, AI workflow, productivity AI, intelligent assistant"
+            />
+            <div className="min-h-screen bg-white p-4 md:p-8">
+                <div className="max-w-4xl mx-auto">
                 
 
                 {/* Model Selection */}
