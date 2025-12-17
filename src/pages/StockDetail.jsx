@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, PieChart as RePieChart, Pie, Cell, LineChart as ReLineChart, Line } from 'recharts';
 import { Award } from 'lucide-react';
+import StockSectionContent from '@/components/stocks/StockSectionContent';
 
 const NAV_ITEMS = [
     { id: 'overview', label: 'Overview', icon: Eye },
@@ -197,6 +198,123 @@ export default function StockDetail() {
                     };
                     break;
 
+                case 'fundamentals':
+                    prompt = `Fundamentals for ${stock.ticker}: 5-year revenue growth with yearly data, earnings growth, profit margins (gross, operating, net %), debt-to-equity, interest coverage`;
+                    schema = {
+                        type: "object",
+                        properties: {
+                            revenueGrowth: { type: "array", items: { type: "object", properties: { year: { type: "string" }, growth: { type: "number" }, revenue: { type: "number" } } } },
+                            margins: { type: "object", properties: { gross: { type: "number" }, operating: { type: "number" }, net: { type: "number" } } },
+                            debtToEquity: { type: "number" },
+                            interestCoverage: { type: "number" }
+                        }
+                    };
+                    break;
+
+                case 'technicals':
+                    prompt = `Technical analysis for ${stock.ticker}: trend, support/resistance levels, moving averages (50,100,200), RSI, MACD signal, volume trend`;
+                    schema = {
+                        type: "object",
+                        properties: {
+                            trend: { type: "string" },
+                            support: { type: "array", items: { type: "number" } },
+                            resistance: { type: "array", items: { type: "number" } },
+                            ma50: { type: "number" },
+                            rsi: { type: "number" },
+                            macdSignal: { type: "string" },
+                            volumeTrend: { type: "string" }
+                        }
+                    };
+                    break;
+
+                case 'sentiment':
+                    prompt = `Sentiment for ${stock.ticker}: sentiment score 0-100, analyst ratings (buy/hold/sell counts), institutional changes, insider activity, short interest %`;
+                    schema = {
+                        type: "object",
+                        properties: {
+                            sentimentScore: { type: "number" },
+                            analystRatings: { type: "object", properties: { buy: { type: "number" }, hold: { type: "number" }, sell: { type: "number" } } },
+                            institutionalChange: { type: "string" },
+                            insiderActivity: { type: "string" },
+                            shortInterest: { type: "number" }
+                        }
+                    };
+                    break;
+
+                case 'risk':
+                    prompt = `Risk for ${stock.ticker}: risk score 1-10, volatility, beta, max drawdown, company risks, macro risks, sharpe ratio`;
+                    schema = {
+                        type: "object",
+                        properties: {
+                            riskScore: { type: "number" },
+                            volatility: { type: "string" },
+                            beta: { type: "number" },
+                            maxDrawdown: { type: "number" },
+                            companyRisks: { type: "array", items: { type: "string" } },
+                            macroRisks: { type: "array", items: { type: "string" } },
+                            sharpeRatio: { type: "number" }
+                        }
+                    };
+                    break;
+
+                case 'dividends':
+                    prompt = `Dividends for ${stock.ticker}: yield %, annual dividend, growth rate, payout ratio, ex-dividend date, 5-year history, safety score`;
+                    schema = {
+                        type: "object",
+                        properties: {
+                            yield: { type: "number" },
+                            annualDividend: { type: "number" },
+                            growthRate: { type: "number" },
+                            payoutRatio: { type: "number" },
+                            exDividendDate: { type: "string" },
+                            history: { type: "array", items: { type: "object", properties: { year: { type: "string" }, dividend: { type: "number" } } } },
+                            safetyScore: { type: "number" }
+                        }
+                    };
+                    break;
+
+                case 'peers':
+                    prompt = `Peers for ${stock.ticker}: 5 competitors with ticker, name, market cap, P/E, ROE, growth %. Industry averages, competitive advantages, market share %`;
+                    schema = {
+                        type: "object",
+                        properties: {
+                            peers: { type: "array", items: { type: "object", properties: { ticker: { type: "string" }, name: { type: "string" }, marketCap: { type: "string" }, pe: { type: "number" }, roe: { type: "number" }, growth: { type: "number" } } } },
+                            industryAvg: { type: "object", properties: { pe: { type: "number" }, roe: { type: "number" }, growth: { type: "number" } } },
+                            advantages: { type: "array", items: { type: "string" } },
+                            marketShare: { type: "number" }
+                        }
+                    };
+                    break;
+
+                case 'bullbear':
+                    prompt = `Bull/bear for ${stock.ticker}: 5 bull points, 5 bear points, bull target price, bear target price, bull/bear probabilities %`;
+                    schema = {
+                        type: "object",
+                        properties: {
+                            bullCase: { type: "array", items: { type: "string" } },
+                            bearCase: { type: "array", items: { type: "string" } },
+                            bullTarget: { type: "number" },
+                            bearTarget: { type: "number" },
+                            bullProbability: { type: "number" },
+                            bearProbability: { type: "number" }
+                        }
+                    };
+                    break;
+
+                case 'dcf':
+                    prompt = `DCF for ${stock.ticker}: intrinsic value, margin of safety %, verdict, price targets (low/mid/high), assumptions (growth/discount/terminal rates)`;
+                    schema = {
+                        type: "object",
+                        properties: {
+                            intrinsicValue: { type: "number" },
+                            marginOfSafety: { type: "number" },
+                            verdict: { type: "string" },
+                            priceTargets: { type: "object", properties: { low: { type: "number" }, mid: { type: "number" }, high: { type: "number" } } },
+                            assumptions: { type: "object", properties: { growthRate: { type: "number" }, discountRate: { type: "number" }, terminalGrowth: { type: "number" } } }
+                        }
+                    };
+                    break;
+
                 default:
                     return;
             }
@@ -273,18 +391,18 @@ export default function StockDetail() {
                             </div>
                         </div>
 
-                        {/* Top Navigation Menu */}
-                        <div className="flex gap-1 overflow-x-auto pb-2 hide-scrollbar">
+                        {/* Top Navigation Menu - 2 Rows */}
+                        <div className="grid grid-cols-4 md:grid-cols-8 gap-1">
                             {NAV_ITEMS.map(item => (
                                 <button
                                     key={item.id}
                                     onClick={() => setActiveNav(item.id)}
-                                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
+                                    className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-medium transition-colors ${
                                         activeNav === item.id ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                                     }`}
                                 >
-                                    <item.icon className="w-4 h-4" />
-                                    {item.label}
+                                    <item.icon className="w-3.5 h-3.5" />
+                                    <span className="hidden md:inline">{item.label}</span>
                                     {loadingSection === item.id && <Loader2 className="w-3 h-3 animate-spin" />}
                                 </button>
                             ))}
@@ -300,103 +418,21 @@ export default function StockDetail() {
                             <p className="text-gray-600">Loading {activeNav} data with AI...</p>
                         </div>
                     ) : sectionData[activeNav] ? (
-                        <div className="space-y-6">
-                            {activeNav === 'overview' && sectionData.overview && (
-                                <>
-                                    <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                                        <h3 className="font-semibold text-gray-900 mb-3">Company Overview</h3>
-                                        <p className="text-gray-600 mb-4">{sectionData.overview.description}</p>
-                                        {sectionData.overview.advantages && (
-                                            <div>
-                                                <h4 className="font-medium text-gray-900 mb-2">Competitive Advantages</h4>
-                                                <ul className="space-y-1">
-                                                    {sectionData.overview.advantages.map((adv, i) => (
-                                                        <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
-                                                            <span className="w-1.5 h-1.5 rounded-full bg-purple-500 mt-2" />
-                                                            {adv}
-                                                        </li>
-                                                    ))}
-                                                </ul>
-                                            </div>
-                                        )}
-                                    </div>
-                                    {sectionData.overview.priceHistory?.length > 0 && (
-                                        <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                                            <div className="flex items-center justify-between mb-4">
-                                                <h3 className="font-semibold text-gray-900">Price History</h3>
-                                                <div className="flex gap-1">
-                                                    {['24H', '1W', '3M', '6M', '12M', '36M'].map(period => (
-                                                        <button
-                                                            key={period}
-                                                            onClick={() => setPriceChartPeriod(period)}
-                                                            className={`px-2 py-1 text-xs rounded-lg ${
-                                                                priceChartPeriod === period ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-600'
-                                                            }`}
-                                                        >
-                                                            {period}
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                            <div className="h-64">
-                                                <ResponsiveContainer width="100%" height="100%">
-                                                    <AreaChart data={sectionData.overview.priceHistory.map(p => ({ time: p.time, price: p.price }))}>
-                                                        <defs>
-                                                            <linearGradient id="priceGrad" x1="0" y1="0" x2="0" y2="1">
-                                                                <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.3}/>
-                                                                <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0}/>
-                                                            </linearGradient>
-                                                        </defs>
-                                                        <XAxis dataKey="time" tick={{ fontSize: 10 }} />
-                                                        <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `$${v.toFixed(0)}`} />
-                                                        <Tooltip formatter={(v) => [`$${Number(v).toFixed(2)}`, 'Price']} />
-                                                        <Area type="monotone" dataKey="price" stroke="#8B5CF6" strokeWidth={2} fill="url(#priceGrad)" />
-                                                    </AreaChart>
-                                                </ResponsiveContainer>
-                                            </div>
-                                        </div>
-                                    )}
-                                </>
-                            )}
-                            {activeNav === 'moat' && sectionData.moat && (
-                                <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                                    <h3 className="font-semibold text-gray-900 mb-4">MOAT Analysis</h3>
-                                    <div className="space-y-3">
-                                        <MoatBar label="Brand Power" value={sectionData.moat.moatBreakdown?.brandPower || 0} />
-                                        <MoatBar label="Switching Costs" value={sectionData.moat.moatBreakdown?.switchingCosts || 0} color="#10B981" />
-                                        <MoatBar label="Network Effects" value={sectionData.moat.moatBreakdown?.networkEffects || 0} />
-                                        <MoatBar label="Cost Advantages" value={sectionData.moat.moatBreakdown?.costAdvantages || 0} color="#F59E0B" />
-                                        <MoatBar label="Scale Advantage" value={sectionData.moat.moatBreakdown?.scaleAdvantage || 0} color="#3B82F6" />
-                                        <MoatBar label="Regulatory Moat" value={sectionData.moat.moatBreakdown?.regulatoryMoat || 0} color="#EC4899" />
-                                    </div>
-                                    {sectionData.moat.thesis && (
-                                        <div className="mt-6 p-4 bg-purple-50 rounded-lg">
-                                            <h4 className="font-medium text-gray-900 mb-2">Investment Thesis</h4>
-                                            <p className="text-sm text-gray-700">{sectionData.moat.thesis}</p>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
-                            {activeNav === 'valuation' && sectionData.valuation && (
-                                <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                                    <h3 className="font-semibold text-gray-900 mb-4">Valuation Analysis</h3>
-                                    <div className="grid grid-cols-3 gap-4">
-                                        <div className="bg-purple-50 rounded-xl p-4 text-center">
-                                            <p className="text-sm text-gray-500">Fair Value</p>
-                                            <p className="text-2xl font-bold text-purple-600">${sectionData.valuation.fairValue?.toFixed(2)}</p>
-                                        </div>
-                                        <div className="bg-green-50 rounded-xl p-4 text-center">
-                                            <p className="text-sm text-gray-500">Margin of Safety</p>
-                                            <p className="text-2xl font-bold text-green-600">{sectionData.valuation.marginOfSafety}%</p>
-                                        </div>
-                                        <div className="bg-gray-50 rounded-xl p-4 text-center">
-                                            <p className="text-sm text-gray-500">Grade</p>
-                                            <p className="text-2xl font-bold text-gray-900">{sectionData.valuation.grade}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
+                        <StockSectionContent 
+                            activeNav={activeNav}
+                            stock={stock}
+                            data={sectionData[activeNav]}
+                            priceChartPeriod={priceChartPeriod}
+                            setPriceChartPeriod={setPriceChartPeriod}
+                            investmentAmount={investmentAmount}
+                            setInvestmentAmount={setInvestmentAmount}
+                            yearsToHold={yearsToHold}
+                            setYearsToHold={setYearsToHold}
+                            expectedReturn={expectedReturn}
+                            setExpectedReturn={setExpectedReturn}
+                            activeReportTab={activeReportTab}
+                            setActiveReportTab={setActiveReportTab}
+                        />
                     ) : (
                         <div className="text-center text-gray-500 py-20">
                             <Info className="w-12 h-12 text-gray-300 mx-auto mb-4" />
