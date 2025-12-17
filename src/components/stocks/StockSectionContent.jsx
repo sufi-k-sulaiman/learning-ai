@@ -864,6 +864,64 @@ export default function StockSectionContent({
                 </div>
             );
 
+        case 'legends':
+            const legendaryFrameworks = [
+                { name: 'Warren Buffett', style: 'Value / MOAT', color: '#8B5CF6', score: stock.moat, verdict: stock.moat >= 70 ? 'Strong Buy' : 'Hold' },
+                { name: 'Peter Lynch', style: 'GARP', color: '#10B981', score: (stock.peg || 1.2) <= 1 ? 90 : 70, verdict: (stock.peg || 1.2) <= 1 ? 'Strong Buy' : 'Buy' },
+                { name: 'Benjamin Graham', style: 'Deep Value', color: '#14B8A6', score: stock.pe < 15 ? 85 : 60, verdict: stock.pe < 15 ? 'Value' : 'Not Cheap' },
+                { name: 'Joel Greenblatt', style: 'Magic Formula', color: '#3B82F6', score: (stock.roic || 18) >= 20 ? 85 : 70, verdict: (stock.roic || 18) >= 20 ? 'Top Quartile' : 'Above Avg' },
+                { name: 'Ray Dalio', style: 'Risk Parity', color: '#0EA5E9', score: 75, verdict: 'Portfolio Fit' },
+                { name: 'Cathie Wood', style: 'Innovation', color: '#6366F1', score: stock.sector === 'Technology' ? 85 : 50, verdict: stock.sector === 'Technology' ? 'Innovation' : 'Not Focus' },
+                { name: 'George Soros', style: 'Reflexivity', color: '#EF4444', score: 72, verdict: 'Trend Following' },
+                { name: 'David Dreman', style: 'Contrarian', color: '#A855F7', score: stock.pe < 15 ? 85 : 55, verdict: stock.pe < 15 ? 'Contrarian Buy' : 'Wait' },
+            ];
+            return (
+                <div className="min-h-[600px] space-y-6">
+                    <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-6 text-white">
+                        <div className="flex items-center gap-3">
+                            <Award className="w-8 h-8" />
+                            <div>
+                                <h2 className="text-2xl font-bold">Legendary Frameworks</h2>
+                                <p className="text-white/80">Analyze {stock.ticker} through 8 investment philosophies</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        {legendaryFrameworks.map((legend, i) => (
+                            <div key={i} className="bg-white rounded-2xl border border-gray-200 p-4 hover:shadow-lg transition-shadow">
+                                <div className="flex items-center gap-2 mb-3">
+                                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold" style={{ backgroundColor: legend.color }}>
+                                        {legend.name.split(' ').map(n => n[0]).join('')}
+                                    </div>
+                                    <div>
+                                        <p className="font-semibold text-gray-900 text-sm">{legend.name}</p>
+                                        <p className="text-xs text-gray-500">{legend.style}</p>
+                                    </div>
+                                </div>
+                                <div className="mb-3">
+                                    <div className="flex justify-between text-sm mb-1">
+                                        <span className="text-gray-600">Score</span>
+                                        <span className="font-bold text-gray-900">{legend.score}/100</span>
+                                    </div>
+                                    <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                                        <div className="h-full rounded-full bg-gradient-to-r from-purple-500 to-green-500" style={{ width: `${legend.score}%` }} />
+                                    </div>
+                                </div>
+                                <div className="pt-2 border-t border-gray-100">
+                                    <span className={`px-2 py-1 rounded text-xs font-medium ${
+                                        legend.verdict.includes('Buy') || legend.verdict.includes('Strong') ? 'bg-green-100 text-green-700' :
+                                        legend.verdict.includes('Hold') || legend.verdict.includes('Fit') ? 'bg-yellow-100 text-yellow-700' :
+                                        'bg-gray-100 text-gray-700'
+                                    }`}>
+                                        {legend.verdict}
+                                    </span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+
         default:
             return (
                 <div className="min-h-[600px] bg-white rounded-2xl border border-gray-200 p-6">
