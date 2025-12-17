@@ -23,9 +23,6 @@ const NAV_ITEMS = [
     { id: 'simulator', label: 'Simulator', icon: Calculator },
     { id: 'financials', label: 'Financials', icon: DollarSign },
     { id: 'technicals', label: 'Technicals', icon: BarChart3 },
-    { id: 'sentiment', label: 'Sentiment', icon: Brain },
-    { id: 'ai-insights', label: 'AI Insights', icon: Sparkles },
-    { id: 'risk', label: 'Risk & Macro', icon: AlertTriangle },
     { id: 'news', label: 'News & Events', icon: FileText },
     { id: 'dividends', label: 'Dividends', icon: Percent },
     { id: 'peers', label: 'Peers', icon: Users },
@@ -185,22 +182,30 @@ export default function StockDetail() {
                     break;
 
                 case 'technicals':
-                    prompt = `Technical analysis for ${stock.ticker}: trend, support/resistance levels, moving averages (50,100,200), RSI, MACD signal, volume trend`;
+                    prompt = `Complete technical analysis for ${stock.ticker}: Technical indicators (trend, RSI, MA50, MACD signal), Sentiment (sentiment score 0-100, analyst ratings buy/hold/sell counts, short interest %), AI insights (AI confidence 0-100, 3-5 predictions, risk alerts), Risk assessment (risk score 1-10, volatility, beta, max drawdown %, 2-4 company risks)`;
                     schema = {
                         type: "object",
                         properties: {
                             trend: { type: "string" },
-                            support: { type: "array", items: { type: "number" } },
-                            resistance: { type: "array", items: { type: "number" } },
-                            ma50: { type: "number" },
                             rsi: { type: "number" },
+                            ma50: { type: "number" },
                             macdSignal: { type: "string" },
-                            volumeTrend: { type: "string" }
+                            sentimentScore: { type: "number" },
+                            analystRatings: { type: "object", properties: { buy: { type: "number" }, hold: { type: "number" }, sell: { type: "number" } } },
+                            shortInterest: { type: "number" },
+                            aiConfidence: { type: "number" },
+                            predictions: { type: "array", items: { type: "string" } },
+                            riskAlerts: { type: "array", items: { type: "string" } },
+                            riskScore: { type: "number" },
+                            volatility: { type: "string" },
+                            beta: { type: "number" },
+                            maxDrawdown: { type: "number" },
+                            companyRisks: { type: "array", items: { type: "string" } }
                         }
                     };
                     break;
 
-                case 'sentiment':
+                case 'news':
                     prompt = `Sentiment for ${stock.ticker}: sentiment score 0-100, analyst ratings (buy/hold/sell counts), institutional changes, insider activity, short interest %`;
                     schema = {
                         type: "object",
@@ -210,22 +215,6 @@ export default function StockDetail() {
                             institutionalChange: { type: "string" },
                             insiderActivity: { type: "string" },
                             shortInterest: { type: "number" }
-                        }
-                    };
-                    break;
-
-                case 'risk':
-                    prompt = `Risk for ${stock.ticker}: risk score 1-10, volatility, beta, max drawdown, company risks, macro risks, sharpe ratio`;
-                    schema = {
-                        type: "object",
-                        properties: {
-                            riskScore: { type: "number" },
-                            volatility: { type: "string" },
-                            beta: { type: "number" },
-                            maxDrawdown: { type: "number" },
-                            companyRisks: { type: "array", items: { type: "string" } },
-                            macroRisks: { type: "array", items: { type: "string" } },
-                            sharpeRatio: { type: "number" }
                         }
                     };
                     break;
@@ -303,22 +292,6 @@ export default function StockDetail() {
                             investorPresentations: { type: "array", items: { type: "object", properties: { title: { type: "string" }, date: { type: "string" } } } },
                             earningsReleases: { type: "array", items: { type: "object", properties: { title: { type: "string" }, date: { type: "string" }, eps: { type: "string" } } } },
                             fiscalYearData: { type: "array", items: { type: "object", properties: { year: { type: "string" }, revenue: { type: "string" }, earnings: { type: "string" }, assets: { type: "string" } } } }
-                        }
-                    };
-                    break;
-
-                case 'ai-insights':
-                    prompt = `AI insights for ${stock.ticker}: AI confidence 0-100, predictions (3-5), unusual patterns (3), earnings surprise probability, sector rotation signal, smart money flow, risk alerts (2-4)`;
-                    schema = {
-                        type: "object",
-                        properties: {
-                            aiConfidence: { type: "number" },
-                            predictions: { type: "array", items: { type: "string" } },
-                            patterns: { type: "array", items: { type: "string" } },
-                            earningsSurprise: { type: "string" },
-                            sectorRotation: { type: "string" },
-                            smartMoneyFlow: { type: "string" },
-                            riskAlerts: { type: "array", items: { type: "string" } }
                         }
                     };
                     break;

@@ -451,9 +451,10 @@ export default function StockSectionContent({
         case 'technicals':
               return (
                   <div className="min-h-[600px] space-y-6">
-                      <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                          <h3 className="font-semibold text-gray-900 mb-4">Technical Indicators</h3>
-                          {data.rsi ? (
+                      {/* Technical Indicators */}
+                      {data.rsi && (
+                          <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                              <h3 className="font-semibold text-gray-900 mb-4">Technical Indicators</h3>
                               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                   <div className="bg-gray-50 rounded-xl p-4 text-center">
                                       <p className="text-sm text-gray-500">RSI</p>
@@ -478,98 +479,130 @@ export default function StockSectionContent({
                                       </div>
                                   )}
                               </div>
-                          ) : <p className="text-gray-500 text-center py-12">Loading technical data...</p>}
-                      </div>
-                  </div>
-              );
+                          </div>
+                      )}
 
-        case 'sentiment':
-              return (
-                  <div className="min-h-[600px] space-y-6">
-                      <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                          <h3 className="font-semibold text-gray-900 mb-4">Market Sentiment</h3>
-                          {data.analystRatings ? (
-                              <>
-                                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
-                                      <div className="bg-green-50 rounded-xl p-4 text-center">
-                                          <p className="text-sm text-gray-500">Buy</p>
-                                          <p className="text-2xl font-bold text-green-600">{data.analystRatings.buy}</p>
-                                      </div>
-                                      <div className="bg-yellow-50 rounded-xl p-4 text-center">
-                                          <p className="text-sm text-gray-500">Hold</p>
-                                          <p className="text-2xl font-bold text-yellow-600">{data.analystRatings.hold}</p>
-                                      </div>
-                                      <div className="bg-red-50 rounded-xl p-4 text-center">
-                                          <p className="text-sm text-gray-500">Sell</p>
-                                          <p className="text-2xl font-bold text-red-600">{data.analystRatings.sell}</p>
-                                      </div>
+                      {/* Market Sentiment */}
+                      {data.analystRatings && (
+                          <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                              <h3 className="font-semibold text-gray-900 mb-4">Market Sentiment</h3>
+                              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                                  <div className="bg-green-50 rounded-xl p-4 text-center">
+                                      <p className="text-sm text-gray-500">Buy</p>
+                                      <p className="text-2xl font-bold text-green-600">{data.analystRatings.buy}</p>
                                   </div>
-                                  <div className="grid grid-cols-2 gap-4">
-                                      {data.sentimentScore && (
-                                          <div className="bg-gray-50 rounded-xl p-4">
-                                              <p className="text-sm text-gray-500">Sentiment Score</p>
-                                              <p className="text-3xl font-bold text-orange-600">{data.sentimentScore}/100</p>
-                                          </div>
-                                      )}
-                                      {data.shortInterest && (
-                                          <div className="bg-gray-50 rounded-xl p-4">
-                                              <p className="text-sm text-gray-500">Short Interest</p>
-                                              <p className="text-3xl font-bold text-gray-900">{data.shortInterest}%</p>
-                                          </div>
-                                      )}
+                                  <div className="bg-yellow-50 rounded-xl p-4 text-center">
+                                      <p className="text-sm text-gray-500">Hold</p>
+                                      <p className="text-2xl font-bold text-yellow-600">{data.analystRatings.hold}</p>
                                   </div>
-                              </>
-                          ) : <p className="text-gray-500 text-center py-12">Loading sentiment data...</p>}
-                      </div>
-                  </div>
-              );
-
-        case 'risk':
-              return (
-                  <div className="min-h-[600px] space-y-6">
-                      <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                          <h3 className="font-semibold text-gray-900 mb-4">Risk Assessment</h3>
-                          {data.riskScore ? (
-                              <>
-                                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                                      <div className="bg-orange-50 rounded-xl p-4 text-center">
-                                          <p className="text-sm text-gray-500">Risk Score</p>
-                                          <p className="text-3xl font-bold text-orange-600">{data.riskScore}/10</p>
-                                      </div>
-                                      {(data.beta || stock.beta) && (
-                                          <div className="bg-gray-50 rounded-xl p-4 text-center">
-                                              <p className="text-sm text-gray-500">Beta</p>
-                                              <p className="text-2xl font-bold text-gray-900">{(data.beta || stock.beta).toFixed(2)}</p>
-                                          </div>
-                                      )}
-                                      {data.volatility && (
-                                          <div className="bg-gray-50 rounded-xl p-4 text-center">
-                                              <p className="text-sm text-gray-500">Volatility</p>
-                                              <p className="text-xl font-bold text-gray-900">{data.volatility}</p>
-                                          </div>
-                                      )}
-                                      {data.maxDrawdown && (
-                                          <div className="bg-red-50 rounded-xl p-4 text-center">
-                                              <p className="text-sm text-gray-500">Max Drawdown</p>
-                                              <p className="text-2xl font-bold text-red-600">-{data.maxDrawdown}%</p>
-                                          </div>
-                                      )}
+                                  <div className="bg-red-50 rounded-xl p-4 text-center">
+                                      <p className="text-sm text-gray-500">Sell</p>
+                                      <p className="text-2xl font-bold text-red-600">{data.analystRatings.sell}</p>
                                   </div>
-                                  {data.companyRisks && data.companyRisks.length > 0 && (
-                                      <div className="mb-4">
-                                          <h4 className="font-medium text-gray-900 mb-2">Company Risks</h4>
-                                          <div className="flex flex-wrap gap-2">
-                                              {data.companyRisks.map((r, i) => (
-                                                  <span key={i} className="px-3 py-1 bg-red-100 text-red-800 text-sm rounded-full">{r}</span>
-                                              ))}
-                                          </div>
+                              </div>
+                              <div className="grid grid-cols-2 gap-4">
+                                  {data.sentimentScore && (
+                                      <div className="bg-gray-50 rounded-xl p-4">
+                                          <p className="text-sm text-gray-500">Sentiment Score</p>
+                                          <p className="text-3xl font-bold text-orange-600">{data.sentimentScore}/100</p>
                                       </div>
                                   )}
-                              </>
-                          ) : <p className="text-gray-500 text-center py-12">Loading risk data...</p>}
-                      </div>
+                                  {data.shortInterest && (
+                                      <div className="bg-gray-50 rounded-xl p-4">
+                                          <p className="text-sm text-gray-500">Short Interest</p>
+                                          <p className="text-3xl font-bold text-gray-900">{data.shortInterest}%</p>
+                                      </div>
+                                  )}
+                              </div>
+                          </div>
+                      )}
+
+                      {/* AI Insights */}
+                      {data.aiConfidence && (
+                          <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl border border-purple-200 p-6">
+                              <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                  <Sparkles className="w-5 h-5 text-purple-600" /> AI-Powered Insights
+                              </h3>
+                              <div className="mb-4">
+                                  <p className="text-sm text-gray-600 mb-2">AI Confidence</p>
+                                  <p className="text-5xl font-bold text-purple-600">{data.aiConfidence}%</p>
+                              </div>
+                              {data.predictions && data.predictions.length > 0 && (
+                                  <div className="mt-4">
+                                      <h4 className="font-semibold text-gray-900 mb-3">AI Predictions</h4>
+                                      <ul className="space-y-3">
+                                          {data.predictions.map((p, i) => (
+                                              <li key={i} className="flex items-start gap-3 p-3 bg-white/60 rounded-lg">
+                                                  <Sparkles className="w-5 h-5 text-purple-600 mt-0.5" />
+                                                  <span className="text-gray-700">{p}</span>
+                                              </li>
+                                          ))}
+                                      </ul>
+                                  </div>
+                              )}
+                              {data.riskAlerts && data.riskAlerts.length > 0 && (
+                                  <div className="mt-4 p-4 bg-red-50 rounded-lg border border-red-200">
+                                      <h4 className="font-semibold text-red-900 mb-2 flex items-center gap-2">
+                                          <AlertTriangle className="w-4 h-4" /> AI Risk Alerts
+                                      </h4>
+                                      <ul className="space-y-2">
+                                          {data.riskAlerts.map((r, i) => (
+                                              <li key={i} className="text-sm text-red-700">{r}</li>
+                                          ))}
+                                      </ul>
+                                  </div>
+                              )}
+                          </div>
+                      )}
+
+                      {/* Risk Assessment */}
+                      {data.riskScore && (
+                          <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                              <h3 className="font-semibold text-gray-900 mb-4">Risk Assessment</h3>
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                                  <div className="bg-orange-50 rounded-xl p-4 text-center">
+                                      <p className="text-sm text-gray-500">Risk Score</p>
+                                      <p className="text-3xl font-bold text-orange-600">{data.riskScore}/10</p>
+                                  </div>
+                                  {(data.beta || stock.beta) && (
+                                      <div className="bg-gray-50 rounded-xl p-4 text-center">
+                                          <p className="text-sm text-gray-500">Beta</p>
+                                          <p className="text-2xl font-bold text-gray-900">{(data.beta || stock.beta).toFixed(2)}</p>
+                                      </div>
+                                  )}
+                                  {data.volatility && (
+                                      <div className="bg-gray-50 rounded-xl p-4 text-center">
+                                          <p className="text-sm text-gray-500">Volatility</p>
+                                          <p className="text-xl font-bold text-gray-900">{data.volatility}</p>
+                                      </div>
+                                  )}
+                                  {data.maxDrawdown && (
+                                      <div className="bg-red-50 rounded-xl p-4 text-center">
+                                          <p className="text-sm text-gray-500">Max Drawdown</p>
+                                          <p className="text-2xl font-bold text-red-600">-{data.maxDrawdown}%</p>
+                                      </div>
+                                  )}
+                              </div>
+                              {data.companyRisks && data.companyRisks.length > 0 && (
+                                  <div>
+                                      <h4 className="font-medium text-gray-900 mb-2">Company Risks</h4>
+                                      <div className="flex flex-wrap gap-2">
+                                          {data.companyRisks.map((r, i) => (
+                                              <span key={i} className="px-3 py-1 bg-red-100 text-red-800 text-sm rounded-full">{r}</span>
+                                          ))}
+                                      </div>
+                                  </div>
+                              )}
+                          </div>
+                      )}
+
+                      {!data.rsi && <p className="text-gray-500 text-center py-32">Loading technical data...</p>}
                   </div>
               );
+
+
+
+
 
         case 'dividends':
               return (
@@ -1144,57 +1177,7 @@ export default function StockSectionContent({
                   </div>
               );
 
-        case 'ai-insights':
-              return (
-                  <div className="min-h-[600px] space-y-6">
-                      {(data.aiConfidence || stock.aiRating) ? (
-                          <>
-                              <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl border border-purple-200 p-6">
-                                  <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                      <Sparkles className="w-5 h-5 text-purple-600" /> AI-Powered Insights
-                                  </h3>
-                                  <div className="grid grid-cols-2 gap-6 mb-4">
-                                      <div>
-                                          <p className="text-sm text-gray-600 mb-2">AI Confidence</p>
-                                          <p className="text-5xl font-bold text-purple-600">{data.aiConfidence || stock.aiRating}%</p>
-                                      </div>
-                                      {data.earningsSurprise && (
-                                          <div>
-                                              <p className="text-sm text-gray-600 mb-2">Earnings Surprise</p>
-                                              <p className="text-2xl font-bold text-gray-900">{data.earningsSurprise}</p>
-                                          </div>
-                                      )}
-                                  </div>
-                              </div>
-                              {data.predictions && data.predictions.length > 0 && (
-                                  <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                                      <h4 className="font-semibold text-gray-900 mb-4">AI Predictions</h4>
-                                      <ul className="space-y-3">
-                                          {data.predictions.map((p, i) => (
-                                              <li key={i} className="flex items-start gap-3 p-3 bg-purple-50 rounded-lg">
-                                                  <Sparkles className="w-5 h-5 text-purple-600 mt-0.5" />
-                                                  <span className="text-gray-700">{p}</span>
-                                              </li>
-                                          ))}
-                                      </ul>
-                                  </div>
-                              )}
-                              {data.riskAlerts && data.riskAlerts.length > 0 && (
-                                  <div className="bg-red-50 rounded-2xl border border-red-200 p-6">
-                                      <h4 className="font-semibold text-red-900 mb-4 flex items-center gap-2">
-                                          <AlertTriangle className="w-5 h-5" /> AI Risk Alerts
-                                      </h4>
-                                      <ul className="space-y-2">
-                                          {data.riskAlerts.map((r, i) => (
-                                              <li key={i} className="text-sm text-red-700">{r}</li>
-                                          ))}
-                                      </ul>
-                                  </div>
-                              )}
-                          </>
-                      ) : <p className="text-gray-500 text-center py-32">Loading AI insights...</p>}
-                  </div>
-              );
+
 
         case 'news':
               return (
