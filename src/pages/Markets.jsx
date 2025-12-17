@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { createPageUrl } from '@/utils';
 import PageMeta from '@/components/PageMeta';
 import { Search, RefreshCw, TrendingUp, TrendingDown, Shield, Zap, DollarSign, BarChart3, Activity, AlertTriangle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -6,7 +8,6 @@ import { Input } from "@/components/ui/input";
 import StockCard from '@/components/markets/StockCard';
 import StockTicker from '@/components/markets/StockTicker';
 import FilterChips from '@/components/markets/FilterChips';
-import StockDetailModal from '@/components/markets/StockDetailModal';
 import MarketOverviewChart from '@/components/markets/MarketOverviewChart';
 import { EmptyState, LoadingState } from '@/components/ErrorDisplay';
 import { base44 } from '@/api/base44Client';
@@ -922,26 +923,12 @@ const STOCK_DATA = ALL_TICKERS;
 // Stock Markets
 
 export default function Markets() {
-    // Update URL for display only (aesthetic, not parsed)
-    const updateUrl = (stockTicker, filterType) => {
-        const basePath = window.location.pathname;
-        if (stockTicker) {
-            window.history.pushState({}, '', `${basePath}/${stockTicker}`);
-        } else if (filterType) {
-            window.history.pushState({}, '', `${basePath}/${filterType}`);
-        } else {
-            window.history.pushState({}, '', basePath);
-        }
-    };
-
-
+    const navigate = useNavigate();
 
     const [stocks, setStocks] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [activePreset, setActivePreset] = useState('all');
     const [filters, setFilters] = useState({ market: 'All Markets', sector: 'All Sectors', industry: 'All Industries', moat: 'Any', roe: 'Any', pe: 'Any', zscore: 'Any' });
-    const [selectedStock, setSelectedStock] = useState(null);
-    const [showStockModal, setShowStockModal] = useState(false);
     const [loading, setLoading] = useState(false);
     const [loadingMore, setLoadingMore] = useState(false);
     const [hasMore, setHasMore] = useState(true);
@@ -1077,9 +1064,7 @@ Use real market data. Return ALL ${batch.length} stocks.`,
         await loadInitialStocks();
     };
     const handleStockClick = (stock) => { 
-        setSelectedStock(stock); 
-        setShowStockModal(true); 
-        updateUrl(stock.ticker);
+        navigate(`${createPageUrl('StockDetail')}?ticker=${stock.ticker}`);
     };
 
     const filteredStocks = useMemo(() => {
@@ -1285,7 +1270,6 @@ Use real market data. Return ALL ${batch.length} stocks.`,
                 />
             )}
 
-            <StockDetailModal stock={selectedStock} isOpen={showStockModal} onClose={() => { setShowStockModal(false); updateUrl(null); }} />
             </div>
         </>
     );
