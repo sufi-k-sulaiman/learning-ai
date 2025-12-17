@@ -1,21 +1,60 @@
-import React, { useState } from 'react';
-import { X, Plus, Trash2, ArrowRight } from 'lucide-react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { X, Plus, Trash2, ArrowRight, Search } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
+import { ALL_TICKERS } from './StockTickerData';
 
 export default function ComparisonModal({ isOpen, onClose, currentTicker }) {
     const navigate = useNavigate();
     const [tickers, setTickers] = useState([currentTicker]);
     const [newTicker, setNewTicker] = useState('');
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const [selectedIndex, setSelectedIndex] = useState(0);
+    const inputRef = useRef(null);
+    const suggestionsRef = useRef(null);
 
-    const addTicker = () => {
-        const ticker = newTicker.trim().toUpperCase();
-        if (ticker && !tickers.includes(ticker) && tickers.length < 5) {
-            setTickers([...tickers, ticker]);
+    const suggestions = useMemo(() => {
+        if (!newTicker.trim()) return [];
+        const query = newTicker.toLowerCase().trim();
+        return ALL_TICKERS.filter(stock => 
+            stock.ticker.toLowerCase().includes(query) || 
+            stock.name.toLowerCase().includes(query)
+        ).slice(0, 8);
+    }, [newTicker]);
+
+    useEffect(() => {
+        setShowSuggestions(suggestions.length > 0 && newTicker.trim().length > 0);
+        setSelectedIndex(0);
+    }, [suggestions.length, newTicker]);
+
+    const addTicker = (ticker = null) => {
+        const tickerToAdd = ticker || newTicker.trim().toUpperCase();
+        if (tickerToAdd && !tickers.includes(tickerToAdd) && tickers.length < 5) {
+            setTickers([...tickers, tickerToAdd]);
             setNewTicker('');
+            setShowSuggestions(false);
+        }
+    };
+
+    const handleKeyDown = (e) => {
+        if (!showSuggestions) return;
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            setSelectedIndex(prev => (prev + 1) % suggestions.length);
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            setSelectedIndex(prev => (prev - 1 + suggestions.length) % suggestions.length);
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (suggestions[selectedIndex]) {
+                addTicker(suggestions[selectedIndex].ticker);
+            }
+        } else if (e.key === 'Escape') {
+            setShowSuggestions(false);
         }
     };
 
@@ -37,17 +76,49 @@ export default function ComparisonModal({ isOpen, onClose, currentTicker }) {
                 </DialogHeader>
                 
                 <div className="space-y-4">
-                    <div className="flex gap-2">
-                        <Input
-                            value={newTicker}
-                            onChange={(e) => setNewTicker(e.target.value)}
-                            onKeyPress={(e) => e.key === 'Enter' && addTicker()}
-                            placeholder="Enter ticker (e.g., AAPL)"
-                            className="flex-1"
-                        />
-                        <Button onClick={addTicker} disabled={tickers.length >= 5}>
-                            <Plus className="w-4 h-4" />
-                        </Button>
+                    <div className="relative">
+                        <div className="flex gap-2">
+                            <div className="relative flex-1">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                                <Input
+                                    ref={inputRef}
+                                    value={newTicker}
+                                    onChange={(e) => setNewTicker(e.target.value)}
+                                    onKeyDown={handleKeyDown}
+                                    onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
+                                    placeholder="Search ticker or company name..."
+                                    className="flex-1 pl-10"
+                                />
+                            </div>
+                            <Button onClick={() => addTicker()} disabled={tickers.length >= 5}>
+                                <Plus className="w-4 h-4" />
+                            </Button>
+                        </div>
+
+                        {showSuggestions && suggestions.length > 0 && (
+                            <div 
+                                ref={suggestionsRef}
+                                className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-64 overflow-y-auto"
+                            >
+                                {suggestions.map((stock, i) => (
+                                    <button
+                                        key={stock.ticker}
+                                        onClick={() => addTicker(stock.ticker)}
+                                        className={`w-full text-left px-4 py-3 hover:bg-purple-50 transition-colors border-b border-gray-100 last:border-0 ${
+                                            i === selectedIndex ? 'bg-purple-50' : ''
+                                        }`}
+                                    >
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <span className="font-bold text-purple-600">{stock.ticker}</span>
+                                                <span className="text-sm text-gray-600 ml-2">{stock.name}</span>
+                                            </div>
+                                            <span className="text-xs text-gray-400">{stock.sector}</span>
+                                        </div>
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
                     <div className="space-y-2">
