@@ -19,13 +19,13 @@ import StockSectionContent from '@/components/stocks/StockSectionContent';
 
 const NAV_ITEMS = [
     { id: 'overview', label: 'Overview', icon: Eye },
+    { id: 'legends', label: 'Legends', icon: Award },
     { id: 'investor-moat', label: 'Investor MOAT', icon: Shield },
     { id: 'simulator', label: 'Simulator', icon: Calculator },
     { id: 'financials', label: 'Financials', icon: DollarSign },
     { id: 'technicals', label: 'Technicals', icon: BarChart3 },
     { id: 'news', label: 'News & Events', icon: FileText },
     { id: 'investor-reports', label: 'Investor Reports', icon: Building },
-    { id: 'legends', label: 'Legends', icon: Award },
 ];
 
 const CHART_COLORS = ['#8B5CF6', '#10B981', '#3B82F6', '#F59E0B', '#EF4444', '#EC4899'];
@@ -54,6 +54,7 @@ export default function StockDetail() {
     const [expectedReturn, setExpectedReturn] = useState(12);
     const [activeReportTab, setActiveReportTab] = useState('annual');
     const [priceChartPeriod, setPriceChartPeriod] = useState('36M');
+    const [selectedLegend, setSelectedLegend] = useState(null);
 
     // Get stock ticker from URL
     useEffect(() => {
@@ -434,7 +435,9 @@ export default function StockDetail() {
                             setExpectedReturn={setExpectedReturn}
                             activeReportTab={activeReportTab}
                             setActiveReportTab={setActiveReportTab}
-                        />
+                            selectedLegend={selectedLegend}
+                            setSelectedLegend={setSelectedLegend}
+                            />
                     ) : (
                         <div className="text-center text-gray-500 py-20">
                             <Info className="w-12 h-12 text-gray-300 mx-auto mb-4" />

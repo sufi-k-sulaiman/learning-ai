@@ -29,7 +29,9 @@ export default function StockSectionContent({
     expectedReturn,
     setExpectedReturn,
     activeReportTab,
-    setActiveReportTab
+    setActiveReportTab,
+    selectedLegend,
+    setSelectedLegend
 }) {
     const isPositive = stock.change >= 0;
 
@@ -1229,10 +1231,37 @@ export default function StockSectionContent({
               );
 
         case 'legends': {
-            const legendaryFrameworks = [
-                { name: 'Warren Buffett', style: 'Value / MOAT', color: '#8B5CF6', metrics: [{ label: 'MOAT', value: stock.moat, max: 100, good: 70 }, { label: 'ROE', value: stock.roe, max: 40, good: 15 }], verdict: stock.moat >= 70 && stock.roe >= 15 ? 'Strong Buy' : stock.moat >= 50 ? 'Hold' : 'Avoid' },
-                { name: 'Peter Lynch', style: 'GARP', color: '#10B981', metrics: [{ label: 'PEG', value: stock.peg || 1.2, max: 3, good: 1, inverse: true }, { label: 'Growth', value: stock.sgr || 15, max: 40, good: 15 }], verdict: (stock.peg || 1.2) <= 1 ? 'Strong Buy' : (stock.peg || 1.2) <= 1.5 ? 'Buy' : 'Hold' },
-                { name: 'Benjamin Graham', style: 'Deep Value', color: '#14B8A6', metrics: [{ label: 'P/E', value: stock.pe, max: 40, good: 15, inverse: true }, { label: 'Margin', value: 18, max: 50, good: 25 }], verdict: stock.pe < 15 ? 'Graham Value' : 'Not Cheap' },
+              const legendaryFrameworks = [
+                  { 
+                      name: 'Warren Buffett', 
+                      style: 'Value / MOAT', 
+                      color: '#8B5CF6', 
+                      metrics: [{ label: 'MOAT', value: stock.moat, max: 100, good: 70 }, { label: 'ROE', value: stock.roe, max: 40, good: 15 }], 
+                      verdict: stock.moat >= 70 && stock.roe >= 15 ? 'Strong Buy' : stock.moat >= 50 ? 'Hold' : 'Avoid',
+                      philosophy: 'Focus on companies with strong economic moats and excellent returns on equity',
+                      keyMetrics: ['Economic MOAT', 'ROE > 15%', 'Competitive Advantages', 'Pricing Power'],
+                      approach: 'Buy wonderful companies at fair prices and hold forever. Focus on businesses with durable competitive advantages.'
+                  },
+                { 
+                    name: 'Peter Lynch', 
+                    style: 'GARP', 
+                    color: '#10B981', 
+                    metrics: [{ label: 'PEG', value: stock.peg || 1.2, max: 3, good: 1, inverse: true }, { label: 'Growth', value: stock.sgr || 15, max: 40, good: 15 }], 
+                    verdict: (stock.peg || 1.2) <= 1 ? 'Strong Buy' : (stock.peg || 1.2) <= 1.5 ? 'Buy' : 'Hold',
+                    philosophy: 'Growth At Reasonable Price - find fast-growing companies trading at fair valuations',
+                    keyMetrics: ['PEG < 1.0', 'Earnings Growth', 'Reasonable P/E', 'Scalable Business'],
+                    approach: 'Look for companies with earnings growth matching or exceeding their P/E ratio. PEG ratio is the key metric.'
+                },
+                { 
+                    name: 'Benjamin Graham', 
+                    style: 'Deep Value', 
+                    color: '#14B8A6', 
+                    metrics: [{ label: 'P/E', value: stock.pe, max: 40, good: 15, inverse: true }, { label: 'Margin', value: 18, max: 50, good: 25 }], 
+                    verdict: stock.pe < 15 ? 'Graham Value' : 'Not Cheap',
+                    philosophy: 'Buy stocks trading below intrinsic value with a margin of safety',
+                    keyMetrics: ['P/E < 15', 'P/B < 1.5', 'Margin of Safety', 'Strong Balance Sheet'],
+                    approach: 'Systematic value investing with strict quantitative criteria. Focus on cheap stocks with strong fundamentals.'
+                },
                 { name: 'Joel Greenblatt', style: 'Magic Formula', color: '#3B82F6', metrics: [{ label: 'ROIC', value: stock.roic || 18, max: 40, good: 15 }, { label: 'Yield', value: 8.5, max: 20, good: 8 }], verdict: (stock.roic || 18) >= 20 ? 'Top Quartile' : 'Above Avg' },
                 { name: 'Ray Dalio', style: 'Risk Parity', color: '#0EA5E9', metrics: [{ label: 'Diversification', value: 72, max: 100, good: 70 }, { label: 'Risk Balance', value: 78, max: 100, good: 70 }], verdict: 'Portfolio Fit' },
                 { name: 'Cathie Wood', style: 'Innovation', color: '#6366F1', metrics: [{ label: 'Innovation', value: stock.sector === 'Technology' ? 85 : 50, max: 100, good: 70 }, { label: 'TAM Growth', value: 85, max: 100, good: 60 }], verdict: stock.sector === 'Technology' ? 'Innovation' : 'Not Focus' },
@@ -1258,9 +1287,120 @@ export default function StockSectionContent({
 
             const overallScores = legendaryFrameworks.map(l => ({
                 name: l.name.split(' ')[1] || l.name.split(' ')[0],
+                fullName: l.name,
                 score: Math.round(l.metrics.reduce((sum, m) => sum + (m.inverse ? (m.max - m.value) / m.max * 100 : m.value / m.max * 100), 0) / l.metrics.length),
                 color: l.color
             })).sort((a, b) => b.score - a.score);
+
+            // If legend selected, show detailed view
+            if (selectedLegend) {
+                const legend = legendaryFrameworks.find(l => l.name === selectedLegend);
+                if (!legend) return null;
+
+                const metricData = legend.metrics.map(m => ({
+                    name: m.label,
+                    value: m.value,
+                    target: m.good,
+                    max: m.max
+                }));
+
+                return (
+                    <div className="min-h-[600px] space-y-6">
+                        <Button 
+                            variant="ghost" 
+                            onClick={() => setSelectedLegend(null)}
+                            className="mb-4"
+                        >
+                            <ArrowLeft className="w-4 h-4 mr-2" /> Back to All Legends
+                        </Button>
+
+                        <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-2xl p-8 text-white">
+                            <div className="flex items-center gap-4 mb-6">
+                                <div className="w-20 h-20 rounded-full flex items-center justify-center text-white text-2xl font-bold bg-white/20 backdrop-blur-sm">
+                                    {legend.name.split(' ').map(n => n[0]).join('')}
+                                </div>
+                                <div>
+                                    <h1 className="text-4xl font-bold">{legend.name}</h1>
+                                    <p className="text-xl text-white/90">{legend.style}</p>
+                                </div>
+                            </div>
+                            <p className="text-lg text-white/90">{legend.philosophy}</p>
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-6">
+                            <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                                <h3 className="font-semibold text-gray-900 mb-4">Investment Approach</h3>
+                                <p className="text-gray-700 leading-relaxed">{legend.approach}</p>
+                                <div className="mt-6">
+                                    <h4 className="font-medium text-gray-900 mb-3">Key Metrics</h4>
+                                    <div className="flex flex-wrap gap-2">
+                                        {legend.keyMetrics.map((metric, i) => (
+                                            <span key={i} className="px-3 py-1 bg-purple-100 text-purple-700 text-sm rounded-full font-medium">
+                                                {metric}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                                <h3 className="font-semibold text-gray-900 mb-4">Performance Metrics</h3>
+                                <div className="h-64">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart data={metricData} layout="vertical">
+                                            <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 10 }} />
+                                            <YAxis type="category" dataKey="name" tick={{ fontSize: 11 }} width={80} />
+                                            <Tooltip />
+                                            <Bar dataKey="value" fill={legend.color} radius={[0, 4, 4, 0]} />
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                            <h3 className="font-semibold text-gray-900 mb-4">Detailed Analysis for {stock.ticker}</h3>
+                            <div className="space-y-4">
+                                {legend.metrics.map((m, i) => (
+                                    <div key={i}>
+                                        <div className="flex justify-between items-center mb-2">
+                                            <span className="font-medium text-gray-900">{m.label}</span>
+                                            <div className="flex items-center gap-4">
+                                                <span className="text-sm text-gray-500">Current: <span className="font-bold text-gray-900">{typeof m.value === 'number' ? m.value.toFixed(1) : m.value}</span></span>
+                                                <span className="text-sm text-gray-500">Target: <span className="font-bold text-green-600">{m.good}</span></span>
+                                            </div>
+                                        </div>
+                                        <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+                                            <div 
+                                                className="h-full rounded-full transition-all" 
+                                                style={{ 
+                                                    width: `${Math.min((m.value / m.max) * 100, 100)}%`,
+                                                    backgroundColor: (m.inverse ? m.value < m.good : m.value >= m.good) ? '#10B981' : '#F59E0B'
+                                                }} 
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className={`rounded-2xl p-6 ${
+                            legend.verdict.includes('Buy') || legend.verdict.includes('Strong') ? 'bg-green-50 border border-green-200' :
+                            legend.verdict.includes('Hold') ? 'bg-yellow-50 border border-yellow-200' :
+                            'bg-red-50 border border-red-200'
+                        }`}>
+                            <h3 className="font-semibold text-gray-900 mb-2">Verdict</h3>
+                            <p className={`text-3xl font-bold ${
+                                legend.verdict.includes('Buy') || legend.verdict.includes('Strong') ? 'text-green-700' :
+                                legend.verdict.includes('Hold') ? 'text-yellow-700' :
+                                'text-red-700'
+                            }`}>
+                                {legend.verdict}
+                            </p>
+                        </div>
+                    </div>
+                );
+            }
 
             return (
                 <div className="min-h-[600px] space-y-6">
@@ -1323,7 +1463,11 @@ export default function StockSectionContent({
 
                     <div className="grid grid-cols-4 gap-4">
                         {legendaryFrameworks.map((legend, i) => (
-                            <div key={i} className="bg-white rounded-2xl border border-gray-200 p-4 hover:shadow-lg transition-shadow">
+                            <div 
+                                key={i} 
+                                onClick={() => setSelectedLegend(legend.name)}
+                                className="bg-white rounded-2xl border border-gray-200 p-4 hover:shadow-lg transition-all cursor-pointer hover:border-purple-400"
+                            >
                                 <div className="flex items-center gap-2 mb-3">
                                     <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-sm font-bold" style={{ backgroundColor: legend.color }}>
                                         {legend.name.split(' ').map(n => n[0]).join('')}
