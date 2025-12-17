@@ -20,9 +20,7 @@ import StockSectionContent from '@/components/stocks/StockSectionContent';
 const NAV_ITEMS = [
     { id: 'overview', label: 'Overview', icon: Eye },
     { id: 'investor-moat', label: 'Investor MOAT', icon: Shield },
-    { id: 'valuation', label: 'Valuation', icon: BarChart3 },
     { id: 'simulator', label: 'Simulator', icon: Calculator },
-    { id: 'dcf', label: 'DCF Calculator', icon: Activity },
     { id: 'bullbear', label: 'Bull/Bear Case', icon: TrendingUp },
     { id: 'fundamentals', label: 'Fundamentals', icon: LineChart },
     { id: 'financials', label: 'Financials', icon: DollarSign },
@@ -188,21 +186,6 @@ export default function StockDetail() {
                     };
                     break;
 
-                case 'valuation':
-                    prompt = `Valuation for ${stock.ticker}: fair value, margin of safety %, sector average P/E, grade A-F, 5 comparable companies with P/E, 5-year historical P/E trend`;
-                    schema = {
-                        type: "object",
-                        properties: {
-                            fairValue: { type: "number" },
-                            comparables: { type: "array", items: { type: "object", properties: { ticker: { type: "string" }, pe: { type: "number" } } } },
-                            historicalPE: { type: "array", items: { type: "object", properties: { year: { type: "string" }, pe: { type: "number" } } } },
-                            sectorAvgPE: { type: "number" },
-                            marginOfSafety: { type: "number" },
-                            grade: { type: "string" }
-                        }
-                    };
-                    break;
-
                 case 'fundamentals':
                     prompt = `Fundamentals for ${stock.ticker}: 5-year revenue growth with yearly data, earnings growth, profit margins (gross, operating, net %), debt-to-equity, interest coverage`;
                     schema = {
@@ -306,20 +289,6 @@ export default function StockDetail() {
                     };
                     break;
 
-                case 'dcf':
-                    prompt = `DCF for ${stock.ticker}: intrinsic value, margin of safety %, verdict, price targets (low/mid/high), assumptions (growth/discount/terminal rates)`;
-                    schema = {
-                        type: "object",
-                        properties: {
-                            intrinsicValue: { type: "number" },
-                            marginOfSafety: { type: "number" },
-                            verdict: { type: "string" },
-                            priceTargets: { type: "object", properties: { low: { type: "number" }, mid: { type: "number" }, high: { type: "number" } } },
-                            assumptions: { type: "object", properties: { growthRate: { type: "number" }, discountRate: { type: "number" }, terminalGrowth: { type: "number" } } }
-                        }
-                    };
-                    break;
-
                 case 'financials':
                     prompt = `Financial ratios for ${stock.ticker}: current P/E, PEG, ROE, ROIC, ROA, profit margins, liquidity ratios`;
                     schema = {
@@ -335,10 +304,19 @@ export default function StockDetail() {
                     break;
 
                 case 'simulator':
-                    // Simulator doesn't need AI, just calculations
-                    setSectionData(prev => ({ ...prev, [section]: { loaded: true } }));
-                    setLoadingSection(null);
-                    return;
+                    prompt = `Combined simulator data for ${stock.ticker}: fair value, grade A-F, sector average P/E, DCF intrinsic value, DCF margin of safety %, DCF verdict (Undervalued/Fairly Valued/Overvalued)`;
+                    schema = {
+                        type: "object",
+                        properties: {
+                            fairValue: { type: "number" },
+                            grade: { type: "string" },
+                            sectorAvgPE: { type: "number" },
+                            dcfIntrinsicValue: { type: "number" },
+                            dcfMarginOfSafety: { type: "number" },
+                            dcfVerdict: { type: "string" }
+                        }
+                    };
+                    break;
 
                 case 'investor-reports':
                     prompt = `Investor reports for ${stock.ticker}: fiscal year end, next earnings date, latest 3 annual reports (title, date, description), latest 4 quarterly reports (title, date, description), latest 3 investor presentations (title, date), latest 4 earnings releases (title, date, EPS), fiscal year data (3 years with revenue/earnings/assets)`;

@@ -290,34 +290,7 @@ export default function StockSectionContent({
                   </div>
               );
 
-          case 'valuation':
-              return (
-                  <div className="space-y-6">
-                      <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                          <h3 className="font-semibold text-gray-900 mb-4">Valuation Metrics</h3>
-                          {data.fairValue ? (
-                              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                  <div className="bg-purple-50 rounded-xl p-4 text-center">
-                                      <p className="text-sm text-gray-500">Fair Value</p>
-                                      <p className="text-2xl font-bold text-purple-600">${data.fairValue.toFixed(2)}</p>
-                                  </div>
-                                  <div className="bg-green-50 rounded-xl p-4 text-center">
-                                      <p className="text-sm text-gray-500">Margin of Safety</p>
-                                      <p className="text-2xl font-bold text-green-600">{data.marginOfSafety}%</p>
-                                  </div>
-                                  <div className="bg-gray-50 rounded-xl p-4 text-center">
-                                      <p className="text-sm text-gray-500">Grade</p>
-                                      <p className="text-2xl font-bold text-gray-900">{data.grade}</p>
-                                  </div>
-                                  <div className="bg-blue-50 rounded-xl p-4 text-center">
-                                      <p className="text-sm text-gray-500">Sector P/E</p>
-                                      <p className="text-2xl font-bold text-blue-600">{data.sectorAvgPE.toFixed(1)}</p>
-                                  </div>
-                              </div>
-                          ) : <p className="text-gray-500 text-center py-12">Loading valuation data...</p>}
-                      </div>
-                  </div>
-              );
+
 
         case 'fundamentals':
             return (
@@ -682,12 +655,47 @@ export default function StockSectionContent({
                   </div>
               );
 
-        case 'dcf':
+
+
+        case 'simulator':
+              const simResult = calculateFutureValue();
+              const projectionData = Array.from({ length: yearsToHold + 1 }, (_, i) => ({
+                  year: `Y${i}`,
+                  value: investmentAmount * Math.pow(1 + expectedReturn / 100, i),
+                  withDividends: investmentAmount * Math.pow(1 + expectedReturn / 100, i) + ((stock.dividend || 2) * (investmentAmount / stock.price) * i)
+              }));
+
               return (
-                  <div className="min-h-[600px] bg-white rounded-2xl border border-gray-200 p-6">
-                      <h3 className="font-semibold text-gray-900 mb-6">DCF Intrinsic Value</h3>
-                      {data.intrinsicValue ? (
-                          <>
+                  <div className="min-h-[600px] space-y-6">
+                      {/* Valuation Metrics */}
+                      {data.fairValue && (
+                          <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                              <h3 className="font-semibold text-gray-900 mb-4">Valuation Metrics</h3>
+                              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                  <div className="bg-purple-50 rounded-xl p-4 text-center">
+                                      <p className="text-sm text-gray-500">Fair Value</p>
+                                      <p className="text-2xl font-bold text-purple-600">${data.fairValue.toFixed(2)}</p>
+                                  </div>
+                                  {data.grade && (
+                                      <div className="bg-gray-50 rounded-xl p-4 text-center">
+                                          <p className="text-sm text-gray-500">Grade</p>
+                                          <p className="text-2xl font-bold text-gray-900">{data.grade}</p>
+                                      </div>
+                                  )}
+                                  {data.sectorAvgPE && (
+                                      <div className="bg-blue-50 rounded-xl p-4 text-center">
+                                          <p className="text-sm text-gray-500">Sector P/E</p>
+                                          <p className="text-2xl font-bold text-blue-600">{data.sectorAvgPE.toFixed(1)}</p>
+                                      </div>
+                                  )}
+                              </div>
+                          </div>
+                      )}
+
+                      {/* DCF Calculator */}
+                      {data.dcfIntrinsicValue && (
+                          <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                              <h3 className="font-semibold text-gray-900 mb-4">DCF Intrinsic Value</h3>
                               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                   <div className="bg-gray-50 rounded-xl p-4 text-center">
                                       <p className="text-sm text-gray-500">Current Price</p>
@@ -695,96 +703,85 @@ export default function StockSectionContent({
                                   </div>
                                   <div className="bg-purple-50 rounded-xl p-4 text-center">
                                       <p className="text-sm text-gray-500">Intrinsic Value</p>
-                                      <p className="text-2xl font-bold text-purple-600">${data.intrinsicValue.toFixed(2)}</p>
+                                      <p className="text-2xl font-bold text-purple-600">${data.dcfIntrinsicValue.toFixed(2)}</p>
                                   </div>
                                   <div className="bg-green-50 rounded-xl p-4 text-center">
                                       <p className="text-sm text-gray-500">Margin of Safety</p>
-                                      <p className={`text-2xl font-bold ${data.marginOfSafety > 0 ? 'text-green-600' : 'text-red-600'}`}>{data.marginOfSafety}%</p>
+                                      <p className={`text-2xl font-bold ${data.dcfMarginOfSafety > 0 ? 'text-green-600' : 'text-red-600'}`}>{data.dcfMarginOfSafety}%</p>
                                   </div>
-                                  {data.verdict && (
-                                      <div className={`rounded-xl p-4 text-center ${data.verdict === 'Undervalued' ? 'bg-green-100' : data.verdict === 'Overvalued' ? 'bg-red-100' : 'bg-yellow-100'}`}>
+                                  {data.dcfVerdict && (
+                                      <div className={`rounded-xl p-4 text-center ${data.dcfVerdict === 'Undervalued' ? 'bg-green-100' : data.dcfVerdict === 'Overvalued' ? 'bg-red-100' : 'bg-yellow-100'}`}>
                                           <p className="text-sm text-gray-500">Verdict</p>
-                                          <p className={`text-xl font-bold ${data.verdict === 'Undervalued' ? 'text-green-700' : data.verdict === 'Overvalued' ? 'text-red-700' : 'text-yellow-700'}`}>{data.verdict}</p>
+                                          <p className={`text-xl font-bold ${data.dcfVerdict === 'Undervalued' ? 'text-green-700' : data.dcfVerdict === 'Overvalued' ? 'text-red-700' : 'text-yellow-700'}`}>{data.dcfVerdict}</p>
                                       </div>
                                   )}
                               </div>
-                          </>
-                      ) : <p className="text-gray-500 text-center py-12">Loading DCF data...</p>}
+                          </div>
+                      )}
+
+                      {/* Investment Simulator */}
+                      <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                          <div className="flex items-center gap-2 mb-6">
+                              <Calculator className="w-5 h-5 text-purple-600" />
+                              <h3 className="font-semibold text-gray-900">Investment Simulator</h3>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                              <div>
+                                  <label className="text-sm text-gray-600 mb-2 block">Investment Amount</label>
+                                  <Input type="number" value={investmentAmount} onChange={(e) => setInvestmentAmount(Number(e.target.value))} min={100} max={4000000} />
+                              </div>
+                              <div>
+                                  <label className="text-sm text-gray-600 mb-2 block">Years: {yearsToHold}</label>
+                                  <Slider value={[yearsToHold]} onValueChange={(v) => setYearsToHold(v[0])} min={1} max={30} step={1} className="mt-4" />
+                              </div>
+                              <div>
+                                  <label className="text-sm text-gray-600 mb-2 block">Return: {expectedReturn}%</label>
+                                  <Slider value={[expectedReturn]} onValueChange={(v) => setExpectedReturn(v[0])} min={-20} max={50} step={1} className="mt-4" />
+                              </div>
+                          </div>
+                          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+                              <div className="bg-gray-50 rounded-xl p-4 text-center">
+                                  <p className="text-xs text-gray-500">Shares</p>
+                                  <p className="text-xl font-bold text-gray-900">{simResult.shares}</p>
+                              </div>
+                              <div className="bg-blue-50 rounded-xl p-4 text-center">
+                                  <p className="text-xs text-gray-500">Future Price</p>
+                                  <p className="text-xl font-bold text-blue-600">${simResult.futurePrice}</p>
+                              </div>
+                              <div className="bg-purple-50 rounded-xl p-4 text-center">
+                                  <p className="text-xs text-gray-500">Future Value</p>
+                                  <p className="text-xl font-bold text-purple-600">${Number(simResult.futureValue).toLocaleString()}</p>
+                              </div>
+                              <div className="bg-green-50 rounded-xl p-4 text-center">
+                                  <p className="text-xs text-gray-500">Dividends</p>
+                                  <p className="text-xl font-bold text-green-600">${Number(simResult.totalDividends).toLocaleString()}</p>
+                              </div>
+                              <div className={`rounded-xl p-4 text-center ${Number(simResult.totalReturn) >= 0 ? 'bg-green-100' : 'bg-red-100'}`}>
+                                  <p className="text-xs text-gray-500">Total Return</p>
+                                  <p className={`text-xl font-bold ${Number(simResult.totalReturn) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                                      {Number(simResult.totalReturn) >= 0 ? '+' : ''}${Number(simResult.totalReturn).toLocaleString()}
+                                  </p>
+                              </div>
+                          </div>
+                          <div className="h-64">
+                              <ResponsiveContainer width="100%" height="100%">
+                                  <AreaChart data={projectionData}>
+                                      <defs>
+                                          <linearGradient id="projGrad" x1="0" y1="0" x2="0" y2="1">
+                                              <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.3}/>
+                                              <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0}/>
+                                          </linearGradient>
+                                      </defs>
+                                      <XAxis dataKey="year" tick={{ fontSize: 10 }} />
+                                      <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `$${(v/1000).toFixed(0)}K`} />
+                                      <Tooltip formatter={(v) => `$${Number(v).toLocaleString()}`} />
+                                      <Area type="monotone" dataKey="withDividends" stroke="#10B981" strokeWidth={2} fill="url(#projGrad)" />
+                                  </AreaChart>
+                              </ResponsiveContainer>
+                          </div>
+                      </div>
                   </div>
               );
-
-        case 'simulator':
-            const simResult = calculateFutureValue();
-            const projectionData = Array.from({ length: yearsToHold + 1 }, (_, i) => ({
-                year: `Y${i}`,
-                value: investmentAmount * Math.pow(1 + expectedReturn / 100, i),
-                withDividends: investmentAmount * Math.pow(1 + expectedReturn / 100, i) + ((stock.dividend || 2) * (investmentAmount / stock.price) * i)
-            }));
-            
-            return (
-                <div className="min-h-[600px] space-y-6">
-                    <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                        <div className="flex items-center gap-2 mb-6">
-                            <Calculator className="w-5 h-5 text-purple-600" />
-                            <h3 className="font-semibold text-gray-900">Investment Simulator</h3>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                            <div>
-                                <label className="text-sm text-gray-600 mb-2 block">Investment Amount</label>
-                                <Input type="number" value={investmentAmount} onChange={(e) => setInvestmentAmount(Number(e.target.value))} min={100} max={4000000} />
-                            </div>
-                            <div>
-                                <label className="text-sm text-gray-600 mb-2 block">Years: {yearsToHold}</label>
-                                <Slider value={[yearsToHold]} onValueChange={(v) => setYearsToHold(v[0])} min={1} max={30} step={1} className="mt-4" />
-                            </div>
-                            <div>
-                                <label className="text-sm text-gray-600 mb-2 block">Return: {expectedReturn}%</label>
-                                <Slider value={[expectedReturn]} onValueChange={(v) => setExpectedReturn(v[0])} min={-20} max={50} step={1} className="mt-4" />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
-                            <div className="bg-gray-50 rounded-xl p-4 text-center">
-                                <p className="text-xs text-gray-500">Shares</p>
-                                <p className="text-xl font-bold text-gray-900">{simResult.shares}</p>
-                            </div>
-                            <div className="bg-blue-50 rounded-xl p-4 text-center">
-                                <p className="text-xs text-gray-500">Future Price</p>
-                                <p className="text-xl font-bold text-blue-600">${simResult.futurePrice}</p>
-                            </div>
-                            <div className="bg-purple-50 rounded-xl p-4 text-center">
-                                <p className="text-xs text-gray-500">Future Value</p>
-                                <p className="text-xl font-bold text-purple-600">${Number(simResult.futureValue).toLocaleString()}</p>
-                            </div>
-                            <div className="bg-green-50 rounded-xl p-4 text-center">
-                                <p className="text-xs text-gray-500">Dividends</p>
-                                <p className="text-xl font-bold text-green-600">${Number(simResult.totalDividends).toLocaleString()}</p>
-                            </div>
-                            <div className={`rounded-xl p-4 text-center ${Number(simResult.totalReturn) >= 0 ? 'bg-green-100' : 'bg-red-100'}`}>
-                                <p className="text-xs text-gray-500">Total Return</p>
-                                <p className={`text-xl font-bold ${Number(simResult.totalReturn) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                                    {Number(simResult.totalReturn) >= 0 ? '+' : ''}${Number(simResult.totalReturn).toLocaleString()}
-                                </p>
-                            </div>
-                        </div>
-                        <div className="h-64">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <AreaChart data={projectionData}>
-                                    <defs>
-                                        <linearGradient id="projGrad" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#8B5CF6" stopOpacity={0.3}/>
-                                            <stop offset="95%" stopColor="#8B5CF6" stopOpacity={0}/>
-                                        </linearGradient>
-                                    </defs>
-                                    <XAxis dataKey="year" tick={{ fontSize: 10 }} />
-                                    <YAxis tick={{ fontSize: 10 }} tickFormatter={(v) => `$${(v/1000).toFixed(0)}K`} />
-                                    <Tooltip formatter={(v) => `$${Number(v).toLocaleString()}`} />
-                                    <Area type="monotone" dataKey="withDividends" stroke="#10B981" strokeWidth={2} fill="url(#projGrad)" />
-                                </AreaChart>
-                            </ResponsiveContainer>
-                        </div>
-                    </div>
-                </div>
-            );
         
         case 'reports':
             return (
