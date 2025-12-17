@@ -74,12 +74,12 @@ export default function Header({ title, sidebarOpen, setSidebarOpen, children, c
                         <img src={LOGO_URL} alt="1cPublishing" className="h-10 w-10 object-contain" />
                         <div className="hidden sm:block">
                             <span className="text-xl font-bold text-gray-900">Agentic Ai</span>
-                            <p className="text-x font-medium text-purple-800">1cPlatform - Demo</p>
+                            <p className="text-x font-medium" style={{ color: '#6209e6' }}>1cPlatform - Demo</p>
                         </div>
                     </Link>
                     {setSidebarOpen && (
                         <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(!sidebarOpen)} className="hover:bg-gray-100">
-                            {sidebarOpen ? <ChevronLeft className="w-5 h-5 text-purple-800" /> : <Menu className="w-5 h-5 text-purple-800" />}
+                            {sidebarOpen ? <ChevronLeft className="w-5 h-5" style={{ color: '#6209e6' }} /> : <Menu className="w-5 h-5" style={{ color: '#6209e6' }} />}
                         </Button>
                     )}
                 </div>
@@ -92,13 +92,24 @@ export default function Header({ title, sidebarOpen, setSidebarOpen, children, c
                                 type="text"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                onFocus={() => searchQuery && setShowSuggestions(true)}
+                                onFocus={(e) => { 
+                                    if (searchQuery) setShowSuggestions(true);
+                                    e.target.style.borderColor = '#6209e6';
+                                    e.target.style.boxShadow = '0 0 0 2px rgba(98, 9, 230, 0.1)';
+                                }}
+                                onBlur={(e) => {
+                                    e.target.style.borderColor = '';
+                                    e.target.style.boxShadow = '';
+                                }}
                                 placeholder="Search anything..."
-                                className="w-full h-12 pl-5 pr-14 rounded-full border border-gray-200 bg-gray-50 focus:bg-white focus:border-purple-300 focus:ring-2 focus:ring-purple-100 outline-none transition-all text-gray-700 placeholder:text-gray-400"
+                                className="w-full h-12 pl-5 pr-14 rounded-full border border-gray-200 bg-gray-50 focus:bg-white outline-none transition-all text-gray-700 placeholder:text-gray-400"
                             />
                             <button
                                 type="submit"
-                                className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-purple-800 hover:bg-purple-800 flex items-center justify-center transition-colors"
+                                className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full flex items-center justify-center transition-colors"
+                                style={{ backgroundColor: '#6209e6' }}
+                                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#5507C8'}
+                                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#6209e6'}
                             >
                                 <Search className="w-4 h-4 text-white" />
                             </button>
@@ -111,12 +122,14 @@ export default function Header({ title, sidebarOpen, setSidebarOpen, children, c
                                             key={i}
                                             type="button"
                                             onClick={() => handleSuggestionClick(s)}
-                                            className="w-full px-4 py-3 text-left hover:bg-purple-50 flex items-center gap-3 transition-colors"
+                                            className="w-full px-4 py-3 text-left flex items-center gap-3 transition-colors"
+                                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#F3E8FF'}
+                                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = ''}
                                         >
                                             <Search className="w-4 h-4 text-gray-400" />
                                             <span className="text-gray-700">{s.label}</span>
                                             {s.type === 'page' && (
-                                                <span className="ml-auto text-xs text-purple-800 bg-purple-50 px-2 py-0.5 rounded-full">Page</span>
+                                                <span className="ml-auto text-xs px-2 py-0.5 rounded-full" style={{ color: '#6209e6', backgroundColor: '#F3E8FF' }}>Page</span>
                                             )}
                                         </button>
                                     ))}
@@ -129,7 +142,7 @@ export default function Header({ title, sidebarOpen, setSidebarOpen, children, c
                     <div className="flex-1 flex md:hidden justify-end mr-2">
                         <div className="text-right">
                             <span className="text-lg font-bold text-gray-900">1cPublishing</span>
-                            <p className="text-x font-medium text-purple-800">Agentic Ai</p>
+                            <p className="text-x font-medium" style={{ color: '#6209e6' }}>Agentic Ai</p>
                         </div>
                     </div>
                 )}

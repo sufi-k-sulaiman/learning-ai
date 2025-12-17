@@ -27,11 +27,22 @@ export default function Sidebar({ isOpen, activePage, onClose }) {
                             onClick={handleMobileClose}
                             className={`flex items-center gap-2 md:gap-3 px-2 md:px-4 py-1.5 md:py-3 rounded-lg transition-colors text-sm ${
                                 item.label === activePage
-                                    ? 'bg-purple-100 text-purple-700'
-                                    : 'text-gray-700 hover:bg-purple-50 hover:text-purple-600'
+                                    ? 'text-gray-700'
+                                    : 'text-gray-700'
                             }`}
+                            style={item.label === activePage ? { backgroundColor: '#E9D5FF', color: '#6209e6' } : {}}
+                            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#F3E8FF'; e.currentTarget.style.color = '#6209e6'; }}
+                            onMouseLeave={(e) => { 
+                                if (item.label !== activePage) {
+                                    e.currentTarget.style.backgroundColor = '';
+                                    e.currentTarget.style.color = '';
+                                } else {
+                                    e.currentTarget.style.backgroundColor = '#E9D5FF';
+                                    e.currentTarget.style.color = '#6209e6';
+                                }
+                            }}
                         >
-                            <item.icon className="w-4 h-4 md:w-5 md:h-5 text-purple-600" />
+                            <item.icon className="w-4 h-4 md:w-5 md:h-5" style={{ color: '#6209e6' }} />
                             <span className="font-medium" style={{ fontSize: '1rem' }}>{item.label}</span>
                         </Link>
                     ))}

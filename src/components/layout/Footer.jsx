@@ -14,12 +14,12 @@ export default function Footer() {
                     </Link>
                     <nav className="flex flex-wrap justify-center gap-6 text-sm">
                         {footerLinks.map((link, i) => (
-                            <a key={i} href={link.href} className="text-gray-600 hover:text-purple-600 transition-colors">{link.label}</a>
+                            <a key={i} href={link.href} className="text-gray-600 transition-colors" style={{ '--hover-color': '#6209e6' }} onMouseEnter={(e) => e.currentTarget.style.color = '#6209e6'} onMouseLeave={(e) => e.currentTarget.style.color = ''}>{link.label}</a>
                         ))}
                     </nav>
                 </div>
                 <div className="mt-4 pt-4 border-t border-gray-200 text-center text-sm text-gray-500">
-                    Copyright © 2025 <a href="https://1cplatform.com/" target="_blank" rel="noopener noreferrer" className="text-purple-800 hover:text-purple-600 transition-colors">1cPlatform</a>. All rights reserved.
+                    Copyright © 2025 <a href="https://1cplatform.com/" target="_blank" rel="noopener noreferrer" className="transition-colors" style={{ color: '#6209e6' }} onMouseEnter={(e) => e.currentTarget.style.color = '#5507C8'} onMouseLeave={(e) => e.currentTarget.style.color = '#6209e6'}>1cPlatform</a>. All rights reserved.
                 </div>
             </div>
         </footer>
