@@ -825,7 +825,7 @@ export default function SearchPods() {
                 <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl border border-purple-100 p-6">
                     <div className="flex items-center gap-3 mb-6">
                         <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center">
-                            <Radio className="w-5 h-5 text-purple-700" />
+                            <Radio className="w-5 h-5 text-purple-800" />
                         </div>
                         <div>
                             <span className="text-gray-900 font-bold text-2xl md:text-3xl">SearchPods</span>
@@ -840,7 +840,7 @@ export default function SearchPods() {
                                 onClick={() => playEpisode(item)}
                                 className="relative flex items-center gap-3 p-4 rounded-xl cursor-pointer bg-white hover:bg-purple-50 border border-gray-100 hover:border-purple-200 group transition-all shadow-sm"
                             >
-                                <div className={`absolute -top-2 -left-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${i < 3 ? 'bg-purple-700 text-white' : 'bg-gray-200 text-gray-600'}`}>
+                                <div className={`absolute -top-2 -left-2 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${i < 3 ? 'bg-purple-800 text-white' : 'bg-gray-200 text-gray-600'}`}>
                                     {i + 1}
                                 </div>
                                 <div className="relative w-14 h-14 rounded-lg overflow-hidden flex-shrink-0">
@@ -852,7 +852,7 @@ export default function SearchPods() {
                                 <div className="flex-1 min-w-0">
                                     <h4 className="text-gray-900 text-sm font-medium truncate">{item.title}</h4>
                                     <p className="text-gray-500 text-xs capitalize">{item.category}</p>
-                                    <div className="flex items-center gap-2 mt-1 text-purple-700 text-xs">
+                                    <div className="flex items-center gap-2 mt-1 text-purple-800 text-xs">
                                         <Users className="w-3 h-3" />
                                         {item.plays.toLocaleString()} plays
                                     </div>
@@ -876,7 +876,7 @@ export default function SearchPods() {
                         <button
                             type="submit"
                             disabled={!searchQuery.trim()}
-                            className="absolute right-2 top-1/2 -translate-y-1/2 px-5 h-10 rounded-full bg-purple-700 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 text-white font-medium transition-colors"
+                            className="absolute right-2 top-1/2 -translate-y-1/2 px-5 h-10 rounded-full bg-purple-800 hover:bg-purple-800 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 text-white font-medium transition-colors"
                         >
                             <Sparkles className="w-4 h-4" />
                             Generate
@@ -893,7 +893,7 @@ export default function SearchPods() {
                                     setSearchQuery(topic);
                                     playEpisode({ title: topic, category: 'Quick' });
                                 }}
-                                className="px-3 py-1.5 rounded-full bg-gray-100 hover:bg-purple-100 text-gray-600 hover:text-purple-700 text-sm transition-all"
+                                className="px-3 py-1.5 rounded-full bg-gray-100 hover:bg-purple-100 text-gray-600 hover:text-purple-800 text-sm transition-all"
                             >
                                 {topic}
                             </button>
@@ -923,7 +923,7 @@ export default function SearchPods() {
                                         <p className="text-gray-500 text-sm">{cat.episodes} episodes</p>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-2 text-gray-500 hover:text-purple-700">
+                                <div className="flex items-center gap-2 text-gray-500 hover:text-purple-800">
                                     {loadingCategory === cat.id ? (
                                         <Loader2 className="w-5 h-5 animate-spin" />
                                     ) : (
@@ -941,12 +941,12 @@ export default function SearchPods() {
                                     {/* Subtopic Filters */}
                                     {categoryData[cat.id].subtopics?.length > 0 && (
                                         <div className="flex flex-wrap gap-2 py-2">
-                                            <span className="px-3 py-1 rounded-full text-xs bg-purple-100 text-purple-700">All</span>
+                                            <span className="px-3 py-1 rounded-full text-xs bg-purple-100 text-purple-800">All</span>
                                             {categoryData[cat.id].subtopics.slice(0, 3).map((sub, i) => (
                                                 <button
                                                     key={i}
                                                     onClick={(e) => { e.stopPropagation(); playEpisode({ title: sub, category: cat.name }); }}
-                                                    className="px-3 py-1 rounded-full text-xs bg-gray-100 text-gray-600 hover:bg-purple-100 hover:text-purple-700 transition-all"
+                                                    className="px-3 py-1 rounded-full text-xs bg-gray-100 text-gray-600 hover:bg-purple-100 hover:text-purple-800 transition-all"
                                                 >
                                                     {sub}
                                                 </button>
@@ -966,7 +966,7 @@ export default function SearchPods() {
                                         >
                                             <div className="w-10 h-10 rounded-lg bg-gray-200 overflow-hidden flex items-center justify-center flex-shrink-0">
                                                 <Radio className="w-4 h-4 text-gray-400 group-hover:hidden" />
-                                                <Play className="w-4 h-4 text-purple-700 hidden group-hover:block" fill="currentColor" />
+                                                <Play className="w-4 h-4 text-purple-800 hidden group-hover:block" fill="currentColor" />
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <h4 className="text-gray-900 text-sm font-medium truncate">{ep.title}</h4>
@@ -983,7 +983,7 @@ export default function SearchPods() {
                                     {/* Generate More */}
                                     <button
                                         onClick={() => playEpisode({ title: `Latest in ${cat.name}`, category: cat.name })}
-                                        className="w-full py-3 rounded-xl border border-dashed border-gray-300 text-gray-500 hover:border-purple-300 hover:text-purple-700 flex items-center justify-center gap-2 text-sm transition-all"
+                                        className="w-full py-3 rounded-xl border border-dashed border-gray-300 text-gray-500 hover:border-purple-300 hover:text-purple-800 flex items-center justify-center gap-2 text-sm transition-all"
                                     >
                                         <Sparkles className="w-4 h-4" />
                                         Generate New Episode
@@ -1003,7 +1003,7 @@ export default function SearchPods() {
                         {/* Header */}
                         <div className="flex justify-between items-center mb-6">
                             <span className="text-gray-500 text-sm uppercase tracking-wider">Now Playing</span>
-                            <button onClick={closePlayer} className="w-10 h-10 rounded-full bg-purple-700 hover:bg-purple-700 flex items-center justify-center transition-colors">
+                            <button onClick={closePlayer} className="w-10 h-10 rounded-full bg-purple-800 hover:bg-purple-800 flex items-center justify-center transition-colors">
                                 <X className="w-5 h-5 text-white" />
                             </button>
                         </div>
@@ -1075,7 +1075,7 @@ export default function SearchPods() {
                         {/* Title */}
                         <div className="text-center mb-4">
                             <h2 className="text-gray-900 text-xl font-bold mb-1 line-clamp-2">{currentEpisode?.title}</h2>
-                            <p className="text-purple-700 text-sm">{currentEpisode?.category}</p>
+                            <p className="text-purple-800 text-sm">{currentEpisode?.category}</p>
                         </div>
 
                         {/* Captions - fixed height for 3 lines */}
@@ -1105,7 +1105,7 @@ export default function SearchPods() {
                                                         const isHighlighted = i === highlightIndex || i === highlightIndex - 1;
 
                                                         return (
-                                                            <span key={i} className={isHighlighted ? 'text-purple-700 font-semibold' : ''}>
+                                                            <span key={i} className={isHighlighted ? 'text-purple-800 font-semibold' : ''}>
                                                                 {word}{' '}
                                                             </span>
                                                         );
@@ -1117,7 +1117,7 @@ export default function SearchPods() {
                                 <button
                                     onClick={extendPodcast}
                                     disabled={isExtending || isGenerating}
-                                    className="mt-2 w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-700 text-sm font-medium transition-colors disabled:opacity-50"
+                                    className="mt-2 w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-purple-50 hover:bg-purple-100 text-purple-800 text-sm font-medium transition-colors disabled:opacity-50"
                                 >
                                     {isExtending ? (
                                         <>
@@ -1146,11 +1146,11 @@ export default function SearchPods() {
                                 }}
                             >
                                 <div 
-                                    className="absolute h-full bg-purple-700 rounded-full transition-all"
+                                    className="absolute h-full bg-purple-800 rounded-full transition-all"
                                     style={{ width: `${(currentTime / (duration || 1)) * 100}%` }}
                                 />
                                 <div 
-                                    className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-purple-700 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
+                                    className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-purple-800 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-md"
                                     style={{ left: `calc(${(currentTime / (duration || 1)) * 100}% - 6px)` }}
                                 />
                             </div>
@@ -1173,7 +1173,7 @@ export default function SearchPods() {
                             <button
                                 onClick={togglePlay}
                                 disabled={isGenerating}
-                                className="w-16 h-16 rounded-full bg-purple-700 hover:bg-purple-700 flex items-center justify-center text-white disabled:opacity-50 transition-all shadow-lg shadow-purple-500/30"
+                                className="w-16 h-16 rounded-full bg-purple-800 hover:bg-purple-800 flex items-center justify-center text-white disabled:opacity-50 transition-all shadow-lg shadow-purple-500/30"
                             >
                                 {isPlaying ? (
                                     <Pause className="w-7 h-7" />
@@ -1224,7 +1224,7 @@ export default function SearchPods() {
                                     }}
                                     className={`px-2 py-1 rounded text-xs transition-all ${
                                         playbackSpeed === speed
-                                            ? 'bg-purple-700 text-white'
+                                            ? 'bg-purple-800 text-white'
                                             : 'text-gray-500 hover:bg-gray-100'
                                     }`}
                                 >
@@ -1243,8 +1243,8 @@ export default function SearchPods() {
                                 disabled={isSwappingVoice}
                                 className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
                                     selectedVoice === voice.id 
-                                        ? 'bg-purple-700 text-white' 
-                                        : 'bg-gray-100 text-gray-600 hover:bg-purple-100 hover:text-purple-700'
+                                        ? 'bg-purple-800 text-white' 
+                                        : 'bg-gray-100 text-gray-600 hover:bg-purple-100 hover:text-purple-800'
                                 } disabled:opacity-50`}
                             >
                                 {isSwappingVoice && selectedVoice !== voice.id && swappingToVoice === voice.id ? (
@@ -1260,7 +1260,7 @@ export default function SearchPods() {
                                 onClick={() => setShowBraille(!showBraille)}
                                 className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors ${
                                     showBraille 
-                                        ? 'bg-purple-100 text-purple-700 border border-purple-200' 
+                                        ? 'bg-purple-100 text-purple-800 border border-purple-200' 
                                         : 'bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-600'
                                 }`}
                             >
@@ -1272,7 +1272,7 @@ export default function SearchPods() {
                                 disabled={isGenerating}
                                 className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm transition-colors ${
                                     showRecommendations 
-                                        ? 'bg-purple-100 text-purple-700 border border-purple-200' 
+                                        ? 'bg-purple-100 text-purple-800 border border-purple-200' 
                                         : 'bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-600'
                                 } disabled:opacity-50`}
                             >
@@ -1296,7 +1296,7 @@ export default function SearchPods() {
                             </div>
                             {recommendations.length === 0 ? (
                                 <div className="flex items-center justify-center py-4">
-                                    <Loader2 className="w-5 h-5 text-purple-700 animate-spin" />
+                                    <Loader2 className="w-5 h-5 text-purple-800 animate-spin" />
                                 </div>
                             ) : (
                                 <div className="space-y-2">
@@ -1310,13 +1310,13 @@ export default function SearchPods() {
                                             className="w-full flex items-center gap-3 p-3 rounded-lg bg-white hover:bg-purple-50 border border-gray-100 hover:border-purple-200 transition-all text-left"
                                         >
                                             <div className="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center flex-shrink-0">
-                                                <Radio className="w-5 h-5 text-purple-700" />
+                                                <Radio className="w-5 h-5 text-purple-800" />
                                             </div>
                                             <div className="flex-1 min-w-0">
                                                 <p className="text-sm font-medium text-gray-800 truncate">{rec.title}</p>
                                                 <p className="text-xs text-gray-500">{rec.reason || rec.category}</p>
                                             </div>
-                                            <Play className="w-4 h-4 text-purple-700" />
+                                            <Play className="w-4 h-4 text-purple-800" />
                                         </button>
                                     ))}
                                 </div>

@@ -95,7 +95,7 @@ export default function StockSectionContent({
                                             key={period}
                                             onClick={() => setPriceChartPeriod(period)}
                                             className={`px-2 py-1 text-xs rounded-lg ${
-                                                priceChartPeriod === period ? 'bg-purple-700 text-white' : 'bg-gray-100 text-gray-600'
+                                                priceChartPeriod === period ? 'bg-purple-800 text-white' : 'bg-gray-100 text-gray-600'
                                             }`}
                                         >
                                             {period}
@@ -134,7 +134,7 @@ export default function StockSectionContent({
                                 </div>
                                 <div className="bg-purple-50 rounded-xl p-3 text-center">
                                     <p className="text-xs text-gray-500">Current</p>
-                                    <p className="text-lg font-bold text-purple-700">${stock.price?.toFixed(2)}</p>
+                                    <p className="text-lg font-bold text-purple-800">${stock.price?.toFixed(2)}</p>
                                 </div>
                             </div>
                         </div>
@@ -143,7 +143,7 @@ export default function StockSectionContent({
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div className="bg-white rounded-2xl border border-gray-200 p-4">
                             <div className="flex items-center gap-2 mb-2">
-                                <Shield className="w-4 h-4 text-purple-700" />
+                                <Shield className="w-4 h-4 text-purple-800" />
                                 <span className="text-sm text-gray-600">MOAT</span>
                             </div>
                             <p className="text-2xl font-bold text-gray-900">{stock.moat}/100</p>
@@ -180,7 +180,7 @@ export default function StockSectionContent({
                           <>
                               <div className="bg-white rounded-2xl border border-gray-200 p-6">
                                   <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                      <Target className="w-5 h-5 text-purple-700" /> Investment Recommendation
+                                      <Target className="w-5 h-5 text-purple-800" /> Investment Recommendation
                                   </h3>
                                   <div className="flex items-center gap-6 mb-6">
                                       <div className={`px-6 py-3 rounded-xl text-2xl font-bold ${
@@ -208,7 +208,7 @@ export default function StockSectionContent({
                                           {data.priceTargets.mid && (
                                               <div className="bg-purple-50 rounded-xl p-4 text-center">
                                                   <p className="text-sm text-gray-600">Mid Target</p>
-                                                  <p className="text-2xl font-bold text-purple-700">${data.priceTargets.mid.toFixed(2)}</p>
+                                                  <p className="text-2xl font-bold text-purple-800">${data.priceTargets.mid.toFixed(2)}</p>
                                               </div>
                                           )}
                                           {data.priceTargets.high && (
@@ -349,7 +349,7 @@ export default function StockSectionContent({
                               {data.moatBreakdown && typeof data.moatBreakdown === 'object' && (
                                   <div className="bg-white rounded-2xl border border-gray-200 p-6">
                                       <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                          <Shield className="w-5 h-5 text-purple-700" /> MOAT Breakdown
+                                          <Shield className="w-5 h-5 text-purple-800" /> MOAT Breakdown
                                       </h3>
                                       <div className="space-y-3 mb-6">
                                           {data.moatBreakdown.brandPower !== undefined && <MoatBar label="Brand Power" value={data.moatBreakdown.brandPower} />}
@@ -445,7 +445,7 @@ export default function StockSectionContent({
                                       </div>
                                       <div className="text-center">
                                           <p className="text-sm text-gray-500">Net</p>
-                                          <p className="text-3xl font-bold text-purple-700">{data.margins.net}%</p>
+                                          <p className="text-3xl font-bold text-purple-800">{data.margins.net}%</p>
                                       </div>
                                   </div>
                               </div>
@@ -616,11 +616,11 @@ export default function StockSectionContent({
                       {data.aiConfidence && (
                           <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl border border-purple-200 p-6">
                               <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                  <Sparkles className="w-5 h-5 text-purple-700" /> AI-Powered Insights
+                                  <Sparkles className="w-5 h-5 text-purple-800" /> AI-Powered Insights
                               </h3>
                               <div className="mb-4">
                                   <p className="text-sm text-gray-600 mb-2">AI Confidence</p>
-                                  <p className="text-5xl font-bold text-purple-700">{data.aiConfidence}%</p>
+                                  <p className="text-5xl font-bold text-purple-800">{data.aiConfidence}%</p>
                               </div>
                               {data.predictions && data.predictions.length > 0 && (
                                   <div className="mt-4">
@@ -628,7 +628,7 @@ export default function StockSectionContent({
                                       <ul className="space-y-3">
                                           {data.predictions.map((p, i) => (
                                               <li key={i} className="flex items-start gap-3 p-3 bg-white/60 rounded-lg">
-                                                  <Sparkles className="w-5 h-5 text-purple-700 mt-0.5" />
+                                                  <Sparkles className="w-5 h-5 text-purple-800 mt-0.5" />
                                                   <span className="text-gray-700">{p}</span>
                                               </li>
                                           ))}
@@ -722,7 +722,7 @@ export default function StockSectionContent({
                               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                   <div className="bg-purple-50 rounded-xl p-4 text-center">
                                       <p className="text-sm text-gray-500">Fair Value</p>
-                                      <p className="text-2xl font-bold text-purple-700">${data.fairValue.toFixed(2)}</p>
+                                      <p className="text-2xl font-bold text-purple-800">${data.fairValue.toFixed(2)}</p>
                                   </div>
                                   {data.grade && (
                                       <div className="bg-gray-50 rounded-xl p-4 text-center">
@@ -751,7 +751,7 @@ export default function StockSectionContent({
                                   </div>
                                   <div className="bg-purple-50 rounded-xl p-4 text-center">
                                       <p className="text-sm text-gray-500">Intrinsic Value</p>
-                                      <p className="text-2xl font-bold text-purple-700">${data.dcfIntrinsicValue.toFixed(2)}</p>
+                                      <p className="text-2xl font-bold text-purple-800">${data.dcfIntrinsicValue.toFixed(2)}</p>
                                   </div>
                                   <div className="bg-green-50 rounded-xl p-4 text-center">
                                       <p className="text-sm text-gray-500">Margin of Safety</p>
@@ -770,7 +770,7 @@ export default function StockSectionContent({
                       {/* Investment Simulator */}
                       <div className="bg-white rounded-2xl border border-gray-200 p-6">
                           <div className="flex items-center gap-2 mb-6">
-                              <Calculator className="w-5 h-5 text-purple-700" />
+                              <Calculator className="w-5 h-5 text-purple-800" />
                               <h3 className="font-semibold text-gray-900">Investment Simulator</h3>
                           </div>
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
@@ -798,7 +798,7 @@ export default function StockSectionContent({
                               </div>
                               <div className="bg-purple-50 rounded-xl p-4 text-center">
                                   <p className="text-xs text-gray-500">Future Value</p>
-                                  <p className="text-xl font-bold text-purple-700">${Number(simResult.futureValue).toLocaleString()}</p>
+                                  <p className="text-xl font-bold text-purple-800">${Number(simResult.futureValue).toLocaleString()}</p>
                               </div>
                               <div className="bg-green-50 rounded-xl p-4 text-center">
                                   <p className="text-xs text-gray-500">Dividends</p>
@@ -902,7 +902,7 @@ export default function StockSectionContent({
                         <div className="space-y-2">
                             {(data.annualReports || []).map((r, i) => (
                                 <a key={i} href={`https://www.sec.gov/cgi-bin/browse-edgar?CIK=${stock.ticker}&type=10-K`} target="_blank" rel="noopener noreferrer" className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl hover:bg-purple-50 block">
-                                    <FileText className="w-5 h-5 text-purple-700 mt-0.5" />
+                                    <FileText className="w-5 h-5 text-purple-800 mt-0.5" />
                                     <div className="flex-1">
                                         <p className="font-medium text-gray-900">{r.title}</p>
                                         <p className="text-sm text-gray-500">{r.date}</p>
@@ -966,7 +966,7 @@ export default function StockSectionContent({
                             <div className="space-y-2">
                                 {data.annualReports.map((r, i) => (
                                     <a key={i} href={`https://www.sec.gov/cgi-bin/browse-edgar?CIK=${stock.ticker}&type=10-K`} target="_blank" rel="noopener noreferrer" className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl hover:bg-purple-50 block">
-                                        <FileText className="w-5 h-5 text-purple-700 mt-0.5" />
+                                        <FileText className="w-5 h-5 text-purple-800 mt-0.5" />
                                         <div className="flex-1">
                                             <p className="font-medium text-gray-900">{r.title}</p>
                                             <p className="text-sm text-gray-500">{r.date}</p>
@@ -1073,7 +1073,7 @@ export default function StockSectionContent({
                       {data.news && data.news.length > 0 && (
                           <div className="bg-white rounded-2xl border border-gray-200 p-6">
                               <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                  <FileText className="w-5 h-5 text-purple-700" /> Recent News
+                                  <FileText className="w-5 h-5 text-purple-800" /> Recent News
                               </h3>
                               <div className="space-y-4">
                                   {data.news.map((n, i) => (
@@ -1110,7 +1110,7 @@ export default function StockSectionContent({
                                   {data.upcomingEvents.map((e, i) => (
                                       <div key={i} className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
                                           <span className="text-sm text-gray-900">{e.event}</span>
-                                          <span className="text-sm text-purple-700 font-medium">{e.date}</span>
+                                          <span className="text-sm text-purple-800 font-medium">{e.date}</span>
                                       </div>
                                   ))}
                               </div>
@@ -1131,7 +1131,7 @@ export default function StockSectionContent({
                                   {data.annualDividend && (
                                       <div className="bg-purple-50 rounded-xl p-4 text-center">
                                           <p className="text-sm text-gray-500">Annual</p>
-                                          <p className="text-2xl font-bold text-purple-700">${data.annualDividend.toFixed(2)}</p>
+                                          <p className="text-2xl font-bold text-purple-800">${data.annualDividend.toFixed(2)}</p>
                                       </div>
                                   )}
                                   {data.growthRate && (
@@ -1178,7 +1178,7 @@ export default function StockSectionContent({
                                       </thead>
                                       <tbody>
                                           <tr className="bg-purple-50 border-b">
-                                              <td className="py-3 px-2 font-bold text-purple-700">{stock.ticker}</td>
+                                              <td className="py-3 px-2 font-bold text-purple-800">{stock.ticker}</td>
                                               <td className="py-3 px-2 text-right">{stock.pe?.toFixed(1)}</td>
                                               <td className="py-3 px-2 text-right">{stock.roe}%</td>
                                               <td className="py-3 px-2 text-right">{stock.sgr}%</td>
@@ -1259,7 +1259,7 @@ export default function StockSectionContent({
                             <ArrowLeft className="w-4 h-4 mr-2" /> Back to All Legends
                         </Button>
 
-                        <div className="bg-gradient-to-r from-purple-700 to-indigo-600 rounded-2xl p-8 text-white">
+                        <div className="bg-gradient-to-r from-purple-800 to-indigo-600 rounded-2xl p-8 text-white">
                             <div className="flex items-center gap-4 mb-6">
                                 <div className="w-20 h-20 rounded-full flex items-center justify-center text-white text-2xl font-bold bg-white/20 backdrop-blur-sm">
                                     {legend.name.split(' ').map(n => n[0]).join('')}
@@ -1280,7 +1280,7 @@ export default function StockSectionContent({
                                     <h4 className="font-medium text-gray-900 mb-3">Key Metrics</h4>
                                     <div className="flex flex-wrap gap-2">
                                         {legend.keyMetrics.map((metric, i) => (
-                                            <span key={i} className="px-3 py-1 bg-purple-100 text-purple-700 text-sm rounded-full font-medium">
+                                            <span key={i} className="px-3 py-1 bg-purple-100 text-purple-800 text-sm rounded-full font-medium">
                                                 {metric}
                                             </span>
                                         ))}
@@ -1428,7 +1428,7 @@ export default function StockSectionContent({
 
                         <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl border border-indigo-200 p-6">
                             <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                <Sparkles className="w-5 h-5 text-purple-700" /> {legend.name}'s Perspective on {stock.ticker}
+                                <Sparkles className="w-5 h-5 text-purple-800" /> {legend.name}'s Perspective on {stock.ticker}
                             </h3>
                             <div className="space-y-4">
                                 <div className="bg-white/60 rounded-lg p-4">
@@ -1499,7 +1499,7 @@ export default function StockSectionContent({
 
             return (
                 <div className="min-h-[600px] space-y-6">
-                    <div className="bg-gradient-to-r from-purple-700 to-indigo-600 rounded-2xl p-6 text-white">
+                    <div className="bg-gradient-to-r from-purple-800 to-indigo-600 rounded-2xl p-6 text-white">
                         <div className="flex items-center gap-3 mb-4">
                             <Award className="w-8 h-8" />
                             <div>

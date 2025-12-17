@@ -119,7 +119,7 @@ export default function Settings() {
     const OptionCard = ({ selected, onClick, children, label = '' }) => (
         <button onClick={() => { onClick(); if (cognitiveMode === 'audible' && label) speakText(`Selected ${label}`); }}
             className={`p-4 rounded-xl border-2 transition-all flex flex-col items-center gap-2 min-w-[100px] ${
-                selected ? 'border-purple-500 bg-purple-50 text-purple-700' : 'border-gray-200 bg-white hover:border-purple-300 text-gray-600'
+                selected ? 'border-purple-500 bg-purple-50 text-purple-800' : 'border-gray-200 bg-white hover:border-purple-300 text-gray-600'
             }`}>
             {children}
         </button>
@@ -130,7 +130,7 @@ export default function Settings() {
             <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                     <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${enabled ? 'bg-purple-100' : 'bg-gray-100'}`}>
-                        <Icon className={`w-5 h-5 ${enabled ? 'text-purple-700' : 'text-gray-500'}`} />
+                        <Icon className={`w-5 h-5 ${enabled ? 'text-purple-800' : 'text-gray-500'}`} />
                     </div>
                     <div>
                         <h3 className="font-medium text-gray-800 text-sm">{title}</h3>
@@ -190,7 +190,7 @@ export default function Settings() {
                 <div className="bg-white rounded-xl border border-gray-200 p-4">
                     <div className="flex items-center justify-between mb-3">
                         <span className="text-sm font-medium text-gray-700">Fine adjustment</span>
-                        <span className="text-sm text-purple-700 font-medium">{fontSizeSlider}px</span>
+                        <span className="text-sm text-purple-800 font-medium">{fontSizeSlider}px</span>
                     </div>
                     <Slider value={[fontSizeSlider]} onValueChange={([v]) => { setFontSizeSlider(v); document.documentElement.style.fontSize = `${v}px`; }} min={12} max={24} step={1} />
                 </div>
@@ -210,7 +210,7 @@ export default function Settings() {
                         <span className="text-sm font-medium">Square</span>
                     </OptionCard>
                     <OptionCard selected={uiStyle === 'classic'} onClick={() => setUiStyle('classic')} label="Classic style">
-                        <span className="text-purple-700 underline text-sm">Link</span>
+                        <span className="text-purple-800 underline text-sm">Link</span>
                         <span className="text-sm font-medium">Classic</span>
                     </OptionCard>
                 </div>
@@ -258,7 +258,7 @@ export default function Settings() {
                 setFontSize('medium'); setCognitiveMode('none'); setTheme('light'); setUiStyle('rounded');
                 setBlackWhiteMode(false); setHideIcons(false); setFontSizeSlider(16);
             }} className={uiStyle === 'classic' 
-                ? "text-purple-700 underline font-medium" 
+                ? "text-purple-800 underline font-medium" 
                 : "flex items-center gap-2 px-5 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-medium transition-colors"}>
                 {uiStyle !== 'classic' && <RotateCcw className="w-4 h-4" />} Reset to Defaults
             </button>

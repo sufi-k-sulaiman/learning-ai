@@ -53,7 +53,7 @@ const SourceLink = ({ source }) => {
             href={url} 
             target="_blank" 
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-xs text-purple-700 hover:text-purple-800 transition-colors px-2 py-1 bg-purple-50 hover:bg-purple-100 rounded-md"
+            className="inline-flex items-center gap-1.5 text-xs text-purple-800 hover:text-purple-800 transition-colors px-2 py-1 bg-purple-50 hover:bg-purple-100 rounded-md"
             title={url}
         >
             {domain}
@@ -106,7 +106,7 @@ const TextWithLinks = ({ text }) => {
                         href={part.url} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-xs text-purple-700 hover:text-purple-800 transition-colors px-1.5 py-0.5 bg-purple-50 hover:bg-purple-100 rounded mx-1"
+                        className="inline-flex items-center gap-1 text-xs text-purple-800 hover:text-purple-800 transition-colors px-1.5 py-0.5 bg-purple-50 hover:bg-purple-100 rounded mx-1"
                         title={part.url}
                     >
                         {cleanDomain}
@@ -222,7 +222,7 @@ const CATEGORIES = {
         name: "Designing & Building",
         icon: Beaker,
         color: "#7C3AED",
-        gradient: "from-violet-500 to-purple-700",
+        gradient: "from-violet-500 to-purple-800",
         items: ["Mechanical Engineer", "Civil Engineer", "Electrical Engineer", "Structural Engineer", "Aerospace Engineer", "Automotive Engineer", "Industrial Designer", "Product Designer", "Fashion Designer", "Graphic Designer", "UX Designer", "Interior Designer", "Architect", "Tooling Engineer", "Manufacturing Engineer"]
     },
     Operating_Maintaining: {
@@ -264,7 +264,7 @@ const CATEGORIES = {
         name: "Technology & Digital Solutions",
         icon: Cpu,
         color: "#7C3AED",
-        gradient: "from-purple-700 to-violet-600",
+        gradient: "from-purple-800 to-violet-600",
         items: ["Software Engineer", "Data Scientist", "AI/ML Engineer", "Web Developer", "Mobile App Developer", "Front-End Developer", "Back-End Developer", "Full-Stack Developer", "Cloud Architect", "DevOps Engineer", "Database Administrator", "Network Administrator", "IT Support Specialist", "Cybersecurity Analyst", "Business Intelligence Analyst"]
     },
     Customer_Service_Hospitality: {
@@ -354,7 +354,7 @@ function ItemCard({ item, color, onClick }) {
                     <Sparkles className="w-5 h-5" style={{ color }} />
                 </div>
                 <div className="flex-1">
-                    <h4 className="font-semibold text-gray-900 group-hover:text-purple-700 transition-colors">{item}</h4>
+                    <h4 className="font-semibold text-gray-900 group-hover:text-purple-800 transition-colors">{item}</h4>
                     <p className="text-xs text-gray-500">Tap to explore</p>
                 </div>
                 <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-purple-500 group-hover:translate-x-1 transition-all" />
@@ -485,7 +485,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                 <p className="text-gray-500 mb-4">Unable to fetch intelligence data for {item}</p>
                 <button 
                     onClick={fetchItemData}
-                    className="px-4 py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                    className="px-4 py-2 bg-purple-800 text-white rounded-lg hover:bg-purple-800 transition-colors"
                 >
                     Try Again
                 </button>
@@ -496,7 +496,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
     return (
         <div>
             {/* Header with Generated Image */}
-            <div className={`bg-gradient-to-r ${category?.gradient || 'from-purple-700 to-indigo-600'} rounded-2xl p-6 mb-6 text-white`}>
+            <div className={`bg-gradient-to-r ${category?.gradient || 'from-purple-800 to-indigo-600'} rounded-2xl p-6 mb-6 text-white`}>
                 <div className="flex flex-col md:flex-row md:items-center gap-6">
                     <div className="flex items-center gap-4 flex-1">
                         <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center">
@@ -627,7 +627,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                                     className="p-4 rounded-lg border border-gray-100 hover:shadow-md hover:border-purple-300 transition-all text-left cursor-pointer group" 
                                     style={{ backgroundColor: `${category?.color}05` }}
                                 >
-                                    <h4 className="font-medium text-gray-900 mb-1 group-hover:text-purple-700 transition-colors">{comp.property}</h4>
+                                    <h4 className="font-medium text-gray-900 mb-1 group-hover:text-purple-800 transition-colors">{comp.property}</h4>
                                     <p className="text-sm text-gray-600">{comp.description}</p>
                                 </button>
                             ))}
@@ -654,7 +654,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                                     </div>
                                     <div className="flex-1">
                                         <div className="flex items-center justify-between">
-                                            <h4 className="font-medium text-gray-900 group-hover:text-purple-700 transition-colors">{comp.element}</h4>
+                                            <h4 className="font-medium text-gray-900 group-hover:text-purple-800 transition-colors">{comp.element}</h4>
                                             <span className="text-sm font-semibold" style={{ color: category?.color }}>{comp.percentage}</span>
                                         </div>
                                         <p className="text-sm text-gray-600">{comp.description}</p>
@@ -800,7 +800,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                                     className="p-4 rounded-lg border border-gray-100 hover:shadow-md hover:border-purple-300 transition-all text-left cursor-pointer group" 
                                     style={{ backgroundColor: `${category?.color}05` }}
                                 >
-                                    <h4 className="font-medium text-gray-900 mb-1 group-hover:text-purple-700 transition-colors">{app.name}</h4>
+                                    <h4 className="font-medium text-gray-900 mb-1 group-hover:text-purple-800 transition-colors">{app.name}</h4>
                                     <p className="text-sm text-gray-600">{app.description}</p>
                                 </button>
                             ))}
@@ -823,7 +823,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                                     className="p-4 rounded-lg border border-gray-100 hover:shadow-md hover:border-purple-300 transition-all text-left cursor-pointer group" 
                                     style={{ backgroundColor: `${category?.color}05` }}
                                 >
-                                    <h4 className="font-medium text-gray-900 mb-1 group-hover:text-purple-700 transition-colors">{innovation.name}</h4>
+                                    <h4 className="font-medium text-gray-900 mb-1 group-hover:text-purple-800 transition-colors">{innovation.name}</h4>
                                     <p className="text-sm text-gray-600">{innovation.description}</p>
                                 </button>
                             ))}
@@ -846,7 +846,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                                     className="p-4 rounded-lg border border-gray-100 hover:shadow-md hover:border-purple-300 transition-all text-left cursor-pointer group" 
                                     style={{ backgroundColor: `${category?.color}05` }}
                                 >
-                                    <h4 className="font-medium text-gray-900 mb-1 group-hover:text-purple-700 transition-colors">{tool.name}</h4>
+                                    <h4 className="font-medium text-gray-900 mb-1 group-hover:text-purple-800 transition-colors">{tool.name}</h4>
                                     <p className="text-sm text-gray-600">{tool.description}</p>
                                 </button>
                             ))}
@@ -869,7 +869,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                                     className="p-4 rounded-lg border border-gray-100 hover:shadow-md hover:border-purple-300 transition-all text-left cursor-pointer group" 
                                     style={{ backgroundColor: `${category?.color}05` }}
                                 >
-                                    <h4 className="font-medium text-gray-900 mb-1 group-hover:text-purple-700 transition-colors">{system.name}</h4>
+                                    <h4 className="font-medium text-gray-900 mb-1 group-hover:text-purple-800 transition-colors">{system.name}</h4>
                                     <p className="text-sm text-gray-600">{system.description}</p>
                                 </button>
                             ))}
@@ -984,7 +984,7 @@ export default function Intelligence() {
             <div className="min-h-screen bg-gray-50 p-4 md:p-6">
                 <div className="max-w-6xl mx-auto">
                 {/* Header */}
-                <div className="bg-gradient-to-r from-purple-700 to-indigo-600 rounded-2xl p-6 mb-6 text-white">
+                <div className="bg-gradient-to-r from-purple-800 to-indigo-600 rounded-2xl p-6 mb-6 text-white">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div className="flex items-center gap-4">
                             <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">

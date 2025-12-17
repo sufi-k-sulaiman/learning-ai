@@ -74,12 +74,12 @@ export default function Header({ title, sidebarOpen, setSidebarOpen, children, c
                         <img src={LOGO_URL} alt="1cPublishing" className="h-10 w-10 object-contain" />
                         <div className="hidden sm:block">
                             <span className="text-xl font-bold text-gray-900">Agentic Ai</span>
-                            <p className="text-x font-medium text-purple-700">Demo</p>
+                            <p className="text-x font-medium text-purple-800">Demo</p>
                         </div>
                     </Link>
                     {setSidebarOpen && (
                         <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(!sidebarOpen)} className="hover:bg-gray-100">
-                            {sidebarOpen ? <ChevronLeft className="w-5 h-5 text-purple-700" /> : <Menu className="w-5 h-5 text-purple-700" />}
+                            {sidebarOpen ? <ChevronLeft className="w-5 h-5 text-purple-800" /> : <Menu className="w-5 h-5 text-purple-800" />}
                         </Button>
                     )}
                 </div>
@@ -98,7 +98,7 @@ export default function Header({ title, sidebarOpen, setSidebarOpen, children, c
                             />
                             <button
                                 type="submit"
-                                className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-purple-700 hover:bg-purple-700 flex items-center justify-center transition-colors"
+                                className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-purple-800 hover:bg-purple-800 flex items-center justify-center transition-colors"
                             >
                                 <Search className="w-4 h-4 text-white" />
                             </button>
@@ -116,7 +116,7 @@ export default function Header({ title, sidebarOpen, setSidebarOpen, children, c
                                             <Search className="w-4 h-4 text-gray-400" />
                                             <span className="text-gray-700">{s.label}</span>
                                             {s.type === 'page' && (
-                                                <span className="ml-auto text-xs text-purple-700 bg-purple-50 px-2 py-0.5 rounded-full">Page</span>
+                                                <span className="ml-auto text-xs text-purple-800 bg-purple-50 px-2 py-0.5 rounded-full">Page</span>
                                             )}
                                         </button>
                                     ))}
@@ -129,7 +129,7 @@ export default function Header({ title, sidebarOpen, setSidebarOpen, children, c
                     <div className="flex-1 flex md:hidden justify-end mr-2">
                         <div className="text-right">
                             <span className="text-lg font-bold text-gray-900">1cPublishing</span>
-                            <p className="text-x font-medium text-purple-700">Agentic Ai</p>
+                            <p className="text-x font-medium text-purple-800">Agentic Ai</p>
                         </div>
                     </div>
                 )}
@@ -139,7 +139,7 @@ export default function Header({ title, sidebarOpen, setSidebarOpen, children, c
                         href="https://1cplatform.com/Onboarding" 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="hidden sm:inline-flex items-center px-5 py-2.5 bg-purple-700 hover:bg-purple-700 text-white font-semibold rounded-full transition-colors shadow-sm hover:shadow-md"
+                        className="hidden sm:inline-flex items-center px-5 py-2.5 bg-purple-800 hover:bg-purple-800 text-white font-semibold rounded-full transition-colors shadow-sm hover:shadow-md"
                     >
                         Get Started
                     </a>

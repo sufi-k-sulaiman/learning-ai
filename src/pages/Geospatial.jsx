@@ -100,7 +100,7 @@ export default function Geospatial() {
             {/* Top Row - Stats Left, Use Case Selector Right */}
             <div className="mx-4 md:mx-8 mt-4 flex flex-col lg:flex-row gap-4">
                 {/* Stats Panel - Left */}
-                <div className="bg-gradient-to-r from-purple-700 to-indigo-600 rounded-2xl p-8 shadow-lg lg:w-1/2 flex flex-col justify-between min-h-[320px]">
+                <div className="bg-gradient-to-r from-purple-800 to-indigo-600 rounded-2xl p-8 shadow-lg lg:w-1/2 flex flex-col justify-between min-h-[320px]">
                     <div>
                         <h1 className="text-2xl md:text-3xl font-bold text-white">Geospatial Intelligence</h1>
                         <p className="text-purple-200 text-sm">AI-Powered Spatial Analytics</p>
@@ -153,7 +153,7 @@ export default function Geospatial() {
                         <Button 
                             onClick={() => setLoading(true)}
                             disabled={loading || activeUseCases.length === 0}
-                            className="bg-white text-purple-700 hover:bg-white/90 text-sm"
+                            className="bg-white text-purple-800 hover:bg-white/90 text-sm"
                             size="sm"
                         >
                             <RefreshCw className={`w-3 h-3 mr-1.5 ${loading ? 'animate-spin' : ''}`} />
@@ -236,16 +236,16 @@ export default function Geospatial() {
                     <div className="absolute top-4 left-4 z-[1000]">
                         <Tabs value={activeTab} onValueChange={setActiveTab}>
                             <TabsList className="bg-white/95 backdrop-blur-sm shadow-lg border border-gray-200 grid grid-cols-2 md:flex md:flex-row h-auto gap-1 p-1">
-                                <TabsTrigger value="explore" className="gap-1.5 text-xs data-[state=active]:bg-purple-700 data-[state=active]:text-white">
+                                <TabsTrigger value="explore" className="gap-1.5 text-xs data-[state=active]:bg-purple-800 data-[state=active]:text-white">
                                     <Map className="w-3 h-3" /> Explore
                                 </TabsTrigger>
-                                <TabsTrigger value="satellite" className="gap-1.5 text-xs data-[state=active]:bg-purple-700 data-[state=active]:text-white">
+                                <TabsTrigger value="satellite" className="gap-1.5 text-xs data-[state=active]:bg-purple-800 data-[state=active]:text-white">
                                     <Satellite className="w-3 h-3" /> Satellite
                                 </TabsTrigger>
-                                <TabsTrigger value="heatmap" className="gap-1.5 text-xs data-[state=active]:bg-purple-700 data-[state=active]:text-white">
+                                <TabsTrigger value="heatmap" className="gap-1.5 text-xs data-[state=active]:bg-purple-800 data-[state=active]:text-white">
                                     <Activity className="w-3 h-3" /> Heatmap
                                 </TabsTrigger>
-                                <TabsTrigger value="terrain" className="gap-1.5 text-xs data-[state=active]:bg-purple-700 data-[state=active]:text-white">
+                                <TabsTrigger value="terrain" className="gap-1.5 text-xs data-[state=active]:bg-purple-800 data-[state=active]:text-white">
                                     <Mountain className="w-3 h-3" /> Terrain
                                 </TabsTrigger>
                             </TabsList>
@@ -278,7 +278,7 @@ export default function Geospatial() {
                                         <TabsTrigger 
                                             key={tab.id} 
                                             value={tab.id}
-                                            className="gap-1.5 text-xs data-[state=active]:bg-purple-700 data-[state=active]:text-white"
+                                            className="gap-1.5 text-xs data-[state=active]:bg-purple-800 data-[state=active]:text-white"
                                         >
                                             <TabIcon className="w-3 h-3" />
                                             {tab.name}

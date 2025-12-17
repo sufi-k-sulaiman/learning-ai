@@ -1181,7 +1181,7 @@ Use real market data. Return ALL ${batch.length} stocks.`,
                     
                     {/* Preset Filters Dropdown */}
                     <Select value={activePreset} onValueChange={setActivePreset}>
-                        <SelectTrigger className="w-44 h-11 bg-gradient-to-r from-purple-700 to-indigo-600 text-white border-0 shadow-lg shadow-purple-500/25 hover:shadow-xl transition-all">
+                        <SelectTrigger className="w-44 h-11 bg-gradient-to-r from-purple-800 to-indigo-600 text-white border-0 shadow-lg shadow-purple-500/25 hover:shadow-xl transition-all">
                             <div className="flex items-center gap-2">
                                 {PRESET_FILTERS.find(p => p.id === activePreset)?.icon && 
                                     React.createElement(PRESET_FILTERS.find(p => p.id === activePreset).icon, { className: "w-4 h-4" })
@@ -1193,7 +1193,7 @@ Use real market data. Return ALL ${batch.length} stocks.`,
                             {PRESET_FILTERS.map(preset => (
                                 <SelectItem key={preset.id} value={preset.id}>
                                     <div className="flex items-center gap-2">
-                                        <preset.icon className="w-4 h-4 text-purple-700" />
+                                        <preset.icon className="w-4 h-4 text-purple-800" />
                                         {preset.label}
                                     </div>
                                 </SelectItem>
@@ -1206,8 +1206,8 @@ Use real market data. Return ALL ${batch.length} stocks.`,
                     
                     <div className="flex items-center gap-2 ml-auto">
                         <div className="flex items-center gap-1.5 px-3 py-2 rounded-lg bg-gradient-to-r from-purple-100 to-indigo-100 border border-purple-200/50">
-                            <BarChart3 className="w-4 h-4 text-purple-700" />
-                            <span className="text-sm font-bold text-purple-700">{stocks.length}</span>
+                            <BarChart3 className="w-4 h-4 text-purple-800" />
+                            <span className="text-sm font-bold text-purple-800">{stocks.length}</span>
                             <span className="text-xs text-purple-500">stocks</span>
                         </div>
                         
@@ -1216,7 +1216,7 @@ Use real market data. Return ALL ${batch.length} stocks.`,
                             disabled={loading} 
                             className="w-10 h-10 rounded-xl bg-white border border-gray-200 hover:border-purple-300 hover:bg-purple-50 flex items-center justify-center transition-all disabled:opacity-50 group"
                         >
-                            <RefreshCw className={`w-4 h-4 text-gray-500 group-hover:text-purple-700 ${loading ? 'animate-spin' : ''}`} />
+                            <RefreshCw className={`w-4 h-4 text-gray-500 group-hover:text-purple-800 ${loading ? 'animate-spin' : ''}`} />
                         </button>
                     </div>
                 </div>
@@ -1231,7 +1231,7 @@ Use real market data. Return ALL ${batch.length} stocks.`,
                 <div className="flex items-center gap-2">
                     <p className="text-gray-600 text-xs md:text-sm">Showing <span className="font-bold text-gray-900">{filteredStocks.length}</span> of {stocks.length} stocks</p>
                     {chartFilter.value && (
-                        <span className="px-2 py-1 rounded-full bg-purple-100 text-purple-700 text-xs font-medium flex items-center gap-1">
+                        <span className="px-2 py-1 rounded-full bg-purple-100 text-purple-800 text-xs font-medium flex items-center gap-1">
                             {chartFilter.type === 'sector' ? 'Sector' : 'Industry'}: {chartFilter.value}
                             <button 
                                 onClick={() => setChartFilter({ type: null, value: null })}
@@ -1254,7 +1254,7 @@ Use real market data. Return ALL ${batch.length} stocks.`,
 
                     {loadingMore && (
                         <div className="flex justify-center mt-8">
-                            <div className="flex items-center gap-2 text-purple-700">
+                            <div className="flex items-center gap-2 text-purple-800">
                                 <RefreshCw className="w-5 h-5 animate-spin" />
                                 <span className="text-sm font-medium">Loading more stocks...</span>
                             </div>

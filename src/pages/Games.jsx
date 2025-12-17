@@ -100,7 +100,7 @@ like fun.</p>
                       />
                       <h2 className="text-xl font-bold text-gray-900 mb-2">Word Shooter</h2>
                       <p className="text-gray-500 text-sm mb-4 flex-grow">Gamified vocabulary learning with AI-powered word sets.</p>
-                      <Button onClick={() => selectGame('word-shooter')} size="lg" className="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-700 hover:to-pink-700">
+                      <Button onClick={() => selectGame('word-shooter')} size="lg" className="w-full bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-800 hover:to-pink-700">
                           Play Now
                       </Button>
                   </div>

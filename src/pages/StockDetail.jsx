@@ -371,7 +371,7 @@ export default function StockDetail() {
     if (!stock) {
         return (
             <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <Loader2 className="w-8 h-8 animate-spin text-purple-700" />
+                <Loader2 className="w-8 h-8 animate-spin text-purple-800" />
             </div>
         );
     }
@@ -404,7 +404,7 @@ export default function StockDetail() {
                                 <div>
                                     <div className="flex items-center gap-2">
                                         <span className="text-2xl font-bold text-gray-900">{stock.ticker}</span>
-                                        <span className="px-2 py-1 bg-purple-100 text-purple-700 text-sm rounded-lg font-medium">{stock.name}</span>
+                                        <span className="px-2 py-1 bg-purple-100 text-purple-800 text-sm rounded-lg font-medium">{stock.name}</span>
                                     </div>
                                     <p className="text-sm text-gray-500">{stock.sector} • {stock.industry}</p>
                                 </div>
@@ -418,7 +418,7 @@ export default function StockDetail() {
                                 </div>
                                 <Button 
                                     onClick={() => setShowComparisonModal(true)}
-                                    className="bg-purple-700 hover:bg-purple-700"
+                                    className="bg-purple-800 hover:bg-purple-800"
                                 >
                                     <GitCompare className="w-4 h-4 mr-2" />
                                     Compare
@@ -433,7 +433,7 @@ export default function StockDetail() {
                                     key={item.id}
                                     onClick={() => setActiveNav(item.id)}
                                     className={`flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-xs font-medium transition-colors ${
-                                        activeNav === item.id ? 'bg-purple-700 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                                        activeNav === item.id ? 'bg-purple-800 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                                     }`}
                                 >
                                     <item.icon className="w-3.5 h-3.5" />
@@ -449,7 +449,7 @@ export default function StockDetail() {
                 <div className="max-w-7xl mx-auto px-4 py-6">
                     {loadingSection === activeNav ? (
                         <div className="flex flex-col items-center justify-center py-20">
-                            <Loader2 className="w-8 h-8 text-purple-700 animate-spin mb-3" />
+                            <Loader2 className="w-8 h-8 text-purple-800 animate-spin mb-3" />
                             <p className="text-gray-600">Loading {activeNav} data with AI...</p>
                         </div>
                     ) : sectionData[activeNav] ? (

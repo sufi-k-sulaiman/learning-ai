@@ -548,7 +548,7 @@ export default function MindMapPage() {
                     <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
                         <div className="flex items-center gap-2 md:gap-3">
                             <div className="w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-purple-100 flex items-center justify-center">
-                                <Network className="w-4 h-4 md:w-5 md:h-5 text-purple-700" />
+                                <Network className="w-4 h-4 md:w-5 md:h-5 text-purple-800" />
                             </div>
                             <h1 className="text-lg md:text-2xl lg:text-3xl font-bold text-gray-900">Neural MindMaps</h1>
                         </div>
@@ -702,7 +702,7 @@ export default function MindMapPage() {
                                     <button
                                         onClick={() => handleSearch(searchTerm)}
                                         disabled={loading || !searchTerm.trim()}
-                                        className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-purple-700 hover:bg-purple-700 disabled:opacity-50 flex items-center justify-center transition-colors"
+                                        className="absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-purple-800 hover:bg-purple-800 disabled:opacity-50 flex items-center justify-center transition-colors"
                                     >
                                         {loading ? <Loader2 className="w-4 h-4 text-white animate-spin" /> : <Search className="w-4 h-4 text-white" />}
                                     </button>
@@ -730,7 +730,7 @@ export default function MindMapPage() {
                         </div>
                     ) : loading ? (
                         <div className="h-full flex flex-col items-center justify-center py-20">
-                            <Loader2 className="w-12 h-12 animate-spin text-purple-700 mb-4" />
+                            <Loader2 className="w-12 h-12 animate-spin text-purple-800 mb-4" />
                             <p className="text-gray-600">Building knowledge network...</p>
                         </div>
                     ) : error ? (

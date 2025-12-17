@@ -138,7 +138,7 @@ const TasksPage = () => {
                         <p className="text-sm text-gray-500">Task Management</p>
                     </div>
                 </div>
-          <Button onClick={() => handleOpenModal()} className="bg-purple-700 hover:bg-purple-700">
+          <Button onClick={() => handleOpenModal()} className="bg-purple-800 hover:bg-purple-800">
             <Plus className="w-4 h-4 mr-2" />
             New Task
           </Button>
@@ -153,7 +153,7 @@ const TasksPage = () => {
                     }
                 `}</style>
                 <div className="relative mb-4 flex items-center justify-center">
-                    <div className="absolute w-16 h-16 rounded-full border-4 border-purple-200 border-t-purple-700 animate-spin" />
+                    <div className="absolute w-16 h-16 rounded-full border-4 border-purple-200 border-t-purple-800 animate-spin" />
                     <img 
                         src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/622024f26_image-loading-logo.png" 
                         alt="Loading" 

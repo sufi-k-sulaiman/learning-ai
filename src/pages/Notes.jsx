@@ -273,14 +273,14 @@ export default function Notes() {
                             <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Ai Generative Notes</h1>
                             <p className="text-gray-500 text-sm">Create and organize your notes</p>
                         </div>
-                        <Button onClick={() => openNewNote()} className="bg-purple-700 hover:bg-purple-700">
+                        <Button onClick={() => openNewNote()} className="bg-purple-800 hover:bg-purple-800">
                             <Plus className="w-4 h-4 mr-2" /> New Note
                         </Button>
                     </div>
 
                     {/* Quick Start Templates */}
                     <div className="bg-white rounded-xl border border-gray-200 p-5 mb-6">
-                        <h2 className="text-purple-700 font-semibold mb-4">Quick Start Templates</h2>
+                        <h2 className="text-purple-800 font-semibold mb-4">Quick Start Templates</h2>
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
                             {TEMPLATES.map(t => (
                                 <button
@@ -298,7 +298,7 @@ export default function Notes() {
                     {/* Notes Grid */}
                     {isLoading ? (
                         <div className="flex items-center justify-center py-20">
-                            <Loader2 className="w-8 h-8 animate-spin text-purple-700" />
+                            <Loader2 className="w-8 h-8 animate-spin text-purple-800" />
                         </div>
                     ) : filteredNotes.length === 0 ? (
                         <div className="text-center py-20 bg-white rounded-xl border border-gray-200">
@@ -337,7 +337,7 @@ export default function Notes() {
                             />
                             <div className="flex items-center gap-2">
                                 <Button onClick={() => setShowAiTextModal(true)} variant="outline" size="sm" className="gap-2">
-                                    <Sparkles className="w-4 h-4 text-purple-700" />
+                                    <Sparkles className="w-4 h-4 text-purple-800" />
                                     AI Text
                                 </Button>
                                 <Button onClick={() => setShowAiImageModal(true)} variant="outline" size="sm" className="gap-2">
@@ -351,7 +351,7 @@ export default function Notes() {
                                 <Button onClick={() => setIsFullscreen(!isFullscreen)} variant="ghost" size="icon">
                                     {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
                                 </Button>
-                                <Button onClick={saveNote} disabled={createMutation.isPending || updateMutation.isPending} className="bg-purple-700 hover:bg-purple-700 gap-2 min-w-[100px]">
+                                <Button onClick={saveNote} disabled={createMutation.isPending || updateMutation.isPending} className="bg-purple-800 hover:bg-purple-800 gap-2 min-w-[100px]">
                                     {(createMutation.isPending || updateMutation.isPending) ? (
                                         <>
                                             <Loader2 className="w-4 h-4 animate-spin" />
@@ -393,7 +393,7 @@ export default function Notes() {
                             <div className="flex items-center gap-2">
                                 <Tag className="w-4 h-4 text-gray-400" />
                                 {noteTags.map((tag, i) => (
-                                    <span key={i} className="text-xs px-2 py-1 bg-purple-100 text-purple-700 rounded flex items-center gap-1">
+                                    <span key={i} className="text-xs px-2 py-1 bg-purple-100 text-purple-800 rounded flex items-center gap-1">
                                         {tag}
                                         <button onClick={() => setNoteTags(noteTags.filter((_, idx) => idx !== i))} className="hover:text-purple-900">×</button>
                                     </span>
@@ -430,7 +430,7 @@ export default function Notes() {
             <Dialog open={showAiTextModal} onOpenChange={setShowAiTextModal}>
                 <DialogContent className="max-w-md">
                     <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
-                        <Sparkles className="w-5 h-5 text-purple-700" /> Generate AI Text
+                        <Sparkles className="w-5 h-5 text-purple-800" /> Generate AI Text
                     </h3>
                     <Input
                         placeholder="Describe what you want to write about..."
@@ -440,7 +440,7 @@ export default function Notes() {
                     />
                     <div className="flex justify-end gap-2 mt-4">
                         <Button variant="outline" onClick={() => { setShowAiTextModal(false); setAiPrompt(''); }}>Cancel</Button>
-                        <Button onClick={generateAIText} disabled={aiLoading || !aiPrompt.trim()} className="bg-purple-700 hover:bg-purple-700">
+                        <Button onClick={generateAIText} disabled={aiLoading || !aiPrompt.trim()} className="bg-purple-800 hover:bg-purple-800">
                             {aiLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <Sparkles className="w-4 h-4 mr-2" />}
                             Generate
                         </Button>
