@@ -1,5 +1,5 @@
 import React from 'react';
-import { TrendingUp, TrendingDown, Shield, Sparkles, AlertTriangle, Target, LineChart, Calculator, ThumbsUp, ThumbsDown, ArrowUpRight, ArrowDownRight, Brain, Percent, Users, Zap, Info, Building, Globe, FileText, Calendar, DollarSign, Play, Download, ExternalLink, Award } from 'lucide-react';
+import { TrendingUp, TrendingDown, Shield, Sparkles, AlertTriangle, Target, LineChart, Calculator, ThumbsUp, ThumbsDown, ArrowUpRight, ArrowDownRight, Brain, Percent, Users, Zap, Info, Building, Globe, FileText, Calendar, DollarSign, Play, Download, ExternalLink, Award, Loader2 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, PieChart as RePieChart, Pie, Cell, LineChart as ReLineChart, Line } from 'recharts';
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
@@ -864,7 +864,168 @@ export default function StockSectionContent({
                 </div>
             );
 
+        case 'invest':
+            return (
+                <div className="min-h-[600px] space-y-6">
+                    <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                        <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                            <Target className="w-5 h-5 text-purple-600" /> Investment Recommendation
+                        </h3>
+                        <div className="flex items-center gap-6 mb-6">
+                            <div className={`px-6 py-3 rounded-xl text-2xl font-bold ${
+                                data.recommendation === 'Buy' ? 'bg-green-100 text-green-700' :
+                                data.recommendation === 'Sell' ? 'bg-red-100 text-red-700' :
+                                'bg-yellow-100 text-yellow-700'
+                            }`}>
+                                {data.recommendation || 'Buy'}
+                            </div>
+                            <div>
+                                <p className="text-sm text-gray-500">AI Confidence</p>
+                                <p className="text-3xl font-bold text-gray-900">{data.confidence || 78}%</p>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-3 gap-4">
+                            <div className="bg-red-50 rounded-xl p-4 text-center">
+                                <p className="text-sm text-gray-600">Low Target</p>
+                                <p className="text-2xl font-bold text-red-600">${data.priceTargets?.low || (stock.price * 0.8).toFixed(2)}</p>
+                            </div>
+                            <div className="bg-purple-50 rounded-xl p-4 text-center">
+                                <p className="text-sm text-gray-600">Mid Target</p>
+                                <p className="text-2xl font-bold text-purple-600">${data.priceTargets?.mid || (stock.price * 1.15).toFixed(2)}</p>
+                            </div>
+                            <div className="bg-green-50 rounded-xl p-4 text-center">
+                                <p className="text-sm text-gray-600">High Target</p>
+                                <p className="text-2xl font-bold text-green-600">${data.priceTargets?.high || (stock.price * 1.4).toFixed(2)}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-6">
+                        <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                            <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                                <Zap className="w-4 h-4 text-green-600" /> Key Catalysts
+                            </h4>
+                            <ul className="space-y-2">
+                                {(data.catalysts || ['Strong earnings growth', 'Product launches', 'Market expansion']).map((c, i) => (
+                                    <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-green-500 mt-2" />
+                                        {c}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                        <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                            <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
+                                <AlertTriangle className="w-4 h-4 text-red-600" /> Risks
+                            </h4>
+                            <ul className="space-y-2">
+                                {(data.risks || ['Market volatility', 'Competition', 'Regulatory changes']).map((r, i) => (
+                                    <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                                        <span className="w-1.5 h-1.5 rounded-full bg-red-500 mt-2" />
+                                        {r}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            );
+
+        case 'ai-insights':
+            return (
+                <div className="min-h-[600px] space-y-6">
+                    <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-2xl border border-purple-200 p-6">
+                        <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                            <Sparkles className="w-5 h-5 text-purple-600" /> AI-Powered Insights
+                        </h3>
+                        <div className="grid grid-cols-2 gap-6 mb-4">
+                            <div>
+                                <p className="text-sm text-gray-600 mb-2">AI Confidence</p>
+                                <p className="text-5xl font-bold text-purple-600">{data.aiConfidence || stock.aiRating || 82}%</p>
+                            </div>
+                            <div>
+                                <p className="text-sm text-gray-600 mb-2">Earnings Surprise</p>
+                                <p className="text-2xl font-bold text-gray-900">{data.earningsSurprise || 'Likely Beat'}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                        <h4 className="font-semibold text-gray-900 mb-4">AI Predictions</h4>
+                        <ul className="space-y-3">
+                            {(data.predictions || ['Strong momentum continuing', 'Technical breakout detected', 'Estimates trending higher']).map((p, i) => (
+                                <li key={i} className="flex items-start gap-3 p-3 bg-purple-50 rounded-lg">
+                                    <Sparkles className="w-5 h-5 text-purple-600 mt-0.5" />
+                                    <span className="text-gray-700">{p}</span>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                    {data.riskAlerts?.length > 0 && (
+                        <div className="bg-red-50 rounded-2xl border border-red-200 p-6">
+                            <h4 className="font-semibold text-red-900 mb-4 flex items-center gap-2">
+                                <AlertTriangle className="w-5 h-5" /> AI Risk Alerts
+                            </h4>
+                            <ul className="space-y-2">
+                                {data.riskAlerts.map((r, i) => (
+                                    <li key={i} className="text-sm text-red-700">{r}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+                </div>
+            );
+
+        case 'news':
+            return (
+                <div className="min-h-[600px] space-y-6">
+                    <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                        <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                            <FileText className="w-5 h-5 text-purple-600" /> Recent News
+                        </h3>
+                        <div className="space-y-4">
+                            {(data.news || []).map((n, i) => (
+                                <div key={i} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                                    <span className={`mt-1 w-2 h-2 rounded-full flex-shrink-0 ${
+                                        n.sentiment === 'Positive' ? 'bg-green-500' :
+                                        n.sentiment === 'Negative' ? 'bg-red-500' : 'bg-gray-400'
+                                    }`} />
+                                    <div className="flex-1">
+                                        <p className="text-sm font-medium text-gray-900">{n.headline}</p>
+                                        <p className="text-xs text-gray-500 mt-1">{n.date}</p>
+                                    </div>
+                                    <span className={`px-2 py-0.5 text-xs rounded ${
+                                        n.sentiment === 'Positive' ? 'bg-green-100 text-green-700' :
+                                        n.sentiment === 'Negative' ? 'bg-red-100 text-red-700' : 'bg-gray-200 text-gray-600'
+                                    }`}>
+                                        {n.sentiment}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                        <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                            <Calendar className="w-4 h-4" /> Upcoming Events
+                        </h4>
+                        <div className="space-y-3">
+                            {(data.upcomingEvents || []).map((e, i) => (
+                                <div key={i} className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+                                    <span className="text-sm text-gray-900">{e.event}</span>
+                                    <span className="text-sm text-purple-600 font-medium">{e.date}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            );
+
         case 'legends':
+            // Legends uses stock data directly, no AI needed
+            setSectionData(prev => ({ ...prev, [section]: { loaded: true } }));
+            setLoadingSection(null);
+            return;
+
+        default:
+            return;
             const legendaryFrameworks = [
                 { name: 'Warren Buffett', style: 'Value / MOAT', color: '#8B5CF6', metrics: [{ label: 'MOAT', value: stock.moat, max: 100, good: 70 }, { label: 'ROE', value: stock.roe, max: 40, good: 15 }], verdict: stock.moat >= 70 && stock.roe >= 15 ? 'Strong Buy' : stock.moat >= 50 ? 'Hold' : 'Avoid' },
                 { name: 'Peter Lynch', style: 'GARP', color: '#10B981', metrics: [{ label: 'PEG', value: stock.peg || 1.2, max: 3, good: 1, inverse: true }, { label: 'Growth', value: stock.sgr || 15, max: 40, good: 15 }], verdict: (stock.peg || 1.2) <= 1 ? 'Strong Buy' : (stock.peg || 1.2) <= 1.5 ? 'Buy' : 'Hold' },

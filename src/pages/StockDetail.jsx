@@ -19,19 +19,22 @@ import StockSectionContent from '@/components/stocks/StockSectionContent';
 
 const NAV_ITEMS = [
     { id: 'overview', label: 'Overview', icon: Eye },
+    { id: 'invest', label: 'Investment Rec', icon: Target },
     { id: 'moat', label: 'MOAT Analysis', icon: Shield },
     { id: 'valuation', label: 'Valuation', icon: BarChart3 },
-    { id: 'simulator', label: 'Simulator', icon: Target },
+    { id: 'simulator', label: 'Simulator', icon: Calculator },
     { id: 'dcf', label: 'DCF Calculator', icon: Activity },
     { id: 'bullbear', label: 'Bull/Bear Case', icon: TrendingUp },
     { id: 'fundamentals', label: 'Fundamentals', icon: LineChart },
-    { id: 'financials', label: 'Financials', icon: Activity },
-    { id: 'technicals', label: 'Technicals', icon: TrendingUp },
+    { id: 'financials', label: 'Financials', icon: DollarSign },
+    { id: 'technicals', label: 'Technicals', icon: BarChart3 },
     { id: 'sentiment', label: 'Sentiment', icon: Brain },
+    { id: 'ai-insights', label: 'AI Insights', icon: Sparkles },
     { id: 'risk', label: 'Risk & Macro', icon: AlertTriangle },
+    { id: 'news', label: 'News & Events', icon: FileText },
     { id: 'dividends', label: 'Dividends', icon: Percent },
     { id: 'peers', label: 'Peers', icon: Users },
-    { id: 'reports', label: 'Reports', icon: FileText },
+    { id: 'reports', label: 'Reports', icon: Download },
     { id: 'investor-relations', label: 'Investor Relations', icon: Building },
     { id: 'legends', label: 'Legends', icon: Award },
 ];
@@ -361,6 +364,52 @@ export default function StockDetail() {
                             earningsReleases: { type: "array", items: { type: "object", properties: { title: { type: "string" }, date: { type: "string" } } } },
                             plStatements: { type: "array", items: { type: "object", properties: { year: { type: "string" }, revenue: { type: "string" }, netIncome: { type: "string" } } } },
                             fiscalYearData: { type: "array", items: { type: "object", properties: { year: { type: "string" }, revenue: { type: "string" }, earnings: { type: "string" }, assets: { type: "string" } } } }
+                        }
+                    };
+                    break;
+
+                case 'invest':
+                    prompt = `Investment recommendation for ${stock.ticker}: Buy/Hold/Sell with confidence %, price targets (low/mid/high), entry point, position size, time horizon, key catalysts (3-5), risks (3-5)`;
+                    schema = {
+                        type: "object",
+                        properties: {
+                            recommendation: { type: "string" },
+                            confidence: { type: "number" },
+                            priceTargets: { type: "object", properties: { low: { type: "number" }, mid: { type: "number" }, high: { type: "number" } } },
+                            entryPoint: { type: "number" },
+                            positionSize: { type: "string" },
+                            timeHorizon: { type: "string" },
+                            catalysts: { type: "array", items: { type: "string" } },
+                            risks: { type: "array", items: { type: "string" } }
+                        }
+                    };
+                    break;
+
+                case 'ai-insights':
+                    prompt = `AI insights for ${stock.ticker}: AI confidence 0-100, predictions (3-5), unusual patterns (3), earnings surprise probability, sector rotation signal, smart money flow, risk alerts (2-4)`;
+                    schema = {
+                        type: "object",
+                        properties: {
+                            aiConfidence: { type: "number" },
+                            predictions: { type: "array", items: { type: "string" } },
+                            patterns: { type: "array", items: { type: "string" } },
+                            earningsSurprise: { type: "string" },
+                            sectorRotation: { type: "string" },
+                            smartMoneyFlow: { type: "string" },
+                            riskAlerts: { type: "array", items: { type: "string" } }
+                        }
+                    };
+                    break;
+
+                case 'news':
+                    prompt = `News for ${stock.ticker}: latest 5 news (headline, date, sentiment), upcoming events (2-3 with event/date), recent filings (3), management commentary highlights (2-3)`;
+                    schema = {
+                        type: "object",
+                        properties: {
+                            news: { type: "array", items: { type: "object", properties: { headline: { type: "string" }, date: { type: "string" }, sentiment: { type: "string" } } } },
+                            upcomingEvents: { type: "array", items: { type: "object", properties: { event: { type: "string" }, date: { type: "string" } } } },
+                            filings: { type: "array", items: { type: "string" } },
+                            managementNotes: { type: "array", items: { type: "string" } }
                         }
                     };
                     break;
