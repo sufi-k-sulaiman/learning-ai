@@ -56,10 +56,10 @@ export default function StockSectionContent({
 
     switch (activeNav) {
         case 'overview':
-            const filteredPriceData = data.priceHistory?.map(point => ({
-                month: point.time,
-                price: point.price
-            })) || [];
+            const filteredPriceData = Array.isArray(data.priceHistory) ? data.priceHistory.map(point => ({
+                month: point?.time || '',
+                price: point?.price || 0
+            })) : [];
             
             const startPrice = filteredPriceData[0]?.price || stock.price;
             const highPrice = Math.max(...(filteredPriceData.map(p => p.price).concat([stock.price])));
@@ -70,14 +70,14 @@ export default function StockSectionContent({
                     <div className="bg-white rounded-2xl border border-gray-200 p-6">
                         <h3 className="font-semibold text-gray-900 mb-3">Company Overview</h3>
                         {data.description && <p className="text-gray-600 mb-4">{data.description}</p>}
-                        {data.advantages && (
+                        {Array.isArray(data.advantages) && data.advantages.length > 0 && (
                             <div>
                                 <h4 className="font-medium text-gray-900 mb-2">Competitive Advantages</h4>
                                 <ul className="space-y-1">
                                     {data.advantages.map((adv, i) => (
                                         <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
                                             <span className="w-1.5 h-1.5 rounded-full bg-purple-500 mt-2" />
-                                            {adv}
+                                            {typeof adv === 'string' ? adv : ''}
                                         </li>
                                     ))}
                                 </ul>
@@ -346,38 +346,40 @@ export default function StockSectionContent({
                                   </div>
                               )}
 
-                              <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                                  <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                                      <Shield className="w-5 h-5 text-purple-600" /> MOAT Breakdown
-                                  </h3>
-                                  <div className="space-y-3 mb-6">
-                                      <MoatBar label="Brand Power" value={data.moatBreakdown.brandPower} />
-                                      <MoatBar label="Switching Costs" value={data.moatBreakdown.switchingCosts} color="#10B981" />
-                                      <MoatBar label="Network Effects" value={data.moatBreakdown.networkEffects} />
-                                      <MoatBar label="Cost Advantages" value={data.moatBreakdown.costAdvantages} color="#F59E0B" />
-                                      <MoatBar label="Scale Advantage" value={data.moatBreakdown.scaleAdvantage} color="#3B82F6" />
-                                      <MoatBar label="Regulatory Moat" value={data.moatBreakdown.regulatoryMoat} color="#EC4899" />
-                                  </div>
+                              {data.moatBreakdown && typeof data.moatBreakdown === 'object' && (
+                                  <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                                      <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                          <Shield className="w-5 h-5 text-purple-600" /> MOAT Breakdown
+                                      </h3>
+                                      <div className="space-y-3 mb-6">
+                                          {data.moatBreakdown.brandPower !== undefined && <MoatBar label="Brand Power" value={data.moatBreakdown.brandPower} />}
+                                          {data.moatBreakdown.switchingCosts !== undefined && <MoatBar label="Switching Costs" value={data.moatBreakdown.switchingCosts} color="#10B981" />}
+                                          {data.moatBreakdown.networkEffects !== undefined && <MoatBar label="Network Effects" value={data.moatBreakdown.networkEffects} />}
+                                          {data.moatBreakdown.costAdvantages !== undefined && <MoatBar label="Cost Advantages" value={data.moatBreakdown.costAdvantages} color="#F59E0B" />}
+                                          {data.moatBreakdown.scaleAdvantage !== undefined && <MoatBar label="Scale Advantage" value={data.moatBreakdown.scaleAdvantage} color="#3B82F6" />}
+                                          {data.moatBreakdown.regulatoryMoat !== undefined && <MoatBar label="Regulatory Moat" value={data.moatBreakdown.regulatoryMoat} color="#EC4899" />}
+                                      </div>
                                   {data.thesis && (
                                       <div className="p-4 bg-purple-50 rounded-lg">
                                           <h4 className="font-medium text-gray-900 mb-2">Investment Thesis</h4>
                                           <p className="text-sm text-gray-700">{data.thesis}</p>
                                       </div>
                                   )}
-                                  {data.advantages && data.advantages.length > 0 && (
+                                  {Array.isArray(data.advantages) && data.advantages.length > 0 && (
                                       <div className="mt-4">
                                           <h4 className="font-medium text-gray-900 mb-2">Key Advantages</h4>
                                           <ul className="space-y-2">
                                               {data.advantages.map((adv, i) => (
                                                   <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
                                                       <span className="w-1.5 h-1.5 rounded-full bg-green-500 mt-2" />
-                                                      {adv}
+                                                      {typeof adv === 'string' ? adv : ''}
                                                   </li>
                                               ))}
                                           </ul>
                                       </div>
                                   )}
-                              </div>
+                                  </div>
+                                  )}
                           </>
                       ) : <p className="text-gray-500 text-center py-32">Loading investor MOAT data...</p>}
                   </div>
