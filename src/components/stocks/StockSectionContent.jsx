@@ -654,40 +654,6 @@ export default function StockSectionContent({
                 </div>
             );
 
-        case 'reports':
-            return (
-                <div className="min-h-[600px] space-y-6">
-                    <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                        <h3 className="font-semibold text-gray-900 mb-4">Annual Reports</h3>
-                        <div className="space-y-2">
-                            {(data.annualReports || []).map((r, i) => (
-                                <a key={i} href={`https://www.sec.gov/cgi-bin/browse-edgar?CIK=${stock.ticker}&type=10-K`} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between p-4 bg-gray-50 rounded-xl hover:bg-purple-50">
-                                    <div>
-                                        <p className="font-medium text-gray-900">{r.title}</p>
-                                        <p className="text-sm text-gray-500">{r.date}</p>
-                                    </div>
-                                    <Download className="w-4 h-4 text-gray-400" />
-                                </a>
-                            ))}
-                        </div>
-                    </div>
-                    <div className="bg-white rounded-2xl border border-gray-200 p-6">
-                        <h3 className="font-semibold text-gray-900 mb-4">Quarterly Reports</h3>
-                        <div className="space-y-2">
-                            {(data.quarterlyReports || []).map((r, i) => (
-                                <div key={i} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
-                                    <div>
-                                        <p className="font-medium text-gray-900">{r.title}</p>
-                                        <p className="text-sm text-gray-500">{r.date}</p>
-                                    </div>
-                                    <Download className="w-4 h-4 text-gray-400" />
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            );
-
         case 'investor-relations':
             return (
                 <div className="min-h-[600px] space-y-6">
@@ -747,9 +713,6 @@ export default function StockSectionContent({
                             </div>
                         )}
                     </div>
-                </div>
-            );
-
         case 'reports':
             return (
                 <div className="min-h-[600px] space-y-6">
@@ -1019,13 +982,6 @@ export default function StockSectionContent({
             );
 
         case 'legends':
-            // Legends uses stock data directly, no AI needed
-            setSectionData(prev => ({ ...prev, [section]: { loaded: true } }));
-            setLoadingSection(null);
-            return;
-
-        default:
-            return;
             const legendaryFrameworks = [
                 { name: 'Warren Buffett', style: 'Value / MOAT', color: '#8B5CF6', metrics: [{ label: 'MOAT', value: stock.moat, max: 100, good: 70 }, { label: 'ROE', value: stock.roe, max: 40, good: 15 }], verdict: stock.moat >= 70 && stock.roe >= 15 ? 'Strong Buy' : stock.moat >= 50 ? 'Hold' : 'Avoid' },
                 { name: 'Peter Lynch', style: 'GARP', color: '#10B981', metrics: [{ label: 'PEG', value: stock.peg || 1.2, max: 3, good: 1, inverse: true }, { label: 'Growth', value: stock.sgr || 15, max: 40, good: 15 }], verdict: (stock.peg || 1.2) <= 1 ? 'Strong Buy' : (stock.peg || 1.2) <= 1.5 ? 'Buy' : 'Hold' },
