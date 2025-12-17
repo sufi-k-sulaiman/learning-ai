@@ -1061,8 +1061,9 @@ export default function Intelligence() {
                             updateUrl(selectedCategory, topic);
                         }}
                     />
-                )}
-            </div>
-        </div>
-    );
-}
+                    )}
+                    </div>
+                    </div>
+                    </>
+                    );
+                    }

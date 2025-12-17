@@ -786,6 +786,7 @@ export default function MindMapPage() {
                     containerRef={containerRef}
                 />
             )}
-        </div>
+            </div>
+        </>
     );
 }

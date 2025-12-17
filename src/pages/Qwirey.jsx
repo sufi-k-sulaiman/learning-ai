@@ -1629,6 +1629,7 @@ I need 10 reviews with: title, intro, and reviews array (name, rating 1-10, text
                     </div>
                 </DialogContent>
             </Dialog>
-        </div>
+            </div>
+        </>
     );
 }
