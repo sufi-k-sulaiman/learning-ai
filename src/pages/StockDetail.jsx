@@ -68,39 +68,24 @@ export default function StockDetail() {
 
     const loadStockData = async (ticker) => {
         try {
-            // Call AI to get stock data
-            const response = await base44.integrations.Core.InvokeLLM({
-                prompt: `Provide REAL, CURRENT stock market data for ${ticker}. Return: ticker, name, sector, industry, marketCap, price, change (%), volume, moat (0-100), roe (%), roic (%), roa (%), pe, peg, zscore, eps, dividend (%), sgr (%), beta, fcf, eva, aiRating (0-100)`,
-                add_context_from_internet: true,
+            const response = await base44.functions.invoke('yahooFinance', { ticker });
+            
+            // Calculate derived metrics using AI
+            const aiMetrics = await base44.integrations.Core.InvokeLLM({
+                prompt: `Calculate investment metrics for ${ticker}: MOAT score (0-100), Z-Score, Sustainable Growth Rate (%), EVA, AI Rating (0-100) based on: ROE=${response.roe}, PE=${response.pe}, Beta=${response.beta}, Debt/Equity=${response.debtToEquity}, Growth=${response.revenueGrowth}%`,
                 response_json_schema: {
                     type: "object",
                     properties: {
-                        ticker: { type: "string" },
-                        name: { type: "string" },
-                        sector: { type: "string" },
-                        industry: { type: "string" },
-                        marketCap: { type: "string" },
-                        price: { type: "number" },
-                        change: { type: "number" },
-                        volume: { type: "string" },
                         moat: { type: "number" },
-                        roe: { type: "number" },
-                        roic: { type: "number" },
-                        roa: { type: "number" },
-                        pe: { type: "number" },
-                        peg: { type: "number" },
                         zscore: { type: "number" },
-                        eps: { type: "number" },
-                        dividend: { type: "number" },
                         sgr: { type: "number" },
-                        beta: { type: "number" },
-                        fcf: { type: "number" },
                         eva: { type: "number" },
                         aiRating: { type: "number" }
                     }
                 }
             });
-            setStock(response);
+            
+            setStock({ ...response, ...aiMetrics });
         } catch (error) {
             console.error('Error loading stock:', error);
         }
@@ -318,44 +303,29 @@ export default function StockDetail() {
                     break;
 
                 case 'legends':
-                    // Split into 4 batches of 4 frameworks each for reliability
-                    const batches = [
-                        ['Warren Buffett', 'Peter Lynch', 'Benjamin Graham', 'Joel Greenblatt'],
-                        ['Ray Dalio', 'Cathie Wood', 'George Soros', 'David Dreman'],
-                        ['John Templeton', 'Aswath Damodaran', 'Stanley Druckenmiller', 'Carl Icahn'],
-                        ['Seth Klarman', 'David Tepper', 'Jim Simons', 'John Bogle']
-                    ];
+                    const investors = ['Warren Buffett', 'Peter Lynch', 'Benjamin Graham', 'Joel Greenblatt', 'Ray Dalio', 'Cathie Wood', 'George Soros', 'David Dreman', 'John Templeton', 'Aswath Damodaran', 'Stanley Druckenmiller', 'Carl Icahn', 'Seth Klarman', 'David Tepper', 'Jim Simons', 'John Bogle'];
                     
                     const allFrameworks = [];
-                    for (const batch of batches) {
-                        const batchPrompt = `Analyze ${stock.ticker} for ${batch.join(', ')}. Stock: MOAT=${stock.moat}, ROE=${stock.roe}%, PE=${stock.pe}, PEG=${stock.peg}, Z=${stock.zscore}, Beta=${stock.beta}, Growth=${stock.sgr}%. Return JSON with frameworks array containing name, style, color(hex), verdict, philosophy, approach, keyMetrics(3 strings), metrics(2 objects with label/value/max/good/inverse).`;
-                        const batchSchema = {
+                    for (const investor of investors) {
+                        const investorPrompt = `Analyze ${stock.ticker} from ${investor}'s perspective. Metrics: MOAT=${stock.moat}, ROE=${stock.roe}%, PE=${stock.pe}, PEG=${stock.peg}, Z=${stock.zscore}, Beta=${stock.beta}, Growth=${stock.sgr}%. Return: name, style, color, verdict, philosophy, approach, keyMetrics(3), metrics(2 with label/value/max/good/inverse).`;
+                        const investorSchema = {
                             type: "object",
                             properties: {
-                                frameworks: {
-                                    type: "array",
-                                    items: {
-                                        type: "object",
-                                        properties: {
-                                            name: { type: "string" },
-                                            style: { type: "string" },
-                                            color: { type: "string" },
-                                            verdict: { type: "string" },
-                                            philosophy: { type: "string" },
-                                            approach: { type: "string" },
-                                            keyMetrics: { type: "array", items: { type: "string" } },
-                                            metrics: { type: "array", items: { type: "object", properties: { label: { type: "string" }, value: { type: "number" }, max: { type: "number" }, good: { type: "number" }, inverse: { type: "boolean" } } } }
-                                        }
-                                    }
-                                }
+                                name: { type: "string" },
+                                style: { type: "string" },
+                                color: { type: "string" },
+                                verdict: { type: "string" },
+                                philosophy: { type: "string" },
+                                approach: { type: "string" },
+                                keyMetrics: { type: "array", items: { type: "string" } },
+                                metrics: { type: "array", items: { type: "object", properties: { label: { type: "string" }, value: { type: "number" }, max: { type: "number" }, good: { type: "number" }, inverse: { type: "boolean" } } } }
                             }
                         };
-                        const batchResponse = await base44.integrations.Core.InvokeLLM({
-                            prompt: batchPrompt,
-                            add_context_from_internet: true,
-                            response_json_schema: batchSchema
+                        const framework = await base44.integrations.Core.InvokeLLM({
+                            prompt: investorPrompt,
+                            response_json_schema: investorSchema
                         });
-                        allFrameworks.push(...(batchResponse.frameworks || []));
+                        allFrameworks.push(framework);
                     }
                     setSectionData(prev => ({ ...prev, legends: { frameworks: allFrameworks } }));
                     setLoadingSection(null);
