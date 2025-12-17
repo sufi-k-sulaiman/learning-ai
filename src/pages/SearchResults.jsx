@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import PageMeta from '@/components/PageMeta';
 import { Link } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { Search, FileText, Sparkles, Radio, Brain, Settings, ArrowLeft, Loader2 } from 'lucide-react';
@@ -72,7 +73,13 @@ export default function SearchResults() {
     };
 
     return (
-        <PageLayout activePage="" onSearch={handleSearch} searchPlaceholder="Search anything..." showSearch={true}>
+        <>
+            <PageMeta 
+                title="Search Results"
+                description="AI-powered search results with intelligent suggestions and related topics across all platform features."
+                keywords="search, AI search, intelligent search, search results, platform search"
+            />
+            <PageLayout activePage="" onSearch={handleSearch} searchPlaceholder="Search anything..." showSearch={true}>
             <div className="p-4 md:p-8 max-w-4xl mx-auto">
                 <div className="flex items-center gap-3 mb-6">
                     <Link to={createPageUrl('Home')}>
@@ -158,5 +165,6 @@ export default function SearchResults() {
                 )}
             </div>
         </PageLayout>
+        </>
     );
 }

@@ -1,4 +1,5 @@
 import React from 'react';
+import PageMeta from '@/components/PageMeta';
 import { Link } from 'react-router-dom';
 import { Home, ArrowLeft } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -7,7 +8,13 @@ import { createPageUrl } from '@/utils';
 
 export default function NotFound() {
     return (
-        <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-6">
+        <>
+            <PageMeta 
+                title="404 - Page Not Found"
+                description="The page you're looking for doesn't exist. Browse our available pages and features."
+                keywords="404, page not found, 1cPublishing"
+            />
+            <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-6">
             <div className="text-center max-w-2xl">
                 <img 
                     src={LOGO_URL} 
@@ -55,5 +62,6 @@ export default function NotFound() {
                 </div>
             </div>
         </div>
+        </>
     );
 }
