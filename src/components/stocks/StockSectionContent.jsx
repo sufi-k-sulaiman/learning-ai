@@ -713,6 +713,9 @@ export default function StockSectionContent({
                             </div>
                         )}
                     </div>
+                </div>
+            );
+
         case 'reports':
             return (
                 <div className="min-h-[600px] space-y-6">
