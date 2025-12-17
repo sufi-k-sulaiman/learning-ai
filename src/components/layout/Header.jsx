@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { ChevronLeft, Menu, Search } from 'lucide-react';
+import { ChevronLeft, Menu, Search, ArrowRight } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { LOGO_URL, menuItems } from '../NavigationConfig';
 
@@ -139,9 +139,10 @@ export default function Header({ title, sidebarOpen, setSidebarOpen, children, c
                         href="https://1cplatform.com/Onboarding" 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="hidden sm:inline-flex items-center px-5 py-2.5 bg-purple-800 hover:bg-purple-800 text-white font-semibold rounded-full transition-colors shadow-sm hover:shadow-md"
+                        className="hidden sm:inline-flex items-center gap-2 px-8 py-3.5 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-full transition-all shadow-lg hover:shadow-xl"
                     >
-                        Get Started
+                        Get started
+                        <ArrowRight className="w-5 h-5" />
                     </a>
                     {children}
                 </div>
