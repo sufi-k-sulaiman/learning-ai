@@ -1359,29 +1359,179 @@ export default function StockSectionContent({
                             </div>
                         </div>
 
+                        <div className="grid grid-cols-3 gap-6">
+                            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border border-blue-200 p-6">
+                                <h3 className="font-semibold text-blue-900 mb-4 flex items-center gap-2">
+                                    <ThumbsUp className="w-5 h-5" /> What {legend.name.split(' ')[1] || legend.name.split(' ')[0]} Would Like
+                                </h3>
+                                <ul className="space-y-3">
+                                    {legend.metrics.filter(m => !m.inverse ? m.value >= m.good : m.value < m.good).length > 0 ? (
+                                        legend.metrics.filter(m => !m.inverse ? m.value >= m.good : m.value < m.good).map((m, i) => (
+                                            <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-green-500 mt-2" />
+                                                <span><strong>{m.label}:</strong> {m.value} {m.inverse ? '(below target)' : '(above target)'}</span>
+                                            </li>
+                                        ))
+                                    ) : (
+                                        <li className="text-sm text-gray-600 italic">No metrics currently meet target thresholds</li>
+                                    )}
+                                </ul>
+                            </div>
+
+                            <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-2xl border border-orange-200 p-6">
+                                <h3 className="font-semibold text-orange-900 mb-4 flex items-center gap-2">
+                                    <AlertTriangle className="w-5 h-5" /> Concerns
+                                </h3>
+                                <ul className="space-y-3">
+                                    {legend.metrics.filter(m => !m.inverse ? m.value < m.good : m.value >= m.good).length > 0 ? (
+                                        legend.metrics.filter(m => !m.inverse ? m.value < m.good : m.value >= m.good).map((m, i) => (
+                                            <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-red-500 mt-2" />
+                                                <span><strong>{m.label}:</strong> {m.value} {m.inverse ? '(above target)' : '(below target)'}</span>
+                                            </li>
+                                        ))
+                                    ) : (
+                                        <li className="text-sm text-gray-600 italic">All metrics meet framework standards</li>
+                                    )}
+                                </ul>
+                            </div>
+
+                            <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl border border-purple-200 p-6">
+                                <h3 className="font-semibold text-purple-900 mb-4 flex items-center gap-2">
+                                    <Brain className="w-5 h-5" /> Framework Insights
+                                </h3>
+                                <div className="space-y-3 text-sm text-gray-700">
+                                    <p><strong>Score:</strong> {Math.round(legend.metrics.reduce((sum, m) => sum + (m.inverse ? (m.max - m.value) / m.max * 100 : m.value / m.max * 100), 0) / legend.metrics.length)}/100</p>
+                                    <p><strong>Alignment:</strong> {legend.metrics.filter(m => !m.inverse ? m.value >= m.good : m.value < m.good).length} of {legend.metrics.length} criteria met</p>
+                                    <p><strong>Risk Profile:</strong> {
+                                        legend.metrics.filter(m => !m.inverse ? m.value >= m.good : m.value < m.good).length >= legend.metrics.length * 0.7 ? 'Low Risk' :
+                                        legend.metrics.filter(m => !m.inverse ? m.value >= m.good : m.value < m.good).length >= legend.metrics.length * 0.4 ? 'Moderate Risk' :
+                                        'High Risk'
+                                    }</p>
+                                </div>
+                            </div>
+                        </div>
+
                         <div className="bg-white rounded-2xl border border-gray-200 p-6">
                             <h3 className="font-semibold text-gray-900 mb-4">Detailed Analysis for {stock.ticker}</h3>
                             <div className="space-y-4">
-                                {legend.metrics.map((m, i) => (
-                                    <div key={i}>
-                                        <div className="flex justify-between items-center mb-2">
-                                            <span className="font-medium text-gray-900">{m.label}</span>
-                                            <div className="flex items-center gap-4">
-                                                <span className="text-sm text-gray-500">Current: <span className="font-bold text-gray-900">{typeof m.value === 'number' ? m.value.toFixed(1) : m.value}</span></span>
-                                                <span className="text-sm text-gray-500">Target: <span className="font-bold text-green-600">{m.good}</span></span>
+                                {legend.metrics.map((m, i) => {
+                                    const meetsTarget = m.inverse ? m.value < m.good : m.value >= m.good;
+                                    const percentOfTarget = m.inverse ? ((m.max - m.value) / (m.max - m.good)) * 100 : (m.value / m.good) * 100;
+                                    return (
+                                        <div key={i} className="p-4 bg-gray-50 rounded-xl">
+                                            <div className="flex justify-between items-center mb-2">
+                                                <span className="font-medium text-gray-900">{m.label}</span>
+                                                <div className="flex items-center gap-4">
+                                                    <span className="text-sm text-gray-500">Current: <span className="font-bold text-gray-900">{typeof m.value === 'number' ? m.value.toFixed(1) : m.value}</span></span>
+                                                    <span className="text-sm text-gray-500">Target: <span className="font-bold text-green-600">{m.good}</span></span>
+                                                    <span className={`text-xs font-bold px-2 py-1 rounded ${meetsTarget ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}`}>
+                                                        {percentOfTarget.toFixed(0)}%
+                                                    </span>
+                                                </div>
                                             </div>
+                                            <div className="h-3 bg-gray-200 rounded-full overflow-hidden mb-2">
+                                                <div 
+                                                    className="h-full rounded-full transition-all" 
+                                                    style={{ 
+                                                        width: `${Math.min((m.value / m.max) * 100, 100)}%`,
+                                                        backgroundColor: meetsTarget ? '#10B981' : '#F59E0B'
+                                                    }} 
+                                                />
+                                            </div>
+                                            <p className="text-xs text-gray-600 mt-2">
+                                                {meetsTarget ? 
+                                                    `✓ This metric aligns with ${legend.name}'s criteria for quality investments.` : 
+                                                    `⚠ Below ${legend.name}'s preferred threshold. ${m.inverse ? 'Lower' : 'Higher'} values needed.`
+                                                }
+                                            </p>
                                         </div>
-                                        <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
-                                            <div 
-                                                className="h-full rounded-full transition-all" 
-                                                style={{ 
-                                                    width: `${Math.min((m.value / m.max) * 100, 100)}%`,
-                                                    backgroundColor: (m.inverse ? m.value < m.good : m.value >= m.good) ? '#10B981' : '#F59E0B'
-                                                }} 
-                                            />
-                                        </div>
+                                    );
+                                })}
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-2xl border border-gray-200 p-6">
+                            <h3 className="font-semibold text-gray-900 mb-4">Historical Context & Comparables</h3>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="p-4 bg-blue-50 rounded-xl">
+                                    <h4 className="font-medium text-blue-900 mb-2">Sector Comparison</h4>
+                                    <p className="text-sm text-gray-700 mb-2">How {stock.ticker} compares to {stock.sector} sector averages:</p>
+                                    <div className="space-y-1 text-xs">
+                                        {legend.metrics.slice(0, 2).map((m, i) => (
+                                            <div key={i} className="flex justify-between">
+                                                <span>{m.label}:</span>
+                                                <span className="font-bold">{m.value > m.good * 0.9 ? 'Above Average' : 'Below Average'}</span>
+                                            </div>
+                                        ))}
                                     </div>
-                                ))}
+                                </div>
+
+                                <div className="p-4 bg-purple-50 rounded-xl">
+                                    <h4 className="font-medium text-purple-900 mb-2">Framework Track Record</h4>
+                                    <p className="text-sm text-gray-700 mb-2">{legend.name} typically invests in companies with:</p>
+                                    <ul className="space-y-1 text-xs">
+                                        {legend.keyMetrics.slice(0, 3).map((metric, i) => (
+                                            <li key={i} className="flex items-start gap-1">
+                                                <span className="w-1 h-1 rounded-full bg-purple-500 mt-1.5" />
+                                                {metric}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-2xl border border-indigo-200 p-6">
+                            <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                                <Sparkles className="w-5 h-5 text-purple-600" /> {legend.name}'s Perspective on {stock.ticker}
+                            </h3>
+                            <div className="space-y-4">
+                                <div className="bg-white/60 rounded-lg p-4">
+                                    <h4 className="font-medium text-gray-900 mb-2">Investment Rationale</h4>
+                                    <p className="text-sm text-gray-700">
+                                        Based on {legend.name}'s methodology, {stock.ticker} {legend.verdict.includes('Buy') || legend.verdict.includes('Strong') ? 
+                                            `presents a compelling opportunity due to its alignment with key framework criteria. The stock demonstrates ${legend.metrics.filter(m => !m.inverse ? m.value >= m.good : m.value < m.good).length} out of ${legend.metrics.length} favorable characteristics.` :
+                                            `requires caution as it currently meets only ${legend.metrics.filter(m => !m.inverse ? m.value >= m.good : m.value < m.good).length} out of ${legend.metrics.length} framework criteria. Further improvement needed before consideration.`
+                                        }
+                                    </p>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div className="bg-white/60 rounded-lg p-4">
+                                        <h4 className="font-medium text-green-900 mb-2">Strengths</h4>
+                                        <ul className="space-y-1 text-sm">
+                                            {legend.metrics.filter(m => !m.inverse ? m.value >= m.good : m.value < m.good).slice(0, 3).map((m, i) => (
+                                                <li key={i} className="flex items-start gap-2">
+                                                    <span className="text-green-600">▪</span>
+                                                    Strong {m.label.toLowerCase()} at {m.value}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+
+                                    <div className="bg-white/60 rounded-lg p-4">
+                                        <h4 className="font-medium text-orange-900 mb-2">Areas for Improvement</h4>
+                                        <ul className="space-y-1 text-sm">
+                                            {legend.metrics.filter(m => !m.inverse ? m.value < m.good : m.value >= m.good).slice(0, 3).map((m, i) => (
+                                                <li key={i} className="flex items-start gap-2">
+                                                    <span className="text-orange-600">▪</span>
+                                                    {m.label} needs improvement
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div className="bg-white/60 rounded-lg p-4">
+                                    <h4 className="font-medium text-gray-900 mb-2">Framework-Specific Recommendation</h4>
+                                    <p className="text-sm text-gray-700">
+                                        {legend.name} would likely {legend.verdict.includes('Buy') || legend.verdict.includes('Strong') ? 
+                                            `consider ${stock.ticker} a worthwhile investment, particularly for long-term holders who value ${legend.keyMetrics[0].toLowerCase()}. The company's ${legend.metrics[0]?.label.toLowerCase()} of ${legend.metrics[0]?.value} aligns well with this philosophy.` :
+                                            `wait for better entry points or improved fundamentals before initiating a position in ${stock.ticker}. Key focus areas would be improving ${legend.metrics.filter(m => !m.inverse ? m.value < m.good : m.value >= m.good)[0]?.label.toLowerCase()}.`
+                                        }
+                                    </p>
+                                </div>
                             </div>
                         </div>
 
