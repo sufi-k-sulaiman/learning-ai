@@ -8,8 +8,9 @@ import {
     LineChart, Activity, Brain, Shield, AlertTriangle, List, 
     Sparkles, ChevronRight, Info, Loader2, Target, Zap, Building,
     Users, Globe, Calendar, FileText, PieChart, Percent, ArrowUpRight, ArrowDownRight,
-    Calculator, ThumbsUp, ThumbsDown, Download, ExternalLink, Play, ArrowLeft
+    Calculator, ThumbsUp, ThumbsDown, Download, ExternalLink, Play, ArrowLeft, GitCompare
 } from 'lucide-react';
+import ComparisonModal from '@/components/stocks/ComparisonModal';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
@@ -46,7 +47,7 @@ export default function StockDetail() {
     const navigate = useNavigate();
     const [stock, setStock] = useState(null);
     const [activeNav, setActiveNav] = useState('overview');
-    const [isWatchlisted, setIsWatchlisted] = useState(false);
+    const [showComparisonModal, setShowComparisonModal] = useState(false);
     const [sectionData, setSectionData] = useState({});
     const [loadingSection, setLoadingSection] = useState(null);
     const [investmentAmount, setInvestmentAmount] = useState(10000);
@@ -385,11 +386,11 @@ export default function StockDetail() {
                                     </span>
                                 </div>
                                 <Button 
-                                    onClick={() => setIsWatchlisted(!isWatchlisted)}
-                                    className={`${isWatchlisted ? 'bg-yellow-500 hover:bg-yellow-600' : 'bg-purple-600 hover:bg-purple-700'}`}
+                                    onClick={() => setShowComparisonModal(true)}
+                                    className="bg-purple-600 hover:bg-purple-700"
                                 >
-                                    <Star className={`w-4 h-4 mr-2 ${isWatchlisted ? 'fill-white' : ''}`} />
-                                    {isWatchlisted ? 'Watching' : 'Watchlist'}
+                                    <GitCompare className="w-4 h-4 mr-2" />
+                                    Compare
                                 </Button>
                             </div>
                         </div>
@@ -445,6 +446,12 @@ export default function StockDetail() {
                         </div>
                     )}
                 </div>
+
+                <ComparisonModal 
+                    isOpen={showComparisonModal}
+                    onClose={() => setShowComparisonModal(false)}
+                    currentTicker={stock.ticker}
+                />
             </div>
         </>
     );

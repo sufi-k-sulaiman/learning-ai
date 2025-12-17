@@ -24,6 +24,7 @@ import NotFound from './pages/NotFound';
 import Privacy from './pages/Privacy';
 import Appstore from './pages/Appstore';
 import StockDetail from './pages/StockDetail';
+import StockComparison from './pages/StockComparison';
 import __Layout from './Layout.jsx';
 
 
@@ -54,6 +55,7 @@ export const PAGES = {
     "Privacy": Privacy,
     "Appstore": Appstore,
     "StockDetail": StockDetail,
+    "StockComparison": StockComparison,
 }
 
 export const pagesConfig = {
