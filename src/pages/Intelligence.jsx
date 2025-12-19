@@ -416,7 +416,7 @@ function ItemCard({ item, color, onClick }) {
                 <Sparkles className="w-10 h-10 sm:w-12 sm:h-12 mb-4" />
             </div>
             <h4 className="text-2xl sm:text-3xl font-bold mb-3 leading-tight">{item}</h4>
-            <p className="text-white/80 text-sm sm:text-base leading-relaxed">
+            <p className="text-white/80 pr-16 text-sm leading-relaxed sm:text-base">
                 Explore comprehensive insights and discover fascinating facts about {item.toLowerCase()}.
             </p>
         </div>);
@@ -457,9 +457,9 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
           }
         } catch (e) {
 
+
           // Invalid cache, continue to generate
         }}
-
       const response = await base44.integrations.Core.GenerateImage({
         prompt: `A stunning, educational scientific illustration of ${item} in the context of ${category?.name || 'natural world'}. Photorealistic, highly detailed, vibrant colors, professional scientific visualization style.`
       });
@@ -499,9 +499,9 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
           }
         } catch (e) {
 
+
           // Invalid cache, continue to generate
         }}
-
       const response = await base44.integrations.Core.GenerateImage({
         prompt: `Creative conceptual visualization showing the real-world applications and impact of ${item} in ${category?.name || 'modern world'}. Show how it affects everyday life, technology, or nature. Artistic, engaging, educational illustration style.`
       });
@@ -543,9 +543,9 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
         }
       } catch (e) {
 
+
         // Invalid cache, continue to fetch
       }}
-
     try {
       // Split into two smaller API calls for reliability
       const [basicResponse, chartsResponse] = await Promise.all([
