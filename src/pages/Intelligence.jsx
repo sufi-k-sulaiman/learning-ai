@@ -475,9 +475,9 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
       } catch (e) {
 
 
+
         // Invalid cache, continue to fetch
-      }}
-    try {
+      }}try {
       // Split into two smaller API calls for reliability
       const [basicResponse, chartsResponse] = await Promise.all([
       base44.integrations.Core.InvokeLLM({
@@ -715,8 +715,8 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                         <div className="w-10 h-10 rounded-lg flex items-center justify-center">
                             <img
                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6944bf3dc7235d670de46364/813b2f73c_Group83.png"
-                alt="Learning Ai"
-                className="w-full h-full object-contain" />
+                alt="Learning Ai" className="rounded-3xl w-full h-full object-contain" />
+
 
                         </div>
                         <div>
