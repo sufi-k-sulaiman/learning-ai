@@ -17,11 +17,25 @@ const extractDomain = (url) => {
     if (!url) return null;
     try {
         const urlObj = new URL(url.startsWith('http') ? url : `https://${url}`);
-        return urlObj.hostname.replace('www.', '');
+        const hostname = urlObj.hostname.replace('www.', '');
+        // Get just the main domain (e.g., example.com instead of subdomain.example.com)
+        const parts = hostname.split('.');
+        if (parts.length > 2) {
+            return parts.slice(-2).join('.');
+        }
+        return hostname;
     } catch {
         // Try to extract domain from malformed URLs
         const match = url.match(/(?:https?:\/\/)?(?:www\.)?([^\/\?\s]+)/);
-        return match ? match[1] : url;
+        if (match) {
+            const domain = match[1].split('/')[0];
+            const parts = domain.split('.');
+            if (parts.length > 2) {
+                return parts.slice(-2).join('.');
+            }
+            return domain;
+        }
+        return url;
     }
 };
 
@@ -79,8 +93,9 @@ const TextWithLinks = ({ text }) => {
         if (match.index > lastIndex) {
             parts.push({ type: 'text', content: text.slice(lastIndex, match.index) });
         }
-        // Add the link
-        parts.push({ type: 'link', domain: match[1], url: match[2] });
+        // Add the link - extract domain from URL
+        const domain = extractDomain(match[2]);
+        parts.push({ type: 'link', domain, url: match[2] });
         lastIndex = match.index + match[0].length;
     }
     
@@ -100,8 +115,6 @@ const TextWithLinks = ({ text }) => {
                 if (part.type === 'text') {
                     return <span key={i}>{part.content}</span>;
                 }
-                // Clean domain
-                const cleanDomain = part.domain.replace(/^www\./, '').split('/')[0];
                 return (
                     <a 
                         key={i}
@@ -111,7 +124,7 @@ const TextWithLinks = ({ text }) => {
                         className="inline-flex items-center gap-1 text-xs text-purple-800 hover:text-purple-800 transition-colors px-1.5 py-0.5 bg-purple-50 hover:bg-purple-100 rounded mx-1"
                         title={part.url}
                     >
-                        {cleanDomain}
+                        {part.domain}
                         <ExternalLink className="w-3 h-3" />
                     </a>
                 );
