@@ -440,6 +440,26 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
         setLoading(true);
         setData(null);
         setError(false);
+        
+        // Check cache first (72 hours)
+        const cacheKey = `intelligence_${item}_${category?.name}`;
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) {
+            try {
+                const { data: cachedData, timestamp } = JSON.parse(cached);
+                const age = Date.now() - timestamp;
+                const maxAge = 72 * 60 * 60 * 1000; // 72 hours
+                
+                if (age < maxAge) {
+                    setData(cachedData);
+                    setLoading(false);
+                    return;
+                }
+            } catch (e) {
+                // Invalid cache, continue to fetch
+            }
+        }
+        
         try {
             // Split into two smaller API calls for reliability
             const [basicResponse, chartsResponse] = await Promise.all([
@@ -501,6 +521,12 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                 ...basicResponse,
                 ...chartsResponse
             };
+            
+            // Cache the data
+            localStorage.setItem(cacheKey, JSON.stringify({
+                data: mergedData,
+                timestamp: Date.now()
+            }));
             
             setData(mergedData);
         } catch (error) {
