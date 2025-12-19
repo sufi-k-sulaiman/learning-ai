@@ -704,7 +704,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                         </div>
                         <div>
                             <h3 className="font-semibold text-gray-900">Test Your Knowledge!</h3>
-                            <p className="text-sm text-gray-600">Take this fun interactive quiz to learn more</p>
+                            <p className="text-sm text-gray-600">Fun interactive quiz to learn more</p>
                         </div>
                     </div>
                     <GamifiedLearning item={item} category={category} />
