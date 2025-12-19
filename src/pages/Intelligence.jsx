@@ -1072,17 +1072,16 @@ export default function Intelligence() {
                             onNavigate={handleBreadcrumbNavigate}
                             onMenuClick={() => setMenuOpen(true)}
                         />
-                    </div>
-                    
-                    <MobileMenu 
+                        </div>
+
+                        <MobileMenu 
                         items={breadcrumbItems}
                         onNavigate={handleBreadcrumbNavigate}
                         isOpen={menuOpen}
                         onClose={() => setMenuOpen(false)}
-                    />
-                    </div>
+                        />
 
-                {/* Content */}
+                        {/* Content */}
                 {!selectedCategory ? (
                     /* Category Grid */
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-4 md:gap-6">
