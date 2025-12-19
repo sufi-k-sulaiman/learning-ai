@@ -35,6 +35,26 @@ export default function Appstore() {
             link: 'https://apps.apple.com/app/routineops/id6756257586',
             color: 'from-green-600 to-emerald-600',
             features: ['Smart scheduling', 'Habit tracking', 'AI productivity tips', 'Progress analytics']
+        },
+        {
+            name: 'AI News Pro',
+            tagline: 'Intelligent News Aggregation',
+            description: 'Stay informed with AI-curated news from around the world. AI News Pro delivers personalized news feeds, real-time updates, and intelligent summaries to keep you connected to what matters most.',
+            thumbnail: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/c92b3eabd_image.png',
+            logo: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/438969435_Search-Pods-AppIcon1.png',
+            link: 'https://apps.apple.com/us/app/ai-news-pro/id6756688599',
+            color: 'from-red-600 to-orange-600',
+            features: ['AI-curated news', 'Real-time updates', 'Smart summaries', 'Multi-category support']
+        },
+        {
+            name: 'Notes AI Pro',
+            tagline: 'Smart Note-Taking with AI',
+            description: 'Transform your note-taking experience with AI-powered features. Notes AI Pro helps you create, organize, and enhance your notes with intelligent suggestions, code snippets, and image generation capabilities.',
+            thumbnail: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/2df582115_image.png',
+            logo: 'https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/692729a5f5180fbd43f297e9/438969435_Search-Pods-AppIcon1.png',
+            link: 'https://apps.apple.com/us/app/notes-ai-pro/id6756442195',
+            color: 'from-purple-600 to-indigo-600',
+            features: ['AI text generation', 'Image creation', 'Code snippets', 'Smart organization']
         }
     ];
 
@@ -96,7 +116,7 @@ export default function Appstore() {
                                         <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                             {app.features.map((feature, i) => (
                                                 <li key={i} className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
-                                                    <Star className="w-3 h-3 text-purple-500 fill-purple-500 flex-shrink-0" />
+                                                    <Star className="w-3 h-3 flex-shrink-0" style={{ color: '#6209e6', fill: '#6209e6' }} />
                                                     <span className="line-clamp-1">{feature}</span>
                                                 </li>
                                             ))}
@@ -110,7 +130,7 @@ export default function Appstore() {
                                         rel="noopener noreferrer"
                                         className="block mt-auto"
                                     >
-                                        <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2.5 sm:py-3 text-sm sm:text-base">
+                                        <Button className="w-full text-white font-semibold py-2.5 sm:py-3 text-sm sm:text-base" style={{ backgroundColor: '#6209e6' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#5507C8'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#6209e6'}>
                                             <Download className="w-4 h-4 mr-2" />
                                             Download
                                             <ExternalLink className="w-4 h-4 ml-2" />
@@ -134,7 +154,7 @@ export default function Appstore() {
                     </p>
                     <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-500">
                         <span className="flex items-center gap-1">
-                            <Star className="w-4 h-4 text-purple-500 fill-purple-500" />
+                            <Star className="w-4 h-4" style={{ color: '#6209e6', fill: '#6209e6' }} />
                             Free to download
                         </span>
                         <span>•</span>
