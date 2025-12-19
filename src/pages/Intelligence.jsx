@@ -346,21 +346,16 @@ function ItemCard({ item, color, onClick }) {
     return (
         <div 
             onClick={onClick}
-            className="bg-white rounded-none sm:rounded-xl border-0 border-b sm:border border-gray-200 p-3 sm:p-4 active:shadow-none sm:hover:shadow-lg active:border-purple-300 sm:hover:border-purple-200 cursor-pointer transition-all group touch-manipulation"
+            className="rounded-none sm:rounded-2xl p-6 sm:p-8 cursor-pointer transition-all group touch-manipulation text-white"
+            style={{ backgroundColor: color }}
         >
-            <div className="flex items-center gap-2.5 sm:gap-3">
-                <div 
-                    className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center flex-shrink-0"
-                    style={{ backgroundColor: `${color}20` }}
-                >
-                    <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" style={{ color }} />
-                </div>
-                <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-sm sm:text-base text-gray-900 group-active:text-purple-800 sm:group-hover:text-purple-800 transition-colors truncate">{item}</h4>
-                    <p className="text-xs text-gray-500">Tap to explore</p>
-                </div>
-                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-active:text-purple-500 sm:group-hover:text-purple-500 group-active:translate-x-1 sm:group-hover:translate-x-1 transition-all flex-shrink-0" />
+            <div className="mb-6">
+                <Sparkles className="w-10 h-10 sm:w-12 sm:h-12 mb-4" />
             </div>
+            <h4 className="text-2xl sm:text-3xl font-bold mb-3 leading-tight">{item}</h4>
+            <p className="text-white/80 text-sm sm:text-base leading-relaxed">
+                Explore comprehensive insights and discover fascinating facts about {item.toLowerCase()}.
+            </p>
         </div>
     );
 }
