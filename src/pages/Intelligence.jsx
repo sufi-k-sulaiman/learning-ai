@@ -416,10 +416,13 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
     const [error, setError] = useState(false);
     const [imageUrl, setImageUrl] = useState(null);
     const [imageLoading, setImageLoading] = useState(true);
+    const [secondImageUrl, setSecondImageUrl] = useState(null);
+    const [secondImageLoading, setSecondImageLoading] = useState(true);
 
     useEffect(() => {
         fetchItemData();
         generateImage();
+        generateSecondImage();
     }, [item]);
 
     const generateImage = async () => {
@@ -433,6 +436,20 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
             console.error('Failed to generate image:', error);
         } finally {
             setImageLoading(false);
+        }
+    };
+
+    const generateSecondImage = async () => {
+        setSecondImageLoading(true);
+        try {
+            const response = await base44.integrations.Core.GenerateImage({
+                prompt: `Creative conceptual visualization showing the real-world applications and impact of ${item} in ${category?.name || 'modern world'}. Show how it affects everyday life, technology, or nature. Artistic, engaging, educational illustration style.`
+            });
+            setSecondImageUrl(response?.url);
+        } catch (error) {
+            console.error('Failed to generate second image:', error);
+        } finally {
+            setSecondImageLoading(false);
         }
     };
 
@@ -882,6 +899,25 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                         </div>
                     </div>
                 )}
+
+                {/* Second Visual Representation */}
+                <div className="text-center">
+                    <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Real-World Impact</h2>
+                    {secondImageLoading ? (
+                        <div className="w-full max-w-5xl mx-auto h-64 sm:h-96 rounded-none sm:rounded-3xl bg-gray-100 flex items-center justify-center">
+                            <Loader2 className="w-10 h-10 animate-spin" style={{ color: category?.color }} />
+                        </div>
+                    ) : secondImageUrl && (
+                        <motion.img 
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ duration: 0.6 }}
+                            src={secondImageUrl} 
+                            alt={`${item} real-world applications`} 
+                            className="w-full max-w-5xl mx-auto h-64 sm:h-96 object-cover rounded-none sm:rounded-3xl shadow-none sm:shadow-2xl" 
+                        />
+                    )}
+                </div>
 
                 {/* Common Applications */}
                 {Array.isArray(data?.applications) && data.applications.length > 0 && (
