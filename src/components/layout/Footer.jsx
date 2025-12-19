@@ -8,7 +8,7 @@ export default function Footer() {
         <footer className="py-6 bg-white border-t border-gray-200">
             <div className="max-w-6xl mx-auto px-4">
                 <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                    <a href="https://1cplatform.com/AgenticAI" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2">
+                    <Link to={createPageUrl('Intelligence')} className="flex items-center gap-2">
                         <img src={LOGO_URL} alt="1cPublishing" className="h-8 w-8 object-contain" />
                         <span className="text-sm font-bold text-gray-900">1cPlatform</span>
                     </a>
