@@ -8,6 +8,7 @@ import {
     Clock, AlertCircle, Rocket, Network, Gamepad2
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import { motion } from 'framer-motion';
 import { BarChart, Bar, PieChart, Pie, Cell, LineChart, Line, RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import GamifiedLearning from '@/components/intelligence/GamifiedLearning';
 
