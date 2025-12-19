@@ -5,7 +5,7 @@ import {
     Globe, Mountain, Leaf, Zap, Star, Home,
     Beaker, Calculator, FlaskConical, Users, Lightbulb, BookOpen, Atom, ExternalLink,
     Factory, Truck, ShoppingCart, Plane, Heart, Building, Cpu, Wheat, GraduationCap, Wrench,
-    Clock, AlertCircle, Rocket, Network, Gamepad2
+    Clock, AlertCircle, Rocket, Network, Gamepad2, Menu, X
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
@@ -292,29 +292,64 @@ const CATEGORIES = {
     }
 };
 
-function Breadcrumb({ items, onNavigate }) {
+function MobileMenu({ items, onNavigate, isOpen, onClose }) {
+    if (!isOpen) return null;
+    
     return (
-        <nav className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm flex-wrap">
-            {items.map((item, index) => (
-                <React.Fragment key={index}>
-                    {index > 0 && <ChevronRight className="w-4 h-4 text-gray-400" />}
-                    <button
-                        onClick={() => onNavigate(index)}
-                        className={`flex items-center gap-1 sm:gap-1.5 px-2 py-1 rounded-lg transition-colors text-xs sm:text-sm ${
-                            index === items.length - 1
-                                ? 'text-gray-900 font-medium bg-gray-100'
-                                : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
-                        }`}
-                    >
-                        {index === 0 ? (
-                            <Home className="w-3 h-3 sm:w-4 sm:h-4" />
-                        ) : (
-                            item.label
-                        )}
+        <div className="fixed inset-0 z-50 bg-black/50" onClick={onClose}>
+            <div className="bg-white w-64 h-full shadow-xl" onClick={(e) => e.stopPropagation()}>
+                <div className="p-4 border-b border-gray-200 flex items-center justify-between">
+                    <h2 className="font-semibold text-gray-900">Navigation</h2>
+                    <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded-lg">
+                        <X className="w-5 h-5 text-gray-500" />
                     </button>
-                </React.Fragment>
-            ))}
-        </nav>
+                </div>
+                <div className="p-2">
+                    {items.map((item, index) => (
+                        <button
+                            key={index}
+                            onClick={() => {
+                                onNavigate(index);
+                                onClose();
+                            }}
+                            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors text-left ${
+                                index === items.length - 1
+                                    ? 'bg-purple-50 text-purple-900 font-medium'
+                                    : 'text-gray-700 hover:bg-gray-50'
+                            }`}
+                        >
+                            {index === 0 ? (
+                                <Home className="w-5 h-5" />
+                            ) : (
+                                <ChevronRight className="w-5 h-5" />
+                            )}
+                            <span>{index === 0 ? 'Home' : item.label}</span>
+                        </button>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+}
+
+function Breadcrumb({ items, onNavigate, onMenuClick }) {
+    return (
+        <button
+            onClick={onMenuClick}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+        >
+            <Menu className="w-5 h-5 text-gray-600" />
+            <div className="flex items-center gap-1.5 text-sm text-gray-600">
+                {items.map((item, index) => (
+                    <React.Fragment key={index}>
+                        {index > 0 && <ChevronRight className="w-4 h-4" />}
+                        <span className={index === items.length - 1 ? 'font-medium text-gray-900' : ''}>
+                            {index === 0 ? 'Home' : item.label}
+                        </span>
+                    </React.Fragment>
+                ))}
+            </div>
+        </button>
     );
 }
 
@@ -935,6 +970,7 @@ export default function Intelligence() {
 
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [selectedItem, setSelectedItem] = useState(null);
+    const [menuOpen, setMenuOpen] = useState(false);
 
     // Update URL for display only (aesthetic, not parsed)
     const updateUrl = (category, item) => {
@@ -1014,12 +1050,22 @@ export default function Intelligence() {
                             <img 
                                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6944bf3dc7235d670de46364/d3e2e95fc_LearningAi.png" 
                                 alt="Learning Ai" 
-                                className="h-9 sm:h-10 w-auto object-contain"
+                                className="h-7 sm:h-8 w-auto object-contain"
                             />
-                            <h1 className="text-lg sm:text-xl font-bold text-gray-900">Learning Ai</h1>
+                            <h1 className="text-sm sm:text-base font-bold text-gray-900">Learning Ai</h1>
                         </button>
                         
-                        <Breadcrumb items={breadcrumbItems} onNavigate={handleBreadcrumbNavigate} />
+                        <Breadcrumb 
+                            items={breadcrumbItems} 
+                            onNavigate={handleBreadcrumbNavigate}
+                            onMenuClick={() => setMenuOpen(true)}
+                        />
+                        <MobileMenu 
+                            items={breadcrumbItems}
+                            onNavigate={handleBreadcrumbNavigate}
+                            isOpen={menuOpen}
+                            onClose={() => setMenuOpen(false)}
+                        />
                     </div>
 
                 {/* Content */}
