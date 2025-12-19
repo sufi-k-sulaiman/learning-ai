@@ -1,7 +1,5 @@
 import React, { useEffect } from 'react';
 import { HelmetProvider } from 'react-helmet-async';
-import PageLayout from '@/components/PageLayout';
-import ErrorBoundary from '@/components/ErrorBoundary';
 
 export default function Layout({ children, currentPageName }) {
   useEffect(() => {
@@ -64,9 +62,6 @@ export default function Layout({ children, currentPageName }) {
 
   return (
       <HelmetProvider>
-          <div style={{ display: 'none' }}>
-          <PageLayout activePage={currentPageName}>
-              <ErrorBoundary fallbackMessage="There was an error loading this page.">
       <style>{`
         /* Hide Leaflet attribution */
         .leaflet-control-attribution {
@@ -111,13 +106,9 @@ export default function Layout({ children, currentPageName }) {
           display: none !important;
         }
         `}</style>
-      {children}
-      </ErrorBoundary>
-      </PageLayout>
-      </div>
-      <div className="min-h-screen">
-      {children}
-      </div>
-      </HelmetProvider>
-      );
+        <div className="min-h-screen">
+        {children}
+        </div>
+        </HelmetProvider>
+        );
       }
