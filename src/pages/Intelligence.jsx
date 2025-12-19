@@ -614,7 +614,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                 </div>
 
                 {/* Physical Composition */}
-                {data?.physicalComposition?.length > 0 && (
+                {Array.isArray(data?.physicalComposition) && data.physicalComposition.length > 0 && (
                     <div className="bg-white rounded-xl border border-gray-200 p-5">
                         <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
                             <Atom className="w-5 h-5" style={{ color: category?.color }} />
@@ -637,7 +637,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                 )}
 
                 {/* Chemical Composition */}
-                {data?.chemicalComposition?.length > 0 && (
+                {Array.isArray(data?.chemicalComposition) && data.chemicalComposition.length > 0 && (
                     <div className="bg-white rounded-xl border border-gray-200 p-5">
                         <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
                             <FlaskConical className="w-5 h-5" style={{ color: category?.color }} />
@@ -667,7 +667,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                 )}
 
                 {/* Mathematical Illustrations */}
-                {data?.mathematicalIllustrations?.length > 0 && (
+                {Array.isArray(data?.mathematicalIllustrations) && data.mathematicalIllustrations.length > 0 && (
                     <div className="bg-white rounded-xl border border-gray-200 p-5">
                         <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
                             <Calculator className="w-5 h-5" style={{ color: category?.color }} />
@@ -688,7 +688,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                 )}
 
                 {/* Research Data */}
-                {data?.researchData?.length > 0 && (
+                {Array.isArray(data?.researchData) && data.researchData.length > 0 && (
                     <div className="bg-white rounded-xl border border-gray-200 p-5">
                         <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
                             <BookOpen className="w-5 h-5" style={{ color: category?.color }} />
@@ -709,7 +709,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                 )}
 
                 {/* Subject Matter Experts */}
-                {data?.subjectMatterExperts?.length > 0 && (
+                {Array.isArray(data?.subjectMatterExperts) && data.subjectMatterExperts.length > 0 && (
                     <div className="bg-white rounded-xl border border-gray-200 p-5">
                         <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
                             <Users className="w-5 h-5" style={{ color: category?.color }} />
@@ -762,7 +762,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                 </div>
 
                 {/* Historical Timeline */}
-                {data?.historicalTimeline?.length > 0 && (
+                {Array.isArray(data?.historicalTimeline) && data.historicalTimeline.length > 0 && (
                     <div className="bg-white rounded-xl border border-gray-200 p-5">
                         <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
                             <Clock className="w-5 h-5" style={{ color: category?.color }} />
@@ -787,7 +787,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                 )}
 
                 {/* Common Applications */}
-                {data?.applications?.length > 0 && (
+                {Array.isArray(data?.applications) && data.applications.length > 0 && (
                     <div className="bg-white rounded-xl border border-gray-200 p-5">
                         <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
                             <Lightbulb className="w-5 h-5" style={{ color: category?.color }} />
@@ -810,7 +810,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                 )}
 
                 {/* Innovations */}
-                {data?.innovations?.length > 0 && (
+                {Array.isArray(data?.innovations) && data.innovations.length > 0 && (
                     <div className="bg-white rounded-xl border border-gray-200 p-5">
                         <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
                             <Rocket className="w-5 h-5" style={{ color: category?.color }} />
@@ -833,7 +833,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                 )}
 
                 {/* Tools */}
-                {data?.tools?.length > 0 && (
+                {Array.isArray(data?.tools) && data.tools.length > 0 && (
                     <div className="bg-white rounded-xl border border-gray-200 p-5">
                         <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
                             <Wrench className="w-5 h-5" style={{ color: category?.color }} />
@@ -856,7 +856,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                 )}
 
                 {/* Systems */}
-                {data?.systems?.length > 0 && (
+                {Array.isArray(data?.systems) && data.systems.length > 0 && (
                     <div className="bg-white rounded-xl border border-gray-200 p-5">
                         <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
                             <Network className="w-5 h-5" style={{ color: category?.color }} />
@@ -879,7 +879,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                 )}
 
                 {/* Challenges & Considerations */}
-                {data?.challenges?.length > 0 && (
+                {Array.isArray(data?.challenges) && data.challenges.length > 0 && (
                     <div className="bg-white rounded-xl border border-gray-200 p-5">
                         <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
                             <AlertCircle className="w-5 h-5" style={{ color: category?.color }} />
