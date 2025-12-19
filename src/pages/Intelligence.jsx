@@ -476,9 +476,9 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
 
 
 
+
         // Invalid cache, continue to fetch
-      }}try {
-      // Split into two smaller API calls for reliability
+      }}try {// Split into two smaller API calls for reliability
       const [basicResponse, chartsResponse] = await Promise.all([
       base44.integrations.Core.InvokeLLM({
         prompt: `Provide intelligence data about "${item}" (${category?.name || 'general'}):
@@ -697,7 +697,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
               className="bg-gray-50 rounded-none sm:rounded-2xl p-4 sm:p-6 shadow-none sm:shadow-sm border-b border-gray-200 sm:border-0">
 
                                 <div className="flex items-start gap-4">
-                                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-lg font-bold flex-shrink-0" style={{ backgroundColor: category?.color }}>
+                                    <div className="text-white my-2 text-lg font-bold rounded-full w-10 h-10 flex items-center justify-center flex-shrink-0" style={{ backgroundColor: category?.color }}>
                                         {i + 1}
                                     </div>
                                     <p className="text-gray-700 text-base leading-relaxed pt-1">
