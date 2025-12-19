@@ -1014,7 +1014,7 @@ export default function Intelligence() {
                             <img 
                                 src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6944bf3dc7235d670de46364/d3e2e95fc_LearningAi.png" 
                                 alt="Learning Ai" 
-                                className="h-12 sm:h-14 w-auto object-contain"
+                                className="h-9 sm:h-10 w-auto object-contain"
                             />
                             <h1 className="text-lg sm:text-xl font-bold text-gray-900">Learning Ai</h1>
                         </button>
