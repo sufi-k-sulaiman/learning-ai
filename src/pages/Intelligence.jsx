@@ -1295,7 +1295,7 @@ export default function Intelligence() {
 
                             <span className="text-base font-bold text-gray-900">Learning Ai</span>
                         </div>
-                        <p className="text-xs text-gray-500">Intelligence platform for automated insights</p>
+                        <p className="text-xs text-gray-500">Gamified learning & education</p>
                     </div>
                     </div>
                     </>);
