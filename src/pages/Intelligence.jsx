@@ -441,9 +441,37 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
     const generateImage = async () => {
         setImageLoading(true);
         try {
+            // Check cache first (72 hours)
+            const cacheKey = `image_${item}_${category?.name}_1`;
+            const cached = localStorage.getItem(cacheKey);
+            if (cached) {
+                try {
+                    const { url, timestamp } = JSON.parse(cached);
+                    const age = Date.now() - timestamp;
+                    const maxAge = 72 * 60 * 60 * 1000; // 72 hours
+                    
+                    if (age < maxAge) {
+                        setImageUrl(url);
+                        setImageLoading(false);
+                        return;
+                    }
+                } catch (e) {
+                    // Invalid cache, continue to generate
+                }
+            }
+            
             const response = await base44.integrations.Core.GenerateImage({
                 prompt: `A stunning, educational scientific illustration of ${item} in the context of ${category?.name || 'natural world'}. Photorealistic, highly detailed, vibrant colors, professional scientific visualization style.`
             });
+            
+            // Cache the image URL
+            if (response?.url) {
+                localStorage.setItem(cacheKey, JSON.stringify({
+                    url: response.url,
+                    timestamp: Date.now()
+                }));
+            }
+            
             setImageUrl(response?.url);
         } catch (error) {
             console.error('Failed to generate image:', error);
@@ -455,9 +483,37 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
     const generateSecondImage = async () => {
         setSecondImageLoading(true);
         try {
+            // Check cache first (72 hours)
+            const cacheKey = `image_${item}_${category?.name}_2`;
+            const cached = localStorage.getItem(cacheKey);
+            if (cached) {
+                try {
+                    const { url, timestamp } = JSON.parse(cached);
+                    const age = Date.now() - timestamp;
+                    const maxAge = 72 * 60 * 60 * 1000; // 72 hours
+                    
+                    if (age < maxAge) {
+                        setSecondImageUrl(url);
+                        setSecondImageLoading(false);
+                        return;
+                    }
+                } catch (e) {
+                    // Invalid cache, continue to generate
+                }
+            }
+            
             const response = await base44.integrations.Core.GenerateImage({
                 prompt: `Creative conceptual visualization showing the real-world applications and impact of ${item} in ${category?.name || 'modern world'}. Show how it affects everyday life, technology, or nature. Artistic, engaging, educational illustration style.`
             });
+            
+            // Cache the image URL
+            if (response?.url) {
+                localStorage.setItem(cacheKey, JSON.stringify({
+                    url: response.url,
+                    timestamp: Date.now()
+                }));
+            }
+            
             setSecondImageUrl(response?.url);
         } catch (error) {
             console.error('Failed to generate second image:', error);
