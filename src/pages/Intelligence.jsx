@@ -669,8 +669,12 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                 {/* Gamified Learning Section */}
                 <div className="sm:bg-gradient-to-br sm:from-purple-50 sm:to-blue-50 rounded-none sm:rounded-xl sm:border sm:border-purple-200 sm:p-6">
                     <div className="flex items-center gap-3 mb-4 px-3 sm:px-0">
-                        <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-gradient-to-br from-purple-500 to-blue-500">
-                            <Gamepad2 className="w-5 h-5 text-white" />
+                        <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-gradient-to-br from-purple-500 to-blue-500 p-2">
+                            <img 
+                                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6944bf3dc7235d670de46364/d3e2e95fc_LearningAi.png" 
+                                alt="Learning Ai" 
+                                className="w-full h-full object-contain"
+                            />
                         </div>
                         <div>
                             <h3 className="font-semibold text-gray-900">Test Your Knowledge!</h3>

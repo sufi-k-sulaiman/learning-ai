@@ -34,8 +34,8 @@ export default function GamifiedLearning({ item, category }) {
         try {
             const response = await base44.integrations.Core.InvokeLLM({
                 prompt: `Create an engaging, educational quiz about "${item}" (${category?.name}). 
-                
-Generate 5 bite-sized quiz questions:
+
+                Generate 10 bite-sized quiz questions:
 - Mix multiple choice, true/false, and interactive formats
 - Make them fun and engaging with friendly language
 - Include a mix of difficulty levels (easy, medium, hard)
