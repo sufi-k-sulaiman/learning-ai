@@ -530,10 +530,8 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                     </p>
                 </div>
 
-                {/* Gamified Analysis Sections */}
-                <div className="space-y-4">
-                    {/* Distribution Analysis - Duolingo Style */}
-                    {data?.distributionData?.length > 0 && (
+                {/* Distribution Analysis - Apple Style */}
+                {data?.distributionData?.length > 0 && (
                         <div className="rounded-xl border-2 p-5 shadow-sm" style={{ 
                             background: `linear-gradient(135deg, ${category?.color}15, ${category?.color}08)`,
                             borderColor: `${category?.color}40`
@@ -580,7 +578,8 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                                 })}
                             </div>
                         </div>
-                    )}
+                    </div>
+                )}
 
                 {/* Attribute Analysis - Apple Style */}
                 {data?.radarData?.length > 0 && (
