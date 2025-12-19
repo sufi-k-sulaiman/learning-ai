@@ -81,9 +81,10 @@ export default function Layout({ children, currentPageName }) {
 
   return (
       <HelmetProvider>
+          <div style={{ display: 'none' }}>
           <PageLayout activePage={currentPageName}>
               <ErrorBoundary fallbackMessage="There was an error loading this page.">
-              <style>{`
+      <style>{`
         /* Hide Leaflet attribution */
         .leaflet-control-attribution {
           display: none !important;
@@ -130,6 +131,10 @@ export default function Layout({ children, currentPageName }) {
       {children}
       </ErrorBoundary>
       </PageLayout>
+      </div>
+      <div className="min-h-screen">
+      {children}
+      </div>
       </HelmetProvider>
       );
       }
