@@ -533,27 +533,35 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                 <div className="space-y-4">
                     {/* Distribution Analysis - Duolingo Style */}
                     {data?.distributionData?.length > 0 && (
-                        <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border-2 border-green-200 p-5 shadow-sm">
-                            <div className="flex items-center gap-2 mb-4">
-                                <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center">
+                        <div className="rounded-xl border-2 p-5 shadow-sm" style={{ 
+                            background: `linear-gradient(135deg, ${category?.color}15, ${category?.color}08)`,
+                            borderColor: `${category?.color}40`
+                        }}>
+                            <div className="flex items-center gap-2 mb-2">
+                                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: category?.color }}>
                                     <Sparkles className="w-5 h-5 text-white" />
                                 </div>
-                                <h3 className="font-bold text-lg text-gray-900">Distribution Breakdown</h3>
+                                <div>
+                                    <h3 className="font-bold text-lg text-gray-900">Distribution Breakdown</h3>
+                                    <p className="text-xs text-gray-600">Watch the animated progress bars fill up!</p>
+                                </div>
                             </div>
-                            <div className="space-y-3">
+                            <div className="space-y-3 mt-4">
                                 {data.distributionData.map((item, index) => {
                                     const maxValue = Math.max(...data.distributionData.map(d => d.value));
                                     const percentage = (item.value / maxValue) * 100;
                                     return (
-                                        <div key={index} className="bg-white rounded-xl p-4 border-2 border-gray-100 hover:border-green-300 transition-all">
+                                        <div key={index} className="bg-white rounded-xl p-4 border-2 border-gray-100 transition-all" style={{ 
+                                            borderColor: `${category?.color}20` 
+                                        }}>
                                             <div className="flex items-center justify-between mb-2">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-white" style={{ backgroundColor: CHART_COLORS[index % CHART_COLORS.length] }}>
+                                                    <div className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-white" style={{ backgroundColor: category?.color }}>
                                                         {index + 1}
                                                     </div>
                                                     <span className="font-semibold text-gray-900">{item.name}</span>
                                                 </div>
-                                                <span className="text-2xl font-bold" style={{ color: CHART_COLORS[index % CHART_COLORS.length] }}>
+                                                <span className="text-2xl font-bold" style={{ color: category?.color }}>
                                                     {item.value}%
                                                 </span>
                                             </div>
@@ -563,7 +571,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                                                     animate={{ width: `${percentage}%` }}
                                                     transition={{ duration: 1, delay: index * 0.1 }}
                                                     className="h-full rounded-full"
-                                                    style={{ backgroundColor: CHART_COLORS[index % CHART_COLORS.length] }}
+                                                    style={{ backgroundColor: category?.color }}
                                                 />
                                             </div>
                                         </div>
@@ -575,21 +583,30 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
 
                     {/* Attribute Analysis - Duolingo Style */}
                     {data?.radarData?.length > 0 && (
-                        <div className="bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl border-2 border-purple-200 p-5 shadow-sm">
-                            <div className="flex items-center gap-2 mb-4">
-                                <div className="w-10 h-10 rounded-full bg-purple-500 flex items-center justify-center">
+                        <div className="rounded-xl border-2 p-5 shadow-sm" style={{ 
+                            background: `linear-gradient(135deg, ${category?.color}15, ${category?.color}08)`,
+                            borderColor: `${category?.color}40`
+                        }}>
+                            <div className="flex items-center gap-2 mb-2">
+                                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: category?.color }}>
                                     <Star className="w-5 h-5 text-white" />
                                 </div>
-                                <h3 className="font-bold text-lg text-gray-900">Key Attributes</h3>
+                                <div>
+                                    <h3 className="font-bold text-lg text-gray-900">Key Attributes</h3>
+                                    <p className="text-xs text-gray-600">Interactive cards with star ratings and animated progress</p>
+                                </div>
                             </div>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
                                 {data.radarData.map((item, index) => (
                                     <motion.div
                                         key={index}
                                         initial={{ scale: 0.8, opacity: 0 }}
                                         animate={{ scale: 1, opacity: 1 }}
                                         transition={{ delay: index * 0.1 }}
-                                        className="bg-white rounded-xl p-4 border-2 border-gray-100 hover:border-purple-300 hover:scale-105 transition-all cursor-pointer"
+                                        className="bg-white rounded-xl p-4 border-2 transition-all cursor-pointer"
+                                        style={{ 
+                                            borderColor: `${category?.color}20`
+                                        }}
                                     >
                                         <div className="flex items-center justify-between mb-3">
                                             <span className="font-semibold text-gray-900 text-sm">{item.attribute}</span>
@@ -597,7 +614,8 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                                                 {[...Array(5)].map((_, i) => (
                                                     <Star
                                                         key={i}
-                                                        className={`w-4 h-4 ${i < Math.round(item.score / 20) ? 'fill-amber-400 text-amber-400' : 'text-gray-200'}`}
+                                                        className={`w-4 h-4 ${i < Math.round(item.score / 20) ? 'text-amber-400' : 'text-gray-200'}`}
+                                                        style={i < Math.round(item.score / 20) ? { fill: '#fbbf24' } : {}}
                                                     />
                                                 ))}
                                             </div>
@@ -608,10 +626,11 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                                                     initial={{ width: 0 }}
                                                     animate={{ width: `${item.score}%` }}
                                                     transition={{ duration: 1, delay: index * 0.1 }}
-                                                    className="h-full rounded-full bg-gradient-to-r from-purple-500 to-pink-500"
+                                                    className="h-full rounded-full"
+                                                    style={{ backgroundColor: category?.color }}
                                                 />
                                             </div>
-                                            <span className="absolute -top-6 right-0 text-xl font-bold text-purple-600">
+                                            <span className="absolute -top-6 right-0 text-xl font-bold" style={{ color: category?.color }}>
                                                 {item.score}
                                             </span>
                                         </div>
