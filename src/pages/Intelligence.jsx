@@ -529,14 +529,14 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                 </div>
 
                 {/* Charts Section */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-4">
                     {/* Distribution Pie Chart */}
                     {data?.distributionData?.length > 0 && (
                         <div className="bg-white rounded-xl border border-gray-200 p-5">
                             <h3 className="font-semibold text-gray-900 mb-4">Distribution Analysis</h3>
-                            <ResponsiveContainer width="100%" height={200}>
+                            <ResponsiveContainer width="100%" height={300}>
                                 <PieChart>
-                                    <Pie data={data.distributionData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={70} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
+                                    <Pie data={data.distributionData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
                                         {data.distributionData.map((_, index) => (
                                             <Cell key={index} fill={CHART_COLORS[index % CHART_COLORS.length]} />
                                         ))}
@@ -547,46 +547,14 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                         </div>
                     )}
 
-                    {/* Trend Line Chart */}
-                    {data?.trendData?.length > 0 && (
-                        <div className="bg-white rounded-xl border border-gray-200 p-5">
-                            <h3 className="font-semibold text-gray-900 mb-4">Trend Over Time</h3>
-                            <ResponsiveContainer width="100%" height={200}>
-                                <LineChart data={data.trendData}>
-                                    <XAxis dataKey="year" tick={{ fontSize: 12 }} />
-                                    <YAxis tick={{ fontSize: 12 }} />
-                                    <Tooltip />
-                                    <Line type="monotone" dataKey="value" stroke={category?.color} strokeWidth={2} dot={{ fill: category?.color }} />
-                                </LineChart>
-                            </ResponsiveContainer>
-                        </div>
-                    )}
-
-                    {/* Comparison Bar Chart */}
-                    {data?.comparisonData?.length > 0 && (
-                        <div className="bg-white rounded-xl border border-gray-200 p-5">
-                            <h3 className="font-semibold text-gray-900 mb-4">Comparative Analysis</h3>
-                            <ResponsiveContainer width="100%" height={200}>
-                                <BarChart data={data.comparisonData}>
-                                    <XAxis dataKey="name" tick={{ fontSize: 10 }} />
-                                    <YAxis tick={{ fontSize: 12 }} />
-                                    <Tooltip />
-                                    <Legend />
-                                    <Bar dataKey="valueA" fill={category?.color} name="Primary" />
-                                    <Bar dataKey="valueB" fill={CHART_COLORS[1]} name="Secondary" />
-                                </BarChart>
-                            </ResponsiveContainer>
-                        </div>
-                    )}
-
                     {/* Radar Chart */}
                     {data?.radarData?.length > 0 && (
                         <div className="bg-white rounded-xl border border-gray-200 p-5">
                             <h3 className="font-semibold text-gray-900 mb-4">Attribute Analysis</h3>
-                            <ResponsiveContainer width="100%" height={200}>
+                            <ResponsiveContainer width="100%" height={300}>
                                 <RadarChart data={data.radarData}>
                                     <PolarGrid />
-                                    <PolarAngleAxis dataKey="attribute" tick={{ fontSize: 10 }} />
+                                    <PolarAngleAxis dataKey="attribute" tick={{ fontSize: 12 }} />
                                     <Radar dataKey="score" stroke={category?.color} fill={category?.color} fillOpacity={0.5} />
                                     <Tooltip />
                                 </RadarChart>
