@@ -2,26 +2,9 @@ import React, { useEffect } from 'react';
 import { HelmetProvider } from 'react-helmet-async';
 import PageLayout from '@/components/PageLayout';
 import ErrorBoundary from '@/components/ErrorBoundary';
-import { LOGO_URL } from '@/components/NavigationConfig';
 
 export default function Layout({ children, currentPageName }) {
   useEffect(() => {
-    let link = document.querySelector("link[rel~='icon']");
-    if (!link) {
-      link = document.createElement('link');
-      link.rel = 'icon';
-      document.getElementsByTagName('head')[0].appendChild(link);
-    }
-    link.href = LOGO_URL;
-    
-    // Also set apple-touch-icon
-    let appleLink = document.querySelector("link[rel='apple-touch-icon']");
-    if (!appleLink) {
-      appleLink = document.createElement('link');
-      appleLink.rel = 'apple-touch-icon';
-      document.getElementsByTagName('head')[0].appendChild(appleLink);
-    }
-    appleLink.href = LOGO_URL;
 
     // Create meta tags if they don't exist
     if (!document.querySelector('meta[name="description"]')) {
