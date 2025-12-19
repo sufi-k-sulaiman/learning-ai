@@ -1008,14 +1008,17 @@ export default function Intelligence() {
             <div className="min-h-screen bg-white sm:p-4 md:p-6">
                 <div className="max-w-6xl mx-auto pb-safe">
                     {/* Logo Header */}
-                    <div className="flex items-center gap-3 px-3 sm:px-0 py-4 sm:py-6">
+                    <button 
+                        onClick={() => handleBreadcrumbNavigate(0)}
+                        className="flex items-center gap-2 px-3 sm:px-0 py-4 sm:py-6 hover:opacity-80 transition-opacity"
+                    >
                         <img 
                             src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6944bf3dc7235d670de46364/5040bab12_LearningAi.png" 
                             alt="Learning Ai" 
-                            className="w-10 h-10 sm:w-12 sm:h-12"
+                            className="w-12 h-12 sm:w-14 sm:h-14"
                         />
                         <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Learning Ai</h1>
-                    </div>
+                    </button>
                     
                     {/* Breadcrumb Navigation */}
                 <Breadcrumb items={breadcrumbItems} onNavigate={handleBreadcrumbNavigate} />
