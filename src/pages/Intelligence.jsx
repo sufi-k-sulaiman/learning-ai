@@ -334,22 +334,34 @@ function MobileMenu({ items, onNavigate, isOpen, onClose }) {
 
 function Breadcrumb({ items, onNavigate, onMenuClick }) {
     return (
-        <button
-            onClick={onMenuClick}
-            className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
-        >
-            <Menu className="w-5 h-5 text-gray-600" />
-            <div className="flex items-center gap-1.5 text-sm text-gray-600">
+        <>
+            {/* Mobile Menu Button */}
+            <button
+                onClick={onMenuClick}
+                className="sm:hidden flex items-center justify-center p-2 rounded-lg hover:bg-gray-100 transition-colors"
+            >
+                <Menu className="w-6 h-6 text-gray-600" />
+            </button>
+            
+            {/* Desktop Breadcrumbs */}
+            <nav className="hidden sm:flex items-center gap-1.5 text-sm">
                 {items.map((item, index) => (
                     <React.Fragment key={index}>
-                        {index > 0 && <ChevronRight className="w-4 h-4" />}
-                        <span className={index === items.length - 1 ? 'font-medium text-gray-900' : ''}>
+                        {index > 0 && <ChevronRight className="w-4 h-4 text-gray-400" />}
+                        <button
+                            onClick={() => onNavigate(index)}
+                            className={`px-2 py-1 rounded-lg transition-colors ${
+                                index === items.length - 1
+                                    ? 'text-gray-900 font-medium bg-gray-100'
+                                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                            }`}
+                        >
                             {index === 0 ? 'Home' : item.label}
-                        </span>
+                        </button>
                     </React.Fragment>
                 ))}
-            </div>
-        </button>
+            </nav>
+        </>
     );
 }
 
@@ -1060,12 +1072,14 @@ export default function Intelligence() {
                             onNavigate={handleBreadcrumbNavigate}
                             onMenuClick={() => setMenuOpen(true)}
                         />
-                        <MobileMenu 
-                            items={breadcrumbItems}
-                            onNavigate={handleBreadcrumbNavigate}
-                            isOpen={menuOpen}
-                            onClose={() => setMenuOpen(false)}
-                        />
+                    </div>
+                    
+                    <MobileMenu 
+                        items={breadcrumbItems}
+                        onNavigate={handleBreadcrumbNavigate}
+                        isOpen={menuOpen}
+                        onClose={() => setMenuOpen(false)}
+                    />
                     </div>
 
                 {/* Content */}
