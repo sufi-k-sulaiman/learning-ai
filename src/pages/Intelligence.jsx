@@ -294,7 +294,7 @@ const CATEGORIES = {
 
 function Breadcrumb({ items, onNavigate }) {
     return (
-        <nav className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm mb-2 sm:mb-6 flex-wrap px-3 sm:px-0">
+        <nav className="flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm mb-2 sm:mb-6 flex-wrap px-3 sm:px-0">
             {items.map((item, index) => (
                 <React.Fragment key={index}>
                     {index > 0 && <ChevronRight className="w-4 h-4 text-gray-400" />}
@@ -1015,9 +1015,9 @@ export default function Intelligence() {
                         <img 
                             src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6944bf3dc7235d670de46364/5040bab12_LearningAi.png" 
                             alt="Learning Ai" 
-                            className="w-12 h-12 sm:w-14 sm:h-14"
+                            className="w-14 h-14 sm:w-16 sm:h-16"
                         />
-                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Learning Ai</h1>
+                        <h1 className="text-lg sm:text-xl font-bold text-gray-900">Learning Ai</h1>
                     </button>
                     
                     {/* Breadcrumb Navigation */}
