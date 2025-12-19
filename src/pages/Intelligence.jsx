@@ -984,34 +984,7 @@ export default function Intelligence() {
             />
             <div className="min-h-screen bg-gray-50 p-4 md:p-6">
                 <div className="max-w-6xl mx-auto">
-                {/* Header */}
-                <div className="bg-gradient-to-r from-purple-800 to-indigo-600 rounded-2xl p-6 mb-6 text-white">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
-                                <Brain className="w-6 h-6 text-white" />
-                            </div>
-                            <div>
-                                <h1 className="text-2xl md:text-3xl font-bold">General Intelligence</h1>
-                                <p className="text-white/80 text-sm">Explore the wonders of our universe</p>
-                            </div>
-                        </div>
-                        <div className="flex gap-6">
-                            <div className="text-center">
-                                <p className="text-2xl font-bold">{Object.keys(CATEGORIES).length}</p>
-                                <p className="text-xs text-white/70">Categories</p>
-                            </div>
-                            <div className="text-center">
-                                <p className="text-2xl font-bold">
-                                    {Object.values(CATEGORIES).reduce((acc, cat) => acc + cat.items.length, 0)}
-                                </p>
-                                <p className="text-xs text-white/70">Topics</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Breadcrumb Navigation */}
+                    {/* Breadcrumb Navigation */}
                 <Breadcrumb items={breadcrumbItems} onNavigate={handleBreadcrumbNavigate} />
 
                 {/* Content */}

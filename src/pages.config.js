@@ -59,7 +59,7 @@ export const PAGES = {
 }
 
 export const pagesConfig = {
-    mainPage: "Intelligence",
+    mainPage: "Qwirey",
     Pages: PAGES,
     Layout: __Layout,
 };
