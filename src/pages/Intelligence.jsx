@@ -1046,11 +1046,13 @@ export default function Intelligence() {
         setSelectedCategory(categoryKey);
         setSelectedItem(null);
         updateUrl(categoryKey, null);
+        window.scrollTo(0, 0);
     };
 
     const handleItemClick = (item) => {
         setSelectedItem(item);
         updateUrl(selectedCategory, item);
+        window.scrollTo(0, 0);
     };
 
     const handleBreadcrumbNavigate = (index) => {
@@ -1062,6 +1064,7 @@ export default function Intelligence() {
             setSelectedItem(null);
             updateUrl(selectedCategory, null);
         }
+        window.scrollTo(0, 0);
     };
 
     // Parse URL on mount and handle browser back/forward
@@ -1171,6 +1174,7 @@ export default function Intelligence() {
                         onNavigateToTopic={(topic) => {
                             setSelectedItem(topic);
                             updateUrl(selectedCategory, topic);
+                            window.scrollTo(0, 0);
                         }}
                     />
                     )}
