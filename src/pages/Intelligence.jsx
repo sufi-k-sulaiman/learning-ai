@@ -1012,7 +1012,7 @@ export default function Intelligence() {
                             className="flex items-center gap-2 hover:opacity-80 transition-opacity"
                         >
                             <img 
-                                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6944bf3dc7235d670de46364/5040bab12_LearningAi.png" 
+                                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6944bf3dc7235d670de46364/d3e2e95fc_LearningAi.png" 
                                 alt="Learning Ai" 
                                 className="w-14 h-14 sm:w-16 sm:h-16"
                             />
