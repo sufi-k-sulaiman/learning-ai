@@ -988,47 +988,30 @@ export default function Intelligence() {
     const [selectedItem, setSelectedItem] = useState(null);
     const [menuOpen, setMenuOpen] = useState(false);
 
-    // Update URL and make it bookmarkable
+    // Update URL and make it bookmarkable using query parameters
     const updateUrl = (category, item) => {
-        const basePath = '/intelligence';
-        let displayPath = basePath;
+        const params = new URLSearchParams();
         if (category) {
-            const catName = CATEGORIES[category]?.name?.replace(/[^a-zA-Z0-9]+/g, '-').toLowerCase() || category;
-            displayPath = `${basePath}/${catName}`;
+            params.set('category', category);
             if (item) {
-                const itemSlug = item.replace(/[^a-zA-Z0-9]+/g, '-').toLowerCase();
-                displayPath = `${displayPath}/${itemSlug}`;
+                params.set('topic', item);
             }
         }
-        window.history.pushState({ category, item }, '', displayPath);
+        const newUrl = params.toString() ? `/intelligence?${params.toString()}` : '/intelligence';
+        window.history.pushState({ category, item }, '', newUrl);
     };
 
     // Parse URL on mount to restore state
     const parseUrl = () => {
-        const pathParts = window.location.pathname.split('/').filter(Boolean);
-        if (pathParts[0] !== 'intelligence') return;
+        const params = new URLSearchParams(window.location.search);
+        const category = params.get('category');
+        const item = params.get('topic');
         
-        if (pathParts.length >= 2) {
-            const categorySlug = pathParts[1];
-            // Find matching category
-            const categoryKey = Object.keys(CATEGORIES).find(key => 
-                CATEGORIES[key].name.replace(/[^a-zA-Z0-9]+/g, '-').toLowerCase() === categorySlug
-            );
+        if (category && CATEGORIES[category]) {
+            setSelectedCategory(category);
             
-            if (categoryKey) {
-                setSelectedCategory(categoryKey);
-                
-                if (pathParts.length >= 3) {
-                    const itemSlug = pathParts[2];
-                    // Find matching item in category
-                    const item = CATEGORIES[categoryKey].items.find(i => 
-                        i.replace(/[^a-zA-Z0-9]+/g, '-').toLowerCase() === itemSlug
-                    );
-                    
-                    if (item) {
-                        setSelectedItem(item);
-                    }
-                }
+            if (item && CATEGORIES[category].items.includes(item)) {
+                setSelectedItem(item);
             }
         }
     };
