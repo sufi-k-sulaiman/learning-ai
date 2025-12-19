@@ -621,6 +621,20 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                     </div>
                 </div>
 
+                {/* Gamified Learning Section */}
+                <div className="sm:bg-gradient-to-br sm:from-purple-50 sm:to-blue-50 rounded-none sm:rounded-xl sm:border sm:border-purple-200 sm:p-6">
+                    <div className="flex items-center gap-3 mb-4 px-3 sm:px-0">
+                        <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-gradient-to-br from-purple-500 to-blue-500">
+                            <Gamepad2 className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                            <h3 className="font-semibold text-gray-900">Test Your Knowledge!</h3>
+                            <p className="text-sm text-gray-600">Take this fun interactive quiz to learn more</p>
+                        </div>
+                    </div>
+                    <GamifiedLearning item={item} category={category} />
+                </div>
+
                 {/* Physical Composition - Apple Style */}
                 {Array.isArray(data?.physicalComposition) && data.physicalComposition.length > 0 && (
                     <div>
@@ -914,20 +928,6 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                         <p className="text-white/90 leading-relaxed">{data.futureOutlook}</p>
                     </div>
                 )}
-
-                {/* Gamified Learning Section */}
-                <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl border border-purple-200 p-6">
-                    <div className="flex items-center gap-3 mb-4">
-                        <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-gradient-to-br from-purple-500 to-blue-500">
-                            <Gamepad2 className="w-5 h-5 text-white" />
-                        </div>
-                        <div>
-                            <h3 className="font-semibold text-gray-900">Test Your Knowledge!</h3>
-                            <p className="text-sm text-gray-600">Take this fun interactive quiz to learn more</p>
-                        </div>
-                    </div>
-                    <GamifiedLearning item={item} category={category} />
-                </div>
             </div>
         </div>
     );
