@@ -1217,16 +1217,16 @@ export default function Intelligence() {
                     </div>
 
                     {/* Footer */}
-                    <div className="text-center py-12 border-t border-gray-200 mt-16">
-                    <div className="flex items-center justify-center gap-2 mb-2">
-                        <img 
-                            src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6944bf3dc7235d670de46364/d3e2e95fc_LearningAi.png" 
-                            alt="Learning Ai" 
-                            className="h-6 w-auto object-contain"
-                        />
-                        <span className="text-lg font-bold text-gray-900">Learning Ai</span>
-                    </div>
-                    <p className="text-sm text-gray-500">Intelligence platform for automated insights</p>
+                    <div className="text-center py-6 border-t border-gray-200 mt-8">
+                        <div className="flex items-center justify-center gap-2 mb-1">
+                            <img 
+                                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6944bf3dc7235d670de46364/d3e2e95fc_LearningAi.png" 
+                                alt="Learning Ai" 
+                                className="h-5 w-auto object-contain"
+                            />
+                            <span className="text-base font-bold text-gray-900">Learning Ai</span>
+                        </div>
+                        <p className="text-xs text-gray-500">Intelligence platform for automated insights</p>
                     </div>
                     </div>
                     </>
