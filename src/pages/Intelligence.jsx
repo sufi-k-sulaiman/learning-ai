@@ -294,7 +294,7 @@ const CATEGORIES = {
 
 function Breadcrumb({ items, onNavigate }) {
     return (
-        <nav className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm mb-4 sm:mb-6 flex-wrap">
+        <nav className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm mb-2 sm:mb-6 flex-wrap px-3 sm:px-0">
             {items.map((item, index) => (
                 <React.Fragment key={index}>
                     {index > 0 && <ChevronRight className="w-4 h-4 text-gray-400" />}
@@ -321,7 +321,7 @@ function CategoryCard({ category, onClick }) {
     return (
         <div 
             onClick={onClick}
-            className={`bg-gradient-to-br ${category.gradient} rounded-xl sm:rounded-2xl p-4 sm:p-6 cursor-pointer active:scale-95 sm:hover:scale-[1.02] transition-all shadow-lg active:shadow-md sm:hover:shadow-xl text-white group touch-manipulation`}
+            className={`bg-gradient-to-br ${category.gradient} rounded-none sm:rounded-2xl p-4 sm:p-6 cursor-pointer active:scale-95 sm:hover:scale-[1.02] transition-all shadow-none sm:shadow-lg active:shadow-md sm:hover:shadow-xl text-white group touch-manipulation border-b border-white/10 sm:border-0`}
         >
             <div className="flex items-start justify-between mb-3 sm:mb-4">
                 <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl bg-white/20 flex items-center justify-center">
@@ -346,7 +346,7 @@ function ItemCard({ item, color, onClick }) {
     return (
         <div 
             onClick={onClick}
-            className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-3 sm:p-4 active:shadow-md sm:hover:shadow-lg active:border-purple-300 sm:hover:border-purple-200 cursor-pointer transition-all group touch-manipulation active:scale-95"
+            className="bg-white rounded-none sm:rounded-xl border-0 border-b sm:border border-gray-200 p-3 sm:p-4 active:shadow-none sm:hover:shadow-lg active:border-purple-300 sm:hover:border-purple-200 cursor-pointer transition-all group touch-manipulation"
         >
             <div className="flex items-center gap-2.5 sm:gap-3">
                 <div 
@@ -498,7 +498,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
     return (
         <div className="bg-white">
             {/* Hero Section - Apple Style */}
-            <div className="text-center py-12 sm:py-16 px-4">
+            <div className="text-center py-8 sm:py-16 px-3 sm:px-4">
                 <p className="text-sm sm:text-base font-semibold mb-2" style={{ color: category?.color }}>
                     {category?.name}
                 </p>
@@ -516,12 +516,12 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                         transition={{ duration: 0.6 }}
                         src={imageUrl} 
                         alt={item} 
-                        className="w-full max-w-5xl mx-auto h-64 sm:h-96 object-cover rounded-3xl shadow-2xl" 
+                        className="w-full max-w-5xl mx-auto h-64 sm:h-96 object-cover rounded-none sm:rounded-3xl shadow-none sm:shadow-2xl" 
                     />
                 )}
             </div>
 
-            <div className="max-w-4xl mx-auto px-4 sm:px-6 space-y-16 sm:space-y-24 pb-16">
+            <div className="max-w-4xl mx-auto px-3 sm:px-6 space-y-12 sm:space-y-24 pb-12 sm:pb-16">
                 {/* Overview - Apple Style */}
                 <div className="text-center">
                     <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Overview</h2>
@@ -573,7 +573,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                                     initial={{ y: 20, opacity: 0 }}
                                     animate={{ y: 0, opacity: 1 }}
                                     transition={{ delay: index * 0.1, duration: 0.5 }}
-                                    className="bg-gray-50 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all"
+                                    className="bg-gray-50 rounded-none sm:rounded-2xl p-4 sm:p-6 shadow-none sm:shadow-sm hover:shadow-md transition-all border-b border-gray-200 sm:border-0"
                                 >
                                     <div className="flex items-center justify-between mb-4">
                                         <span className="text-lg font-semibold text-gray-900">{item.attribute}</span>
@@ -606,7 +606,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                                 initial={{ y: 20, opacity: 0 }}
                                 animate={{ y: 0, opacity: 1 }}
                                 transition={{ delay: i * 0.1 }}
-                                className="bg-gray-50 rounded-2xl p-6 shadow-sm"
+                                className="bg-gray-50 rounded-none sm:rounded-2xl p-4 sm:p-6 shadow-none sm:shadow-sm border-b border-gray-200 sm:border-0"
                             >
                                 <div className="flex items-start gap-4">
                                     <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-lg font-bold flex-shrink-0" style={{ backgroundColor: category?.color }}>
@@ -633,7 +633,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                                     animate={{ y: 0, opacity: 1 }}
                                     transition={{ delay: i * 0.1 }}
                                     onClick={() => onNavigateToTopic(comp.property)}
-                                    className="p-6 rounded-2xl bg-gray-50 hover:bg-gray-100 shadow-sm hover:shadow-md transition-all text-left group"
+                                    className="p-4 sm:p-6 rounded-none sm:rounded-2xl bg-gray-50 hover:bg-gray-100 shadow-none sm:shadow-sm hover:shadow-md transition-all text-left group border-b border-gray-200 sm:border-0"
                                 >
                                     <h4 className="text-lg font-semibold text-gray-900 mb-2">{comp.property}</h4>
                                     <p className="text-sm text-gray-600">{comp.description}</p>
@@ -1005,7 +1005,7 @@ export default function Intelligence() {
                 description="Intelligence platform delivering automated insights and smarter decisions for growth across all knowledge domains."
                 keywords="AI intelligence, knowledge base, general intelligence, automated insights, research data"
             />
-            <div className="min-h-screen bg-gray-50 p-3 sm:p-4 md:p-6">
+            <div className="min-h-screen bg-gray-50 sm:p-4 md:p-6">
                 <div className="max-w-6xl mx-auto pb-safe">
                     {/* Breadcrumb Navigation */}
                 <Breadcrumb items={breadcrumbItems} onNavigate={handleBreadcrumbNavigate} />
@@ -1013,7 +1013,7 @@ export default function Intelligence() {
                 {/* Content */}
                 {!selectedCategory ? (
                     /* Category Grid */
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-4 md:gap-6">
                         {Object.entries(CATEGORIES).map(([key, category]) => (
                             <CategoryCard 
                                 key={key}
@@ -1025,7 +1025,7 @@ export default function Intelligence() {
                 ) : !selectedItem ? (
                     /* Category Items View */
                     <div>
-                        <div className={`bg-gradient-to-r ${currentCategory.gradient} rounded-xl sm:rounded-2xl p-4 sm:p-6 mb-4 sm:mb-6 text-white`}>
+                        <div className={`bg-gradient-to-r ${currentCategory.gradient} rounded-none sm:rounded-2xl p-4 sm:p-6 mb-0 sm:mb-6 text-white`}>
                             <div className="flex items-center gap-3 sm:gap-4">
                                 <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
                                     <currentCategory.icon className="w-6 h-6 sm:w-7 sm:h-7" />
@@ -1037,7 +1037,7 @@ export default function Intelligence() {
                             </div>
                         </div>
                         
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0 sm:gap-3">
                             {currentCategory.items.map((item, i) => (
                                 <ItemCard 
                                     key={i}
