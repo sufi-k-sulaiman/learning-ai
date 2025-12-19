@@ -496,37 +496,38 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
     }
 
     return (
-        <div>
-            {/* Header with Generated Image */}
-            <div className={`bg-gradient-to-r ${category?.gradient || 'from-purple-800 to-indigo-600'} rounded-xl sm:rounded-2xl p-4 sm:p-6 mb-4 sm:mb-6 text-white`}>
-                <div className="flex flex-col gap-4 sm:gap-6">
-                    <div className="flex items-center gap-3 sm:gap-4">
-                        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
-                            <Sparkles className="w-6 h-6 sm:w-7 sm:h-7" />
-                        </div>
-                        <div className="min-w-0 flex-1">
-                            <p className="text-white/70 text-xs sm:text-sm">{category?.name}</p>
-                            <h2 className="text-xl sm:text-2xl font-bold truncate">{item}</h2>
-                        </div>
+        <div className="bg-white">
+            {/* Hero Section - Apple Style */}
+            <div className="text-center py-12 sm:py-16 px-4">
+                <p className="text-sm sm:text-base font-semibold mb-2" style={{ color: category?.color }}>
+                    {category?.name}
+                </p>
+                <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-6 sm:mb-8">
+                    {item}
+                </h1>
+                {imageLoading ? (
+                    <div className="w-full max-w-5xl mx-auto h-64 sm:h-96 rounded-3xl bg-gray-100 flex items-center justify-center">
+                        <Loader2 className="w-10 h-10 animate-spin" style={{ color: category?.color }} />
                     </div>
-                    {imageLoading ? (
-                        <div className="w-full h-32 sm:h-40 rounded-lg sm:rounded-xl bg-white/20 flex items-center justify-center">
-                            <Loader2 className="w-6 h-6 animate-spin" />
-                        </div>
-                    ) : imageUrl && (
-                        <img src={imageUrl} alt={item} className="w-full h-32 sm:h-40 object-cover rounded-lg sm:rounded-xl" />
-                    )}
-                </div>
+                ) : imageUrl && (
+                    <motion.img 
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.6 }}
+                        src={imageUrl} 
+                        alt={item} 
+                        className="w-full max-w-5xl mx-auto h-64 sm:h-96 object-cover rounded-3xl shadow-2xl" 
+                    />
+                )}
             </div>
 
-            <div className="space-y-4 sm:space-y-6">
-                {/* Overview */}
-                <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-4 sm:p-5">
-                    <h3 className="font-semibold text-base sm:text-lg text-gray-900 mb-2 sm:mb-3 flex items-center gap-2">
-                        <Globe className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: category?.color }} />
-                        Overview
-                    </h3>
-                    <p className="text-sm sm:text-base text-gray-700 leading-relaxed"><TextWithLinks text={data?.overview} /></p>
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 space-y-16 sm:space-y-24 pb-16">
+                {/* Overview - Apple Style */}
+                <div className="text-center">
+                    <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Overview</h2>
+                    <p className="text-lg sm:text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto">
+                        <TextWithLinks text={data?.overview} />
+                    </p>
                 </div>
 
                 {/* Gamified Analysis Sections */}
@@ -581,102 +582,82 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                         </div>
                     )}
 
-                    {/* Attribute Analysis - Duolingo Style */}
-                    {data?.radarData?.length > 0 && (
-                        <div className="rounded-xl border-2 p-5 shadow-sm" style={{ 
-                            background: `linear-gradient(135deg, ${category?.color}15, ${category?.color}08)`,
-                            borderColor: `${category?.color}40`
-                        }}>
-                            <div className="flex items-center gap-2 mb-2">
-                                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: category?.color }}>
-                                    <Star className="w-5 h-5 text-white" />
-                                </div>
-                                <div>
-                                    <h3 className="font-bold text-lg text-gray-900">Key Attributes</h3>
-                                    <p className="text-xs text-gray-600">Interactive cards with star ratings and animated progress</p>
-                                </div>
-                            </div>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
-                                {data.radarData.map((item, index) => (
-                                    <motion.div
-                                        key={index}
-                                        initial={{ scale: 0.8, opacity: 0 }}
-                                        animate={{ scale: 1, opacity: 1 }}
-                                        transition={{ delay: index * 0.1 }}
-                                        className="bg-white rounded-xl p-4 border-2 transition-all cursor-pointer"
-                                        style={{ 
-                                            borderColor: `${category?.color}20`
-                                        }}
-                                    >
-                                        <div className="flex items-center justify-between mb-3">
-                                            <span className="font-semibold text-gray-900 text-sm">{item.attribute}</span>
-                                            <div className="flex items-center gap-1">
-                                                {[...Array(5)].map((_, i) => (
-                                                    <Star
-                                                        key={i}
-                                                        className={`w-4 h-4 ${i < Math.round(item.score / 20) ? 'text-amber-400' : 'text-gray-200'}`}
-                                                        style={i < Math.round(item.score / 20) ? { fill: '#fbbf24' } : {}}
-                                                    />
-                                                ))}
-                                            </div>
-                                        </div>
-                                        <div className="relative">
-                                            <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
-                                                <motion.div
-                                                    initial={{ width: 0 }}
-                                                    animate={{ width: `${item.score}%` }}
-                                                    transition={{ duration: 1, delay: index * 0.1 }}
-                                                    className="h-full rounded-full"
-                                                    style={{ backgroundColor: category?.color }}
-                                                />
-                                            </div>
-                                            <span className="absolute -top-6 right-0 text-xl font-bold" style={{ color: category?.color }}>
-                                                {item.score}
-                                            </span>
-                                        </div>
-                                    </motion.div>
-                                ))}
-                            </div>
+                {/* Attribute Analysis - Apple Style */}
+                {data?.radarData?.length > 0 && (
+                    <div>
+                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-8 text-center">Key Attributes</h2>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            {data.radarData.map((item, index) => (
+                                <motion.div
+                                    key={index}
+                                    initial={{ y: 20, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    transition={{ delay: index * 0.1, duration: 0.5 }}
+                                    className="bg-gray-50 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all"
+                                >
+                                    <div className="flex items-center justify-between mb-4">
+                                        <span className="text-lg font-semibold text-gray-900">{item.attribute}</span>
+                                        <span className="text-2xl font-bold" style={{ color: category?.color }}>
+                                            {item.score}
+                                        </span>
+                                    </div>
+                                    <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                                        <motion.div
+                                            initial={{ width: 0 }}
+                                            animate={{ width: `${item.score}%` }}
+                                            transition={{ duration: 1.2, delay: index * 0.15, ease: "easeOut" }}
+                                            className="h-full rounded-full"
+                                            style={{ backgroundColor: category?.color }}
+                                        />
+                                    </div>
+                                </motion.div>
+                            ))}
                         </div>
-                    )}
-                </div>
+                    </div>
+                )}
 
-                {/* Fun Facts */}
-                <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-4 sm:p-5">
-                    <h3 className="font-semibold text-base sm:text-lg text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
-                        <Lightbulb className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: category?.color }} />
-                        Fun Facts
-                    </h3>
-                    <div className="grid grid-cols-1 gap-3">
+                {/* Fun Facts - Apple Style */}
+                <div>
+                    <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-8 text-center">Did You Know?</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {data?.keyFacts?.map((fact, i) => (
-                            <div key={i} className="flex items-start gap-2.5 sm:gap-3 p-3 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg">
-                                <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white text-xs sm:text-sm font-bold flex-shrink-0" style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }}>
-                                    {i + 1}
-                                </span>
-                                <p className="text-gray-700 text-xs sm:text-sm leading-relaxed"><TextWithLinks text={fact} /></p>
-                            </div>
+                            <motion.div 
+                                key={i} 
+                                initial={{ y: 20, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                transition={{ delay: i * 0.1 }}
+                                className="bg-gray-50 rounded-2xl p-6 shadow-sm"
+                            >
+                                <div className="flex items-start gap-4">
+                                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-white text-lg font-bold flex-shrink-0" style={{ backgroundColor: category?.color }}>
+                                        {i + 1}
+                                    </div>
+                                    <p className="text-gray-700 text-base leading-relaxed pt-1">
+                                        <TextWithLinks text={fact} />
+                                    </p>
+                                </div>
+                            </motion.div>
                         ))}
                     </div>
                 </div>
 
-                {/* Physical Composition */}
+                {/* Physical Composition - Apple Style */}
                 {Array.isArray(data?.physicalComposition) && data.physicalComposition.length > 0 && (
-                    <div className="bg-white rounded-xl border border-gray-200 p-5">
-                        <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                            <Atom className="w-5 h-5" style={{ color: category?.color }} />
-                            Physical Composition
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <div>
+                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-8 text-center">Physical Properties</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             {data.physicalComposition.map((comp, i) => (
-                                <button 
-                                    key={i} 
+                                <motion.button 
+                                    key={i}
+                                    initial={{ y: 20, opacity: 0 }}
+                                    animate={{ y: 0, opacity: 1 }}
+                                    transition={{ delay: i * 0.1 }}
                                     onClick={() => onNavigateToTopic(comp.property)}
-                                    className="p-4 rounded-lg border border-gray-100 hover:shadow-md hover:border-purple-300 transition-all text-left cursor-pointer group" 
-                                    style={{ backgroundColor: `${category?.color}05` }}
+                                    className="p-6 rounded-2xl bg-gray-50 hover:bg-gray-100 shadow-sm hover:shadow-md transition-all text-left group"
                                 >
-                                    <h4 className="font-medium text-gray-900 mb-1 group-hover:text-purple-800 transition-colors">{comp.property}</h4>
+                                    <h4 className="text-lg font-semibold text-gray-900 mb-2">{comp.property}</h4>
                                     <p className="text-sm text-gray-600">{comp.description}</p>
-                                </button>
+                                </motion.button>
                             ))}
                         </div>
                     </div>
@@ -778,22 +759,23 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                     </div>
                 )}
                 
-                {/* Why It Matters */}
-                <div className="bg-white rounded-xl border border-gray-200 p-5" style={{ backgroundColor: `${category?.color}08` }}>
-                    <h3 className="font-semibold text-gray-900 mb-2">Why It Matters</h3>
-                    <p className="text-gray-700"><TextWithLinks text={data?.significance} /></p>
+                {/* Why It Matters - Apple Style */}
+                <div className="text-center py-12 px-6 rounded-3xl shadow-sm" style={{ backgroundColor: `${category?.color}08` }}>
+                    <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Why It Matters</h2>
+                    <p className="text-lg sm:text-xl text-gray-700 leading-relaxed max-w-3xl mx-auto">
+                        <TextWithLinks text={data?.significance} />
+                    </p>
                 </div>
                 
-                {/* Related Topics */}
-                <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-4 sm:p-5">
-                    <h3 className="font-semibold text-base sm:text-lg text-gray-900 mb-3 sm:mb-4">Related Topics</h3>
-                    <div className="flex flex-wrap gap-2">
+                {/* Related Topics - Apple Style */}
+                <div className="text-center">
+                    <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-8">Explore More</h2>
+                    <div className="flex flex-wrap justify-center gap-3">
                         {data?.relatedTopics?.map((topic, i) => (
                             <button 
                                 key={i} 
                                 onClick={() => onNavigateToTopic(topic)}
-                                className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-medium active:scale-95 sm:hover:scale-105 active:shadow sm:hover:shadow-md transition-all cursor-pointer touch-manipulation" 
-                                style={{ backgroundColor: `${category?.color}15`, color: category?.color }}
+                                className="px-6 py-3 rounded-full text-base font-medium shadow-sm hover:shadow-md active:scale-95 transition-all bg-gray-50 text-gray-900 hover:bg-gray-100"
                             >
                                 {topic}
                             </button>
