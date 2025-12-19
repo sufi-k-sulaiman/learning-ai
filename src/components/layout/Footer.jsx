@@ -11,7 +11,7 @@ export default function Footer() {
                     <Link to={createPageUrl('Intelligence')} className="flex items-center gap-2">
                         <img src={LOGO_URL} alt="1cPublishing" className="h-8 w-8 object-contain" />
                         <span className="text-sm font-bold text-gray-900">1cPlatform</span>
-                    </a>
+                    </Link>
                     <nav className="flex flex-wrap justify-center gap-6 text-sm">
                         {footerLinks.map((link, i) => (
                             <a key={i} href={link.href} className="text-gray-600 transition-colors" style={{ '--hover-color': '#6209e6' }} onMouseEnter={(e) => e.currentTarget.style.color = '#6209e6'} onMouseLeave={(e) => e.currentTarget.style.color = ''}>{link.label}</a>
