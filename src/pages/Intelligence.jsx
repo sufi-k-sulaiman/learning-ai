@@ -532,51 +532,32 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
 
                 {/* Distribution Analysis - Apple Style */}
                 {data?.distributionData?.length > 0 && (
-                        <div className="rounded-xl border-2 p-5 shadow-sm" style={{ 
-                            background: `linear-gradient(135deg, ${category?.color}15, ${category?.color}08)`,
-                            borderColor: `${category?.color}40`
-                        }}>
-                            <div className="flex items-center gap-2 mb-2">
-                                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ backgroundColor: category?.color }}>
-                                    <Sparkles className="w-5 h-5 text-white" />
-                                </div>
-                                <div>
-                                    <h3 className="font-bold text-lg text-gray-900">Distribution Breakdown</h3>
-                                    <p className="text-xs text-gray-600">Watch the animated progress bars fill up!</p>
-                                </div>
-                            </div>
-                            <div className="space-y-3 mt-4">
-                                {data.distributionData.map((item, index) => {
-                                    const maxValue = Math.max(...data.distributionData.map(d => d.value));
-                                    const percentage = (item.value / maxValue) * 100;
-                                    return (
-                                        <div key={index} className="bg-white rounded-xl p-4 border-2 border-gray-100 transition-all" style={{ 
-                                            borderColor: `${category?.color}20` 
-                                        }}>
-                                            <div className="flex items-center justify-between mb-2">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-white" style={{ backgroundColor: category?.color }}>
-                                                        {index + 1}
-                                                    </div>
-                                                    <span className="font-semibold text-gray-900">{item.name}</span>
-                                                </div>
-                                                <span className="text-2xl font-bold" style={{ color: category?.color }}>
-                                                    {item.value}%
-                                                </span>
-                                            </div>
-                                            <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
-                                                <motion.div
-                                                    initial={{ width: 0 }}
-                                                    animate={{ width: `${percentage}%` }}
-                                                    transition={{ duration: 1, delay: index * 0.1 }}
-                                                    className="h-full rounded-full"
-                                                    style={{ backgroundColor: category?.color }}
-                                                />
-                                            </div>
+                    <div>
+                        <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-8 text-center">Distribution</h2>
+                        <div className="space-y-4">
+                            {data.distributionData.map((item, index) => {
+                                const maxValue = Math.max(...data.distributionData.map(d => d.value));
+                                const percentage = (item.value / maxValue) * 100;
+                                return (
+                                    <div key={index} className="bg-gray-50 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all">
+                                        <div className="flex items-center justify-between mb-4">
+                                            <span className="text-xl font-semibold text-gray-900">{item.name}</span>
+                                            <span className="text-3xl font-bold" style={{ color: category?.color }}>
+                                                {item.value}%
+                                            </span>
                                         </div>
-                                    );
-                                })}
-                            </div>
+                                        <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                                            <motion.div
+                                                initial={{ width: 0 }}
+                                                animate={{ width: `${percentage}%` }}
+                                                transition={{ duration: 1.2, delay: index * 0.15, ease: "easeOut" }}
+                                                className="h-full rounded-full"
+                                                style={{ backgroundColor: category?.color }}
+                                            />
+                                        </div>
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 )}
