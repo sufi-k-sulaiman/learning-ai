@@ -159,69 +159,69 @@ For each question provide:
         const totalPoints = quizData.questions.reduce((sum, q) => sum + q.points, 0);
         const percentage = Math.round((score / totalPoints) * 100);
         const correctCount = answered.filter(a => a.correct).length;
-        
+
         return (
             <motion.div 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl border border-purple-200 p-8"
+                className="bg-white rounded-xl border border-gray-200 overflow-hidden"
             >
-                <div className="text-center">
+                <div className="text-center px-6 py-8">
                     <motion.div
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         transition={{ type: "spring", duration: 0.5 }}
-                        className="w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center"
-                        style={{ backgroundColor: `${category?.color}20` }}
+                        className="w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center"
+                        style={{ backgroundColor: `${category?.color}15` }}
                     >
-                        <Trophy className="w-10 h-10" style={{ color: category?.color }} />
+                        <Trophy className="w-12 h-12" style={{ color: category?.color }} />
                     </motion.div>
-                    
-                    <h3 className="text-2xl font-bold text-gray-900 mb-2">Quiz Complete! 🎉</h3>
-                    <p className="text-gray-600 mb-6">Great job learning about {item}!</p>
-                    
-                    <div className="grid grid-cols-3 gap-4 max-w-md mx-auto mb-6">
-                        <div className="bg-white rounded-lg p-4 border border-gray-200">
-                            <div className="text-3xl font-bold" style={{ color: category?.color }}>{score}</div>
-                            <div className="text-xs text-gray-500">Total Points</div>
+
+                    <h3 className="text-3xl font-bold text-gray-900 mb-3">Quiz Complete! 🎉</h3>
+                    <p className="text-gray-600 text-lg mb-8">Great job learning about {item}!</p>
+
+                    <div className="grid grid-cols-3 gap-3 sm:gap-4 max-w-lg mx-auto mb-8">
+                        <div className="bg-gray-50 rounded-xl p-4 sm:p-6 border border-gray-100">
+                            <div className="text-3xl sm:text-4xl font-bold mb-1" style={{ color: category?.color }}>{score}</div>
+                            <div className="text-xs sm:text-sm text-gray-500 font-medium">Total Points</div>
                         </div>
-                        <div className="bg-white rounded-lg p-4 border border-gray-200">
-                            <div className="text-3xl font-bold text-green-600">{correctCount}/{quizData.questions.length}</div>
-                            <div className="text-xs text-gray-500">Correct</div>
+                        <div className="bg-gray-50 rounded-xl p-4 sm:p-6 border border-gray-100">
+                            <div className="text-3xl sm:text-4xl font-bold text-green-600 mb-1">{correctCount}/{quizData.questions.length}</div>
+                            <div className="text-xs sm:text-sm text-gray-500 font-medium">Correct</div>
                         </div>
-                        <div className="bg-white rounded-lg p-4 border border-gray-200">
-                            <div className="text-3xl font-bold text-blue-600">{percentage}%</div>
-                            <div className="text-xs text-gray-500">Accuracy</div>
+                        <div className="bg-gray-50 rounded-xl p-4 sm:p-6 border border-gray-100">
+                            <div className="text-3xl sm:text-4xl font-bold text-blue-600 mb-1">{percentage}%</div>
+                            <div className="text-xs sm:text-sm text-gray-500 font-medium">Accuracy</div>
                         </div>
                     </div>
-                    
-                    <div className="mb-6">
+
+                    <div className="mb-8">
                         {percentage >= 80 && (
-                            <div className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-100 text-yellow-800 rounded-full">
-                                <Award className="w-5 h-5" />
-                                <span className="font-semibold">Master Level!</span>
+                            <div className="inline-flex items-center gap-2 px-6 py-3 bg-yellow-50 text-yellow-800 rounded-full border-2 border-yellow-200">
+                                <Award className="w-6 h-6" />
+                                <span className="font-bold text-lg">Master Level!</span>
                             </div>
                         )}
                         {percentage >= 60 && percentage < 80 && (
-                            <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-800 rounded-full">
-                                <Star className="w-5 h-5" />
-                                <span className="font-semibold">Well Done!</span>
+                            <div className="inline-flex items-center gap-2 px-6 py-3 bg-blue-50 text-blue-800 rounded-full border-2 border-blue-200">
+                                <Star className="w-6 h-6" />
+                                <span className="font-bold text-lg">Well Done!</span>
                             </div>
                         )}
                         {percentage < 60 && (
-                            <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-100 text-purple-800 rounded-full">
-                                <Brain className="w-5 h-5" />
-                                <span className="font-semibold">Keep Learning!</span>
+                            <div className="inline-flex items-center gap-2 px-6 py-3 bg-purple-50 text-purple-800 rounded-full border-2 border-purple-200">
+                                <Brain className="w-6 h-6" />
+                                <span className="font-bold text-lg">Keep Learning!</span>
                             </div>
                         )}
                     </div>
-                    
+
                     <button
                         onClick={fetchQuizData}
-                        className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium text-white transition-colors"
+                        className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-semibold text-white text-lg shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
                         style={{ backgroundColor: category?.color }}
                     >
-                        <RotateCcw className="w-4 h-4" />
+                        <RotateCcw className="w-5 h-5" />
                         Try New Quiz
                     </button>
                 </div>
