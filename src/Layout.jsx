@@ -63,6 +63,27 @@ export default function Layout({ children, currentPageName }) {
   return (
       <HelmetProvider>
       <style>{`
+        /* iOS Safe Area Support */
+        @supports (padding: max(0px)) {
+          body {
+            padding-left: max(0px, env(safe-area-inset-left));
+            padding-right: max(0px, env(safe-area-inset-right));
+          }
+        }
+
+        .pb-safe {
+          padding-bottom: max(1rem, env(safe-area-inset-bottom));
+        }
+
+        /* Smooth scrolling for iOS */
+        * {
+          -webkit-overflow-scrolling: touch;
+        }
+
+        /* Touch optimization */
+        .touch-manipulation {
+          touch-action: manipulation;
+        }
         /* Hide Leaflet attribution */
         .leaflet-control-attribution {
           display: none !important;

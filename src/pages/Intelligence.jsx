@@ -293,19 +293,19 @@ const CATEGORIES = {
 
 function Breadcrumb({ items, onNavigate }) {
     return (
-        <nav className="flex items-center gap-2 text-sm mb-6 flex-wrap">
+        <nav className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm mb-4 sm:mb-6 flex-wrap">
             {items.map((item, index) => (
                 <React.Fragment key={index}>
                     {index > 0 && <ChevronRight className="w-4 h-4 text-gray-400" />}
                     <button
                         onClick={() => onNavigate(index)}
-                        className={`flex items-center gap-1.5 px-2 py-1 rounded-lg transition-colors ${
+                        className={`flex items-center gap-1 sm:gap-1.5 px-2 py-1 rounded-lg transition-colors text-xs sm:text-sm ${
                             index === items.length - 1
                                 ? 'text-gray-900 font-medium bg-gray-100'
                                 : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
                         }`}
                     >
-                        {index === 0 && <Home className="w-4 h-4" />}
+                        {index === 0 && <Home className="w-3 h-3 sm:w-4 sm:h-4" />}
                         {item.label}
                     </button>
                 </React.Fragment>
@@ -320,19 +320,19 @@ function CategoryCard({ category, onClick }) {
     return (
         <div 
             onClick={onClick}
-            className={`bg-gradient-to-br ${category.gradient} rounded-2xl p-6 cursor-pointer hover:scale-[1.02] transition-all shadow-lg hover:shadow-xl text-white group`}
+            className={`bg-gradient-to-br ${category.gradient} rounded-xl sm:rounded-2xl p-4 sm:p-6 cursor-pointer active:scale-95 sm:hover:scale-[1.02] transition-all shadow-lg active:shadow-md sm:hover:shadow-xl text-white group touch-manipulation`}
         >
-            <div className="flex items-start justify-between mb-4">
-                <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center">
-                    <Icon className="w-7 h-7 text-white" />
+            <div className="flex items-start justify-between mb-3 sm:mb-4">
+                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl bg-white/20 flex items-center justify-center">
+                    <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
                 </div>
-                <ChevronRight className="w-6 h-6 text-white/70 group-hover:translate-x-1 transition-transform" />
+                <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-white/70 group-active:translate-x-1 sm:group-hover:translate-x-1 transition-transform" />
             </div>
-            <h3 className="text-xl font-bold mb-2">{category.name}</h3>
-            <p className="text-white/80 text-sm mb-4">{category.items.length} topics to explore</p>
-            <div className="flex flex-wrap gap-1.5">
+            <h3 className="text-lg sm:text-xl font-bold mb-1.5 sm:mb-2">{category.name}</h3>
+            <p className="text-white/80 text-xs sm:text-sm mb-3 sm:mb-4">{category.items.length} topics to explore</p>
+            <div className="flex flex-wrap gap-1 sm:gap-1.5">
                 {category.items.map((item, i) => (
-                    <span key={i} className="px-2.5 py-1 bg-white/20 rounded-full text-sm font-medium">
+                    <span key={i} className="px-2 py-0.5 sm:px-2.5 sm:py-1 bg-white/20 rounded-full text-xs sm:text-sm font-medium">
                         {item}
                     </span>
                 ))}
@@ -345,20 +345,20 @@ function ItemCard({ item, color, onClick }) {
     return (
         <div 
             onClick={onClick}
-            className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-lg hover:border-purple-200 cursor-pointer transition-all group"
+            className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-3 sm:p-4 active:shadow-md sm:hover:shadow-lg active:border-purple-300 sm:hover:border-purple-200 cursor-pointer transition-all group touch-manipulation active:scale-95"
         >
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5 sm:gap-3">
                 <div 
-                    className="w-10 h-10 rounded-lg flex items-center justify-center"
+                    className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center flex-shrink-0"
                     style={{ backgroundColor: `${color}20` }}
                 >
-                    <Sparkles className="w-5 h-5" style={{ color }} />
+                    <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" style={{ color }} />
                 </div>
-                <div className="flex-1">
-                    <h4 className="font-semibold text-gray-900 group-hover:text-purple-800 transition-colors">{item}</h4>
+                <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold text-sm sm:text-base text-gray-900 group-active:text-purple-800 sm:group-hover:text-purple-800 transition-colors truncate">{item}</h4>
                     <p className="text-xs text-gray-500">Tap to explore</p>
                 </div>
-                <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-purple-500 group-hover:translate-x-1 transition-all" />
+                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-gray-400 group-active:text-purple-500 sm:group-hover:text-purple-500 group-active:translate-x-1 sm:group-hover:translate-x-1 transition-all flex-shrink-0" />
             </div>
         </div>
     );
@@ -497,46 +497,46 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
     return (
         <div>
             {/* Header with Generated Image */}
-            <div className={`bg-gradient-to-r ${category?.gradient || 'from-purple-800 to-indigo-600'} rounded-2xl p-6 mb-6 text-white`}>
-                <div className="flex flex-col md:flex-row md:items-center gap-6">
-                    <div className="flex items-center gap-4 flex-1">
-                        <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center">
-                            <Sparkles className="w-7 h-7" />
+            <div className={`bg-gradient-to-r ${category?.gradient || 'from-purple-800 to-indigo-600'} rounded-xl sm:rounded-2xl p-4 sm:p-6 mb-4 sm:mb-6 text-white`}>
+                <div className="flex flex-col gap-4 sm:gap-6">
+                    <div className="flex items-center gap-3 sm:gap-4">
+                        <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
+                            <Sparkles className="w-6 h-6 sm:w-7 sm:h-7" />
                         </div>
-                        <div>
-                            <p className="text-white/70 text-sm">{category?.name}</p>
-                            <h2 className="text-2xl font-bold">{item}</h2>
+                        <div className="min-w-0 flex-1">
+                            <p className="text-white/70 text-xs sm:text-sm">{category?.name}</p>
+                            <h2 className="text-xl sm:text-2xl font-bold truncate">{item}</h2>
                         </div>
                     </div>
                     {imageLoading ? (
-                        <div className="w-full md:w-48 h-32 rounded-xl bg-white/20 flex items-center justify-center">
+                        <div className="w-full h-32 sm:h-40 rounded-lg sm:rounded-xl bg-white/20 flex items-center justify-center">
                             <Loader2 className="w-6 h-6 animate-spin" />
                         </div>
                     ) : imageUrl && (
-                        <img src={imageUrl} alt={item} className="w-full md:w-48 h-32 object-cover rounded-xl" />
+                        <img src={imageUrl} alt={item} className="w-full h-32 sm:h-40 object-cover rounded-lg sm:rounded-xl" />
                     )}
                 </div>
             </div>
 
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
                 {/* Overview */}
-                <div className="bg-white rounded-xl border border-gray-200 p-5">
-                    <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
-                        <Globe className="w-5 h-5" style={{ color: category?.color }} />
+                <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-4 sm:p-5">
+                    <h3 className="font-semibold text-base sm:text-lg text-gray-900 mb-2 sm:mb-3 flex items-center gap-2">
+                        <Globe className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: category?.color }} />
                         Overview
                     </h3>
-                    <p className="text-gray-700 leading-relaxed"><TextWithLinks text={data?.overview} /></p>
+                    <p className="text-sm sm:text-base text-gray-700 leading-relaxed"><TextWithLinks text={data?.overview} /></p>
                 </div>
 
                 {/* Charts Section */}
                 <div className="space-y-4">
                     {/* Distribution Pie Chart */}
                     {data?.distributionData?.length > 0 && (
-                        <div className="bg-white rounded-xl border border-gray-200 p-5">
-                            <h3 className="font-semibold text-gray-900 mb-4">Distribution Analysis</h3>
-                            <ResponsiveContainer width="100%" height={300}>
+                        <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-4 sm:p-5">
+                            <h3 className="font-semibold text-base sm:text-lg text-gray-900 mb-3 sm:mb-4">Distribution Analysis</h3>
+                            <ResponsiveContainer width="100%" height={250}>
                                 <PieChart>
-                                    <Pie data={data.distributionData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
+                                    <Pie data={data.distributionData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`} labelLine={false}>
                                         {data.distributionData.map((_, index) => (
                                             <Cell key={index} fill={CHART_COLORS[index % CHART_COLORS.length]} />
                                         ))}
@@ -549,12 +549,12 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
 
                     {/* Radar Chart */}
                     {data?.radarData?.length > 0 && (
-                        <div className="bg-white rounded-xl border border-gray-200 p-5">
-                            <h3 className="font-semibold text-gray-900 mb-4">Attribute Analysis</h3>
-                            <ResponsiveContainer width="100%" height={300}>
+                        <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-4 sm:p-5">
+                            <h3 className="font-semibold text-base sm:text-lg text-gray-900 mb-3 sm:mb-4">Attribute Analysis</h3>
+                            <ResponsiveContainer width="100%" height={250}>
                                 <RadarChart data={data.radarData}>
                                     <PolarGrid />
-                                    <PolarAngleAxis dataKey="attribute" tick={{ fontSize: 12 }} />
+                                    <PolarAngleAxis dataKey="attribute" tick={{ fontSize: 10 }} />
                                     <Radar dataKey="score" stroke={category?.color} fill={category?.color} fillOpacity={0.5} />
                                     <Tooltip />
                                 </RadarChart>
@@ -564,18 +564,18 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                 </div>
 
                 {/* Fun Facts */}
-                <div className="bg-white rounded-xl border border-gray-200 p-5">
-                    <h3 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                        <Lightbulb className="w-5 h-5" style={{ color: category?.color }} />
+                <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-4 sm:p-5">
+                    <h3 className="font-semibold text-base sm:text-lg text-gray-900 mb-3 sm:mb-4 flex items-center gap-2">
+                        <Lightbulb className="w-4 h-4 sm:w-5 sm:h-5" style={{ color: category?.color }} />
                         Fun Facts
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 gap-3">
                         {data?.keyFacts?.map((fact, i) => (
-                            <div key={i} className="flex items-start gap-3 p-3 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg">
-                                <span className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-bold flex-shrink-0" style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }}>
+                            <div key={i} className="flex items-start gap-2.5 sm:gap-3 p-3 bg-gradient-to-r from-gray-50 to-gray-100 rounded-lg">
+                                <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white text-xs sm:text-sm font-bold flex-shrink-0" style={{ backgroundColor: CHART_COLORS[i % CHART_COLORS.length] }}>
                                     {i + 1}
                                 </span>
-                                <p className="text-gray-700 text-sm"><TextWithLinks text={fact} /></p>
+                                <p className="text-gray-700 text-xs sm:text-sm leading-relaxed"><TextWithLinks text={fact} /></p>
                             </div>
                         ))}
                     </div>
@@ -707,14 +707,14 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                 </div>
                 
                 {/* Related Topics */}
-                <div className="bg-white rounded-xl border border-gray-200 p-5">
-                    <h3 className="font-semibold text-gray-900 mb-4">Related Topics</h3>
+                <div className="bg-white rounded-lg sm:rounded-xl border border-gray-200 p-4 sm:p-5">
+                    <h3 className="font-semibold text-base sm:text-lg text-gray-900 mb-3 sm:mb-4">Related Topics</h3>
                     <div className="flex flex-wrap gap-2">
                         {data?.relatedTopics?.map((topic, i) => (
                             <button 
                                 key={i} 
                                 onClick={() => onNavigateToTopic(topic)}
-                                className="px-4 py-2 rounded-full text-sm font-medium hover:scale-105 hover:shadow-md transition-all cursor-pointer" 
+                                className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-sm font-medium active:scale-95 sm:hover:scale-105 active:shadow sm:hover:shadow-md transition-all cursor-pointer touch-manipulation" 
                                 style={{ backgroundColor: `${category?.color}15`, color: category?.color }}
                             >
                                 {topic}
@@ -965,15 +965,15 @@ export default function Intelligence() {
                 description="Intelligence platform delivering automated insights and smarter decisions for growth across all knowledge domains."
                 keywords="AI intelligence, knowledge base, general intelligence, automated insights, research data"
             />
-            <div className="min-h-screen bg-gray-50 p-4 md:p-6">
-                <div className="max-w-6xl mx-auto">
+            <div className="min-h-screen bg-gray-50 p-3 sm:p-4 md:p-6">
+                <div className="max-w-6xl mx-auto pb-safe">
                     {/* Breadcrumb Navigation */}
                 <Breadcrumb items={breadcrumbItems} onNavigate={handleBreadcrumbNavigate} />
 
                 {/* Content */}
                 {!selectedCategory ? (
                     /* Category Grid */
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-6">
                         {Object.entries(CATEGORIES).map(([key, category]) => (
                             <CategoryCard 
                                 key={key}
@@ -985,19 +985,19 @@ export default function Intelligence() {
                 ) : !selectedItem ? (
                     /* Category Items View */
                     <div>
-                        <div className={`bg-gradient-to-r ${currentCategory.gradient} rounded-2xl p-6 mb-6 text-white`}>
-                            <div className="flex items-center gap-4">
-                                <div className="w-14 h-14 rounded-xl bg-white/20 flex items-center justify-center">
-                                    <currentCategory.icon className="w-7 h-7" />
+                        <div className={`bg-gradient-to-r ${currentCategory.gradient} rounded-xl sm:rounded-2xl p-4 sm:p-6 mb-4 sm:mb-6 text-white`}>
+                            <div className="flex items-center gap-3 sm:gap-4">
+                                <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg sm:rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
+                                    <currentCategory.icon className="w-6 h-6 sm:w-7 sm:h-7" />
                                 </div>
-                                <div>
-                                    <h2 className="text-2xl font-bold">{currentCategory.name}</h2>
-                                    <p className="text-white/80">{currentCategory.items.length} topics to explore</p>
+                                <div className="min-w-0 flex-1">
+                                    <h2 className="text-xl sm:text-2xl font-bold truncate">{currentCategory.name}</h2>
+                                    <p className="text-white/80 text-xs sm:text-sm">{currentCategory.items.length} topics to explore</p>
                                 </div>
                             </div>
                         </div>
                         
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3">
                             {currentCategory.items.map((item, i) => (
                                 <ItemCard 
                                     key={i}
