@@ -1005,7 +1005,7 @@ export default function Intelligence() {
                 description="Intelligence platform delivering automated insights and smarter decisions for growth across all knowledge domains."
                 keywords="AI intelligence, knowledge base, general intelligence, automated insights, research data"
             />
-            <div className="min-h-screen bg-gray-50 sm:p-4 md:p-6">
+            <div className="min-h-screen bg-white sm:p-4 md:p-6">
                 <div className="max-w-6xl mx-auto pb-safe">
                     {/* Logo Header */}
                     <div className="flex items-center gap-3 px-3 sm:px-0 py-4 sm:py-6">
