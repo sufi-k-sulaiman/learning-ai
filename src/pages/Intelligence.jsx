@@ -459,19 +459,19 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
 
 
 
+
+
+
+
+
+
+
+
+
+
           // Invalid cache, continue to generate
-        }}const response = await base44.integrations.Core.GenerateImage({
-        prompt: `A stunning, educational scientific illustration of ${item} in the context of ${category?.name || 'natural world'}. Photorealistic, highly detailed, vibrant colors, professional scientific visualization style.`
-      });
-
-      // Cache the image URL
-      if (response?.url) {
-        localStorage.setItem(cacheKey, JSON.stringify({
-          url: response.url,
-          timestamp: Date.now()
-        }));
-      }
-
+        }}const response = await base44.integrations.Core.GenerateImage({ prompt: `A stunning, educational scientific illustration of ${item} in the context of ${category?.name || 'natural world'}. Photorealistic, highly detailed, vibrant colors, professional scientific visualization style.` }); // Cache the image URL
+      if (response?.url) {localStorage.setItem(cacheKey, JSON.stringify({ url: response.url, timestamp: Date.now() }));}
       setImageUrl(response?.url);
     } catch (error) {
       console.error('Failed to generate image:', error);
@@ -501,19 +501,19 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
 
 
 
+
+
+
+
+
+
+
+
+
+
           // Invalid cache, continue to generate
-        }}const response = await base44.integrations.Core.GenerateImage({
-        prompt: `Creative conceptual visualization showing the real-world applications and impact of ${item} in ${category?.name || 'modern world'}. Show how it affects everyday life, technology, or nature. Artistic, engaging, educational illustration style.`
-      });
-
-      // Cache the image URL
-      if (response?.url) {
-        localStorage.setItem(cacheKey, JSON.stringify({
-          url: response.url,
-          timestamp: Date.now()
-        }));
-      }
-
+        }}const response = await base44.integrations.Core.GenerateImage({ prompt: `Creative conceptual visualization showing the real-world applications and impact of ${item} in ${category?.name || 'modern world'}. Show how it affects everyday life, technology, or nature. Artistic, engaging, educational illustration style.` }); // Cache the image URL
+      if (response?.url) {localStorage.setItem(cacheKey, JSON.stringify({ url: response.url, timestamp: Date.now() }));}
       setSecondImageUrl(response?.url);
     } catch (error) {
       console.error('Failed to generate second image:', error);
@@ -545,12 +545,19 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
 
 
 
+
+
+
+
+
+
+
+
+
+
         // Invalid cache, continue to fetch
-      }}try {
-      // Split into two smaller API calls for reliability
-      const [basicResponse, chartsResponse] = await Promise.all([
-      base44.integrations.Core.InvokeLLM({
-        prompt: `Provide intelligence data about "${item}" (${category?.name || 'general'}):
+      }}try {// Split into two smaller API calls for reliability
+      const [basicResponse, chartsResponse] = await Promise.all([base44.integrations.Core.InvokeLLM({ prompt: `Provide intelligence data about "${item}" (${category?.name || 'general'}):
                 1. Overview: 3-4 sentence description
                 2. Key Facts: 5 interesting facts (short, under 100 chars each)
                 3. Significance: Why it matters (2 sentences)
@@ -564,42 +571,35 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                 11. Future Outlook: 2-3 sentences on future trends and predictions
                 12. Innovations: 4 recent innovations or breakthroughs with name and description
                 13. Tools: 4 key tools or technologies used with name and description
-                14. Systems: 4 related systems or frameworks with name and description`,
-        add_context_from_internet: true,
-        response_json_schema: {
-          type: "object",
-          properties: {
-            overview: { type: "string" },
-            keyFacts: { type: "array", items: { type: "string" } },
-            significance: { type: "string" },
-            relatedTopics: { type: "array", items: { type: "string" } },
-            currentResearch: { type: "string" },
-            physicalComposition: { type: "array", items: { type: "object", properties: { property: { type: "string" }, description: { type: "string" } } } },
-            chemicalComposition: { type: "array", items: { type: "object", properties: { element: { type: "string" }, percentage: { type: "string" } } } },
-            historicalTimeline: { type: "array", items: { type: "object", properties: { year: { type: "string" }, title: { type: "string" }, description: { type: "string" } } } },
-            applications: { type: "array", items: { type: "object", properties: { name: { type: "string" }, description: { type: "string" } } } },
-            challenges: { type: "array", items: { type: "string" } },
-            futureOutlook: { type: "string" },
-            innovations: { type: "array", items: { type: "object", properties: { name: { type: "string" }, description: { type: "string" } } } },
-            tools: { type: "array", items: { type: "object", properties: { name: { type: "string" }, description: { type: "string" } } } },
-            systems: { type: "array", items: { type: "object", properties: { name: { type: "string" }, description: { type: "string" } } } }
-          }
-        }
-      }),
-      base44.integrations.Core.InvokeLLM({
-        prompt: `For "${item}", provide numerical chart data:
+                14. Systems: 4 related systems or frameworks with name and description`, add_context_from_internet: true, response_json_schema: { type: "object", properties: { overview: { type: "string" }, keyFacts: { type: "array", items: { type: "string" } }, significance: { type: "string" },
+                relatedTopics: { type: "array", items: { type: "string" } },
+                currentResearch: { type: "string" },
+                physicalComposition: { type: "array", items: { type: "object", properties: { property: { type: "string" }, description: { type: "string" } } } },
+                chemicalComposition: { type: "array", items: { type: "object", properties: { element: { type: "string" }, percentage: { type: "string" } } } },
+                historicalTimeline: { type: "array", items: { type: "object", properties: { year: { type: "string" }, title: { type: "string" }, description: { type: "string" } } } },
+                applications: { type: "array", items: { type: "object", properties: { name: { type: "string" }, description: { type: "string" } } } },
+                challenges: { type: "array", items: { type: "string" } },
+                futureOutlook: { type: "string" },
+                innovations: { type: "array", items: { type: "object", properties: { name: { type: "string" }, description: { type: "string" } } } },
+                tools: { type: "array", items: { type: "object", properties: { name: { type: "string" }, description: { type: "string" } } } },
+                systems: { type: "array", items: { type: "object", properties: { name: { type: "string" }, description: { type: "string" } } } }
+              }
+            }
+          }),
+        base44.integrations.Core.InvokeLLM({
+          prompt: `For "${item}", provide numerical chart data:
 - distributionData: 6 items with name and value (numbers adding to 100)
 - trendData: 5 data points with year (2020-2024) and value (numbers)
 - radarData: 6 attributes with score (0-100)`,
-        response_json_schema: {
-          type: "object",
-          properties: {
-            distributionData: { type: "array", items: { type: "object", properties: { name: { type: "string" }, value: { type: "number" } } } },
-            trendData: { type: "array", items: { type: "object", properties: { year: { type: "string" }, value: { type: "number" } } } },
-            radarData: { type: "array", items: { type: "object", properties: { attribute: { type: "string" }, score: { type: "number" } } } }
+          response_json_schema: {
+            type: "object",
+            properties: {
+              distributionData: { type: "array", items: { type: "object", properties: { name: { type: "string" }, value: { type: "number" } } } },
+              trendData: { type: "array", items: { type: "object", properties: { year: { type: "string" }, value: { type: "number" } } } },
+              radarData: { type: "array", items: { type: "object", properties: { attribute: { type: "string" }, score: { type: "number" } } } }
+            }
           }
-        }
-      })]
+        })]
       );
 
       // Merge responses
@@ -811,7 +811,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
               className="p-4 sm:p-6 rounded-none sm:rounded-2xl bg-gray-50 hover:bg-gray-100 shadow-none sm:shadow-sm hover:shadow-md transition-all text-left group border-b border-gray-200 sm:border-0">
 
                                     <h4 className="text-lg font-semibold text-gray-900 mb-2">{comp.property}</h4>
-                                    <p className="text-sm text-gray-600">{comp.description}</p>
+                                    <p className="text-gray-600 text-base">{comp.description}</p>
                                 </motion.button>
             )}
                         </div>
@@ -959,9 +959,9 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                                         {i < data.historicalTimeline.length - 1 && <div className="w-0.5 h-full bg-gray-200 mt-1" />}
                                     </div>
                                     <div className="flex-1 pb-4">
-                                        <p className="text-xs font-medium" style={{ color: category?.color }}>{event.year}</p>
-                                        <p className="font-medium text-gray-900">{event.title}</p>
-                                        <p className="text-sm text-gray-600">{event.description}</p>
+                                        <p className="text-sm font-medium" style={{ color: category?.color }}>{event.year}</p>
+                                        <p className="text-gray-900 text-lg font-medium">{event.title}</p>
+                                        <p className="text-gray-600 text-base">{event.description}</p>
                                     </div>
                                 </div>
             )}
@@ -1004,7 +1004,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
               style={{ backgroundColor: `${category?.color}05` }}>
 
                                     <h4 className="font-medium text-gray-900 mb-1 group-hover:text-purple-800 transition-colors">{app.name}</h4>
-                                    <p className="text-sm text-gray-600">{app.description}</p>
+                                    <p className="text-gray-600 text-base">{app.description}</p>
                                 </button>
             )}
                         </div>
@@ -1027,7 +1027,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
               style={{ backgroundColor: `${category?.color}05` }}>
 
                                     <h4 className="font-medium text-gray-900 mb-1 group-hover:text-purple-800 transition-colors">{innovation.name}</h4>
-                                    <p className="text-sm text-gray-600">{innovation.description}</p>
+                                    <p className="text-gray-600 text-base">{innovation.description}</p>
                                 </button>
             )}
                         </div>
@@ -1050,7 +1050,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
               style={{ backgroundColor: `${category?.color}05` }}>
 
                                     <h4 className="font-medium text-gray-900 mb-1 group-hover:text-purple-800 transition-colors">{tool.name}</h4>
-                                    <p className="text-sm text-gray-600">{tool.description}</p>
+                                    <p className="text-gray-600 text-base">{tool.description}</p>
                                 </button>
             )}
                         </div>
@@ -1073,7 +1073,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
               style={{ backgroundColor: `${category?.color}05` }}>
 
                                     <h4 className="font-medium text-gray-900 mb-1 group-hover:text-purple-800 transition-colors">{system.name}</h4>
-                                    <p className="text-sm text-gray-600">{system.description}</p>
+                                    <p className="text-gray-600 text-base">{system.description}</p>
                                 </button>
             )}
                         </div>
@@ -1091,7 +1091,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                             {data.challenges.map((challenge, i) =>
             <div key={i} className="flex items-start gap-3 p-3 bg-amber-50 rounded-lg border border-amber-100">
                                     <span className="w-6 h-6 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-sm font-bold flex-shrink-0">{i + 1}</span>
-                                    <p className="text-gray-700 text-sm">{challenge}</p>
+                                    <p className="text-gray-700 text-base">{challenge}</p>
                                 </div>
             )}
                         </div>
@@ -1105,7 +1105,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                             <Rocket className="w-5 h-5" />
                             Future Outlook
                         </h3>
-                        <p className="text-white/90 leading-relaxed">{data.futureOutlook}</p>
+                        <p className="text-white/90 text-lg leading-relaxed">{data.futureOutlook}</p>
                     </div>
         }
             </div>
