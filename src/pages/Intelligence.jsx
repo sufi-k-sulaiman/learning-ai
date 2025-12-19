@@ -336,7 +336,7 @@ function Breadcrumb({ items, onNavigate, onMenuClick }) {
     return (
         <button
             onClick={onMenuClick}
-            className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
+            className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors"
         >
             <Menu className="w-5 h-5 text-gray-600" />
             <div className="flex items-center gap-1.5 text-sm text-gray-600">
