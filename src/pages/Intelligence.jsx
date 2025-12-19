@@ -482,9 +482,9 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                             }),
                 base44.integrations.Core.InvokeLLM({
                     prompt: `For "${item}", provide numerical chart data:
-- distributionData: 4 items with name and value (numbers adding to 100)
+- distributionData: 6 items with name and value (numbers adding to 100)
 - trendData: 5 data points with year (2020-2024) and value (numbers)
-- radarData: 4 attributes with score (0-100)`,
+- radarData: 6 attributes with score (0-100)`,
                     response_json_schema: {
                         type: "object",
                         properties: {
