@@ -917,14 +917,15 @@ export default function Intelligence() {
 
     // Update URL for display only (aesthetic, not parsed)
     const updateUrl = (category, item) => {
-        const basePath = window.location.pathname;
+        // Get the base path without any trailing segments
+        const basePath = '/intelligence';
         let displayPath = basePath;
         if (category) {
             const catName = CATEGORIES[category]?.name?.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase() || category;
             displayPath = `${basePath}/${catName}`;
             if (item) {
                 const itemSlug = item.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
-                displayPath = `${basePath}/${catName}/${itemSlug}`;
+                displayPath = `${displayPath}/${itemSlug}`;
             }
         }
         window.history.pushState({ category, item }, '', displayPath);
