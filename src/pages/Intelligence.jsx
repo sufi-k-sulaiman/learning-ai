@@ -452,7 +452,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                 5. Current Research: Recent developments (2 sentences)
                 6. Physical Properties: 3 key properties with brief descriptions
                 7. Chemical Elements: 3 main elements/compounds with percentages
-                8. Historical Timeline: 4 key historical events with year, title, and brief description
+                8. Historical Timeline: 8 key historical events with year, title, and brief description
                 9. Applications: 4 common real-world applications with name and description
                 10. Challenges: 4 current challenges or considerations
                 11. Future Outlook: 2-3 sentences on future trends and predictions
