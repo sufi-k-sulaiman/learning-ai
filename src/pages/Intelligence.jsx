@@ -5,10 +5,11 @@ import {
     Globe, Mountain, Leaf, Zap, Star, Home,
     Beaker, Calculator, FlaskConical, Users, Lightbulb, BookOpen, Atom, ExternalLink,
     Factory, Truck, ShoppingCart, Plane, Heart, Building, Cpu, Wheat, GraduationCap, Wrench,
-    Clock, AlertCircle, Rocket, Network
+    Clock, AlertCircle, Rocket, Network, Gamepad2
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { BarChart, Bar, PieChart, Pie, Cell, LineChart, Line, RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend } from 'recharts';
+import GamifiedLearning from '@/components/intelligence/GamifiedLearning';
 
 // Helper to extract domain from URL
 const extractDomain = (url) => {
@@ -905,6 +906,20 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                         <p className="text-white/90 leading-relaxed">{data.futureOutlook}</p>
                     </div>
                 )}
+
+                {/* Gamified Learning Section */}
+                <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl border border-purple-200 p-6">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-gradient-to-br from-purple-500 to-blue-500">
+                            <Gamepad2 className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                            <h3 className="font-semibold text-gray-900">Test Your Knowledge!</h3>
+                            <p className="text-sm text-gray-600">Take this fun interactive quiz to learn more</p>
+                        </div>
+                    </div>
+                    <GamifiedLearning item={item} category={category} />
+                </div>
             </div>
         </div>
     );
