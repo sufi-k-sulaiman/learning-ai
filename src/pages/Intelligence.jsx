@@ -294,7 +294,7 @@ const CATEGORIES = {
 
 function Breadcrumb({ items, onNavigate }) {
     return (
-        <nav className="flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm mb-2 sm:mb-6 flex-wrap px-3 sm:px-0">
+        <nav className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm flex-wrap">
             {items.map((item, index) => (
                 <React.Fragment key={index}>
                     {index > 0 && <ChevronRight className="w-4 h-4 text-gray-400" />}
@@ -1002,21 +1002,22 @@ export default function Intelligence() {
             />
             <div className="min-h-screen bg-white sm:p-4 md:p-6">
                 <div className="max-w-6xl mx-auto pb-safe">
-                    {/* Logo Header */}
-                    <button 
-                        onClick={() => handleBreadcrumbNavigate(0)}
-                        className="flex items-center gap-2 px-3 sm:px-0 py-4 sm:py-6 hover:opacity-80 transition-opacity"
-                    >
-                        <img 
-                            src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6944bf3dc7235d670de46364/5040bab12_LearningAi.png" 
-                            alt="Learning Ai" 
-                            className="w-14 h-14 sm:w-16 sm:h-16"
-                        />
-                        <h1 className="text-lg sm:text-xl font-bold text-gray-900">Learning Ai</h1>
-                    </button>
-                    
-                    {/* Breadcrumb Navigation */}
-                <Breadcrumb items={breadcrumbItems} onNavigate={handleBreadcrumbNavigate} />
+                    {/* Header with Logo and Breadcrumbs */}
+                    <div className="flex items-center justify-between px-3 sm:px-0 py-4 sm:py-6 gap-4">
+                        <button 
+                            onClick={() => handleBreadcrumbNavigate(0)}
+                            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+                        >
+                            <img 
+                                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6944bf3dc7235d670de46364/5040bab12_LearningAi.png" 
+                                alt="Learning Ai" 
+                                className="w-14 h-14 sm:w-16 sm:h-16"
+                            />
+                            <h1 className="text-lg sm:text-xl font-bold text-gray-900">Learning Ai</h1>
+                        </button>
+                        
+                        <Breadcrumb items={breadcrumbItems} onNavigate={handleBreadcrumbNavigate} />
+                    </div>
 
                 {/* Content */}
                 {!selectedCategory ? (
