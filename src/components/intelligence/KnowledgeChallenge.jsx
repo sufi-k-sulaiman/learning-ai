@@ -91,7 +91,7 @@ export default function KnowledgeChallenge({ item, category }) {
   const [images, setImages] = useState([]);
   const [objective, setObjective] = useState('');
   const [correctIndex, setCorrectIndex] = useState(null);
-  const [futureOutlook, setFutureOutlook] = useState('');
+  const [funFacts, setFunFacts] = useState([]);
   const [playerChoice, setPlayerChoice] = useState(null);
   const [aiChoice, setAiChoice] = useState(null);
   const [result, setResult] = useState(null);
@@ -110,7 +110,7 @@ export default function KnowledgeChallenge({ item, category }) {
 1. Create an objective/target (e.g., "Find the fact about temperature", "Pick the most recent discovery", "Choose the largest measurement")
 2. Generate 4 facts where ONE clearly matches the objective
 3. Make facts interesting and engaging (max 12 words each)
-4. Add a brief future outlook with source (1-2 sentences) - include markdown link format: ([domain](url))`,
+4. For each fact, add a fun fact about it (1-2 sentences, interesting and educational)`,
       response_json_schema: {
         type: "object",
         properties: {
@@ -122,7 +122,12 @@ export default function KnowledgeChallenge({ item, category }) {
             maxItems: 4
           },
           correctIndex: { type: "number" },
-          futureOutlook: { type: "string" }
+          funFacts: {
+            type: "array",
+            items: { type: "string" },
+            minItems: 4,
+            maxItems: 4
+          }
         }
       }
     });
@@ -162,7 +167,7 @@ export default function KnowledgeChallenge({ item, category }) {
       images: generatedImages,
       objective: response.objective,
       correctIndex: response.correctIndex,
-      futureOutlook: response.futureOutlook
+      funFacts: response.funFacts
     };
   };
 
@@ -202,7 +207,7 @@ export default function KnowledgeChallenge({ item, category }) {
       setImages(gameData.images);
       setObjective(gameData.objective);
       setCorrectIndex(gameData.correctIndex);
-      setFutureOutlook(gameData.futureOutlook);
+      setFunFacts(gameData.funFacts);
       setGameState('playing');
     } catch (error) {
       console.error('Failed to generate facts:', error);
@@ -424,14 +429,14 @@ export default function KnowledgeChallenge({ item, category }) {
               </div>
             </div>
 
-            {futureOutlook &&
+            {funFacts[playerChoice] &&
           <div className="rounded-xl p-4 bg-gray-50 border border-gray-200 mb-6">
                 <div className="flex items-center gap-2 mb-2">
-                  <Rocket className="w-4 h-4" style={{ color: category?.color }} />
-                  <h4 className="font-semibold text-gray-900">Future Outlook</h4>
+                  <Sparkles className="w-4 h-4" style={{ color: category?.color }} />
+                  <h4 className="font-semibold text-gray-900">Fun Fact</h4>
                 </div>
                 <p className="text-gray-700 text-sm leading-relaxed">
-                  {futureOutlook.replace(/\(\[([^\]]+)\]\(([^)]+)\)\)/g, '')}
+                  {funFacts[playerChoice]}
                 </p>
               </div>
           }
