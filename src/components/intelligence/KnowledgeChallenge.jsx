@@ -14,6 +14,8 @@ export default function KnowledgeChallenge({ item, category }) {
   const [gameState, setGameState] = useState('loading'); // loading, playing, result
   const [choices, setChoices] = useState([]);
   const [images, setImages] = useState([]);
+  const [objective, setObjective] = useState('');
+  const [correctIndex, setCorrectIndex] = useState(null);
   const [playerChoice, setPlayerChoice] = useState(null);
   const [aiChoice, setAiChoice] = useState(null);
   const [result, setResult] = useState(null);
@@ -28,16 +30,21 @@ export default function KnowledgeChallenge({ item, category }) {
 
   const loadGameData = async () => {
     const response = await base44.integrations.Core.InvokeLLM({
-      prompt: `Generate 4 interesting facts about "${item}" for a knowledge challenge game. Each fact should be different and engaging. Format as short statements (max 12 words each).`,
+      prompt: `Generate a knowledge challenge about "${item}":
+1. Create an objective/target (e.g., "Find the fact about temperature", "Pick the most recent discovery", "Choose the largest measurement")
+2. Generate 4 facts where ONE clearly matches the objective
+3. Make facts interesting and engaging (max 12 words each)`,
       response_json_schema: {
         type: "object",
         properties: {
+          objective: { type: "string" },
           facts: {
             type: "array",
             items: { type: "string" },
             minItems: 4,
             maxItems: 4
-          }
+          },
+          correctIndex: { type: "number" }
         }
       }
     });
@@ -72,7 +79,12 @@ export default function KnowledgeChallenge({ item, category }) {
     });
 
     const generatedImages = await Promise.all(imagePromises);
-    return { facts, images: generatedImages };
+    return { 
+      facts, 
+      images: generatedImages, 
+      objective: response.objective,
+      correctIndex: response.correctIndex 
+    };
   };
 
   const preloadNextGames = async (count) => {
@@ -109,6 +121,8 @@ export default function KnowledgeChallenge({ item, category }) {
 
       setChoices(gameData.facts);
       setImages(gameData.images);
+      setObjective(gameData.objective);
+      setCorrectIndex(gameData.correctIndex);
       setGameState('playing');
     } catch (error) {
       console.error('Failed to generate facts:', error);
@@ -119,16 +133,28 @@ export default function KnowledgeChallenge({ item, category }) {
   const playGame = (playerIndex) => {
     setPlayerChoice(playerIndex);
     
-    // AI makes a choice
+    // AI makes a choice (random)
     const aiIndex = Math.floor(Math.random() * 4);
     setAiChoice(aiIndex);
 
-    // Determine winner with 50% win rate for player, 30% lose, 20% tie
-    const random = Math.random();
+    // Check if choices match the objective
+    const playerCorrect = playerIndex === correctIndex;
+    const aiCorrect = aiIndex === correctIndex;
+
     let outcome;
     
-    if (random < 0.50) {
-      // Player wins
+    if (playerCorrect && aiCorrect) {
+      // Both correct - shared points
+      outcome = 'shared';
+      setCurrentRound(currentRound + 0.5);
+      confetti({
+        particleCount: 30,
+        spread: 50,
+        origin: { y: 0.6 },
+        colors: [category?.color || '#6209e6', '#FFD700']
+      });
+    } else if (playerCorrect && !aiCorrect) {
+      // Only player correct - full win
       outcome = 'win';
       setWins(wins + 1);
       setCurrentRound(currentRound + 1);
@@ -138,14 +164,13 @@ export default function KnowledgeChallenge({ item, category }) {
         origin: { y: 0.6 },
         colors: [category?.color || '#6209e6', '#FFD700']
       });
-    } else if (random < 0.80) {
-      // Player loses
+    } else if (!playerCorrect && aiCorrect) {
+      // Only AI correct - lose
       outcome = 'lose';
       setLosses(losses + 1);
     } else {
-      // Tie
+      // Both wrong - tie
       outcome = 'tie';
-      setCurrentRound(currentRound + 0.5);
     }
 
     setResult(outcome);
@@ -195,7 +220,14 @@ export default function KnowledgeChallenge({ item, category }) {
       <div className="p-4 sm:p-6">
         {gameState === 'playing' && (
           <div>
-            <p className="text-center text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">Step on a tile to progress!</p>
+            <div className="mb-6 p-4 rounded-xl bg-gradient-to-r text-white text-center" style={{ background: `linear-gradient(135deg, ${category?.color}dd, ${category?.color}99)` }}>
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <Target className="w-5 h-5" />
+                <h4 className="font-bold text-lg">Objective</h4>
+              </div>
+              <p className="text-white/90 text-base font-medium">{objective}</p>
+            </div>
+            <p className="text-center text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">Choose the tile that matches the objective!</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mx-auto">
               {choices.map((fact, i) => {
                 return (
@@ -248,28 +280,43 @@ export default function KnowledgeChallenge({ item, category }) {
                     <Zap className="w-10 h-10 text-red-600" />
                   </div>
                 )}
+                {result === 'shared' && (
+                  <div className="w-20 h-20 mx-auto rounded-full bg-yellow-100 flex items-center justify-center mb-4">
+                    <Star className="w-10 h-10 text-yellow-600" />
+                  </div>
+                )}
                 {result === 'tie' && (
-                  <div className="w-20 h-20 mx-auto rounded-full bg-blue-100 flex items-center justify-center mb-4">
-                    <Sparkles className="w-10 h-10 text-blue-600" />
+                  <div className="w-20 h-20 mx-auto rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                    <XCircle className="w-10 h-10 text-gray-600" />
                   </div>
                 )}
               </motion.div>
             </AnimatePresence>
 
             <h4 className="text-2xl font-bold mb-2">
-              {result === 'win' && '🎉 Advanced!'}
-              {result === 'lose' && '😅 Try Again!'}
-              {result === 'tie' && "🤝 Half Step!"}
+              {result === 'win' && '🎉 Perfect! You Win!'}
+              {result === 'lose' && '😅 AI Got It Right!'}
+              {result === 'shared' && '⭐ Both Correct!'}
+              {result === 'tie' && '❌ Both Wrong!'}
             </h4>
 
             <p className="text-gray-600 mb-4">
-              {result === 'win' && `You're now at Level ${Math.floor(currentRound)}!`}
-              {result === 'lose' && 'Keep trying to advance!'}
-              {result === 'tie' && 'You moved forward a bit!'}
+              {result === 'win' && `Only you found the right answer! Level ${Math.floor(currentRound)}`}
+              {result === 'lose' && 'The AI picked correctly, you didn\'t!'}
+              {result === 'shared' && 'Great minds think alike! Points shared'}
+              {result === 'tie' && 'Neither of you got it right!'}
             </p>
 
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+              <div className="flex items-center gap-2 justify-center mb-2">
+                <Target className="w-4 h-4 text-blue-600" />
+                <p className="text-sm font-semibold text-blue-900">Objective: {objective}</p>
+              </div>
+              <p className="text-sm text-blue-700 text-center">Correct Answer: Tile {correctIndex + 1}</p>
+            </div>
+
             <div className="grid grid-cols-2 gap-3 max-w-xs mx-auto mb-6">
-              <div className="bg-gray-50 rounded-xl p-3">
+              <div className={`rounded-xl p-3 ${playerChoice === correctIndex ? 'bg-green-50 border-2 border-green-500' : 'bg-red-50 border-2 border-red-500'}`}>
                 <div className="text-xs text-gray-500 mb-2">You picked</div>
                 <div className="flex items-center gap-2">
                   {images[playerChoice] && (
@@ -282,7 +329,7 @@ export default function KnowledgeChallenge({ item, category }) {
                   <span className="text-xs font-medium">Tile {playerChoice + 1}</span>
                 </div>
               </div>
-              <div className="bg-gray-50 rounded-xl p-3">
+              <div className={`rounded-xl p-3 ${aiChoice === correctIndex ? 'bg-green-50 border-2 border-green-500' : 'bg-red-50 border-2 border-red-500'}`}>
                 <div className="text-xs text-gray-500 mb-2">AI picked</div>
                 <div className="flex items-center gap-2">
                   {images[aiChoice] && (
