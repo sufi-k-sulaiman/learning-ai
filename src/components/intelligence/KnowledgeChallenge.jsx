@@ -278,18 +278,18 @@ export default function KnowledgeChallenge({ item, category }) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
       {/* Header */}
-      <div className="bg-gradient-to-r p-4 sm:p-6 text-white" style={{ background: `linear-gradient(135deg, ${category?.color}dd, ${category?.color}99)` }}>
+      <div className="p-4 sm:p-6 border-b border-gray-200">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Brain className="w-5 h-5 sm:w-6 sm:h-6" />
-            <h3 className="text-base sm:text-lg font-bold">Knowledge Pathway</h3>
+            <Brain className="w-5 h-5 sm:w-6 sm:h-6" style={{ color: category?.color }} />
+            <h3 className="text-base sm:text-lg font-bold text-gray-900">Knowledge Pathway</h3>
           </div>
           <div className="flex items-center gap-2 text-xs sm:text-sm">
-            <div className="px-2 sm:px-3 py-1 bg-white/20 rounded-full font-medium">
+            <div className="px-2 sm:px-3 py-1 bg-gray-100 rounded-full font-medium text-gray-700">
               <Trophy className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" />
               {Math.floor(currentRound)}
             </div>
-            <div className="px-2 sm:px-3 py-1 bg-white/20 rounded-full font-medium">
+            <div className="px-2 sm:px-3 py-1 bg-gray-100 rounded-full font-medium text-gray-700">
               {wins}W-{losses}L
             </div>
           </div>
@@ -425,13 +425,13 @@ export default function KnowledgeChallenge({ item, category }) {
             </div>
 
             {futureOutlook && (
-              <div className="bg-gradient-to-r rounded-xl p-4 text-white mb-6" style={{ background: `linear-gradient(135deg, ${category?.color}dd, ${category?.color}99)` }}>
+              <div className="rounded-xl p-4 bg-gray-50 border border-gray-200 mb-6">
                 <div className="flex items-center gap-2 mb-2">
-                  <Rocket className="w-4 h-4" />
-                  <h4 className="font-semibold">Future Outlook</h4>
+                  <Rocket className="w-4 h-4" style={{ color: category?.color }} />
+                  <h4 className="font-semibold text-gray-900">Future Outlook</h4>
                 </div>
-                <p className="text-white/90 text-sm leading-relaxed">
-                  <TextWithLinks text={futureOutlook} />
+                <p className="text-gray-700 text-sm leading-relaxed">
+                  {futureOutlook.replace(/\(\[([^\]]+)\]\(([^)]+)\)\)/g, '')}
                 </p>
               </div>
             )}
