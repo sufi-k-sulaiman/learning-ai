@@ -13,6 +13,7 @@ const FACT_ICONS = [Lightbulb, Flame, Droplet, Wind, Star, Globe, Leaf, Rocket, 
 export default function KnowledgeChallenge({ item, category }) {
   const [gameState, setGameState] = useState('ready'); // ready, loading, playing, result
   const [choices, setChoices] = useState([]);
+  const [images, setImages] = useState([]);
   const [playerChoice, setPlayerChoice] = useState(null);
   const [aiChoice, setAiChoice] = useState(null);
   const [result, setResult] = useState(null);
@@ -39,7 +40,38 @@ export default function KnowledgeChallenge({ item, category }) {
         }
       });
 
-      setChoices(response.facts || []);
+      const facts = response.facts || [];
+      setChoices(facts);
+
+      // Generate images for each fact
+      const imagePromises = facts.map(async (fact, i) => {
+        const cacheKey = `challenge_${item}_${i}_${fact.substring(0, 20)}`;
+        const cached = localStorage.getItem(cacheKey);
+        
+        if (cached) {
+          try {
+            const { url, timestamp } = JSON.parse(cached);
+            const age = Date.now() - timestamp;
+            if (age < 72 * 60 * 60 * 1000) return url;
+          } catch (e) {}
+        }
+
+        const imageResponse = await base44.integrations.Core.GenerateImage({
+          prompt: `Simple icon-style illustration representing: ${fact}. Minimal, clean, colorful, single subject focus.`
+        });
+
+        if (imageResponse?.url) {
+          localStorage.setItem(cacheKey, JSON.stringify({
+            url: imageResponse.url,
+            timestamp: Date.now()
+          }));
+        }
+
+        return imageResponse?.url;
+      });
+
+      const generatedImages = await Promise.all(imagePromises);
+      setImages(generatedImages);
       setGameState('playing');
     } catch (error) {
       console.error('Failed to generate facts:', error);
@@ -193,7 +225,6 @@ export default function KnowledgeChallenge({ item, category }) {
             <p className="text-center text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">Step on a tile to progress!</p>
             <div className="grid grid-cols-2 gap-3 sm:gap-4 max-w-md mx-auto">
               {choices.map((fact, i) => {
-                const Icon = FACT_ICONS[i % FACT_ICONS.length];
                 return (
                   <motion.button
                     key={i}
@@ -204,13 +235,19 @@ export default function KnowledgeChallenge({ item, category }) {
                     className="aspect-square p-3 sm:p-4 rounded-2xl border-2 border-gray-200 hover:border-purple-500 hover:shadow-xl transition-all group relative overflow-hidden"
                     style={{ backgroundColor: `${category?.color}08` }}
                   >
-                    <div className="absolute top-2 right-2 w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white/50 flex items-center justify-center text-xs sm:text-sm font-bold" style={{ color: category?.color }}>
+                    <div className="absolute top-2 right-2 w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white/90 flex items-center justify-center text-xs sm:text-sm font-bold" style={{ color: category?.color }}>
                       {i + 1}
                     </div>
                     <div className="flex flex-col items-center justify-center h-full text-center gap-2">
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: category?.color }}>
-                        <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-                      </div>
+                      {images[i] ? (
+                        <img 
+                          src={images[i]} 
+                          alt={fact}
+                          className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover"
+                        />
+                      ) : (
+                        <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl bg-gray-200 animate-pulse" />
+                      )}
                       <p className="text-xs sm:text-sm text-gray-700 group-hover:text-gray-900 font-medium leading-tight">{fact}</p>
                     </div>
                   </motion.button>
@@ -260,22 +297,28 @@ export default function KnowledgeChallenge({ item, category }) {
 
             <div className="grid grid-cols-2 gap-3 max-w-xs mx-auto mb-6">
               <div className="bg-gray-50 rounded-xl p-3">
-                <div className="text-xs text-gray-500 mb-1">You picked</div>
+                <div className="text-xs text-gray-500 mb-2">You picked</div>
                 <div className="flex items-center gap-2">
-                  {(() => {
-                    const Icon = FACT_ICONS[playerChoice % FACT_ICONS.length];
-                    return <Icon className="w-4 h-4" style={{ color: category?.color }} />;
-                  })()}
+                  {images[playerChoice] && (
+                    <img 
+                      src={images[playerChoice]} 
+                      alt="Your choice"
+                      className="w-8 h-8 rounded object-cover"
+                    />
+                  )}
                   <span className="text-xs font-medium">Tile {playerChoice + 1}</span>
                 </div>
               </div>
               <div className="bg-gray-50 rounded-xl p-3">
-                <div className="text-xs text-gray-500 mb-1">AI picked</div>
+                <div className="text-xs text-gray-500 mb-2">AI picked</div>
                 <div className="flex items-center gap-2">
-                  {(() => {
-                    const Icon = FACT_ICONS[aiChoice % FACT_ICONS.length];
-                    return <Icon className="w-4 h-4" style={{ color: category?.color }} />;
-                  })()}
+                  {images[aiChoice] && (
+                    <img 
+                      src={images[aiChoice]} 
+                      alt="AI choice"
+                      className="w-8 h-8 rounded object-cover"
+                    />
+                  )}
                   <span className="text-xs font-medium">Tile {aiChoice + 1}</span>
                 </div>
               </div>
