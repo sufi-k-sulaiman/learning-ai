@@ -223,7 +223,7 @@ export default function KnowledgeChallenge({ item, category }) {
         {gameState === 'playing' && (
           <div>
             <p className="text-center text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">Step on a tile to progress!</p>
-            <div className="grid grid-cols-2 gap-3 sm:gap-4 max-w-md mx-auto">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mx-auto">
               {choices.map((fact, i) => {
                 return (
                   <motion.button
@@ -233,22 +233,22 @@ export default function KnowledgeChallenge({ item, category }) {
                     transition={{ delay: i * 0.1 }}
                     onClick={() => playGame(i)}
                     className="p-3 sm:p-4 rounded-2xl border-2 border-gray-200 hover:border-purple-500 hover:shadow-xl transition-all group relative overflow-hidden"
-                    style={{ backgroundColor: `${category?.color}08` }}
+                    style={{ backgroundColor: `${category?.color}08`, aspectRatio: '4/2' }}
                   >
                     <div className="absolute top-2 right-2 w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white/90 flex items-center justify-center text-xs sm:text-sm font-bold" style={{ color: category?.color }}>
                       {i + 1}
                     </div>
-                    <div className="flex flex-col items-center justify-center h-full text-center gap-2">
+                    <div className="flex items-center justify-between h-full gap-3 sm:gap-4">
                       {images[i] ? (
                         <img 
                           src={images[i]} 
                           alt={fact}
-                          className="w-full h-32 sm:h-40 rounded-xl object-cover"
+                          className="w-32 h-32 sm:w-40 sm:h-40 rounded-xl object-cover flex-shrink-0"
                         />
                       ) : (
-                        <div className="w-full h-32 sm:h-40 rounded-xl bg-gray-200 animate-pulse" />
+                        <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-xl bg-gray-200 animate-pulse flex-shrink-0" />
                       )}
-                      <p className="text-xs sm:text-sm text-gray-700 group-hover:text-gray-900 font-medium leading-tight">{fact}</p>
+                      <p className="text-sm sm:text-base text-gray-700 group-hover:text-gray-900 font-medium leading-tight flex-1 text-left">{fact}</p>
                     </div>
                   </motion.button>
                 );
