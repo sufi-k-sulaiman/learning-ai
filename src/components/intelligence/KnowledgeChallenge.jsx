@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Trophy, Zap, Brain, Loader2 } from 'lucide-react';
+import { 
+  Sparkles, Trophy, Zap, Brain, Loader2, 
+  Lightbulb, Flame, Droplet, Wind, Star, Globe, 
+  Leaf, Rocket, Heart, Shield, Target, Eye 
+} from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import confetti from 'canvas-confetti';
+
+const FACT_ICONS = [Lightbulb, Flame, Droplet, Wind, Star, Globe, Leaf, Rocket, Heart, Shield, Target, Eye];
 
 export default function KnowledgeChallenge({ item, category }) {
   const [gameState, setGameState] = useState('ready'); // ready, loading, playing, result
@@ -12,22 +18,22 @@ export default function KnowledgeChallenge({ item, category }) {
   const [result, setResult] = useState(null);
   const [wins, setWins] = useState(0);
   const [losses, setLosses] = useState(0);
-  const [ties, setTies] = useState(0);
+  const [currentRound, setCurrentRound] = useState(0);
 
   const startGame = async () => {
     setGameState('loading');
     
     try {
       const response = await base44.integrations.Core.InvokeLLM({
-        prompt: `Generate 3 interesting facts about "${item}" for a knowledge challenge game. Each fact should be different and engaging. Format as short statements (max 15 words each).`,
+        prompt: `Generate 4 interesting facts about "${item}" for a knowledge challenge game. Each fact should be different and engaging. Format as short statements (max 12 words each).`,
         response_json_schema: {
           type: "object",
           properties: {
             facts: {
               type: "array",
               items: { type: "string" },
-              minItems: 3,
-              maxItems: 3
+              minItems: 4,
+              maxItems: 4
             }
           }
         }
@@ -45,17 +51,18 @@ export default function KnowledgeChallenge({ item, category }) {
     setPlayerChoice(playerIndex);
     
     // AI makes a choice
-    const aiIndex = Math.floor(Math.random() * 3);
+    const aiIndex = Math.floor(Math.random() * 4);
     setAiChoice(aiIndex);
 
-    // Determine winner with 45% win rate for player, 35% lose, 20% tie
+    // Determine winner with 50% win rate for player, 30% lose, 20% tie
     const random = Math.random();
     let outcome;
     
-    if (random < 0.45) {
+    if (random < 0.50) {
       // Player wins
       outcome = 'win';
       setWins(wins + 1);
+      setCurrentRound(currentRound + 1);
       confetti({
         particleCount: 50,
         spread: 60,
@@ -69,7 +76,7 @@ export default function KnowledgeChallenge({ item, category }) {
     } else {
       // Tie
       outcome = 'tie';
-      setTies(ties + 1);
+      setCurrentRound(currentRound + 0.5);
     }
 
     setResult(outcome);
@@ -84,29 +91,66 @@ export default function KnowledgeChallenge({ item, category }) {
   };
 
   if (gameState === 'ready') {
+    const progress = Math.min(currentRound, 5);
+    
     return (
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <div className="text-center">
-          <div className="w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center" style={{ backgroundColor: `${category?.color}15` }}>
-            <Brain className="w-8 h-8" style={{ color: category?.color }} />
+      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="bg-gradient-to-r p-6 text-white" style={{ background: `linear-gradient(135deg, ${category?.color}dd, ${category?.color}99)` }}>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Brain className="w-6 h-6" />
+              <h3 className="text-lg font-bold">Knowledge Pathway</h3>
+            </div>
+            <div className="flex items-center gap-2 text-sm">
+              <Trophy className="w-4 h-4" />
+              <span className="font-medium">Level {Math.floor(currentRound)}</span>
+            </div>
           </div>
-          <h3 className="text-xl font-bold text-gray-900 mb-2">Knowledge Challenge</h3>
+
+          {/* Progress Path */}
+          <div className="flex items-center gap-2 mb-2">
+            {[0, 1, 2, 3, 4, 5].map((step) => (
+              <div key={step} className="flex-1 flex flex-col items-center">
+                <div 
+                  className={`w-full h-2 rounded-full transition-all ${
+                    step < progress ? 'bg-white' : 
+                    step === Math.floor(progress) ? 'bg-white/50' : 'bg-white/20'
+                  }`}
+                />
+                {step === Math.floor(progress) && (
+                  <motion.div 
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="w-4 h-4 rounded-full bg-white border-2 border-white/50 mt-1"
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="p-6 text-center">
           <p className="text-gray-600 mb-4">
-            Test your knowledge about {item}! Choose a fact and see if you can outsmart the AI.
+            Navigate the pathway by choosing facts about {item}!
           </p>
-          {(wins + losses + ties > 0) && (
-            <div className="flex justify-center gap-4 mb-4 text-sm">
-              <span className="text-green-600 font-medium">Wins: {wins}</span>
-              <span className="text-red-600 font-medium">Losses: {losses}</span>
-              <span className="text-gray-600 font-medium">Ties: {ties}</span>
+          {(wins + losses > 0) && (
+            <div className="flex justify-center gap-6 mb-6">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-600">{wins}</div>
+                <div className="text-xs text-gray-500">Wins</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-red-600">{losses}</div>
+                <div className="text-xs text-gray-500">Losses</div>
+              </div>
             </div>
           )}
           <button
             onClick={startGame}
-            className="px-6 py-3 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+            className="px-8 py-3 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
             style={{ backgroundColor: category?.color }}
           >
-            Start Challenge
+            {wins + losses > 0 ? 'Continue Journey' : 'Start Journey'}
           </button>
         </div>
       </div>
@@ -127,39 +171,51 @@ export default function KnowledgeChallenge({ item, category }) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
       {/* Header */}
-      <div className="bg-gradient-to-r p-6 text-white" style={{ background: `linear-gradient(135deg, ${category?.color}dd, ${category?.color}99)` }}>
+      <div className="bg-gradient-to-r p-4 sm:p-6 text-white" style={{ background: `linear-gradient(135deg, ${category?.color}dd, ${category?.color}99)` }}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Brain className="w-6 h-6" />
-            <h3 className="text-lg font-bold">Knowledge Challenge</h3>
+            <Brain className="w-5 h-5 sm:w-6 sm:h-6" />
+            <h3 className="text-base sm:text-lg font-bold">Knowledge Pathway</h3>
           </div>
-          <div className="flex items-center gap-4 text-sm">
-            <span className="px-3 py-1 bg-white/20 rounded-full font-medium">W: {wins}</span>
-            <span className="px-3 py-1 bg-white/20 rounded-full font-medium">L: {losses}</span>
+          <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm">
+            <div className="px-2 sm:px-3 py-1 bg-white/20 rounded-full font-medium">
+              <Trophy className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" />
+              {Math.floor(currentRound)}
+            </div>
           </div>
         </div>
       </div>
 
       {/* Game Area */}
-      <div className="p-6">
+      <div className="p-4 sm:p-6">
         {gameState === 'playing' && (
           <div>
-            <p className="text-center text-gray-600 mb-6">Choose a fact about {item}:</p>
-            <div className="grid grid-cols-1 gap-3">
-              {choices.map((fact, i) => (
-                <button
-                  key={i}
-                  onClick={() => playGame(i)}
-                  className="p-4 rounded-xl border-2 border-gray-200 hover:border-purple-500 hover:shadow-md transition-all text-left group"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold" style={{ backgroundColor: category?.color }}>
+            <p className="text-center text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">Step on a tile to progress!</p>
+            <div className="grid grid-cols-2 gap-3 sm:gap-4 max-w-md mx-auto">
+              {choices.map((fact, i) => {
+                const Icon = FACT_ICONS[i % FACT_ICONS.length];
+                return (
+                  <motion.button
+                    key={i}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: i * 0.1 }}
+                    onClick={() => playGame(i)}
+                    className="aspect-square p-3 sm:p-4 rounded-2xl border-2 border-gray-200 hover:border-purple-500 hover:shadow-xl transition-all group relative overflow-hidden"
+                    style={{ backgroundColor: `${category?.color}08` }}
+                  >
+                    <div className="absolute top-2 right-2 w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white/50 flex items-center justify-center text-xs sm:text-sm font-bold" style={{ color: category?.color }}>
                       {i + 1}
                     </div>
-                    <p className="flex-1 text-gray-700 group-hover:text-gray-900">{fact}</p>
-                  </div>
-                </button>
-              ))}
+                    <div className="flex flex-col items-center justify-center h-full text-center gap-2">
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center" style={{ backgroundColor: category?.color }}>
+                        <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                      </div>
+                      <p className="text-xs sm:text-sm text-gray-700 group-hover:text-gray-900 font-medium leading-tight">{fact}</p>
+                    </div>
+                  </motion.button>
+                );
+              })}
             </div>
           </div>
         )}
@@ -183,27 +239,45 @@ export default function KnowledgeChallenge({ item, category }) {
                   </div>
                 )}
                 {result === 'tie' && (
-                  <div className="w-20 h-20 mx-auto rounded-full bg-gray-100 flex items-center justify-center mb-4">
-                    <Sparkles className="w-10 h-10 text-gray-600" />
+                  <div className="w-20 h-20 mx-auto rounded-full bg-blue-100 flex items-center justify-center mb-4">
+                    <Sparkles className="w-10 h-10 text-blue-600" />
                   </div>
                 )}
               </motion.div>
             </AnimatePresence>
 
             <h4 className="text-2xl font-bold mb-2">
-              {result === 'win' && '🎉 You Win!'}
-              {result === 'lose' && '😅 AI Wins!'}
-              {result === 'tie' && "🤝 It's a Tie!"}
+              {result === 'win' && '🎉 Advanced!'}
+              {result === 'lose' && '😅 Try Again!'}
+              {result === 'tie' && "🤝 Half Step!"}
             </h4>
 
-            <div className="bg-gray-50 rounded-xl p-4 mb-6 space-y-3">
-              <div className="flex items-center gap-3">
-                <span className="text-sm font-medium text-gray-500">You chose:</span>
-                <p className="flex-1 text-sm text-gray-700">{choices[playerChoice]}</p>
+            <p className="text-gray-600 mb-4">
+              {result === 'win' && `You're now at Level ${Math.floor(currentRound)}!`}
+              {result === 'lose' && 'Keep trying to advance!'}
+              {result === 'tie' && 'You moved forward a bit!'}
+            </p>
+
+            <div className="grid grid-cols-2 gap-3 max-w-xs mx-auto mb-6">
+              <div className="bg-gray-50 rounded-xl p-3">
+                <div className="text-xs text-gray-500 mb-1">You picked</div>
+                <div className="flex items-center gap-2">
+                  {(() => {
+                    const Icon = FACT_ICONS[playerChoice % FACT_ICONS.length];
+                    return <Icon className="w-4 h-4" style={{ color: category?.color }} />;
+                  })()}
+                  <span className="text-xs font-medium">Tile {playerChoice + 1}</span>
+                </div>
               </div>
-              <div className="flex items-center gap-3">
-                <span className="text-sm font-medium text-gray-500">AI chose:</span>
-                <p className="flex-1 text-sm text-gray-700">{choices[aiChoice]}</p>
+              <div className="bg-gray-50 rounded-xl p-3">
+                <div className="text-xs text-gray-500 mb-1">AI picked</div>
+                <div className="flex items-center gap-2">
+                  {(() => {
+                    const Icon = FACT_ICONS[aiChoice % FACT_ICONS.length];
+                    return <Icon className="w-4 h-4" style={{ color: category?.color }} />;
+                  })()}
+                  <span className="text-xs font-medium">Tile {aiChoice + 1}</span>
+                </div>
               </div>
             </div>
 
@@ -212,7 +286,7 @@ export default function KnowledgeChallenge({ item, category }) {
               className="px-6 py-3 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
               style={{ backgroundColor: category?.color }}
             >
-              Play Again
+              Continue Journey
             </button>
           </div>
         )}
