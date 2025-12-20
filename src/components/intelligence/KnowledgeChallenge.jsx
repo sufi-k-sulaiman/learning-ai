@@ -305,12 +305,12 @@ export default function KnowledgeChallenge({ item, category }) {
       <div className="p-4 sm:p-6">
         {gameState === 'playing' &&
         <div>
-            <div className="mb-6 p-4 rounded-xl bg-gradient-to-r text-white text-center" style={{ background: `linear-gradient(135deg, ${category?.color}dd, ${category?.color}99)` }}>
+            <div className="mb-6 p-4 sm:p-6 rounded-xl bg-gradient-to-r text-white text-center" style={{ background: `linear-gradient(135deg, ${category?.color}dd, ${category?.color}99)` }}>
               <div className="flex items-center justify-center gap-2 mb-2">
-                <Target className="w-5 h-5" />
-                <h4 className="text-3xl font-bold normal-case">Objective</h4>
+                <Target className="w-4 h-4 sm:w-5 sm:h-5" />
+                <h4 className="text-xl sm:text-3xl font-bold normal-case">Objective</h4>
               </div>
-              <p className="text-white/90 mx-48 text-2xl font-medium">{objective}</p>
+              <p className="text-white/90 text-base sm:text-2xl font-medium px-2 sm:px-48">{objective}</p>
             </div>
             <p className="text-center text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">Choose the tile that matches the objective!</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mx-auto">
