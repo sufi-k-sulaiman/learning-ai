@@ -3,10 +3,85 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Sparkles, Trophy, Zap, Brain, Loader2, 
   Lightbulb, Flame, Droplet, Wind, Star, Globe, 
-  Leaf, Rocket, Heart, Shield, Target, Eye 
+  Leaf, Rocket, Heart, Shield, Target, Eye, ExternalLink, XCircle
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import confetti from 'canvas-confetti';
+
+// Helper to extract domain from URL
+const extractDomain = (url) => {
+  if (!url) return null;
+  try {
+    const urlObj = new URL(url.startsWith('http') ? url : `https://${url}`);
+    const hostname = urlObj.hostname.replace('www.', '');
+    const parts = hostname.split('.');
+    if (parts.length > 2) {
+      return parts.slice(-2).join('.');
+    }
+    return hostname;
+  } catch {
+    const match = url.match(/(?:https?:\/\/)?(?:www\.)?([^\/\?\s]+)/);
+    if (match) {
+      const domain = match[1].split('/')[0];
+      const parts = domain.split('.');
+      if (parts.length > 2) {
+        return parts.slice(-2).join('.');
+      }
+      return domain;
+    }
+    return url;
+  }
+};
+
+// Parse text and convert markdown links to clickable badges
+const TextWithLinks = ({ text }) => {
+  if (!text) return null;
+
+  const parts = [];
+  let lastIndex = 0;
+  const linkRegex = /\(\[([^\]]+)\]\(([^)]+)\)\)/g;
+  let match;
+
+  while ((match = linkRegex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push({ type: 'text', content: text.slice(lastIndex, match.index) });
+    }
+    const domain = extractDomain(match[2]);
+    parts.push({ type: 'link', domain, url: match[2] });
+    lastIndex = match.index + match[0].length;
+  }
+
+  if (lastIndex < text.length) {
+    parts.push({ type: 'text', content: text.slice(lastIndex) });
+  }
+
+  if (parts.length === 0) {
+    return <span>{text}</span>;
+  }
+
+  return (
+    <span>
+      {parts.map((part, i) => {
+        if (part.type === 'text') {
+          return <span key={i}>{part.content}</span>;
+        }
+        return (
+          <a
+            key={i}
+            href={part.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-xs text-white/90 hover:text-white transition-colors px-1.5 py-0.5 bg-white/20 hover:bg-white/30 rounded mx-1"
+            title={part.url}
+          >
+            {part.domain}
+            <ExternalLink className="w-3 h-3" />
+          </a>
+        );
+      })}
+    </span>
+  );
+};
 
 const FACT_ICONS = [Lightbulb, Flame, Droplet, Wind, Star, Globe, Leaf, Rocket, Heart, Shield, Target, Eye];
 
@@ -16,6 +91,7 @@ export default function KnowledgeChallenge({ item, category }) {
   const [images, setImages] = useState([]);
   const [objective, setObjective] = useState('');
   const [correctIndex, setCorrectIndex] = useState(null);
+  const [futureOutlook, setFutureOutlook] = useState('');
   const [playerChoice, setPlayerChoice] = useState(null);
   const [aiChoice, setAiChoice] = useState(null);
   const [result, setResult] = useState(null);
@@ -33,7 +109,8 @@ export default function KnowledgeChallenge({ item, category }) {
       prompt: `Generate a knowledge challenge about "${item}":
 1. Create an objective/target (e.g., "Find the fact about temperature", "Pick the most recent discovery", "Choose the largest measurement")
 2. Generate 4 facts where ONE clearly matches the objective
-3. Make facts interesting and engaging (max 12 words each)`,
+3. Make facts interesting and engaging (max 12 words each)
+4. Add a brief future outlook with source (1-2 sentences) - include markdown link format: ([domain](url))`,
       response_json_schema: {
         type: "object",
         properties: {
@@ -44,7 +121,8 @@ export default function KnowledgeChallenge({ item, category }) {
             minItems: 4,
             maxItems: 4
           },
-          correctIndex: { type: "number" }
+          correctIndex: { type: "number" },
+          futureOutlook: { type: "string" }
         }
       }
     });
@@ -83,7 +161,8 @@ export default function KnowledgeChallenge({ item, category }) {
       facts, 
       images: generatedImages, 
       objective: response.objective,
-      correctIndex: response.correctIndex 
+      correctIndex: response.correctIndex,
+      futureOutlook: response.futureOutlook
     };
   };
 
@@ -123,6 +202,7 @@ export default function KnowledgeChallenge({ item, category }) {
       setImages(gameData.images);
       setObjective(gameData.objective);
       setCorrectIndex(gameData.correctIndex);
+      setFutureOutlook(gameData.futureOutlook);
       setGameState('playing');
     } catch (error) {
       console.error('Failed to generate facts:', error);
@@ -344,6 +424,18 @@ export default function KnowledgeChallenge({ item, category }) {
               </div>
             </div>
 
+            {futureOutlook && (
+              <div className="bg-gradient-to-r rounded-xl p-4 text-white mb-6" style={{ background: `linear-gradient(135deg, ${category?.color}dd, ${category?.color}99)` }}>
+                <div className="flex items-center gap-2 mb-2">
+                  <Rocket className="w-4 h-4" />
+                  <h4 className="font-semibold">Future Outlook</h4>
+                </div>
+                <p className="text-white/90 text-sm leading-relaxed">
+                  <TextWithLinks text={futureOutlook} />
+                </p>
+              </div>
+            )}
+
             <button
               onClick={resetGame}
               className="px-6 py-3 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
@@ -351,9 +443,9 @@ export default function KnowledgeChallenge({ item, category }) {
             >
               Continue Journey
             </button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
+            </div>
+            )}
+            </div>
+            </div>
+            );
+            }

@@ -1104,14 +1104,16 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
 
                 {/* Future Outlook */}
                 {data?.futureOutlook &&
-        <div className="bg-gradient-to-r rounded-xl p-5 text-white" style={{ background: `linear-gradient(135deg, ${category?.color}dd, ${category?.color}99)` }}>
+                <div className="bg-gradient-to-r rounded-xl p-5 text-white" style={{ background: `linear-gradient(135deg, ${category?.color}dd, ${category?.color}99)` }}>
                         <h3 className="font-semibold mb-3 flex items-center gap-2">
                             <Rocket className="w-5 h-5" />
                             Future Outlook
                         </h3>
-                        <p className="text-white/90 text-lg leading-relaxed">{data.futureOutlook}</p>
+                        <p className="text-white/90 text-lg leading-relaxed">
+                          <TextWithLinks text={data.futureOutlook} />
+                        </p>
                     </div>
-        }
+                }
             </div>
         </div>);
 
