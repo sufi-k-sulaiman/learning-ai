@@ -11,7 +11,7 @@ import confetti from 'canvas-confetti';
 const FACT_ICONS = [Lightbulb, Flame, Droplet, Wind, Star, Globe, Leaf, Rocket, Heart, Shield, Target, Eye];
 
 export default function KnowledgeChallenge({ item, category }) {
-  const [gameState, setGameState] = useState('ready'); // ready, loading, playing, result
+  const [gameState, setGameState] = useState('loading'); // loading, playing, result
   const [choices, setChoices] = useState([]);
   const [images, setImages] = useState([]);
   const [playerChoice, setPlayerChoice] = useState(null);
@@ -20,6 +20,10 @@ export default function KnowledgeChallenge({ item, category }) {
   const [wins, setWins] = useState(0);
   const [losses, setLosses] = useState(0);
   const [currentRound, setCurrentRound] = useState(0);
+
+  useEffect(() => {
+    startGame();
+  }, [item]);
 
   const startGame = async () => {
     setGameState('loading');
@@ -119,75 +123,8 @@ export default function KnowledgeChallenge({ item, category }) {
     setPlayerChoice(null);
     setAiChoice(null);
     setResult(null);
-    setGameState('ready');
+    startGame();
   };
-
-  if (gameState === 'ready') {
-    const progress = Math.min(currentRound, 5);
-    
-    return (
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <div className="bg-gradient-to-r p-6 text-white" style={{ background: `linear-gradient(135deg, ${category?.color}dd, ${category?.color}99)` }}>
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <Brain className="w-6 h-6" />
-              <h3 className="text-lg font-bold">Knowledge Pathway</h3>
-            </div>
-            <div className="flex items-center gap-2 text-sm">
-              <Trophy className="w-4 h-4" />
-              <span className="font-medium">Level {Math.floor(currentRound)}</span>
-            </div>
-          </div>
-
-          {/* Progress Path */}
-          <div className="flex items-center gap-2 mb-2">
-            {[0, 1, 2, 3, 4, 5].map((step) => (
-              <div key={step} className="flex-1 flex flex-col items-center">
-                <div 
-                  className={`w-full h-2 rounded-full transition-all ${
-                    step < progress ? 'bg-white' : 
-                    step === Math.floor(progress) ? 'bg-white/50' : 'bg-white/20'
-                  }`}
-                />
-                {step === Math.floor(progress) && (
-                  <motion.div 
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="w-4 h-4 rounded-full bg-white border-2 border-white/50 mt-1"
-                  />
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="p-6 text-center">
-          <p className="text-gray-600 mb-4">
-            Navigate the pathway by choosing facts about {item}!
-          </p>
-          {(wins + losses > 0) && (
-            <div className="flex justify-center gap-6 mb-6">
-              <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">{wins}</div>
-                <div className="text-xs text-gray-500">Wins</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold text-red-600">{losses}</div>
-                <div className="text-xs text-gray-500">Losses</div>
-              </div>
-            </div>
-          )}
-          <button
-            onClick={startGame}
-            className="px-8 py-3 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
-            style={{ backgroundColor: category?.color }}
-          >
-            {wins + losses > 0 ? 'Continue Journey' : 'Start Journey'}
-          </button>
-        </div>
-      </div>
-    );
-  }
 
   if (gameState === 'loading') {
     return (
@@ -209,10 +146,13 @@ export default function KnowledgeChallenge({ item, category }) {
             <Brain className="w-5 h-5 sm:w-6 sm:h-6" />
             <h3 className="text-base sm:text-lg font-bold">Knowledge Pathway</h3>
           </div>
-          <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm">
+          <div className="flex items-center gap-2 text-xs sm:text-sm">
             <div className="px-2 sm:px-3 py-1 bg-white/20 rounded-full font-medium">
               <Trophy className="w-3 h-3 sm:w-4 sm:h-4 inline mr-1" />
               {Math.floor(currentRound)}
+            </div>
+            <div className="px-2 sm:px-3 py-1 bg-white/20 rounded-full font-medium">
+              {wins}W-{losses}L
             </div>
           </div>
         </div>
