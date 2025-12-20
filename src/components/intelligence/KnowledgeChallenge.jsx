@@ -400,31 +400,33 @@ export default function KnowledgeChallenge({ item, category }) {
               <p className="text-sm text-blue-700 text-center">Correct Answer: Tile {correctIndex + 1}</p>
             </div>
 
-            <div className="grid grid-cols-2 gap-3 max-w-xs mx-auto mb-6">
-              <div className={`rounded-xl p-3 ${playerChoice === correctIndex ? 'bg-green-50 border-2 border-green-500' : 'bg-red-50 border-2 border-red-500'}`}>
-                <div className="text-xs text-gray-500 mb-2">You picked</div>
-                <div className="flex items-center gap-2">
+            <div className="grid grid-cols-2 gap-6 max-w-2xl mx-auto mb-6">
+              <div className={`rounded-2xl p-6 ${playerChoice === correctIndex ? 'bg-green-50 border-2 border-green-500' : 'bg-red-50 border-2 border-red-500'}`}>
+                <div className="text-sm text-gray-500 mb-4 font-medium">You picked</div>
+                <div className="flex flex-col items-center gap-4">
                   {images[playerChoice] &&
                 <img
                   src={images[playerChoice]}
                   alt="Your choice"
-                  className="w-16 h-16 rounded object-cover" />
+                  className="w-full rounded-xl object-cover shadow-md"
+                  style={{ aspectRatio: '3/2' }} />
 
                 }
-                  <span className="text-xs font-medium">Tile {playerChoice + 1}</span>
+                  <span className="text-base font-semibold">Tile {playerChoice + 1}</span>
                 </div>
               </div>
-              <div className={`rounded-xl p-3 ${aiChoice === correctIndex ? 'bg-green-50 border-2 border-green-500' : 'bg-red-50 border-2 border-red-500'}`}>
-                <div className="text-xs text-gray-500 mb-2">AI picked</div>
-                <div className="flex items-center gap-2">
+              <div className={`rounded-2xl p-6 ${aiChoice === correctIndex ? 'bg-green-50 border-2 border-green-500' : 'bg-red-50 border-2 border-red-500'}`}>
+                <div className="text-sm text-gray-500 mb-4 font-medium">AI picked</div>
+                <div className="flex flex-col items-center gap-4">
                   {images[aiChoice] &&
                 <img
                   src={images[aiChoice]}
                   alt="AI choice"
-                  className="w-16 h-16 rounded object-cover" />
+                  className="w-full rounded-xl object-cover shadow-md"
+                  style={{ aspectRatio: '3/2' }} />
 
                 }
-                  <span className="text-xs font-medium">Tile {aiChoice + 1}</span>
+                  <span className="text-base font-semibold">Tile {aiChoice + 1}</span>
                 </div>
               </div>
             </div>
