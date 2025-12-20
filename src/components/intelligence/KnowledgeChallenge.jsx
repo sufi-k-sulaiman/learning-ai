@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Sparkles, Trophy, Zap, Brain, Loader2,
   Lightbulb, Flame, Droplet, Wind, Star, Globe,
-  Leaf, Rocket, Heart, Shield, Target, Eye, ExternalLink, XCircle } from
+  Leaf, Rocket, Heart, Shield, Target, Eye, ExternalLink, XCircle, CheckCircle2 } from
 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import confetti from 'canvas-confetti';
@@ -400,10 +400,10 @@ export default function KnowledgeChallenge({ item, category }) {
               <p className="text-sm text-blue-700 text-center">Correct Answer: Tile {correctIndex + 1}</p>
             </div>
 
-            <div className="grid grid-cols-2 gap-6 max-w-2xl mx-auto mb-6">
-              <div className={`rounded-2xl p-6 ${playerChoice === correctIndex ? 'bg-green-50 border-2 border-green-500' : 'bg-red-50 border-2 border-red-500'}`}>
-                <div className="text-sm text-gray-500 mb-4 font-medium">You picked</div>
-                <div className="flex flex-col items-center gap-4">
+            <div className="grid grid-cols-2 gap-4 max-w-2xl mx-auto mb-6">
+              <div className={`rounded-2xl p-4 ${playerChoice === correctIndex ? 'bg-green-50 border-2 border-green-500' : 'bg-red-50 border-2 border-red-500'}`}>
+                <div className="text-sm text-gray-500 mb-3 font-medium">You picked</div>
+                <div className="flex flex-col items-center gap-3">
                   {images[playerChoice] &&
                 <img
                   src={images[playerChoice]}
@@ -415,9 +415,9 @@ export default function KnowledgeChallenge({ item, category }) {
                   <span className="text-base font-semibold">Tile {playerChoice + 1}</span>
                 </div>
               </div>
-              <div className={`rounded-2xl p-6 ${aiChoice === correctIndex ? 'bg-green-50 border-2 border-green-500' : 'bg-red-50 border-2 border-red-500'}`}>
-                <div className="text-sm text-gray-500 mb-4 font-medium">AI picked</div>
-                <div className="flex flex-col items-center gap-4">
+              <div className={`rounded-2xl p-4 ${aiChoice === correctIndex ? 'bg-green-50 border-2 border-green-500' : 'bg-red-50 border-2 border-red-500'}`}>
+                <div className="text-sm text-gray-500 mb-3 font-medium">AI picked</div>
+                <div className="flex flex-col items-center gap-3">
                   {images[aiChoice] &&
                 <img
                   src={images[aiChoice]}
@@ -427,6 +427,26 @@ export default function KnowledgeChallenge({ item, category }) {
 
                 }
                   <span className="text-base font-semibold">Tile {aiChoice + 1}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
+              <div className="flex items-center gap-2 justify-center mb-2">
+                <CheckCircle2 className="w-4 h-4 text-green-600" />
+                <p className="text-sm font-semibold text-green-900">Correct Answer</p>
+              </div>
+              <div className="flex flex-col items-center gap-3">
+                {images[correctIndex] &&
+                <img
+                  src={images[correctIndex]}
+                  alt="Correct answer"
+                  className="w-48 rounded-xl object-cover shadow-md"
+                  style={{ aspectRatio: '3/2' }} />
+                }
+                <div className="text-center">
+                  <span className="text-base font-semibold">Tile {correctIndex + 1}</span>
+                  <p className="text-sm text-gray-600 mt-1">{choices[correctIndex]}</p>
                 </div>
               </div>
             </div>
