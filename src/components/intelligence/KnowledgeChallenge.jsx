@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Sparkles, Trophy, Zap, Brain, Loader2, 
-  Lightbulb, Flame, Droplet, Wind, Star, Globe, 
-  Leaf, Rocket, Heart, Shield, Target, Eye, ExternalLink, XCircle
-} from 'lucide-react';
+import {
+  Sparkles, Trophy, Zap, Brain, Loader2,
+  Lightbulb, Flame, Droplet, Wind, Star, Globe,
+  Leaf, Rocket, Heart, Shield, Target, Eye, ExternalLink, XCircle } from
+'lucide-react';
 import { base44 } from '@/api/base44Client';
 import confetti from 'canvas-confetti';
 
@@ -72,15 +72,15 @@ const TextWithLinks = ({ text }) => {
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1 text-xs text-white/90 hover:text-white transition-colors px-1.5 py-0.5 bg-white/20 hover:bg-white/30 rounded mx-1"
-            title={part.url}
-          >
+            title={part.url}>
+
             {part.domain}
             <ExternalLink className="w-3 h-3" />
-          </a>
-        );
+          </a>);
+
       })}
-    </span>
-  );
+    </span>);
+
 };
 
 const FACT_ICONS = [Lightbulb, Flame, Droplet, Wind, Star, Globe, Leaf, Rocket, Heart, Shield, Target, Eye];
@@ -133,7 +133,7 @@ export default function KnowledgeChallenge({ item, category }) {
     const imagePromises = facts.map(async (fact, i) => {
       const cacheKey = `challenge_${item}_${i}_${fact.substring(0, 20)}`;
       const cached = localStorage.getItem(cacheKey);
-      
+
       if (cached) {
         try {
           const { url, timestamp } = JSON.parse(cached);
@@ -157,9 +157,9 @@ export default function KnowledgeChallenge({ item, category }) {
     });
 
     const generatedImages = await Promise.all(imagePromises);
-    return { 
-      facts, 
-      images: generatedImages, 
+    return {
+      facts,
+      images: generatedImages,
       objective: response.objective,
       correctIndex: response.correctIndex,
       futureOutlook: response.futureOutlook
@@ -176,20 +176,20 @@ export default function KnowledgeChallenge({ item, category }) {
         console.error('Failed to preload game:', error);
       }
     }
-    setPreloadedGames(prev => [...prev, ...preloaded]);
+    setPreloadedGames((prev) => [...prev, ...preloaded]);
   };
 
   const startGame = async () => {
     setGameState('loading');
-    
+
     try {
       let gameData;
-      
+
       // Use preloaded data if available
       if (preloadedGames.length > 0) {
         gameData = preloadedGames[0];
-        setPreloadedGames(prev => prev.slice(1));
-        
+        setPreloadedGames((prev) => prev.slice(1));
+
         // Preload one more game to maintain buffer
         preloadNextGames(1);
       } else {
@@ -212,7 +212,7 @@ export default function KnowledgeChallenge({ item, category }) {
 
   const playGame = (playerIndex) => {
     setPlayerChoice(playerIndex);
-    
+
     // AI makes a choice (random)
     const aiIndex = Math.floor(Math.random() * 4);
     setAiChoice(aiIndex);
@@ -222,7 +222,7 @@ export default function KnowledgeChallenge({ item, category }) {
     const aiCorrect = aiIndex === correctIndex;
 
     let outcome;
-    
+
     if (playerCorrect && aiCorrect) {
       // Both correct - shared points
       outcome = 'shared';
@@ -271,8 +271,8 @@ export default function KnowledgeChallenge({ item, category }) {
           <Loader2 className="w-10 h-10 animate-spin mb-4" style={{ color: category?.color }} />
           <p className="text-gray-500">Generating knowledge challenge...</p>
         </div>
-      </div>
-    );
+      </div>);
+
   }
 
   return (
@@ -298,78 +298,78 @@ export default function KnowledgeChallenge({ item, category }) {
 
       {/* Game Area */}
       <div className="p-4 sm:p-6">
-        {gameState === 'playing' && (
-          <div>
+        {gameState === 'playing' &&
+        <div>
             <div className="mb-6 p-4 rounded-xl bg-gradient-to-r text-white text-center" style={{ background: `linear-gradient(135deg, ${category?.color}dd, ${category?.color}99)` }}>
               <div className="flex items-center justify-center gap-2 mb-2">
                 <Target className="w-5 h-5" />
-                <h4 className="font-bold text-lg">Objective</h4>
+                <h4 className="text-3xl font-bold normal-case">Objective</h4>
               </div>
-              <p className="text-white/90 text-base font-medium">{objective}</p>
+              <p className="text-white/90 mx-48 text-2xl font-medium">{objective}</p>
             </div>
             <p className="text-center text-gray-600 mb-4 sm:mb-6 text-sm sm:text-base">Choose the tile that matches the objective!</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mx-auto">
               {choices.map((fact, i) => {
-                return (
-                  <motion.button
-                    key={i}
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: i * 0.1 }}
-                    onClick={() => playGame(i)}
-                    className="p-3 sm:p-4 rounded-2xl border-2 border-gray-200 hover:border-purple-500 hover:shadow-xl transition-all group relative overflow-hidden"
-                    style={{ backgroundColor: `${category?.color}08`, aspectRatio: '4/2' }}
-                  >
+              return (
+                <motion.button
+                  key={i}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: i * 0.1 }}
+                  onClick={() => playGame(i)}
+                  className="p-3 sm:p-4 rounded-2xl border-2 border-gray-200 hover:border-purple-500 hover:shadow-xl transition-all group relative overflow-hidden"
+                  style={{ backgroundColor: `${category?.color}08`, aspectRatio: '4/2' }}>
+
                     <div className="absolute top-2 right-2 w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white/90 flex items-center justify-center text-xs sm:text-sm font-bold" style={{ color: category?.color }}>
                       {i + 1}
                     </div>
                     <div className="flex items-center justify-between h-full gap-3 sm:gap-4">
-                      {images[i] ? (
-                        <img 
-                          src={images[i]} 
-                          alt={fact}
-                          className="w-32 h-32 sm:w-40 sm:h-40 rounded-xl object-cover flex-shrink-0"
-                        />
-                      ) : (
-                        <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-xl bg-gray-200 animate-pulse flex-shrink-0" />
-                      )}
+                      {images[i] ?
+                    <img
+                      src={images[i]}
+                      alt={fact}
+                      className="w-32 h-32 sm:w-40 sm:h-40 rounded-xl object-cover flex-shrink-0" /> :
+
+
+                    <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-xl bg-gray-200 animate-pulse flex-shrink-0" />
+                    }
                       <p className="text-sm sm:text-base text-gray-700 group-hover:text-gray-900 font-medium leading-tight flex-1 text-left">{fact}</p>
                     </div>
-                  </motion.button>
-                );
-              })}
+                  </motion.button>);
+
+            })}
             </div>
           </div>
-        )}
+        }
 
-        {gameState === 'result' && (
-          <div className="text-center">
+        {gameState === 'result' &&
+        <div className="text-center">
             <AnimatePresence>
               <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                className="mb-6"
-              >
-                {result === 'win' && (
-                  <div className="w-20 h-20 mx-auto rounded-full bg-green-100 flex items-center justify-center mb-4">
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              className="mb-6">
+
+                {result === 'win' &&
+              <div className="w-20 h-20 mx-auto rounded-full bg-green-100 flex items-center justify-center mb-4">
                     <Trophy className="w-10 h-10 text-green-600" />
                   </div>
-                )}
-                {result === 'lose' && (
-                  <div className="w-20 h-20 mx-auto rounded-full bg-red-100 flex items-center justify-center mb-4">
+              }
+                {result === 'lose' &&
+              <div className="w-20 h-20 mx-auto rounded-full bg-red-100 flex items-center justify-center mb-4">
                     <Zap className="w-10 h-10 text-red-600" />
                   </div>
-                )}
-                {result === 'shared' && (
-                  <div className="w-20 h-20 mx-auto rounded-full bg-yellow-100 flex items-center justify-center mb-4">
+              }
+                {result === 'shared' &&
+              <div className="w-20 h-20 mx-auto rounded-full bg-yellow-100 flex items-center justify-center mb-4">
                     <Star className="w-10 h-10 text-yellow-600" />
                   </div>
-                )}
-                {result === 'tie' && (
-                  <div className="w-20 h-20 mx-auto rounded-full bg-gray-100 flex items-center justify-center mb-4">
+              }
+                {result === 'tie' &&
+              <div className="w-20 h-20 mx-auto rounded-full bg-gray-100 flex items-center justify-center mb-4">
                     <XCircle className="w-10 h-10 text-gray-600" />
                   </div>
-                )}
+              }
               </motion.div>
             </AnimatePresence>
 
@@ -399,33 +399,33 @@ export default function KnowledgeChallenge({ item, category }) {
               <div className={`rounded-xl p-3 ${playerChoice === correctIndex ? 'bg-green-50 border-2 border-green-500' : 'bg-red-50 border-2 border-red-500'}`}>
                 <div className="text-xs text-gray-500 mb-2">You picked</div>
                 <div className="flex items-center gap-2">
-                  {images[playerChoice] && (
-                    <img 
-                      src={images[playerChoice]} 
-                      alt="Your choice"
-                      className="w-16 h-16 rounded object-cover"
-                    />
-                  )}
+                  {images[playerChoice] &&
+                <img
+                  src={images[playerChoice]}
+                  alt="Your choice"
+                  className="w-16 h-16 rounded object-cover" />
+
+                }
                   <span className="text-xs font-medium">Tile {playerChoice + 1}</span>
                 </div>
               </div>
               <div className={`rounded-xl p-3 ${aiChoice === correctIndex ? 'bg-green-50 border-2 border-green-500' : 'bg-red-50 border-2 border-red-500'}`}>
                 <div className="text-xs text-gray-500 mb-2">AI picked</div>
                 <div className="flex items-center gap-2">
-                  {images[aiChoice] && (
-                    <img 
-                      src={images[aiChoice]} 
-                      alt="AI choice"
-                      className="w-16 h-16 rounded object-cover"
-                    />
-                  )}
+                  {images[aiChoice] &&
+                <img
+                  src={images[aiChoice]}
+                  alt="AI choice"
+                  className="w-16 h-16 rounded object-cover" />
+
+                }
                   <span className="text-xs font-medium">Tile {aiChoice + 1}</span>
                 </div>
               </div>
             </div>
 
-            {futureOutlook && (
-              <div className="rounded-xl p-4 bg-gray-50 border border-gray-200 mb-6">
+            {futureOutlook &&
+          <div className="rounded-xl p-4 bg-gray-50 border border-gray-200 mb-6">
                 <div className="flex items-center gap-2 mb-2">
                   <Rocket className="w-4 h-4" style={{ color: category?.color }} />
                   <h4 className="font-semibold text-gray-900">Future Outlook</h4>
@@ -434,18 +434,18 @@ export default function KnowledgeChallenge({ item, category }) {
                   {futureOutlook.replace(/\(\[([^\]]+)\]\(([^)]+)\)\)/g, '')}
                 </p>
               </div>
-            )}
+          }
 
             <button
-              onClick={resetGame}
-              className="px-6 py-3 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
-              style={{ backgroundColor: category?.color }}
-            >
+            onClick={resetGame}
+            className="px-6 py-3 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+            style={{ backgroundColor: category?.color }}>
+
               Continue Journey
             </button>
             </div>
-            )}
+        }
             </div>
-            </div>
-            );
-            }
+            </div>);
+
+}
