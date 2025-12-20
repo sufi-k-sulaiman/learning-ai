@@ -322,7 +322,7 @@ export default function KnowledgeChallenge({ item, category }) {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: i * 0.1 }}
                   onClick={() => playGame(i)}
-                  className="p-3 sm:p-4 rounded-2xl border-2 border-gray-200 hover:border-purple-500 hover:shadow-xl transition-all group relative overflow-hidden"
+                  className="p-3 sm:p-4 rounded-none sm:rounded-2xl border-2 border-gray-200 hover:border-purple-500 hover:shadow-xl transition-all group relative overflow-hidden"
                   style={{ backgroundColor: `${category?.color}08`, aspectRatio: '4/2' }}>
 
                     <div className="absolute top-2 right-2 w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-white/90 flex items-center justify-center text-xs sm:text-sm font-bold" style={{ color: category?.color }}>
@@ -333,10 +333,10 @@ export default function KnowledgeChallenge({ item, category }) {
                     <img
                       src={images[i]}
                       alt={fact}
-                      className="w-32 h-32 sm:w-40 sm:h-40 rounded-xl object-cover flex-shrink-0" /> :
+                      className="w-32 h-32 sm:w-40 sm:h-40 rounded-none sm:rounded-xl object-cover flex-shrink-0" /> :
 
 
-                    <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-xl bg-gray-200 animate-pulse flex-shrink-0" />
+                    <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-none sm:rounded-xl bg-gray-200 animate-pulse flex-shrink-0" />
                     }
                       <p className="text-sm sm:text-base text-gray-700 group-hover:text-gray-900 font-medium leading-tight flex-1 text-left">{fact}</p>
                     </div>
@@ -408,7 +408,7 @@ export default function KnowledgeChallenge({ item, category }) {
                 <img
                   src={images[playerChoice]}
                   alt="Your choice"
-                  className="w-full rounded-xl object-cover shadow-md"
+                  className="w-full rounded-none sm:rounded-xl object-cover shadow-none sm:shadow-md"
                   style={{ aspectRatio: '3/2' }} />
 
                 }
@@ -425,7 +425,7 @@ export default function KnowledgeChallenge({ item, category }) {
                 <img
                   src={images[aiChoice]}
                   alt="AI choice"
-                  className="w-full rounded-xl object-cover shadow-md"
+                  className="w-full rounded-none sm:rounded-xl object-cover shadow-none sm:shadow-md"
                   style={{ aspectRatio: '3/2' }} />
 
                 }
