@@ -20,66 +20,99 @@ export default function KnowledgeChallenge({ item, category }) {
   const [wins, setWins] = useState(0);
   const [losses, setLosses] = useState(0);
   const [currentRound, setCurrentRound] = useState(0);
+  const [preloadedGames, setPreloadedGames] = useState([]);
 
   useEffect(() => {
     startGame();
   }, [item]);
 
+  const loadGameData = async () => {
+    const response = await base44.integrations.Core.InvokeLLM({
+      prompt: `Generate 4 interesting facts about "${item}" for a knowledge challenge game. Each fact should be different and engaging. Format as short statements (max 12 words each).`,
+      response_json_schema: {
+        type: "object",
+        properties: {
+          facts: {
+            type: "array",
+            items: { type: "string" },
+            minItems: 4,
+            maxItems: 4
+          }
+        }
+      }
+    });
+
+    const facts = response.facts || [];
+
+    // Generate images for each fact
+    const imagePromises = facts.map(async (fact, i) => {
+      const cacheKey = `challenge_${item}_${i}_${fact.substring(0, 20)}`;
+      const cached = localStorage.getItem(cacheKey);
+      
+      if (cached) {
+        try {
+          const { url, timestamp } = JSON.parse(cached);
+          const age = Date.now() - timestamp;
+          if (age < 72 * 60 * 60 * 1000) return url;
+        } catch (e) {}
+      }
+
+      const imageResponse = await base44.integrations.Core.GenerateImage({
+        prompt: `Simple icon-style illustration representing: ${fact}. Minimal, clean, colorful, single subject focus.`
+      });
+
+      if (imageResponse?.url) {
+        localStorage.setItem(cacheKey, JSON.stringify({
+          url: imageResponse.url,
+          timestamp: Date.now()
+        }));
+      }
+
+      return imageResponse?.url;
+    });
+
+    const generatedImages = await Promise.all(imagePromises);
+    return { facts, images: generatedImages };
+  };
+
+  const preloadNextGames = async (count) => {
+    const preloaded = [];
+    for (let i = 0; i < count; i++) {
+      try {
+        const gameData = await loadGameData();
+        preloaded.push(gameData);
+      } catch (error) {
+        console.error('Failed to preload game:', error);
+      }
+    }
+    setPreloadedGames(prev => [...prev, ...preloaded]);
+  };
+
   const startGame = async () => {
     setGameState('loading');
     
     try {
-      const response = await base44.integrations.Core.InvokeLLM({
-        prompt: `Generate 4 interesting facts about "${item}" for a knowledge challenge game. Each fact should be different and engaging. Format as short statements (max 12 words each).`,
-        response_json_schema: {
-          type: "object",
-          properties: {
-            facts: {
-              type: "array",
-              items: { type: "string" },
-              minItems: 4,
-              maxItems: 4
-            }
-          }
-        }
-      });
-
-      const facts = response.facts || [];
-      setChoices(facts);
-
-      // Generate images for each fact
-      const imagePromises = facts.map(async (fact, i) => {
-        const cacheKey = `challenge_${item}_${i}_${fact.substring(0, 20)}`;
-        const cached = localStorage.getItem(cacheKey);
+      let gameData;
+      
+      // Use preloaded data if available
+      if (preloadedGames.length > 0) {
+        gameData = preloadedGames[0];
+        setPreloadedGames(prev => prev.slice(1));
         
-        if (cached) {
-          try {
-            const { url, timestamp } = JSON.parse(cached);
-            const age = Date.now() - timestamp;
-            if (age < 72 * 60 * 60 * 1000) return url;
-          } catch (e) {}
-        }
+        // Preload one more game to maintain buffer
+        preloadNextGames(1);
+      } else {
+        // Load current game and preload next 2
+        gameData = await loadGameData();
+        preloadNextGames(2);
+      }
 
-        const imageResponse = await base44.integrations.Core.GenerateImage({
-          prompt: `Simple icon-style illustration representing: ${fact}. Minimal, clean, colorful, single subject focus.`
-        });
-
-        if (imageResponse?.url) {
-          localStorage.setItem(cacheKey, JSON.stringify({
-            url: imageResponse.url,
-            timestamp: Date.now()
-          }));
-        }
-
-        return imageResponse?.url;
-      });
-
-      const generatedImages = await Promise.all(imagePromises);
-      setImages(generatedImages);
+      setChoices(gameData.facts);
+      setImages(gameData.images);
       setGameState('playing');
     } catch (error) {
       console.error('Failed to generate facts:', error);
-      setGameState('ready');
+      setGameState('loading');
     }
   };
 
