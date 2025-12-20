@@ -11,6 +11,7 @@ import { base44 } from '@/api/base44Client';
 import { motion } from 'framer-motion';
 import { BarChart, Bar, PieChart, Pie, Cell, LineChart, Line, RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import GamifiedLearning from '@/components/intelligence/GamifiedLearning';
+import KnowledgeChallenge from '@/components/intelligence/KnowledgeChallenge';
 
 // Helper to extract domain from URL
 const extractDomain = (url) => {
@@ -1097,6 +1098,9 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                         </div>
                     </div>
         }
+
+                {/* Knowledge Challenge Game */}
+                <KnowledgeChallenge item={item} category={category} />
 
                 {/* Future Outlook */}
                 {data?.futureOutlook &&
