@@ -1212,7 +1212,7 @@ export default function Intelligence() {
             <div className="min-h-screen bg-white sm:p-4 md:p-6">
                 <div className="max-w-6xl mx-auto pb-safe">
                     {/* Header with Logo and Breadcrumbs */}
-                    <div className="flex items-center justify-between px-3 sm:px-0 py-4 sm:py-6 gap-4">
+                    <div className="flex items-center justify-between px-3 sm:px-0 py-2 sm:py-3 gap-4">
                         <button
               onClick={() => handleBreadcrumbNavigate(0)}
               className="flex items-center gap-2 hover:opacity-80 transition-opacity">
