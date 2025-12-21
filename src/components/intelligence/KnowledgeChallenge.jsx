@@ -392,12 +392,26 @@ export default function KnowledgeChallenge({ item, category }) {
               {result === 'tie' && 'Neither of you got it right!'}
             </p>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
-              <div className="flex items-center gap-2 justify-center mb-2">
-                <Target className="w-4 h-4 text-blue-600" />
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-5 mb-6">
+              <div className="flex items-center gap-2 justify-center mb-3">
+                <Target className="w-5 h-5 text-blue-600" />
                 <p className="text-sm font-semibold text-blue-900">Objective: {objective}</p>
               </div>
-              <p className="text-sm text-blue-700 text-center">Correct Answer: Tile {correctIndex + 1}</p>
+              <div className="flex items-center gap-2 justify-center mb-3">
+                <CheckCircle2 className="w-5 h-5 text-green-600" />
+                <p className="text-sm font-semibold text-green-900">Correct Answer: Tile {correctIndex + 1}</p>
+              </div>
+              {funFacts[playerChoice] && (
+                <div className="pt-3 border-t border-blue-200">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Sparkles className="w-4 h-4 text-purple-600" />
+                    <h4 className="font-semibold text-gray-900 text-sm">Fun Fact</h4>
+                  </div>
+                  <p className="text-gray-700 text-sm leading-relaxed">
+                    {funFacts[playerChoice]}
+                  </p>
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
@@ -437,24 +451,7 @@ export default function KnowledgeChallenge({ item, category }) {
               </div>
             </div>
 
-            <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
-              <div className="flex items-center gap-2 justify-center">
-                <CheckCircle2 className="w-4 h-4 text-green-600" />
-                <p className="text-sm font-semibold text-green-900">Correct Answer: Tile {correctIndex + 1}</p>
-              </div>
-            </div>
 
-            {funFacts[playerChoice] &&
-          <div className="rounded-xl p-4 bg-gray-50 border border-gray-200 mb-6">
-                <div className="flex items-center gap-2 mb-2">
-                  <Sparkles className="w-4 h-4" style={{ color: category?.color }} />
-                  <h4 className="font-semibold text-gray-900">Fun Fact</h4>
-                </div>
-                <p className="text-gray-700 text-sm leading-relaxed">
-                  {funFacts[playerChoice]}
-                </p>
-              </div>
-          }
 
             <button
             onClick={resetGame}
