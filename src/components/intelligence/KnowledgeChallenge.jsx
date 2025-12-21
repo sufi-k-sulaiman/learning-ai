@@ -355,35 +355,14 @@ export default function KnowledgeChallenge({ item, category }) {
               animate={{ scale: 1 }}
               className="mb-6">
 
-                {result === 'win' &&
-              <div className="w-20 h-20 mx-auto rounded-full bg-green-100 flex items-center justify-center mb-4">
-                    <Trophy className="w-10 h-10 text-green-600" />
-                  </div>
-              }
-                {result === 'lose' &&
-              <div className="w-20 h-20 mx-auto rounded-full bg-red-100 flex items-center justify-center mb-4">
-                    <Zap className="w-10 h-10 text-red-600" />
-                  </div>
-              }
-                {result === 'shared' &&
-              <div className="w-20 h-20 mx-auto rounded-full bg-yellow-100 flex items-center justify-center mb-4">
-                    <Star className="w-10 h-10 text-yellow-600" />
-                  </div>
-              }
-                {result === 'tie' &&
-              <div className="w-20 h-20 mx-auto rounded-full bg-gray-100 flex items-center justify-center mb-4">
-                    <XCircle className="w-10 h-10 text-gray-600" />
-                  </div>
-              }
+                <h4 className="text-2xl font-bold mb-2 flex items-center justify-center gap-3">
+                  {result === 'win' && <><Trophy className="w-8 h-8 text-green-600" /> Perfect! You Win!</>}
+                  {result === 'lose' && <><XCircle className="w-8 h-8 text-red-600" /> AI Got It Right!</>}
+                  {result === 'shared' && <><Star className="w-8 h-8 text-yellow-600" /> Both Correct!</>}
+                  {result === 'tie' && <><XCircle className="w-8 h-8 text-gray-600" /> Both Wrong!</>}
+                </h4>
               </motion.div>
             </AnimatePresence>
-
-            <h4 className="text-2xl font-bold mb-2">
-              {result === 'win' && '🎉 Perfect! You Win!'}
-              {result === 'lose' && '😅 AI Got It Right!'}
-              {result === 'shared' && '⭐ Both Correct!'}
-              {result === 'tie' && '❌ Both Wrong!'}
-            </h4>
 
             <p className="text-gray-600 mb-4">
               {result === 'win' && `Only you found the right answer! Level ${Math.floor(currentRound)}`}
@@ -392,24 +371,32 @@ export default function KnowledgeChallenge({ item, category }) {
               {result === 'tie' && 'Neither of you got it right!'}
             </p>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-5 mb-6">
-              <div className="flex items-center gap-2 justify-center mb-3">
-                <Target className="w-5 h-5 text-blue-600" />
-                <p className="text-sm font-semibold text-blue-900">Objective: {objective}</p>
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-6 space-y-4">
+              <div className="flex items-start gap-3">
+                <Target className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-semibold text-blue-900 mb-1">Objective</p>
+                  <p className="text-sm text-gray-700">{objective}</p>
+                </div>
               </div>
-              <div className="flex items-center gap-2 justify-center mb-3">
-                <CheckCircle2 className="w-5 h-5 text-green-600" />
-                <p className="text-sm font-semibold text-green-900">Correct Answer: Tile {correctIndex + 1}</p>
+
+              <div className="flex items-start gap-3">
+                <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-semibold text-green-900 mb-1">Correct Answer</p>
+                  <p className="text-sm text-gray-700">Tile {correctIndex + 1}</p>
+                </div>
               </div>
+
               {funFacts[playerChoice] && (
-                <div className="pt-3 border-t border-blue-200">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Sparkles className="w-4 h-4 text-purple-600" />
-                    <h4 className="font-semibold text-gray-900 text-sm">Fun Fact</h4>
+                <div className="flex items-start gap-3 pt-3 border-t border-blue-200">
+                  <Sparkles className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-sm font-semibold text-gray-900 mb-1">Fun Fact</p>
+                    <p className="text-sm text-gray-700 leading-relaxed">
+                      {funFacts[playerChoice]}
+                    </p>
                   </div>
-                  <p className="text-gray-700 text-sm leading-relaxed">
-                    {funFacts[playerChoice]}
-                  </p>
                 </div>
               )}
             </div>
