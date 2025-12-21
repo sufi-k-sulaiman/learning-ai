@@ -371,32 +371,27 @@ export default function KnowledgeChallenge({ item, category }) {
               {result === 'tie' && 'Neither of you got it right!'}
             </p>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-6 space-y-4">
-              <div className="flex items-start gap-3">
-                <Target className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-sm font-semibold text-blue-900 mb-1">Objective</p>
-                  <p className="text-sm text-gray-700">{objective}</p>
-                </div>
+            <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 mb-6 space-y-6">
+              <div>
+                <Target className="w-10 h-10 mb-4" style={{ color: category?.color }} />
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">
+                  Objective: <span style={{ color: category?.color }}>{objective}</span>
+                </p>
               </div>
 
-              <div className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-sm font-semibold text-green-900 mb-1">Correct Answer</p>
-                  <p className="text-sm text-gray-700">Tile {correctIndex + 1}</p>
-                </div>
+              <div>
+                <CheckCircle2 className="w-10 h-10 mb-4" style={{ color: category?.color }} />
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">
+                  Correct Answer: <span style={{ color: category?.color }}>Tile {correctIndex + 1}</span>
+                </p>
               </div>
 
               {funFacts[playerChoice] && (
-                <div className="flex items-start gap-3 pt-3 border-t border-blue-200">
-                  <Sparkles className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-sm font-semibold text-gray-900 mb-1">Fun Fact</p>
-                    <p className="text-sm text-gray-700 leading-relaxed">
-                      {funFacts[playerChoice]}
-                    </p>
-                  </div>
+                <div className="pt-4 border-t-2 border-gray-200">
+                  <Sparkles className="w-10 h-10 mb-4" style={{ color: category?.color }} />
+                  <p className="text-2xl sm:text-3xl font-bold text-gray-900 leading-tight">
+                    Fun Fact: <span style={{ color: category?.color }}>{funFacts[playerChoice]}</span>
+                  </p>
                 </div>
               )}
             </div>
