@@ -402,9 +402,11 @@ export default function KnowledgeChallenge({ item, category }) {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-              <div className={`rounded-2xl p-5 ${playerChoice === correctIndex ? 'bg-green-50 border-2 border-green-500' : 'bg-red-50 border-2 border-red-500'}`}>
-                <div className="text-sm text-gray-500 mb-3 font-medium">You picked</div>
-                <div className="space-y-3">
+              <div className={`rounded-2xl overflow-hidden ${playerChoice === correctIndex ? 'bg-green-50 border-2 border-green-500' : 'bg-red-50 border-2 border-red-500'}`}>
+                <div className={`p-4 ${playerChoice === correctIndex ? 'bg-green-100' : 'bg-red-100'}`}>
+                  <h3 className="text-lg font-bold text-gray-900">You picked</h3>
+                </div>
+                <div className="p-5 space-y-3">
                   {images[playerChoice] &&
                 <img
                   src={images[playerChoice]}
@@ -419,9 +421,11 @@ export default function KnowledgeChallenge({ item, category }) {
                   </div>
                 </div>
               </div>
-              <div className={`rounded-2xl p-5 ${aiChoice === correctIndex ? 'bg-green-50 border-2 border-green-500' : 'bg-red-50 border-2 border-red-500'}`}>
-                <div className="text-sm text-gray-500 mb-3 font-medium">AI picked</div>
-                <div className="space-y-3">
+              <div className={`rounded-2xl overflow-hidden ${aiChoice === correctIndex ? 'bg-green-50 border-2 border-green-500' : 'bg-red-50 border-2 border-red-500'}`}>
+                <div className={`p-4 ${aiChoice === correctIndex ? 'bg-green-100' : 'bg-red-100'}`}>
+                  <h3 className="text-lg font-bold text-gray-900">AI picked</h3>
+                </div>
+                <div className="p-5 space-y-3">
                   {images[aiChoice] &&
                 <img
                   src={images[aiChoice]}
