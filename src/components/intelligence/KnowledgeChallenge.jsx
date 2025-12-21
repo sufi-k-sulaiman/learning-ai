@@ -372,29 +372,20 @@ export default function KnowledgeChallenge({ item, category }) {
             </p>
 
             <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 mb-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-6">
                 <div className="text-center md:text-left">
                   <Target className="w-10 h-10 mb-4 mx-auto md:mx-0" style={{ color: category?.color }} />
-                  <p className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight">
+                  <p className="text-sm sm:text-lg font-bold text-gray-900 leading-tight">
                     Objective: <span className="block mt-2" style={{ color: category?.color }}>{objective}</span>
                   </p>
                 </div>
 
-                <div className="text-center md:text-left md:border-x-2 md:border-gray-200 md:px-6">
+                <div className="text-center md:text-left md:border-l-2 md:border-gray-200 md:pl-6">
                   <CheckCircle2 className="w-10 h-10 mb-4 mx-auto md:mx-0" style={{ color: category?.color }} />
-                  <p className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight">
+                  <p className="text-sm sm:text-lg font-bold text-gray-900 leading-tight">
                     Correct Answer: <span className="block mt-2" style={{ color: category?.color }}>Tile {correctIndex + 1}</span>
                   </p>
                 </div>
-
-                {funFacts[playerChoice] && (
-                  <div className="text-center md:text-left">
-                    <Sparkles className="w-10 h-10 mb-4 mx-auto md:mx-0" style={{ color: category?.color }} />
-                    <p className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight">
-                      Fun Fact: <span className="block mt-2" style={{ color: category?.color }}>{funFacts[playerChoice]}</span>
-                    </p>
-                  </div>
-                )}
               </div>
             </div>
 
@@ -448,6 +439,17 @@ export default function KnowledgeChallenge({ item, category }) {
 
               Continue Journey
             </button>
+
+            {funFacts[playerChoice] && (
+              <div className="mt-6 bg-white border-2 border-gray-200 rounded-2xl p-8">
+                <div className="text-center md:text-left">
+                  <Sparkles className="w-10 h-10 mb-4 mx-auto md:mx-0" style={{ color: category?.color }} />
+                  <p className="text-xl sm:text-2xl font-bold text-gray-900 leading-tight">
+                    Fun Fact: <span className="block mt-2" style={{ color: category?.color }}>{funFacts[playerChoice]}</span>
+                  </p>
+                </div>
+              </div>
+            )}
             </div>
         }
             </div>
