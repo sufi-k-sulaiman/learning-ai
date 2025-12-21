@@ -471,7 +471,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
 
 
           // Invalid cache, continue to generate
-        }}const response = await base44.integrations.Core.GenerateImage({ prompt: `A stunning, educational scientific illustration of ${item} in the context of ${category?.name || 'natural world'}. Photorealistic, highly detailed, vibrant colors, professional scientific visualization style.` }); // Cache the image URL
+        }}const response = await base44.integrations.Core.GenerateImage({ prompt: `A stunning, educational scientific illustration of ${item} in the context of ${category?.name || 'natural world'}. Photorealistic, highly detailed, vibrant colors, professional scientific visualization style. Ultra-wide cinematic format, 21:9 aspect ratio.` }); // Cache the image URL
       if (response?.url) {localStorage.setItem(cacheKey, JSON.stringify({ url: response.url, timestamp: Date.now() }));}
       setImageUrl(response?.url);
     } catch (error) {
@@ -513,7 +513,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
 
 
           // Invalid cache, continue to generate
-        }}const response = await base44.integrations.Core.GenerateImage({ prompt: `Creative conceptual visualization showing the real-world applications and impact of ${item} in ${category?.name || 'modern world'}. Show how it affects everyday life, technology, or nature. Artistic, engaging, educational illustration style.` }); // Cache the image URL
+        }}const response = await base44.integrations.Core.GenerateImage({ prompt: `Creative conceptual visualization showing the real-world applications and impact of ${item} in ${category?.name || 'modern world'}. Show how it affects everyday life, technology, or nature. Artistic, engaging, educational illustration style. Ultra-wide cinematic format, 21:9 aspect ratio.` }); // Cache the image URL
       if (response?.url) {localStorage.setItem(cacheKey, JSON.stringify({ url: response.url, timestamp: Date.now() }));}
       setSecondImageUrl(response?.url);
     } catch (error) {
