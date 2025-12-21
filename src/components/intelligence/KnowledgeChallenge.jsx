@@ -148,7 +148,7 @@ export default function KnowledgeChallenge({ item, category }) {
       }
 
       const imageResponse = await base44.integrations.Core.GenerateImage({
-        prompt: `Landscape horizontal illustration representing: ${fact}. Minimal, clean, colorful, single subject focus. Wide format, 16:9 ratio.`
+        prompt: `Portrait vertical illustration representing: ${fact}. Minimal, clean, colorful, single subject focus. Tall format, 3:4 ratio.`
       });
 
       if (imageResponse?.url) {
