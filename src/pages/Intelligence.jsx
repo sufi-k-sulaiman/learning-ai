@@ -80,63 +80,16 @@ const SourceLink = ({ source }) => {
 
 };
 
-// Parse text and convert markdown links to clickable badges
+// Parse text and strip out any link formatting
 const TextWithLinks = ({ text }) => {
   if (!text) return null;
 
-  const parts = [];
-  let lastIndex = 0;
+  // Remove link patterns: ([domain] url) and similar formats
+  let cleanText = text.replace(/\(\[([^\]]+)\]\s+https?:\/\/[^)]+\)/g, '');
+  cleanText = cleanText.replace(/\[([^\]]+)\]\(https?:\/\/[^)]+\)/g, '');
+  cleanText = cleanText.replace(/\(https?:\/\/[^)]+\)/g, '');
   
-  // Match pattern: ([domain] url)
-  const linkRegex = /\(\[([^\]]+)\]\s+(https?:\/\/[^)]+)\)/g;
-  let match;
-
-  while ((match = linkRegex.exec(text)) !== null) {
-    // Add text before the link
-    if (match.index > lastIndex) {
-      parts.push({ type: 'text', content: text.slice(lastIndex, match.index) });
-    }
-    
-    // Extract domain from square brackets and URL
-    const domain = match[1]; // Domain from [domain]
-    const url = match[2]; // Full URL
-    
-    parts.push({ type: 'link', domain, url });
-    lastIndex = match.index + match[0].length;
-  }
-
-  // Add remaining text
-  if (lastIndex < text.length) {
-    parts.push({ type: 'text', content: text.slice(lastIndex) });
-  }
-
-  // If no links found, return plain text
-  if (parts.length === 0) {
-    return <span>{text}</span>;
-  }
-
-  return (
-    <span>
-            {parts.map((part, i) => {
-        if (part.type === 'text') {
-          return <span key={i}>{part.content}</span>;
-        }
-        return (
-          <a
-            key={i}
-            href={part.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-xs text-purple-800 hover:text-purple-800 transition-colors px-1.5 py-0.5 bg-purple-50 hover:bg-purple-100 rounded mx-1"
-            title={part.url}>
-
-                        {part.domain}
-                        <ExternalLink className="w-3 h-3" />
-                    </a>);
-
-      })}
-        </span>);
-
+  return <span>{cleanText}</span>;
 };
 
 const CATEGORIES = {
@@ -887,9 +840,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
             <div key={i} className="p-4 border border-gray-100 rounded-lg">
                                     <p className="text-sm text-gray-500 mb-1">{item.statistic}</p>
                                     <p className="text-2xl font-bold" style={{ color: category?.color }}>{item.value}</p>
-                                    <div className="mt-1">
-                                        <SourceLink source={item.source} />
-                                    </div>
+
                                 </div>
             )}
                         </div>
