@@ -44,23 +44,24 @@ const extractDomain = (url) => {
 const SourceLink = ({ source }) => {
   if (!source) return null;
 
-  // Extract URL from various formats like "[domain](url)" or just "url"
   let url = source;
   let domain = source;
 
-  // Handle markdown-style links [text](url)
-  const markdownMatch = source.match(/\[([^\]]+)\]\(([^)]+)\)/);
-  if (markdownMatch) {
-    domain = markdownMatch[1];
-    url = markdownMatch[2];
+  // Match pattern: [domain] url
+  const bracketMatch = source.match(/\[([^\]]+)\]\s+(https?:\/\/[^\s]+)/);
+  if (bracketMatch) {
+    domain = bracketMatch[1];
+    url = bracketMatch[2];
   } else {
-    domain = extractDomain(source);
-    url = source.startsWith('http') ? source : `https://${source}`;
-  }
-
-  // Clean up domain - remove www. and get just the main domain
-  if (domain) {
-    domain = domain.replace(/^www\./, '').split('/')[0];
+    // Handle markdown-style links [text](url)
+    const markdownMatch = source.match(/\[([^\]]+)\]\(([^)]+)\)/);
+    if (markdownMatch) {
+      domain = markdownMatch[1];
+      url = markdownMatch[2];
+    } else {
+      domain = extractDomain(source);
+      url = source.startsWith('http') ? source : `https://${source}`;
+    }
   }
 
   if (!domain) return <span className="text-xs text-gray-400">{source}</span>;

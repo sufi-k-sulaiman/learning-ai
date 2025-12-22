@@ -39,15 +39,18 @@ const TextWithLinks = ({ text }) => {
 
   const parts = [];
   let lastIndex = 0;
-  const linkRegex = /\(\[([^\]]+)\]\(([^)]+)\)\)/g;
+  
+  // Match pattern: ([domain] url)
+  const linkRegex = /\(\[([^\]]+)\]\s+(https?:\/\/[^)]+)\)/g;
   let match;
 
   while ((match = linkRegex.exec(text)) !== null) {
     if (match.index > lastIndex) {
       parts.push({ type: 'text', content: text.slice(lastIndex, match.index) });
     }
-    const domain = extractDomain(match[2]);
-    parts.push({ type: 'link', domain, url: match[2] });
+    const domain = match[1]; // Domain from [domain]
+    const url = match[2]; // Full URL
+    parts.push({ type: 'link', domain, url });
     lastIndex = match.index + match[0].length;
   }
 
