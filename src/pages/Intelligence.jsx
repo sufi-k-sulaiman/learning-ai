@@ -530,7 +530,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                 11. Future Outlook: 2-3 sentences on future trends and predictions
                 12. Innovations: 4 recent innovations or breakthroughs with name and description
                 13. Tools: 4 key tools or technologies used with name and description
-                14. Systems: 4 related systems or frameworks with name and description`, add_context_from_internet: true, response_json_schema: { type: "object", properties: { overview: { type: "string" }, keyFacts: { type: "array", items: { type: "string" } }, significance: { type: "string" },
+                14. Systems: 4 related systems or frameworks with name and description`, add_context_from_internet: true, response_json_schema: { type: "object", properties: { overview: { type: "array", items: { type: "string" }, minItems: 3, maxItems: 3 }, keyFacts: { type: "array", items: { type: "string" } }, significance: { type: "string" },
                 relatedTopics: { type: "array", items: { type: "string" } },
                 currentResearch: { type: "string" },
                 physicalComposition: { type: "array", items: { type: "object", properties: { property: { type: "string" }, description: { type: "string" } } } },
