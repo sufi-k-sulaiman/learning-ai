@@ -86,8 +86,8 @@ const TextWithLinks = ({ text }) => {
   const parts = [];
   let lastIndex = 0;
   
-  // Match both ([text](url)) and (url) patterns
-  const linkRegex = /\(\[([^\]]+)\]\(([^)]+)\)\)|\(https?:\/\/[^)\s]+\)/g;
+  // Match pattern: ([domain] url)
+  const linkRegex = /\(\[([^\]]+)\]\s+(https?:\/\/[^)]+)\)/g;
   let match;
 
   while ((match = linkRegex.exec(text)) !== null) {
@@ -96,17 +96,9 @@ const TextWithLinks = ({ text }) => {
       parts.push({ type: 'text', content: text.slice(lastIndex, match.index) });
     }
     
-    // Extract URL and domain
-    let url, domain;
-    if (match[1] && match[2]) {
-      // Markdown style: ([text](url))
-      url = match[2];
-      domain = extractDomain(match[2]);
-    } else {
-      // Plain URL style: (url)
-      url = match[0].slice(1, -1); // Remove parentheses
-      domain = extractDomain(url);
-    }
+    // Extract domain from square brackets and URL
+    const domain = match[1]; // Domain from [domain]
+    const url = match[2]; // Full URL
     
     parts.push({ type: 'link', domain, url });
     lastIndex = match.index + match[0].length;
