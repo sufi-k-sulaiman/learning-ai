@@ -83,10 +83,11 @@ const SourceLink = ({ source }) => {
 const TextWithLinks = ({ text }) => {
   if (!text) return null;
 
-  // Split text by markdown links pattern [text](url)
   const parts = [];
   let lastIndex = 0;
-  const linkRegex = /\(\[([^\]]+)\]\(([^)]+)\)\)/g;
+  
+  // Match both ([text](url)) and (url) patterns
+  const linkRegex = /\(\[([^\]]+)\]\(([^)]+)\)\)|\(https?:\/\/[^)\s]+\)/g;
   let match;
 
   while ((match = linkRegex.exec(text)) !== null) {
@@ -94,9 +95,20 @@ const TextWithLinks = ({ text }) => {
     if (match.index > lastIndex) {
       parts.push({ type: 'text', content: text.slice(lastIndex, match.index) });
     }
-    // Add the link - extract domain from URL
-    const domain = extractDomain(match[2]);
-    parts.push({ type: 'link', domain, url: match[2] });
+    
+    // Extract URL and domain
+    let url, domain;
+    if (match[1] && match[2]) {
+      // Markdown style: ([text](url))
+      url = match[2];
+      domain = extractDomain(match[2]);
+    } else {
+      // Plain URL style: (url)
+      url = match[0].slice(1, -1); // Remove parentheses
+      domain = extractDomain(url);
+    }
+    
+    parts.push({ type: 'link', domain, url });
     lastIndex = match.index + match[0].length;
   }
 
