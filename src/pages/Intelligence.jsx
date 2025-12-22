@@ -517,7 +517,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
         // Invalid cache, continue to fetch
       }}try {// Split into two smaller API calls for reliability
       const [basicResponse, chartsResponse] = await Promise.all([base44.integrations.Core.InvokeLLM({ prompt: `Provide intelligence data about "${item}" (${category?.name || 'general'}):
-                1. Overview: 3-4 sentence description
+                1. Overview: 3 comprehensive paragraphs (each 3-4 sentences) covering: a) introduction and basic definition, b) key characteristics and properties, c) importance and real-world relevance
                 2. Key Facts: 5 interesting facts (short, under 100 chars each)
                 3. Significance: Why it matters (2 sentences)
                 4. Related Topics: 4 related concepts
@@ -641,9 +641,17 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                 {/* Overview - Apple Style */}
                 <div className="text-center">
                     <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">Overview</h2>
-                    <p className="text-lg sm:text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto">
-                        <TextWithLinks text={data?.overview} />
-                    </p>
+                    <div className="space-y-6 max-w-3xl mx-auto">
+                        {Array.isArray(data?.overview) ? data.overview.map((para, i) =>
+                <p key={i} className="text-lg sm:text-xl text-gray-600 leading-relaxed">
+                                <TextWithLinks text={para} />
+                            </p>
+                ) :
+                <p className="text-lg sm:text-xl text-gray-600 leading-relaxed">
+                                <TextWithLinks text={data?.overview} />
+                            </p>
+                }
+                    </div>
                 </div>
 
                 {/* Distribution Analysis - Apple Style */}
