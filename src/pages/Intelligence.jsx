@@ -12,7 +12,6 @@ import { motion } from 'framer-motion';
 import { BarChart, Bar, PieChart, Pie, Cell, LineChart, Line, RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import GamifiedLearning from '@/components/intelligence/GamifiedLearning';
 import KnowledgeChallenge from '@/components/intelligence/KnowledgeChallenge';
-import WordPuzzleGame from '@/components/intelligence/WordPuzzleGame';
 
 // Helper to extract domain from URL
 const extractDomain = (url) => {
@@ -691,7 +690,7 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                 {data?.radarData?.length > 0 &&
         <div>
                         <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-8 text-center">Key Attributes</h2>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             {data.radarData.map((item, index) =>
             <motion.div
               key={index}
@@ -718,9 +717,6 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                                 </motion.div>
             )}
                         </div>
-                        
-                        {/* Word Puzzle Game */}
-                        <WordPuzzleGame item={item} category={category} />
                     </div>
         }
 
