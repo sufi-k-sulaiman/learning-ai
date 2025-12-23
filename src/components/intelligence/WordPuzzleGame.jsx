@@ -33,9 +33,10 @@ For each level provide:
 - distractors: array of 4 misleading words that don't fit
 - hint: a short hint about what connects the words
 - sentence: the complete sentence formed by the 4 words
+- didYouKnow: an interesting fact that relates to these 4 words (1-2 sentences, educational and engaging)
 
 Example for "Water":
-Level 1: words: ["H2O", "Molecule", "Liquid", "Life"], distractors: ["CO2", "Atom", "Gas", "Death"], sentence: "H2O Molecule Liquid Life"`,
+Level 1: words: ["H2O", "Molecule", "Liquid", "Life"], distractors: ["CO2", "Atom", "Gas", "Death"], sentence: "H2O Molecule Liquid Life", didYouKnow: "Every H2O molecule contains two hydrogen atoms bonded to one oxygen atom, and this simple structure makes water essential for all known forms of life on Earth!"`,
         response_json_schema: {
           type: "object",
           properties: {
@@ -49,7 +50,8 @@ Level 1: words: ["H2O", "Molecule", "Liquid", "Life"], distractors: ["CO2", "Ato
                   words: { type: "array", items: { type: "string" }, minItems: 4, maxItems: 4 },
                   distractors: { type: "array", items: { type: "string" }, minItems: 4, maxItems: 4 },
                   hint: { type: "string" },
-                  sentence: { type: "string" }
+                  sentence: { type: "string" },
+                  didYouKnow: { type: "string" }
                 }
               }
             }
@@ -207,9 +209,12 @@ Level 1: words: ["H2O", "Molecule", "Liquid", "Life"], distractors: ["CO2", "Ato
                 <p className="text-lg font-semibold mb-3" style={{ color: category?.color }}>
                   "{completedSentence}"
                 </p>
-                <p className="text-gray-600">
-                  You've completed level {currentLevel + 1}! This sentence perfectly captures an important aspect of {item}.
-                </p>
+                <div className="text-left bg-blue-50 rounded-lg p-4 mb-2">
+                  <p className="text-sm font-semibold text-blue-900 mb-1">💡 Did You Know?</p>
+                  <p className="text-gray-700 text-sm leading-relaxed">
+                    {levels[currentLevel]?.didYouKnow}
+                  </p>
+                </div>
               </div>
               <button
                 onClick={handleContinue}
