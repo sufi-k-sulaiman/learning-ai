@@ -179,67 +179,76 @@ Rules:
   }
 
   return (
-    <div className="bg-gradient-to-br from-indigo-900 via-purple-900 to-blue-900 rounded-xl p-6 sm:p-8 shadow-2xl">
-      <div className="text-center mb-6">
-        <h3 className="text-2xl sm:text-3xl font-bold text-white mb-2">
+    <div className="bg-black rounded-xl p-6 sm:p-8 shadow-2xl border border-purple-900/30">
+      <div className="text-center mb-8">
+        <h3 className="text-2xl sm:text-3xl font-bold text-purple-400 mb-2">
           🧠 Word Puzzle Challenge
         </h3>
-        <p className="text-white/80 text-sm sm:text-base mb-4">
+        <p className="text-purple-300/70 text-sm sm:text-base mb-4">
           Drag the correct word to fill the missing slot!
         </p>
-        <div className="text-xl font-semibold text-purple-300">
+        <div className="text-lg font-semibold text-purple-400">
           Level {currentLevel + 1} / {levels.length}
         </div>
       </div>
 
-      {/* Slots */}
-      <div className="flex flex-wrap justify-center gap-4 mb-8 px-2">
+      {/* 4x1 Grid of Large Squares with Arrows */}
+      <div className="flex items-center justify-center gap-2 sm:gap-3 mb-12 px-2 overflow-x-auto pb-2">
         {slots.map((slot, i) => (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.1 }}
-            onDragOver={handleDragOver}
-            onDrop={(e) => handleDrop(e, i)}
-            className={`
-              w-36 sm:w-44 h-20 rounded-2xl flex items-center justify-center
-              text-base sm:text-lg font-bold transition-all duration-300 cursor-pointer
-              ${!slot.filled ? 'bg-gradient-to-br from-gray-700 to-gray-800 border-2 border-dashed border-purple-400 text-gray-400' : ''}
-              ${slot.filled && !slot.correct ? 'bg-gradient-to-br from-purple-600 to-blue-600 border-2 border-purple-400 text-white shadow-lg' : ''}
-              ${slot.correct ? 'bg-gradient-to-br from-green-500 to-emerald-500 border-2 border-green-400 text-white shadow-xl animate-pulse' : ''}
-              ${slot.wrong ? 'bg-gradient-to-br from-red-500 to-pink-500 border-2 border-red-400 animate-shake' : ''}
-            `}
-            style={{
-              textShadow: slot.filled ? '0 2px 10px rgba(0,0,0,0.3)' : 'none',
-              transform: slot.correct ? 'scale(1.05)' : 'scale(1)'
-            }}>
-            {slot.filled ? slot.word : ''}
-          </motion.div>
+          <React.Fragment key={i}>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: i * 0.15 }}
+              onDragOver={handleDragOver}
+              onDrop={(e) => handleDrop(e, i)}
+              className={`
+                w-32 h-32 sm:w-40 sm:h-40 rounded-2xl flex items-center justify-center
+                text-sm sm:text-lg font-bold transition-all duration-300 cursor-pointer
+                flex-shrink-0
+                ${!slot.filled ? 'bg-purple-950/50 border-2 border-dashed border-purple-600/50 text-purple-500/40' : ''}
+                ${slot.filled && !slot.correct ? 'bg-gradient-to-br from-purple-900 to-purple-800 border-2 border-purple-600 text-purple-200 shadow-lg shadow-purple-900/50' : ''}
+                ${slot.correct ? 'bg-gradient-to-br from-purple-600 to-purple-700 border-2 border-purple-400 text-white shadow-xl shadow-purple-600/50 animate-pulse' : ''}
+                ${slot.wrong ? 'bg-gradient-to-br from-red-900 to-red-800 border-2 border-red-600 animate-shake' : ''}
+              `}
+              style={{
+                textShadow: slot.filled ? '0 2px 10px rgba(0,0,0,0.5)' : 'none'
+              }}>
+              <span className="text-center px-2 break-words">{slot.filled ? slot.word : '?'}</span>
+            </motion.div>
+            
+            {/* Arrow between slots */}
+            {i < slots.length - 1 && (
+              <svg className="w-6 h-6 sm:w-8 sm:h-8 text-purple-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+            )}
+          </React.Fragment>
         ))}
       </div>
 
-      {/* Tiles */}
-      <div className="flex flex-wrap justify-center gap-3 sm:gap-4 min-h-24">
+      {/* Suggestive Word Tiles - Rounded Rectangles */}
+      <div className="flex flex-wrap justify-center gap-3 min-h-24">
         <AnimatePresence>
           {tileWords.map((word, i) => (
             <motion.div
               key={word}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0 }}
-              transition={{ delay: i * 0.05 }}
+              transition={{ delay: i * 0.08 }}
               draggable
               onDragStart={(e) => handleDragStart(e, word)}
               onDragEnd={handleDragEnd}
-              className="w-32 sm:w-40 h-16 bg-gradient-to-br from-cyan-600 to-blue-700 
-                       border-2 border-cyan-400 rounded-xl flex items-center justify-center
-                       text-sm sm:text-base font-bold text-white cursor-grab active:cursor-grabbing
-                       hover:scale-105 hover:shadow-2xl transition-all duration-300
-                       shadow-lg active:scale-110"
+              className="px-6 py-3 bg-gradient-to-r from-purple-800 to-purple-900
+                       border border-purple-600/50 rounded-full flex items-center justify-center
+                       text-sm sm:text-base font-semibold text-purple-200 cursor-grab active:cursor-grabbing
+                       hover:scale-105 hover:shadow-lg hover:shadow-purple-700/50 transition-all duration-300
+                       hover:border-purple-500 active:scale-110"
               style={{
-                textShadow: '0 2px 5px rgba(0,0,0,0.3)',
-                transform: draggedWord === word ? 'scale(1.1) rotate(5deg)' : 'scale(1)'
+                textShadow: '0 1px 3px rgba(0,0,0,0.5)',
+                transform: draggedWord === word ? 'scale(1.1)' : 'scale(1)',
+                opacity: draggedWord === word ? 0.7 : 1
               }}>
               {word}
             </motion.div>
