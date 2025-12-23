@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, Trophy, Sparkles } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
@@ -13,6 +13,8 @@ export default function WordPuzzle({ item, category }) {
   const [gameComplete, setGameComplete] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [successSentence, setSuccessSentence] = useState('');
+  const [draggedWord, setDraggedWord] = useState(null);
+  const [touchStartPos, setTouchStartPos] = useState(null);
 
   useEffect(() => {
     generateLevels();
@@ -223,6 +225,7 @@ Rules:
           {slots.map((slot) => (
             <div
               key={slot.id}
+              data-slot-id={slot.id}
               onDragOver={(e) => e.preventDefault()}
               onDrop={(e) => {
                 e.preventDefault();
@@ -265,9 +268,48 @@ Rules:
                 draggable
                 onDragStart={(e) => {
                   e.dataTransfer.setData('text/plain', tile.word);
+                  setDraggedWord(tile.word);
+                }}
+                onDragEnd={() => setDraggedWord(null)}
+                onTouchStart={(e) => {
+                  const touch = e.touches[0];
+                  setTouchStartPos({ x: touch.clientX, y: touch.clientY });
+                  setDraggedWord(tile.word);
+                  e.currentTarget.style.transform = 'scale(1.1)';
+                  e.currentTarget.style.opacity = '0.8';
+                }}
+                onTouchMove={(e) => {
+                  if (!draggedWord) return;
+                  e.preventDefault();
+                  const touch = e.touches[0];
+                  const element = e.currentTarget;
+                  element.style.position = 'fixed';
+                  element.style.zIndex = '9999';
+                  element.style.left = `${touch.clientX - 50}px`;
+                  element.style.top = `${touch.clientY - 20}px`;
+                }}
+                onTouchEnd={(e) => {
+                  if (!draggedWord) return;
+                  const touch = e.changedTouches[0];
+                  const element = document.elementFromPoint(touch.clientX, touch.clientY);
+                  const slot = element?.closest('[data-slot-id]');
+                  
+                  if (slot) {
+                    const slotId = parseInt(slot.dataset.slotId);
+                    handleDrop(slotId, draggedWord);
+                  }
+                  
+                  e.currentTarget.style.position = '';
+                  e.currentTarget.style.transform = '';
+                  e.currentTarget.style.opacity = '';
+                  e.currentTarget.style.left = '';
+                  e.currentTarget.style.top = '';
+                  e.currentTarget.style.zIndex = '';
+                  setDraggedWord(null);
+                  setTouchStartPos(null);
                 }}
                 className="px-6 py-3 rounded-full font-semibold cursor-grab active:cursor-grabbing
-                          shadow-md hover:shadow-lg active:scale-95 transition-all"
+                          shadow-md hover:shadow-lg active:scale-95 transition-all touch-manipulation"
                 style={{ 
                   backgroundColor: `${category?.color}20`,
                   color: category?.color,

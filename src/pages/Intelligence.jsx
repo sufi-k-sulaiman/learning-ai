@@ -13,6 +13,7 @@ import { BarChart, Bar, PieChart, Pie, Cell, LineChart, Line, RadarChart, Radar,
 import GamifiedLearning from '@/components/intelligence/GamifiedLearning';
 import KnowledgeChallenge from '@/components/intelligence/KnowledgeChallenge';
 import WordPuzzle from '@/components/intelligence/WordPuzzle';
+import { useSwipeGesture, usePinchZoom } from '@/components/intelligence/TouchHandler';
 
 // Helper to extract domain from URL
 const extractDomain = (url) => {
@@ -391,6 +392,11 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
   const [imageLoading, setImageLoading] = useState(true);
   const [secondImageUrl, setSecondImageUrl] = useState(null);
   const [secondImageLoading, setSecondImageLoading] = useState(true);
+  const imageRef = useRef(null);
+  const secondImageRef = useRef(null);
+
+  usePinchZoom(imageRef);
+  usePinchZoom(secondImageRef);
 
   useEffect(() => {
     fetchItemData();
@@ -628,12 +634,14 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                     </div> :
         imageUrl &&
         <motion.img
+          ref={imageRef}
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6 }}
           src={imageUrl}
           alt={item}
-          className="w-full max-w-5xl mx-auto h-64 sm:h-96 object-cover rounded-none sm:rounded-3xl shadow-none sm:shadow-2xl" />
+          className="w-full max-w-5xl mx-auto h-64 sm:h-96 object-cover rounded-none sm:rounded-3xl shadow-none sm:shadow-2xl"
+          style={{ touchAction: 'pan-x pan-y pinch-zoom' }} />
 
         }
             </div>
@@ -947,12 +955,14 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                         </div> :
           secondImageUrl &&
           <motion.img
+            ref={secondImageRef}
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6 }}
             src={secondImageUrl}
             alt={`${item} real-world applications`}
-            className="w-full max-w-5xl mx-auto h-64 sm:h-96 object-cover rounded-none sm:rounded-3xl shadow-none sm:shadow-2xl" />
+            className="w-full max-w-5xl mx-auto h-64 sm:h-96 object-cover rounded-none sm:rounded-3xl shadow-none sm:shadow-2xl"
+            style={{ touchAction: 'pan-x pan-y pinch-zoom' }} />
 
           }
                 </div>
@@ -1092,6 +1102,25 @@ export default function Intelligence() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedItem, setSelectedItem] = useState(null);
   const [menuOpen, setMenuOpen] = useState(false);
+
+  // Swipe navigation
+  useSwipeGesture(
+    () => {
+      // Swipe left - go forward (not applicable here)
+    },
+    () => {
+      // Swipe right - go back
+      if (selectedItem) {
+        setSelectedItem(null);
+        updateUrl(selectedCategory, null);
+        window.scrollTo(0, 0);
+      } else if (selectedCategory) {
+        setSelectedCategory(null);
+        updateUrl(null, null);
+        window.scrollTo(0, 0);
+      }
+    }
+  );
 
   // Update URL and make it bookmarkable using query parameters
   const updateUrl = (category, item) => {
