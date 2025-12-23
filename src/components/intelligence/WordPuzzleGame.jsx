@@ -1,0 +1,254 @@
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Loader2, Trophy, RotateCcw } from 'lucide-react';
+import { base44 } from '@/api/base44Client';
+
+export default function WordPuzzleGame({ item, category }) {
+  const [loading, setLoading] = useState(true);
+  const [levels, setLevels] = useState([]);
+  const [currentLevel, setCurrentLevel] = useState(0);
+  const [slots, setSlots] = useState([]);
+  const [tiles, setTiles] = useState([]);
+  const [emptyIndex, setEmptyIndex] = useState(0);
+  const [draggedWord, setDraggedWord] = useState(null);
+  const [gameComplete, setGameComplete] = useState(false);
+
+  useEffect(() => {
+    generatePuzzle();
+  }, [item]);
+
+  const generatePuzzle = async () => {
+    setLoading(true);
+    setGameComplete(false);
+    setCurrentLevel(0);
+
+    try {
+      const response = await base44.integrations.Core.InvokeLLM({
+        prompt: `Create 5 word puzzle levels about "${item}". Each level has 4 related words that form a sentence or phrase.
+        
+For each level provide:
+- words: array of 4 words that belong together (in correct order)
+- distractors: array of 4 misleading words that don't fit
+- hint: a short hint about what connects the words
+
+Example for "Water":
+Level 1: words: ["H2O", "Molecule", "Liquid", "Life"], distractors: ["CO2", "Atom", "Gas", "Death"]`,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            levels: {
+              type: "array",
+              minItems: 5,
+              maxItems: 5,
+              items: {
+                type: "object",
+                properties: {
+                  words: { type: "array", items: { type: "string" }, minItems: 4, maxItems: 4 },
+                  distractors: { type: "array", items: { type: "string" }, minItems: 4, maxItems: 4 },
+                  hint: { type: "string" }
+                }
+              }
+            }
+          }
+        }
+      });
+
+      setLevels(response.levels || []);
+      initLevel(response.levels[0]);
+    } catch (error) {
+      console.error('Failed to generate puzzle:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const initLevel = (level) => {
+    if (!level) return;
+
+    const emptyIdx = Math.floor(Math.random() * 4);
+    setEmptyIndex(emptyIdx);
+
+    const slotsData = level.words.map((word, i) => ({
+      word: i === emptyIdx ? '' : word,
+      expected: word,
+      isEmpty: i === emptyIdx,
+      isCorrect: false,
+      isWrong: false
+    }));
+    setSlots(slotsData);
+
+    const allTiles = [...level.distractors, level.words[emptyIdx]];
+    const shuffled = allTiles.sort(() => Math.random() - 0.5);
+    setTiles(shuffled.map(word => ({ word, isUsed: false })));
+  };
+
+  const handleDragStart = (e, word) => {
+    setDraggedWord(word);
+    e.dataTransfer.effectAllowed = 'move';
+  };
+
+  const handleDragEnd = () => {
+    setDraggedWord(null);
+  };
+
+  const handleDrop = (e, slotIndex) => {
+    e.preventDefault();
+    
+    const slot = slots[slotIndex];
+    if (!slot.isEmpty || !draggedWord) return;
+
+    const isCorrect = draggedWord === slot.expected;
+
+    if (isCorrect) {
+      const newSlots = [...slots];
+      newSlots[slotIndex] = { ...slot, word: draggedWord, isEmpty: false, isCorrect: true };
+      setSlots(newSlots);
+
+      const newTiles = tiles.map(t => 
+        t.word === draggedWord ? { ...t, isUsed: true } : t
+      );
+      setTiles(newTiles);
+
+      setTimeout(() => {
+        if (currentLevel < levels.length - 1) {
+          setCurrentLevel(currentLevel + 1);
+          initLevel(levels[currentLevel + 1]);
+        } else {
+          setGameComplete(true);
+        }
+      }, 1500);
+    } else {
+      const newSlots = [...slots];
+      newSlots[slotIndex] = { ...slot, isWrong: true };
+      setSlots(newSlots);
+
+      setTimeout(() => {
+        const resetSlots = [...slots];
+        resetSlots[slotIndex] = { ...slot, isWrong: false };
+        setSlots(resetSlots);
+      }, 600);
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
+
+  if (loading) {
+    return (
+      <div className="bg-white rounded-xl border border-gray-200 p-8">
+        <div className="flex flex-col items-center justify-center py-12">
+          <Loader2 className="w-10 h-10 animate-spin mb-4" style={{ color: category?.color }} />
+          <p className="text-gray-500">Generating word puzzle...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (gameComplete) {
+    return (
+      <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border-2 border-green-200 p-8">
+        <div className="text-center">
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", duration: 0.5 }}>
+            <Trophy className="w-16 h-16 mx-auto mb-4 text-green-600" />
+          </motion.div>
+          <h3 className="text-2xl font-bold text-gray-900 mb-2">🎉 Puzzle Complete!</h3>
+          <p className="text-gray-600 mb-6">You mastered all {levels.length} word puzzles!</p>
+          <button
+            onClick={generatePuzzle}
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all"
+            style={{ backgroundColor: category?.color }}>
+            <RotateCcw className="w-5 h-5" />
+            Play Again
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  const currentLevelData = levels[currentLevel];
+
+  return (
+    <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl border border-purple-200 p-6">
+      <div className="mb-6 text-center">
+        <h3 className="text-xl font-bold text-gray-900 mb-2">Word Puzzle Challenge</h3>
+        <p className="text-sm text-gray-600 mb-4">{currentLevelData?.hint}</p>
+        <div className="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full border border-gray-200">
+          <span className="text-sm font-medium text-gray-600">Level</span>
+          <span className="text-lg font-bold" style={{ color: category?.color }}>
+            {currentLevel + 1} / {levels.length}
+          </span>
+        </div>
+      </div>
+
+      {/* 2x2 Grid */}
+      <div className="grid grid-cols-2 gap-4 mb-8 max-w-md mx-auto">
+        {slots.map((slot, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: i * 0.1 }}
+            onDrop={(e) => handleDrop(e, i)}
+            onDragOver={handleDragOver}
+            className={`
+              aspect-square rounded-2xl flex items-center justify-center text-lg font-bold
+              transition-all duration-300 cursor-pointer
+              ${slot.isEmpty ? 'border-4 border-dashed border-purple-300 bg-white' : 'border-4 border-purple-400'}
+              ${slot.isCorrect ? 'bg-gradient-to-br from-green-400 to-green-500 border-green-500 text-white animate-pulse' : ''}
+              ${slot.isWrong ? 'bg-gradient-to-br from-red-400 to-red-500 border-red-500 text-white' : ''}
+              ${!slot.isEmpty && !slot.isCorrect && !slot.isWrong ? 'bg-gradient-to-br from-purple-100 to-purple-200 text-gray-900' : ''}
+              ${slot.isEmpty ? 'hover:border-purple-500 hover:bg-purple-50' : ''}
+            `}
+            style={{
+              boxShadow: slot.isCorrect ? '0 0 30px rgba(34, 197, 94, 0.4)' : 
+                         slot.isWrong ? '0 0 20px rgba(239, 68, 68, 0.4)' : 
+                         'none',
+              animation: slot.isWrong ? 'shake 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97)' : 'none'
+            }}>
+            {slot.word || (
+              <span className="text-gray-400 text-sm">Drop here</span>
+            )}
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Tiles */}
+      <div className="flex flex-wrap justify-center gap-3">
+        <AnimatePresence>
+          {tiles.filter(t => !t.isUsed).map((tile, i) => (
+            <motion.div
+              key={tile.word}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0 }}
+              transition={{ delay: i * 0.05 }}
+              draggable
+              onDragStart={(e) => handleDragStart(e, tile.word)}
+              onDragEnd={handleDragEnd}
+              className="px-6 py-3 bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-full font-semibold text-base shadow-lg hover:shadow-xl transition-all cursor-grab active:cursor-grabbing hover:scale-105 active:scale-95"
+              style={{
+                opacity: draggedWord === tile.word ? 0.5 : 1,
+                transform: draggedWord === tile.word ? 'scale(1.1)' : 'scale(1)'
+              }}>
+              {tile.word}
+            </motion.div>
+          ))}
+        </AnimatePresence>
+      </div>
+
+      <style jsx>{`
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          20% { transform: translateX(-10px); }
+          40% { transform: translateX(10px); }
+          60% { transform: translateX(-8px); }
+          80% { transform: translateX(8px); }
+        }
+      `}</style>
+    </div>
+  );
+}
