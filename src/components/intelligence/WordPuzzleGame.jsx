@@ -242,8 +242,8 @@ Level 5-6: Advanced/technical terms`,
               }}
               onDragEnd={() => setDraggedWord(null)}
               className={`
-                w-36 h-20 rounded-xl flex items-center justify-center text-base font-bold
-                bg-gradient-to-br from-blue-600 to-cyan-600 border-2 border-blue-400
+                w-36 h-20 rounded-2xl flex items-center justify-center text-base font-bold
+                bg-gradient-to-br from-purple-600 to-purple-800 border-2 border-purple-400
                 cursor-grab active:cursor-grabbing shadow-lg
                 hover:scale-110 hover:shadow-2xl transition-all duration-200
                 ${draggedWord === tile.word ? 'opacity-50 scale-95' : ''}
