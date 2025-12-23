@@ -61,8 +61,11 @@ Level 1: words: ["H2O", "Molecule", "Liquid", "Life"], distractors: ["CO2", "Ato
         }
       });
 
-      setLevels(response.levels || []);
-      initLevel(response.levels[0]);
+      const levels = response?.levels || [];
+      setLevels(levels);
+      if (levels.length > 0 && levels[0]) {
+        initLevel(levels[0]);
+      }
     } catch (error) {
       console.error('Failed to generate puzzle:', error);
     } finally {
@@ -71,7 +74,7 @@ Level 1: words: ["H2O", "Molecule", "Liquid", "Life"], distractors: ["CO2", "Ato
   };
 
   const initLevel = (level) => {
-    if (!level) return;
+    if (!level || !level.words) return;
 
     const emptyIdx = Math.floor(Math.random() * 4);
     setEmptyIndex(emptyIdx);
