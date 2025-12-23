@@ -11,8 +11,6 @@ export default function WordPuzzle({ item, category }) {
   const [tiles, setTiles] = useState([]);
   const [blankIndex, setBlankIndex] = useState(0);
   const [gameComplete, setGameComplete] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
-  const [successSentence, setSuccessSentence] = useState('');
 
   useEffect(() => {
     generateLevels();
@@ -105,25 +103,15 @@ Rules:
       // Remove tile
       setTiles(prev => prev.filter(t => t.word !== droppedWord));
 
-      // Generate success sentence
-      setTimeout(async () => {
-        try {
-          const allWords = newSlots.map(s => s.word).join(', ');
-          const response = await base44.integrations.Core.InvokeLLM({
-            prompt: `Create one meaningful, educational sentence about "${item}" using these 4 words: ${allWords}. The sentence should be informative and flow naturally. Return only the sentence.`,
-            response_json_schema: {
-              type: "object",
-              properties: {
-                sentence: { type: "string" }
-              }
-            }
-          });
-          setSuccessSentence(response.sentence || '');
-        } catch (error) {
-          setSuccessSentence(`Great job! You correctly identified: ${allWords}.`);
+      // Next level after animation
+      setTimeout(() => {
+        if (currentLevel < levels.length - 1) {
+          setCurrentLevel(currentLevel + 1);
+          initLevel(currentLevel + 1, levels);
+        } else {
+          setGameComplete(true);
         }
-        setShowSuccess(true);
-      }, 1000);
+      }, 1600);
     } else if (slot.isEmpty) {
       // Wrong
       const newSlots = slots.map(s => 
@@ -148,16 +136,6 @@ Rules:
     );
   }
 
-  const handleNext = () => {
-    setShowSuccess(false);
-    if (currentLevel < levels.length - 1) {
-      setCurrentLevel(currentLevel + 1);
-      initLevel(currentLevel + 1, levels);
-    } else {
-      setGameComplete(true);
-    }
-  };
-
   if (gameComplete) {
     return (
       <motion.div
@@ -176,27 +154,6 @@ Rules:
           className="px-6 py-3 rounded-full font-semibold text-white shadow-lg hover:shadow-xl transition-all"
           style={{ backgroundColor: category?.color }}>
           Play Again
-        </button>
-      </motion.div>
-    );
-  }
-
-  if (showSuccess) {
-    return (
-      <motion.div
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        className="bg-white rounded-xl border border-gray-200 p-8 text-center">
-        <Sparkles className="w-12 h-12 mx-auto mb-4" style={{ color: category?.color }} />
-        <h3 className="text-xl font-bold text-gray-900 mb-4">Perfect! 🎯</h3>
-        <p className="text-lg text-gray-700 leading-relaxed mb-6 max-w-md mx-auto">
-          {successSentence}
-        </p>
-        <button
-          onClick={handleNext}
-          className="px-8 py-3 rounded-full font-semibold text-white shadow-lg hover:shadow-xl transition-all"
-          style={{ backgroundColor: category?.color }}>
-          {currentLevel < levels.length - 1 ? 'Next Level →' : 'Finish'}
         </button>
       </motion.div>
     );
