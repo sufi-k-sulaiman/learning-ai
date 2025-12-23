@@ -12,7 +12,6 @@ import { motion } from 'framer-motion';
 import { BarChart, Bar, PieChart, Pie, Cell, LineChart, Line, RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import GamifiedLearning from '@/components/intelligence/GamifiedLearning';
 import KnowledgeChallenge from '@/components/intelligence/KnowledgeChallenge';
-import WordPuzzleGame from '@/components/intelligence/WordPuzzleGame';
 
 // Helper to extract domain from URL
 const extractDomain = (url) => {
@@ -720,23 +719,6 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                         </div>
                     </div>
         }
-
-                {/* Word Puzzle Game */}
-                <div className="sm:bg-gradient-to-br sm:from-blue-50 sm:to-purple-50 rounded-none sm:rounded-xl sm:border sm:border-blue-200 sm:p-6">
-                    <div className="flex items-center gap-3 mb-4 px-3 sm:px-0">
-                        <div className="w-10 h-10 rounded-lg flex items-center justify-center">
-                            <img
-                                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6944bf3dc7235d670de46364/813b2f73c_Group83.png"
-                                alt="Learning Ai"
-                                className="rounded-[28px] w-full h-full object-contain" />
-                        </div>
-                        <div>
-                            <h3 className="font-semibold text-gray-900">Word Puzzle Challenge</h3>
-                            <p className="text-sm text-gray-600">Drag and drop to complete the puzzle</p>
-                        </div>
-                    </div>
-                    <WordPuzzleGame item={item} category={category} />
-                </div>
 
                 {/* Fun Facts - Apple Style */}
                 <div>
