@@ -14,6 +14,8 @@ export default function WordPuzzleGame({ item, category }) {
   const [gameComplete, setGameComplete] = useState(false);
   const [showLevelComplete, setShowLevelComplete] = useState(false);
   const [completedSentence, setCompletedSentence] = useState('');
+  const [touchedTile, setTouchedTile] = useState(null);
+  const [touchPosition, setTouchPosition] = useState({ x: 0, y: 0 });
 
   useEffect(() => {
     generatePuzzle();
@@ -149,6 +151,71 @@ Level 1: words: ["H2O", "Molecule", "Liquid", "Life"], distractors: ["CO2", "Ato
     }
   };
 
+  // Touch handlers for iOS
+  const handleTouchStart = (e, word) => {
+    e.preventDefault();
+    setTouchedTile(word);
+    const touch = e.touches[0];
+    setTouchPosition({ x: touch.clientX, y: touch.clientY });
+  };
+
+  const handleTouchMove = (e) => {
+    e.preventDefault();
+    if (touchedTile) {
+      const touch = e.touches[0];
+      setTouchPosition({ x: touch.clientX, y: touch.clientY });
+    }
+  };
+
+  const handleTouchEnd = (e) => {
+    e.preventDefault();
+    if (!touchedTile) return;
+
+    const touch = e.changedTouches[0];
+    const element = document.elementFromPoint(touch.clientX, touch.clientY);
+    const slotElement = element?.closest('[data-slot-index]');
+    
+    if (slotElement) {
+      const slotIndex = parseInt(slotElement.getAttribute('data-slot-index'));
+      const slot = slots[slotIndex];
+      
+      if (slot.isEmpty) {
+        const isCorrect = touchedTile === slot.expected;
+        
+        if (isCorrect) {
+          const newSlots = [...slots];
+          newSlots[slotIndex] = { ...slot, word: touchedTile, isEmpty: false, isCorrect: true };
+          setSlots(newSlots);
+
+          const newTiles = tiles.map(t => 
+            t.word === touchedTile ? { ...t, isUsed: true } : t
+          );
+          setTiles(newTiles);
+
+          const sentence = levels[currentLevel]?.sentence || newSlots.map(s => s.word).join(' ');
+          setCompletedSentence(sentence);
+          
+          setTimeout(() => {
+            setShowLevelComplete(true);
+          }, 800);
+        } else {
+          const newSlots = [...slots];
+          newSlots[slotIndex] = { ...slot, isWrong: true };
+          setSlots(newSlots);
+
+          setTimeout(() => {
+            const resetSlots = [...slots];
+            resetSlots[slotIndex] = { ...slot, isWrong: false };
+            setSlots(resetSlots);
+          }, 600);
+        }
+      }
+    }
+    
+    setTouchedTile(null);
+    setTouchPosition({ x: 0, y: 0 });
+  };
+
   if (loading) {
     return (
       <div className="bg-white rounded-xl border border-gray-200 p-8">
@@ -242,6 +309,7 @@ Level 1: words: ["H2O", "Molecule", "Liquid", "Life"], distractors: ["CO2", "Ato
         {slots.map((slot, i) => (
           <motion.div
             key={i}
+            data-slot-index={i}
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: i * 0.1 }}
@@ -282,16 +350,33 @@ Level 1: words: ["H2O", "Molecule", "Liquid", "Life"], distractors: ["CO2", "Ato
               draggable
               onDragStart={(e) => handleDragStart(e, tile.word)}
               onDragEnd={handleDragEnd}
-              className="px-6 py-3 bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-full font-semibold text-base shadow-lg hover:shadow-xl transition-all cursor-grab active:cursor-grabbing hover:scale-105 active:scale-95"
+              onTouchStart={(e) => handleTouchStart(e, tile.word)}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
+              className="px-6 py-3 bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-full font-semibold text-base shadow-lg hover:shadow-xl transition-all cursor-grab active:cursor-grabbing hover:scale-105 active:scale-95 touch-none select-none"
               style={{
-                opacity: draggedWord === tile.word ? 0.5 : 1,
-                transform: draggedWord === tile.word ? 'scale(1.1)' : 'scale(1)'
+                opacity: (draggedWord === tile.word || touchedTile === tile.word) ? 0.5 : 1,
+                transform: (draggedWord === tile.word || touchedTile === tile.word) ? 'scale(1.1)' : 'scale(1)'
               }}>
               {tile.word}
             </motion.div>
           ))}
         </AnimatePresence>
       </div>
+
+      {/* Floating tile during touch */}
+      {touchedTile && (
+        <div
+          className="fixed pointer-events-none z-50 px-6 py-3 bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-full font-semibold text-base shadow-2xl"
+          style={{
+            left: touchPosition.x,
+            top: touchPosition.y,
+            transform: 'translate(-50%, -50%)',
+            opacity: 0.9
+          }}>
+          {touchedTile}
+        </div>
+      )}
 
       <style jsx>{`
         @keyframes shake {
