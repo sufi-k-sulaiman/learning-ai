@@ -12,6 +12,7 @@ import { motion } from 'framer-motion';
 import { BarChart, Bar, PieChart, Pie, Cell, LineChart, Line, RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import GamifiedLearning from '@/components/intelligence/GamifiedLearning';
 import KnowledgeChallenge from '@/components/intelligence/KnowledgeChallenge';
+import WordPuzzle from '@/components/intelligence/WordPuzzle';
 
 // Helper to extract domain from URL
 const extractDomain = (url) => {
@@ -719,6 +720,11 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                         </div>
                     </div>
         }
+
+                {/* Word Puzzle Game */}
+                <div>
+                    <WordPuzzle item={item} category={category} />
+                </div>
 
                 {/* Fun Facts - Apple Style */}
                 <div>
