@@ -64,8 +64,10 @@ Make it educational and fun!`,
         }
       });
 
-      setGameData(response);
-      initLevel(response.levels[0]);
+      if (response?.levels && response.levels.length > 0) {
+        setGameData(response);
+        initLevel(response.levels[0]);
+      }
     } catch (error) {
       console.error('Failed to generate game:', error);
     } finally {
@@ -74,6 +76,8 @@ Make it educational and fun!`,
   };
 
   const initLevel = (level) => {
+    if (!level || !level.words || level.words.length !== 4) return;
+    
     const shuffledWords = shuffle(level.words);
     const blank = Math.floor(Math.random() * 4);
     
@@ -188,7 +192,7 @@ Make it educational and fun!`,
 
   const handleNextLevel = () => {
     const nextLevel = currentLevel + 1;
-    if (nextLevel < gameData.levels.length) {
+    if (gameData?.levels && nextLevel < gameData.levels.length) {
       setCurrentLevel(nextLevel);
       initLevel(gameData.levels[nextLevel]);
     } else {
@@ -207,7 +211,21 @@ Make it educational and fun!`,
     );
   }
 
-  if (!gameData) return null;
+  if (!gameData || !gameData.levels || gameData.levels.length === 0) {
+    return (
+      <div className="bg-white rounded-xl border border-gray-200 p-8">
+        <div className="flex flex-col items-center justify-center py-12">
+          <p className="text-gray-500">Unable to generate puzzle. Please try again.</p>
+          <button
+            onClick={generateGame}
+            className="mt-4 px-6 py-3 rounded-full font-semibold text-white shadow-lg"
+            style={{ backgroundColor: category?.color }}>
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (gameComplete) {
     return (
