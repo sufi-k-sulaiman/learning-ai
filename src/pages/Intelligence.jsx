@@ -1195,15 +1195,15 @@ export default function Intelligence() {
                     {/* Header with Logo and Breadcrumbs */}
                     <div className="flex items-center justify-between px-3 sm:px-0 pb-1 sm:pb-2 gap-4">
                         <button
-                        onClick={() => handleBreadcrumbNavigate(0)}
-                        className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+              onClick={() => handleBreadcrumbNavigate(0)}
+              className="flex items-center gap-2 hover:opacity-80 transition-opacity">
 
                             <img
-                        src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6944bf3dc7235d670de46364/d3e2e95fc_LearningAi.png"
-                        alt="Learning Ai"
-                        className="h-7 sm:h-8 w-auto object-contain opacity-40" />
+                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6944bf3dc7235d670de46364/d3e2e95fc_LearningAi.png"
+                alt="Learning Ai"
+                className="h-7 sm:h-8 w-auto object-contain" />
 
-                            <h1 className="text-sm sm:text-base font-bold text-purple-600 opacity-40">Learning Ai</h1>
+                            <h1 className="text-sm sm:text-base font-bold text-gray-900">Learning Ai</h1>
                         </button>
                         
                         <Breadcrumb
@@ -1276,11 +1276,11 @@ export default function Intelligence() {
                     <div className="text-center py-6 border-t border-gray-200 mt-8">
                         <div className="flex items-center justify-center gap-2 mb-1">
                             <img
-                        src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6944bf3dc7235d670de46364/d3e2e95fc_LearningAi.png"
-                        alt="Learning Ai"
-                        className="h-5 w-auto object-contain opacity-40" />
+              src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6944bf3dc7235d670de46364/d3e2e95fc_LearningAi.png"
+              alt="Learning Ai"
+              className="h-5 w-auto object-contain" />
 
-                            <span className="text-base font-bold text-purple-600 opacity-40">Learning Ai</span>
+                            <span className="text-base font-bold text-gray-900">Learning Ai</span>
                         </div>
                         <p className="text-xs text-gray-500">Gamified learning & education</p>
                     </div>
