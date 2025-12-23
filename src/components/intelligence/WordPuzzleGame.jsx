@@ -378,7 +378,7 @@ Level 1: words: ["H2O", "Molecule", "Liquid", "Life"], distractors: ["CO2", "Ato
         </div>
       )}
 
-      <style jsx>{`
+      <style>{`
         @keyframes shake {
           0%, 100% { transform: translateX(0); }
           20% { transform: translateX(-10px); }
