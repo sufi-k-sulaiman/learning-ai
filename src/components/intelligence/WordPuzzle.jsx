@@ -14,6 +14,7 @@ export default function WordPuzzle({ item, category }) {
   const [draggedWord, setDraggedWord] = useState(null);
   const [showExplanation, setShowExplanation] = useState(false);
   const [explanation, setExplanation] = useState('');
+  const [selectedTile, setSelectedTile] = useState(null);
 
   useEffect(() => {
     generateGame();
@@ -94,6 +95,7 @@ Make it educational and fun!`,
     setBlankIndex(blank);
     setShowExplanation(false);
     setExplanation(level.explanation || '');
+    setSelectedTile(null);
   };
 
   const handleDragStart = (e, word) => {
@@ -142,6 +144,46 @@ Make it educational and fun!`,
     }
 
     setDraggedWord(null);
+  };
+
+  const handleTileClick = (word) => {
+    setSelectedTile(word);
+  };
+
+  const handleSlotClick = (slotIndex) => {
+    if (slotIndex !== blankIndex || !selectedTile) return;
+
+    const correctWord = slots[slotIndex].word;
+    
+    if (selectedTile === correctWord) {
+      // Correct answer
+      const newSlots = [...slots];
+      newSlots[slotIndex] = { ...newSlots[slotIndex], isEmpty: false, isCorrect: true };
+      setSlots(newSlots);
+
+      const newTiles = tiles.map(t => 
+        t.word === selectedTile ? { ...t, isUsed: true } : t
+      );
+      setTiles(newTiles);
+
+      setSelectedTile(null);
+
+      // Show explanation
+      setTimeout(() => {
+        setShowExplanation(true);
+      }, 800);
+    } else {
+      // Wrong answer
+      const newSlots = [...slots];
+      newSlots[slotIndex] = { ...newSlots[slotIndex], isWrong: true };
+      setSlots(newSlots);
+
+      setTimeout(() => {
+        const resetSlots = [...newSlots];
+        resetSlots[slotIndex] = { ...resetSlots[slotIndex], isWrong: false };
+        setSlots(resetSlots);
+      }, 600);
+    }
   };
 
   const handleNextLevel = () => {
@@ -212,9 +254,11 @@ Make it educational and fun!`,
             transition={{ delay: index * 0.1 }}
             onDragOver={handleDragOver}
             onDrop={(e) => handleDrop(e, index)}
+            onClick={() => handleSlotClick(index)}
             className={`
               aspect-square rounded-2xl flex items-center justify-center text-xl font-bold
-              transition-all duration-300 cursor-default
+              transition-all duration-300
+              ${slot.isEmpty ? 'cursor-pointer' : 'cursor-default'}
               ${slot.isEmpty ? 
                 'bg-white border-4 border-dashed border-purple-300 text-gray-400' : 
                 slot.isCorrect ?
@@ -241,9 +285,12 @@ Make it educational and fun!`,
               transition={{ delay: index * 0.05 }}
               draggable
               onDragStart={(e) => handleDragStart(e, tile.word)}
-              className="px-5 py-3 bg-white rounded-full border-2 border-purple-300 text-gray-900 font-semibold
-                       cursor-grab active:cursor-grabbing hover:shadow-lg hover:scale-105 transition-all
-                       hover:border-purple-500 select-none">
+              onClick={() => handleTileClick(tile.word)}
+              className={`px-5 py-3 rounded-full border-2 text-gray-900 font-semibold
+                       cursor-pointer hover:shadow-lg hover:scale-105 transition-all select-none
+                       ${selectedTile === tile.word ? 
+                         'bg-purple-500 text-white border-purple-600 shadow-lg scale-105' : 
+                         'bg-white border-purple-300 hover:border-purple-500'}`}>
               {tile.word}
             </motion.div>
           ))}
