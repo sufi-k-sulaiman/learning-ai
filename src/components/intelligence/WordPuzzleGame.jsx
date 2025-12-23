@@ -242,17 +242,16 @@ Level 5-6: Advanced/technical terms`,
               }}
               onDragEnd={() => setDraggedWord(null)}
               className={`
-                w-36 h-20 rounded-2xl flex items-center justify-center text-base font-bold
-                bg-gradient-to-br from-purple-600 to-purple-800 border-2 border-purple-400
+                w-36 h-20 rounded-3xl flex items-center justify-center text-base font-bold
+                bg-white/30 backdrop-blur-sm border-2 border-white/40
                 cursor-grab active:cursor-grabbing shadow-lg
                 hover:scale-110 hover:shadow-2xl transition-all duration-200
                 ${draggedWord === tile.word ? 'opacity-50 scale-95' : ''}
               `}
               style={{
-                transformStyle: 'preserve-3d',
-                textShadow: '0 2px 8px rgba(0,0,0,0.3)'
+                transformStyle: 'preserve-3d'
               }}>
-              <span className="text-white drop-shadow-lg">{tile.word}</span>
+              <span className="text-purple-200 font-bold">{tile.word}</span>
             </motion.div>
           ))}
         </AnimatePresence>
