@@ -12,7 +12,6 @@ import { motion } from 'framer-motion';
 import { BarChart, Bar, PieChart, Pie, Cell, LineChart, Line, RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import GamifiedLearning from '@/components/intelligence/GamifiedLearning';
 import KnowledgeChallenge from '@/components/intelligence/KnowledgeChallenge';
-import WordPuzzle from '@/components/intelligence/WordPuzzle';
 
 // Helper to extract domain from URL
 const extractDomain = (url) => {
@@ -329,7 +328,7 @@ function Breadcrumb({ items, onNavigate, onMenuClick }) {
             'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}`
             }>
 
-                            {index === 0 ? <Home className="w-4 h-4" /> : item.label}
+                            {index === 0 ? 'Home' : item.label}
                         </button>
                     </React.Fragment>
         )}
@@ -720,9 +719,6 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                         </div>
                     </div>
         }
-
-                {/* Word Puzzle Game */}
-                <WordPuzzle item={item} category={category} />
 
                 {/* Fun Facts - Apple Style */}
                 <div>
