@@ -329,7 +329,7 @@ function Breadcrumb({ items, onNavigate, onMenuClick }) {
             'text-gray-600 hover:text-gray-900 hover:bg-gray-50'}`
             }>
 
-                            {index === 0 ? 'Home' : item.label}
+                            {index === 0 ? <Home className="w-4 h-4" /> : item.label}
                         </button>
                     </React.Fragment>
         )}
