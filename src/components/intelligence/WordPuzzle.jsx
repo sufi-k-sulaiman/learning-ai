@@ -12,6 +12,8 @@ export default function WordPuzzle({ item, category }) {
   const [blankIndex, setBlankIndex] = useState(0);
   const [gameComplete, setGameComplete] = useState(false);
   const [draggedWord, setDraggedWord] = useState(null);
+  const [showExplanation, setShowExplanation] = useState(false);
+  const [explanation, setExplanation] = useState('');
 
   useEffect(() => {
     generateGame();
@@ -35,9 +37,10 @@ export default function WordPuzzle({ item, category }) {
       const response = await base44.integrations.Core.InvokeLLM({
         prompt: `Create a word puzzle game about "${item}" (${category?.name}):
         
-Generate 4 levels, each with:
+Generate 8 levels, each with:
 - 4 words that form a meaningful sequence or are strongly related to ${item}
 - 4 distractor words that are plausible but incorrect
+- explanation: A short educational paragraph (2-3 sentences) explaining why these words are important to ${item}
 
 Make it educational and fun!`,
         response_json_schema: {
@@ -49,11 +52,12 @@ Make it educational and fun!`,
                 type: "object",
                 properties: {
                   words: { type: "array", items: { type: "string" }, minItems: 4, maxItems: 4 },
-                  distractors: { type: "array", items: { type: "string" }, minItems: 4, maxItems: 4 }
+                  distractors: { type: "array", items: { type: "string" }, minItems: 4, maxItems: 4 },
+                  explanation: { type: "string" }
                 }
               },
-              minItems: 4,
-              maxItems: 4
+              minItems: 8,
+              maxItems: 8
             }
           }
         }
@@ -88,6 +92,8 @@ Make it educational and fun!`,
     setSlots(slotData);
     setTiles(tileData);
     setBlankIndex(blank);
+    setShowExplanation(false);
+    setExplanation(level.explanation || '');
   };
 
   const handleDragStart = (e, word) => {
@@ -118,16 +124,10 @@ Make it educational and fun!`,
       );
       setTiles(newTiles);
 
-      // Move to next level after delay
+      // Show explanation
       setTimeout(() => {
-        const nextLevel = currentLevel + 1;
-        if (nextLevel < gameData.levels.length) {
-          setCurrentLevel(nextLevel);
-          initLevel(gameData.levels[nextLevel]);
-        } else {
-          setGameComplete(true);
-        }
-      }, 1500);
+        setShowExplanation(true);
+      }, 800);
     } else {
       // Wrong answer
       const newSlots = [...slots];
@@ -142,6 +142,16 @@ Make it educational and fun!`,
     }
 
     setDraggedWord(null);
+  };
+
+  const handleNextLevel = () => {
+    const nextLevel = currentLevel + 1;
+    if (nextLevel < gameData.levels.length) {
+      setCurrentLevel(nextLevel);
+      initLevel(gameData.levels[nextLevel]);
+    } else {
+      setGameComplete(true);
+    }
   };
 
   if (loading) {
@@ -220,7 +230,7 @@ Make it educational and fun!`,
       </div>
 
       {/* Tiles */}
-      <div className="flex flex-wrap justify-center gap-3">
+      <div className="flex flex-wrap justify-center gap-3 mb-6">
         <AnimatePresence>
           {tiles.filter(t => !t.isUsed).map((tile, index) => (
             <motion.div
@@ -239,6 +249,31 @@ Make it educational and fun!`,
           ))}
         </AnimatePresence>
       </div>
+
+      {/* Explanation Section */}
+      <AnimatePresence>
+        {showExplanation && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="bg-white rounded-xl p-6 shadow-lg border-2 border-green-300">
+            <div className="flex items-start gap-3 mb-4">
+              <Sparkles className="w-6 h-6 flex-shrink-0" style={{ color: category?.color }} />
+              <div>
+                <h4 className="font-bold text-gray-900 mb-2">Perfect! 🎉</h4>
+                <p className="text-gray-700 leading-relaxed">{explanation}</p>
+              </div>
+            </div>
+            <button
+              onClick={handleNextLevel}
+              className="w-full py-3 rounded-full font-semibold text-white shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+              style={{ backgroundColor: category?.color }}>
+              {currentLevel + 1 < gameData.levels.length ? 'Next Level →' : 'Complete! 🎉'}
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <style jsx>{`
         @keyframes shake {
