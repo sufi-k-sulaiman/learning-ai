@@ -259,6 +259,21 @@ Level 1: words: ["H2O", "Molecule", "Liquid", "Life"], distractors: ["CO2", "Ato
 
   const currentLevelData = levels[currentLevel];
 
+  if (!currentLevelData || !slots.length || !tiles.length) {
+    return (
+      <div className="bg-white rounded-xl border border-gray-200 p-8">
+        <div className="flex flex-col items-center justify-center py-12">
+          <p className="text-gray-500">Unable to load puzzle data</p>
+          <button
+            onClick={generatePuzzle}
+            className="mt-4 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl border border-purple-200 p-6 relative">
       {/* Level Complete Overlay */}
