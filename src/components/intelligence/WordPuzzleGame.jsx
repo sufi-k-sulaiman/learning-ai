@@ -12,7 +12,7 @@ export default function WordPuzzleGame({ item, category }) {
   const [emptyIndex, setEmptyIndex] = useState(0);
   const [draggedWord, setDraggedWord] = useState(null);
   const [gameComplete, setGameComplete] = useState(false);
-  const [showSentence, setShowSentence] = useState(false);
+  const [showLevelComplete, setShowLevelComplete] = useState(false);
   const [completedSentence, setCompletedSentence] = useState('');
 
   useEffect(() => {
@@ -116,17 +116,10 @@ Level 1: words: ["H2O", "Molecule", "Liquid", "Life"], distractors: ["CO2", "Ato
       // Show the completed sentence
       const sentence = levels[currentLevel]?.sentence || newSlots.map(s => s.word).join(' ');
       setCompletedSentence(sentence);
-      setShowSentence(true);
-
+      
       setTimeout(() => {
-        setShowSentence(false);
-        if (currentLevel < levels.length - 1) {
-          setCurrentLevel(currentLevel + 1);
-          initLevel(levels[currentLevel + 1]);
-        } else {
-          setGameComplete(true);
-        }
-      }, 2500);
+        setShowLevelComplete(true);
+      }, 800);
     } else {
       const newSlots = [...slots];
       newSlots[slotIndex] = { ...slot, isWrong: true };
@@ -142,6 +135,16 @@ Level 1: words: ["H2O", "Molecule", "Liquid", "Life"], distractors: ["CO2", "Ato
 
   const handleDragOver = (e) => {
     e.preventDefault();
+  };
+
+  const handleContinue = () => {
+    setShowLevelComplete(false);
+    if (currentLevel < levels.length - 1) {
+      setCurrentLevel(currentLevel + 1);
+      initLevel(levels[currentLevel + 1]);
+    } else {
+      setGameComplete(true);
+    }
   };
 
   if (loading) {
@@ -182,7 +185,42 @@ Level 1: words: ["H2O", "Molecule", "Liquid", "Life"], distractors: ["CO2", "Ato
   const currentLevelData = levels[currentLevel];
 
   return (
-    <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl border border-purple-200 p-6">
+    <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-xl border border-purple-200 p-6 relative">
+      {/* Level Complete Overlay */}
+      <AnimatePresence>
+        {showLevelComplete && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-black/50 rounded-xl flex items-center justify-center z-50 p-4">
+            <motion.div
+              initial={{ scale: 0.8, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.8, y: 20 }}
+              className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl">
+              <div className="text-center mb-4">
+                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center">
+                  <Trophy className="w-8 h-8 text-white" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">Perfect! ✨</h3>
+                <p className="text-lg font-semibold mb-3" style={{ color: category?.color }}>
+                  "{completedSentence}"
+                </p>
+                <p className="text-gray-600">
+                  You've completed level {currentLevel + 1}! This sentence perfectly captures an important aspect of {item}.
+                </p>
+              </div>
+              <button
+                onClick={handleContinue}
+                className="w-full py-3 rounded-xl font-semibold text-white shadow-lg hover:shadow-xl transition-all"
+                style={{ backgroundColor: category?.color }}>
+                {currentLevel < levels.length - 1 ? 'Continue to Next Level' : 'See Final Results'}
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <div className="mb-6 text-center">
         <h3 className="text-xl font-bold text-gray-900 mb-2">Word Puzzle Challenge</h3>
         <p className="text-sm text-gray-600 mb-4">{currentLevelData?.hint}</p>
@@ -192,21 +230,6 @@ Level 1: words: ["H2O", "Molecule", "Liquid", "Life"], distractors: ["CO2", "Ato
             {currentLevel + 1} / {levels.length}
           </span>
         </div>
-
-        {/* Completed Sentence Display */}
-        <AnimatePresence>
-          {showSentence && (
-            <motion.div
-              initial={{ opacity: 0, y: -20, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 20, scale: 0.9 }}
-              className="mt-4 p-4 bg-gradient-to-r from-green-400 to-emerald-500 rounded-2xl shadow-lg">
-              <p className="text-white font-bold text-lg">
-                ✨ {completedSentence} ✨
-              </p>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
 
       {/* 2x2 Grid */}
