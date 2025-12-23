@@ -191,7 +191,7 @@ Level 5-6: Advanced/technical terms`,
       </div>
 
       {/* Slots */}
-      <div className="flex flex-wrap justify-center gap-4 mb-8 perspective-1000">
+      <div className="grid grid-cols-2 gap-4 max-w-xl mx-auto mb-8 perspective-1000">
         {slots.map((slot) => (
           <motion.div
             key={slot.id}
@@ -205,7 +205,7 @@ Level 5-6: Advanced/technical terms`,
               handleDrop(slot.id, word);
             }}
             className={`
-              w-40 h-24 rounded-2xl flex items-center justify-center text-lg font-bold
+              w-full h-32 rounded-2xl flex items-center justify-center text-lg font-bold
               transition-all duration-300 cursor-pointer shadow-lg
               ${slot.isBlank 
                 ? 'bg-gradient-to-br from-indigo-800 to-purple-800 border-2 border-dashed border-white/50' 
