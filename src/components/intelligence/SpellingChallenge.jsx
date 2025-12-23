@@ -81,10 +81,14 @@ Make words progressively harder. Focus on technical terms, scientific names, or 
 
     const { source, destination } = result;
 
-    if (destination.droppableId === 'blank-space') {
+    if (destination.droppableId === 'blank-space' && source.droppableId === 'word-bank') {
       const word = availableWords[source.index];
       setDroppedWord(word);
       setAvailableWords(availableWords.filter((_, i) => i !== source.index));
+    } else if (source.droppableId === 'blank-space' && destination.droppableId === 'word-bank') {
+      // Moving word back from blank to bank
+      setAvailableWords([...availableWords, droppedWord]);
+      setDroppedWord(null);
     }
   };
 
@@ -239,7 +243,7 @@ Make words progressively harder. Focus on technical terms, scientific names, or 
                 <React.Fragment key={i}>
                   <span className="text-gray-700">{part}</span>
                   {i < level.sentence.split('_____').length - 1 && (
-                    <Droppable droppableId="blank-space" isDropDisabled={showResult || droppedWord !== null}>
+                    <Droppable droppableId="blank-space">
                       {(provided, snapshot) => (
                         <span
                           ref={provided.innerRef}
@@ -249,11 +253,23 @@ Make words progressively harder. Focus on technical terms, scientific names, or 
                             droppedWord ? 'border-purple-500 bg-purple-50' :
                             'border-gray-300 bg-white'
                           }`}
+                          style={{ display: 'inline-flex' }}
                         >
                           {droppedWord ? (
-                            <span className="font-bold text-gray-900">{droppedWord}</span>
+                            <Draggable draggableId={`placed-${droppedWord}`} index={0} isDragDisabled={showResult}>
+                              {(provided) => (
+                                <span
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
+                                  className="font-bold text-gray-900"
+                                >
+                                  {droppedWord}
+                                </span>
+                              )}
+                            </Draggable>
                           ) : (
-                            <span className="text-gray-400 text-sm">Drop word here</span>
+                            <span className="text-gray-400 text-sm">Drop here</span>
                           )}
                           {provided.placeholder}
                         </span>
@@ -268,21 +284,23 @@ Make words progressively harder. Focus on technical terms, scientific names, or 
           {/* Available Words */}
           <div className="mb-6">
             <h4 className="text-sm font-semibold text-gray-600 mb-3">Drag a word to complete the sentence:</h4>
-            <Droppable droppableId="word-bank" direction="horizontal" isDropDisabled={showResult}>
+            <Droppable droppableId="word-bank" direction="horizontal">
               {(provided) => (
                 <div
                   ref={provided.innerRef}
                   {...provided.droppableProps}
-                  className="flex flex-wrap gap-3"
+                  className="flex flex-wrap gap-3 min-h-[60px]"
                 >
                   {availableWords.map((word, index) => (
-                    <Draggable key={word} draggableId={word} index={index} isDragDisabled={showResult}>
+                    <Draggable key={`word-${word}-${index}`} draggableId={`word-${word}-${index}`} index={index} isDragDisabled={showResult}>
                       {(provided, snapshot) => (
                         <div
                           ref={provided.innerRef}
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
-                          className={`px-6 py-3 rounded-xl font-semibold text-gray-900 border-2 shadow-sm transition-all cursor-move ${
+                          className={`px-6 py-3 rounded-xl font-semibold text-gray-900 border-2 shadow-sm transition-all ${
+                            showResult ? 'cursor-default' : 'cursor-move'
+                          } ${
                             snapshot.isDragging ? 'border-purple-500 bg-purple-50 shadow-lg scale-105' :
                             'border-gray-200 bg-white hover:border-gray-300 hover:shadow-md'
                           }`}
