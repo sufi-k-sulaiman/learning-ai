@@ -12,6 +12,8 @@ export default function WordPuzzleGame({ item, category }) {
   const [emptyIndex, setEmptyIndex] = useState(0);
   const [draggedWord, setDraggedWord] = useState(null);
   const [gameComplete, setGameComplete] = useState(false);
+  const [showSentence, setShowSentence] = useState(false);
+  const [completedSentence, setCompletedSentence] = useState('');
 
   useEffect(() => {
     generatePuzzle();
@@ -24,28 +26,30 @@ export default function WordPuzzleGame({ item, category }) {
 
     try {
       const response = await base44.integrations.Core.InvokeLLM({
-        prompt: `Create 5 word puzzle levels about "${item}". Each level has 4 related words that form a sentence or phrase.
+        prompt: `Create 8 word puzzle levels about "${item}". Each level has 4 related words that form a meaningful sentence or phrase.
         
 For each level provide:
-- words: array of 4 words that belong together (in correct order)
+- words: array of 4 words that form a sentence/phrase (in correct order)
 - distractors: array of 4 misleading words that don't fit
 - hint: a short hint about what connects the words
+- sentence: the complete sentence formed by the 4 words
 
 Example for "Water":
-Level 1: words: ["H2O", "Molecule", "Liquid", "Life"], distractors: ["CO2", "Atom", "Gas", "Death"]`,
+Level 1: words: ["H2O", "Molecule", "Liquid", "Life"], distractors: ["CO2", "Atom", "Gas", "Death"], sentence: "H2O Molecule Liquid Life"`,
         response_json_schema: {
           type: "object",
           properties: {
             levels: {
               type: "array",
-              minItems: 5,
-              maxItems: 5,
+              minItems: 8,
+              maxItems: 8,
               items: {
                 type: "object",
                 properties: {
                   words: { type: "array", items: { type: "string" }, minItems: 4, maxItems: 4 },
                   distractors: { type: "array", items: { type: "string" }, minItems: 4, maxItems: 4 },
-                  hint: { type: "string" }
+                  hint: { type: "string" },
+                  sentence: { type: "string" }
                 }
               }
             }
@@ -109,14 +113,20 @@ Level 1: words: ["H2O", "Molecule", "Liquid", "Life"], distractors: ["CO2", "Ato
       );
       setTiles(newTiles);
 
+      // Show the completed sentence
+      const sentence = levels[currentLevel]?.sentence || newSlots.map(s => s.word).join(' ');
+      setCompletedSentence(sentence);
+      setShowSentence(true);
+
       setTimeout(() => {
+        setShowSentence(false);
         if (currentLevel < levels.length - 1) {
           setCurrentLevel(currentLevel + 1);
           initLevel(levels[currentLevel + 1]);
         } else {
           setGameComplete(true);
         }
-      }, 1500);
+      }, 2500);
     } else {
       const newSlots = [...slots];
       newSlots[slotIndex] = { ...slot, isWrong: true };
@@ -182,6 +192,21 @@ Level 1: words: ["H2O", "Molecule", "Liquid", "Life"], distractors: ["CO2", "Ato
             {currentLevel + 1} / {levels.length}
           </span>
         </div>
+
+        {/* Completed Sentence Display */}
+        <AnimatePresence>
+          {showSentence && (
+            <motion.div
+              initial={{ opacity: 0, y: -20, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.9 }}
+              className="mt-4 p-4 bg-gradient-to-r from-green-400 to-emerald-500 rounded-2xl shadow-lg">
+              <p className="text-white font-bold text-lg">
+                ✨ {completedSentence} ✨
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
       {/* 2x2 Grid */}
