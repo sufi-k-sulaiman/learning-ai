@@ -74,7 +74,10 @@ Level 1: words: ["H2O", "Molecule", "Liquid", "Life"], distractors: ["CO2", "Ato
   };
 
   const initLevel = (level) => {
-    if (!level || !level.words) return;
+    if (!level || !level.words || !Array.isArray(level.words) || level.words.length !== 4) {
+      console.error('Invalid level data:', level);
+      return;
+    }
 
     const emptyIdx = Math.floor(Math.random() * 4);
     setEmptyIndex(emptyIdx);
