@@ -122,6 +122,34 @@ const CATEGORIES = {
     gradient: "from-purple-500 to-indigo-500",
     items: ["Universe", "Galaxy", "Solar System", "Planets", "Asteroids", "Comets", "Black Holes", "Nebulae", "Constellations", "Exoplanets", "Supernovae", "Pulsars", "Quasars", "Dark Matter", "Dark Energy"]
   },
+  Physics: {
+    name: "Physics",
+    icon: Atom,
+    color: "#0EA5E9",
+    gradient: "from-sky-500 to-blue-500",
+    items: ["Classical Mechanics", "Thermodynamics", "Electromagnetism", "Optics", "Quantum Mechanics", "Relativity", "Nuclear", "Particle", "Astrophysics", "Cosmology", "Condensed Matter", "Statistical", "Plasma", "Acoustics", "Geophysics", "Biophysics", "Computational", "Mathematical"]
+  },
+  Chemistry: {
+    name: "Chemistry",
+    icon: FlaskConical,
+    color: "#10B981",
+    gradient: "from-emerald-500 to-green-500",
+    items: ["Organic", "Inorganic", "Physical", "Analytical", "Biochemical", "Theoretical", "Environmental", "Industrial", "Nuclear", "Materials", "Polymer", "Medicinal", "Computational", "Supramolecular", "Quantum", "Electrochemical", "Geochemical"]
+  },
+  Biology: {
+    name: "Biology",
+    icon: Leaf,
+    color: "#84CC16",
+    gradient: "from-lime-500 to-green-600",
+    items: ["Cell Biology", "Molecular Biology", "Genetics", "Evolutionary Biology", "Ecology", "Physiology", "Anatomy", "Microbiology", "Botany", "Zoology", "Biochemistry", "Developmental Biology", "Marine Biology", "Environmental Biology", "Immunology", "Neuroscience", "Biotechnology"]
+  },
+  Mathematics: {
+    name: "Mathematics",
+    icon: Calculator,
+    color: "#F59E0B",
+    gradient: "from-amber-500 to-yellow-500",
+    items: ["Arithmetic", "Algebra", "Geometry", "Trigonometry", "Calculus", "Analysis", "Number Theory", "Topology", "Discrete Mathematics", "Logic", "Set Theory", "Probability", "Statistics", "Applied Mathematics", "Mathematical Physics", "Computational Mathematics", "Differential Equations", "Mathematical Modeling"]
+  },
   Energy_Utilities: {
     name: "Energy & Utilities",
     icon: Zap,
