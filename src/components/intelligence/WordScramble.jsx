@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Shuffle, Trophy, Star, Loader2, RotateCcw, Lightbulb } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
+import { BookOpen, Trophy, Star, Loader2, RotateCcw, Lightbulb, CheckCircle2, XCircle, Sparkles } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import confetti from 'canvas-confetti';
 
@@ -8,33 +8,39 @@ export default function WordScramble({ item, category }) {
   const [loading, setLoading] = useState(true);
   const [words, setWords] = useState([]);
   const [currentWord, setCurrentWord] = useState(0);
-  const [userAnswer, setUserAnswer] = useState('');
+  const [userInputs, setUserInputs] = useState([]);
   const [gameState, setGameState] = useState('loading'); // loading, playing, correct, wrong, complete
   const [score, setScore] = useState(0);
   const [hintsUsed, setHintsUsed] = useState(0);
   const [showHint, setShowHint] = useState(false);
+  const [error, setError] = useState(null);
+  const inputRefs = useRef([]);
 
   useEffect(() => {
-    loadWords();
+    if (item) {
+      loadWords();
+    }
   }, [item]);
 
   const loadWords = async () => {
     setLoading(true);
     setGameState('loading');
+    setError(null);
 
     try {
       const response = await base44.integrations.Core.InvokeLLM({
-        prompt: `Generate 10 key terms/words related to "${item}" (${category?.name}) for a word scramble game.
+        prompt: `Generate 8 key vocabulary terms related to "${item}" (${category?.name || 'general'}) for a fill-in-the-blanks learning game.
         
         For each word provide:
-        1. word: the term (1-3 words max, use underscores for multi-word terms like "quantum_mechanics")
-        2. hint: a helpful hint/clue about the word (10-15 words)
-        3. definition: brief definition (15-20 words)
+        1. word: the term (single word, 4-12 letters, no spaces or underscores)
+        2. meaning: a clear definition explaining what this term means (15-25 words)
+        3. importance: why this term matters or its significance related to ${item} (15-25 words)
+        4. hint: first letter and last letter hint format like "Starts with 'P', ends with 'S'"
         
         Choose words that are:
-        - Important concepts related to the topic
-        - Not too easy, not too hard
-        - Educational and interesting
+        - Important vocabulary related to the topic
+        - Educational and commonly used terms
+        - Single words only (no phrases)
         - Mix of different difficulty levels`,
         response_json_schema: {
           type: "object",
@@ -45,35 +51,58 @@ export default function WordScramble({ item, category }) {
                 type: "object",
                 properties: {
                   word: { type: "string" },
-                  hint: { type: "string" },
-                  definition: { type: "string" }
+                  meaning: { type: "string" },
+                  importance: { type: "string" },
+                  hint: { type: "string" }
                 }
               },
-              minItems: 10,
-              maxItems: 10
+              minItems: 8,
+              maxItems: 8
             }
           }
         }
       });
 
-      setWords(response.words || []);
-      setGameState('playing');
-    } catch (error) {
-      console.error('Failed to load words:', error);
-      setGameState('loading');
+      const validWords = (response?.words || []).filter(w => w?.word && w.word.length >= 3);
+      
+      if (validWords.length === 0) {
+        setError('Could not generate words. Please try again.');
+        setGameState('error');
+      } else {
+        setWords(validWords);
+        // Initialize inputs for first word
+        const firstWordLength = validWords[0].word.replace(/[^a-zA-Z]/g, '').length;
+        setUserInputs(new Array(firstWordLength).fill(''));
+        setGameState('playing');
+      }
+    } catch (err) {
+      console.error('Failed to load words:', err);
+      setError('Failed to load the game. Please try again.');
+      setGameState('error');
     } finally {
       setLoading(false);
     }
   };
 
-  const scrambleWord = (word) => {
-    const cleaned = word.replace(/_/g, '').toUpperCase();
-    const arr = cleaned.split('');
-    for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]];
+  // Generate blanks with some letters revealed
+  const generateBlanks = (word) => {
+    if (!word) return [];
+    const cleanWord = word.toUpperCase().replace(/[^A-Z]/g, '');
+    const blanks = [];
+    
+    // Reveal first letter, last letter, and ~30% of middle letters
+    for (let i = 0; i < cleanWord.length; i++) {
+      const isFirst = i === 0;
+      const isLast = i === cleanWord.length - 1;
+      const revealMiddle = Math.random() < 0.3 && cleanWord.length > 4;
+      
+      blanks.push({
+        letter: cleanWord[i],
+        revealed: isFirst || isLast || revealMiddle,
+        index: i
+      });
     }
-    return arr.join('');
+    return blanks;
   };
 
   const handleSubmit = (e) => {
