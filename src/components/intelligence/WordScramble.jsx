@@ -197,7 +197,25 @@ export default function WordScramble({ item, category }) {
       <div className="bg-white rounded-xl border border-gray-200 p-6">
         <div className="flex flex-col items-center justify-center py-8">
           <Loader2 className="w-10 h-10 animate-spin mb-4" style={{ color: category?.color }} />
-          <p className="text-gray-500">Loading word scramble...</p>
+          <p className="text-gray-500">Loading vocabulary game...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (gameState === 'error' || !words.length) {
+    return (
+      <div className="bg-white rounded-xl border border-gray-200 p-6">
+        <div className="flex flex-col items-center justify-center py-8">
+          <XCircle className="w-10 h-10 mb-4 text-red-500" />
+          <p className="text-gray-700 font-medium mb-2">Failed to load game</p>
+          <p className="text-gray-500 text-sm mb-4">{error || 'Please try again'}</p>
+          <button
+            onClick={loadWords}
+            className="px-4 py-2 rounded-lg font-medium text-white"
+            style={{ backgroundColor: category?.color }}>
+            Try Again
+          </button>
         </div>
       </div>
     );
