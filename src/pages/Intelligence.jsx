@@ -136,13 +136,6 @@ const CATEGORIES = {
     gradient: "from-teal-500 to-emerald-500",
     items: ["Cell Biology", "Molecular Biology", "Genetics", "Evolutionary Biology", "Ecology", "Physiology", "Anatomy", "Microbiology", "Botany", "Zoology", "Biochemistry", "Developmental Biology", "Marine Biology", "Environmental Biology", "Immunology", "Neuroscience", "Biotechnology"]
   },
-  Chemistry: {
-    name: "Chemistry",
-    icon: FlaskConical,
-    color: "#8B5CF6",
-    gradient: "from-violet-500 to-purple-500",
-    items: ["Organic", "Inorganic", "Physical", "Analytical", "Biochemical", "Theoretical", "Environmental", "Industrial", "Nuclear", "Materials", "Polymer", "Medicinal", "Computational", "Supramolecular", "Quantum", "Electrochemical", "Geochemical"]
-  },
   Energy_Utilities: {
     name: "Energy & Utilities",
     icon: Zap,
