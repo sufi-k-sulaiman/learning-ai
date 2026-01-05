@@ -113,7 +113,7 @@ const CATEGORIES = {
     icon: Zap,
     color: "#F59E0B",
     gradient: "from-amber-500 to-orange-500",
-    items: ["Gravity", "Seasons", "Weather", "Energy", "Time", "Magnetism", "Water Cycle", "Life Cycles", "Tectonic Activity", "Evolution", "Photosynthesis", "Carbon Cycle", "Erosion", "Radiation"]
+    items: ["Gravity", "Seasons", "Weather", "Energy", "Time", "Magnetism", "Water Cycle", "Life Cycles", "Tectonic Activity", "Evolution", "Photosynthesis", "Carbon Cycle", "Erosion", "Radiation", "Fog", "Mist", "Hail", "Sleet", "Dew", "Frost", "Windstorms", "Tornadoes", "Rainbows", "Heatwaves", "Cold snaps", "Drought", "Volcanic eruptions", "Landslides", "Avalanches", "Geysers", "Hot springs", "Sinkholes", "Tectonic plate movement", "Sedimentation", "Weathering", "Currents", "Upwelling", "Whirlpools", "Floods", "Rip tides", "Rip currents"]
   },
   Cosmic_Celestial: {
     name: "Cosmic & Celestial",
