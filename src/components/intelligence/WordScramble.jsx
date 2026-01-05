@@ -237,11 +237,11 @@ export default function WordScramble({ item, category }) {
             transition={{ type: "spring", duration: 0.5 }}
             className="w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center"
             style={{ backgroundColor: `${category?.color}15` }}>
-            <Shuffle className="w-12 h-12" style={{ color: category?.color }} />
+            <BookOpen className="w-12 h-12" style={{ color: category?.color }} />
           </motion.div>
 
-          <h3 className="text-3xl font-bold text-gray-900 mb-3">Scramble Complete! 🎯</h3>
-          <p className="text-gray-600 text-lg mb-8">You unscrambled the {item} vocabulary!</p>
+          <h3 className="text-3xl font-bold text-gray-900 mb-3">Vocabulary Complete! 🎯</h3>
+          <p className="text-gray-600 text-lg mb-8">You mastered {item} vocabulary!</p>
 
           <div className="grid grid-cols-3 gap-4 max-w-lg mx-auto mb-8">
             <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
@@ -262,7 +262,7 @@ export default function WordScramble({ item, category }) {
             {percentage >= 80 && (
               <div className="inline-flex items-center gap-2 px-6 py-3 bg-yellow-50 text-yellow-800 rounded-full border-2 border-yellow-200">
                 <Trophy className="w-6 h-6" />
-                <span className="font-bold text-lg">Word Master! 🌟</span>
+                <span className="font-bold text-lg">Vocabulary Master! 🌟</span>
               </div>
             )}
             {percentage >= 60 && percentage < 80 && (
@@ -273,7 +273,7 @@ export default function WordScramble({ item, category }) {
             )}
             {percentage < 60 && (
               <div className="inline-flex items-center gap-2 px-6 py-3 bg-purple-50 text-purple-800 rounded-full border-2 border-purple-200">
-                <Shuffle className="w-6 h-6" />
+                <BookOpen className="w-6 h-6" />
                 <span className="font-bold text-lg">Keep Learning!</span>
               </div>
             )}
