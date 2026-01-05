@@ -12,6 +12,7 @@ import { motion } from 'framer-motion';
 import { BarChart, Bar, PieChart, Pie, Cell, LineChart, Line, RadarChart, Radar, PolarGrid, PolarAngleAxis, ResponsiveContainer, XAxis, YAxis, Tooltip, Legend } from 'recharts';
 import GamifiedLearning from '@/components/intelligence/GamifiedLearning';
 import KnowledgeChallenge from '@/components/intelligence/KnowledgeChallenge';
+import LightningRound from '@/components/intelligence/LightningRound';
 
 // Helper to extract domain from URL
 const extractDomain = (url) => {
@@ -774,6 +775,22 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                             </motion.div>
             )}
                     </div>
+                </div>
+
+                {/* Lightning Round Game */}
+                <div className="sm:bg-gradient-to-br sm:from-yellow-50 sm:to-orange-50 rounded-none sm:rounded-xl sm:border sm:border-yellow-200 sm:p-6">
+                    <div className="flex items-center gap-3 mb-4 px-3 sm:px-0">
+                        <div className="w-10 h-10 rounded-lg flex items-center justify-center">
+                            <img
+                src="https://qtrypzzcjebvfcihiynt.supabase.co/storage/v1/object/public/base44-prod/public/6944bf3dc7235d670de46364/813b2f73c_Group83.png"
+                alt="Learning Ai" className="rounded-[28px] w-full h-full object-contain" />
+                        </div>
+                        <div>
+                            <h3 className="font-semibold text-gray-900">Lightning Round! ⚡</h3>
+                            <p className="text-sm text-gray-600">Quick-fire true/false challenge</p>
+                        </div>
+                    </div>
+                    <LightningRound item={item} category={category} />
                 </div>
 
                 {/* Gamified Learning Section */}
