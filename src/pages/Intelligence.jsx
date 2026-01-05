@@ -353,12 +353,12 @@ function CategoryCard({ category, onClick }) {
             </div>
             <h3 className="text-lg sm:text-xl font-bold mb-1.5 sm:mb-2 h-12 sm:h-14 line-clamp-2">{category.name}</h3>
             <p className="text-white/80 text-xs sm:text-sm mb-3 sm:mb-4">{category.items.length} topics to explore</p>
-            <div className="flex flex-wrap gap-1 sm:gap-1.5 line-clamp-6 overflow-hidden">
+            <div className="flex flex-wrap gap-1 sm:gap-1.5">
                 {category.items.map((item, i) =>
-            <span key={i} className="px-2 py-0.5 sm:px-2.5 sm:py-1 bg-white/20 rounded-full text-xs sm:text-sm font-medium">
+        <span key={i} className="px-2 py-0.5 sm:px-2.5 sm:py-1 bg-white/20 rounded-full text-xs sm:text-sm font-medium">
                         {item}
                     </span>
-            )}
+        )}
             </div>
         </div>);
 
