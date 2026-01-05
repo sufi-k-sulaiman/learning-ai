@@ -292,7 +292,10 @@ export default function WordScramble({ item, category }) {
   }
 
   const word = words[currentWord];
-  const scrambled = scrambleWord(word.word);
+  if (!word) return null;
+  
+  const blanks = generateBlanks(word.word);
+  const canSubmit = userInputs.some(input => input !== '');
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
@@ -300,8 +303,8 @@ export default function WordScramble({ item, category }) {
       <div className="bg-gradient-to-r p-6 text-white" style={{ background: `linear-gradient(135deg, ${category?.color}dd, ${category?.color}99)` }}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
-            <Shuffle className="w-6 h-6" />
-            <h3 className="text-lg font-bold">Word Scramble</h3>
+            <BookOpen className="w-6 h-6" />
+            <h3 className="text-lg font-bold">Fill in the Blanks</h3>
           </div>
           <div className="flex items-center gap-2 px-3 py-1 bg-white/20 rounded-full">
             <Trophy className="w-4 h-4" />
@@ -329,75 +332,124 @@ export default function WordScramble({ item, category }) {
       <div className="p-6">
         {gameState === 'playing' ? (
           <>
-            <div className="text-center mb-8">
-              <p className="text-gray-600 mb-4 text-sm">Unscramble this word:</p>
-              <div className="inline-flex gap-2 mb-6">
-                {scrambled.split('').map((letter, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.1 }}
-                    className="w-12 h-12 sm:w-14 sm:h-14 rounded-lg flex items-center justify-center text-2xl font-bold text-white shadow-lg"
-                    style={{ backgroundColor: category?.color }}>
-                    {letter}
-                  </motion.div>
-                ))}
+            {/* Meaning as hint - always visible */}
+            <div className="mb-6 p-4 rounded-xl bg-blue-50 border border-blue-200">
+              <div className="flex items-start gap-2">
+                <Sparkles className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-blue-900 font-medium mb-2">📖 Meaning:</p>
+                  <p className="text-blue-900 text-sm">{word.meaning}</p>
+                </div>
               </div>
-
-              {showHint && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  className="p-4 rounded-xl bg-blue-50 border border-blue-200 mb-4">
-                  <div className="flex items-start gap-2">
-                    <Lightbulb className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                    <p className="text-blue-900 text-sm">{word.hint}</p>
-                  </div>
-                </motion.div>
-              )}
-
-              {!showHint && (
-                <button
-                  onClick={handleShowHint}
-                  className="text-sm text-gray-500 hover:text-gray-700 underline mb-4">
-                  Need a hint? (−5 points)
-                </button>
-              )}
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <input
-                type="text"
-                value={userAnswer}
-                onChange={(e) => setUserAnswer(e.target.value)}
-                placeholder="Type your answer..."
-                className="w-full px-4 py-3 text-lg border-2 border-gray-200 rounded-xl focus:border-purple-500 focus:outline-none"
-                autoFocus
-              />
+            {/* Fill in the blanks */}
+            <div className="mb-6">
+              <p className="text-gray-600 mb-4 text-sm text-center">Fill in the missing letters:</p>
+              <div className="flex justify-center gap-1.5 sm:gap-2 mb-6 flex-wrap">
+                {blanks.map((blank, i) => (
+                  <div key={i}>
+                    {blank.revealed ? (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: i * 0.05 }}
+                        className="w-10 h-12 sm:w-12 sm:h-14 rounded-lg flex items-center justify-center text-xl sm:text-2xl font-bold text-white shadow-md"
+                        style={{ backgroundColor: category?.color }}>
+                        {blank.letter}
+                      </motion.div>
+                    ) : (
+                      <motion.input
+                        ref={el => inputRefs.current[i] = el}
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.05 }}
+                        type="text"
+                        maxLength="1"
+                        value={userInputs[i] || ''}
+                        onChange={(e) => handleInputChange(i, e.target.value)}
+                        onKeyDown={(e) => handleKeyDown(i, e)}
+                        className="w-10 h-12 sm:w-12 sm:h-14 text-center text-xl sm:text-2xl font-bold border-2 border-gray-300 rounded-lg focus:border-purple-500 focus:outline-none uppercase"
+                        style={{ 
+                          backgroundColor: userInputs[i] ? `${category?.color}10` : 'white',
+                          borderColor: userInputs[i] ? category?.color : undefined
+                        }}
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Letter hint button */}
+            {!showHint && (
               <button
-                type="submit"
-                disabled={!userAnswer.trim()}
-                className="w-full py-3 rounded-xl font-medium text-white shadow-lg hover:shadow-xl transition-all transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
-                style={{ backgroundColor: category?.color }}>
-                Submit Answer
+                onClick={handleShowHint}
+                className="w-full mb-4 py-2 text-sm text-gray-500 hover:text-gray-700 underline">
+                Need extra hint? (−5 points)
               </button>
-            </form>
+            )}
+
+            {/* Extra hint */}
+            {showHint && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                className="mb-4 p-4 rounded-xl bg-amber-50 border border-amber-200">
+                <div className="flex items-start gap-2">
+                  <Lightbulb className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                  <div>
+                    <p className="text-amber-900 font-medium mb-1">💡 Letter Hint:</p>
+                    <p className="text-amber-900 text-sm">{word.hint}</p>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            <button
+              onClick={handleSubmit}
+              disabled={!canSubmit}
+              className="w-full py-3 rounded-xl font-medium text-white shadow-lg hover:shadow-xl transition-all transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{ backgroundColor: category?.color }}>
+              Submit Answer
+            </button>
           </>
         ) : (
           <>
             <div className={`p-6 rounded-xl mb-6 ${
-              gameState === 'correct' ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'
+              gameState === 'correct' ? 'bg-green-50 border-2 border-green-200' : 'bg-red-50 border-2 border-red-200'
             }`}>
-              <p className={`font-bold text-xl mb-2 ${
-                gameState === 'correct' ? 'text-green-900' : 'text-red-900'
-              }`}>
-                {gameState === 'correct' ? '🎉 Correct!' : '❌ Not quite!'}
-              </p>
-              <p className="text-gray-900 mb-1">
-                The word was: <span className="font-bold">{word.word.replace(/_/g, ' ')}</span>
-              </p>
-              <p className="text-gray-700 text-sm">{word.definition}</p>
+              <div className="flex items-start gap-3 mb-4">
+                {gameState === 'correct' ? (
+                  <CheckCircle2 className="w-8 h-8 text-green-600 flex-shrink-0" />
+                ) : (
+                  <XCircle className="w-8 h-8 text-red-600 flex-shrink-0" />
+                )}
+                <div className="flex-1">
+                  <p className={`font-bold text-xl mb-2 ${
+                    gameState === 'correct' ? 'text-green-900' : 'text-red-900'
+                  }`}>
+                    {gameState === 'correct' ? '🎉 Correct!' : '❌ Not quite!'}
+                  </p>
+                  <p className="text-gray-900 mb-3">
+                    The word was: <span className="font-bold text-2xl" style={{ color: category?.color }}>
+                      {word.word.toUpperCase()}
+                    </span>
+                  </p>
+                  
+                  <div className="space-y-3 mt-4">
+                    <div className="p-3 bg-white rounded-lg">
+                      <p className="text-xs text-gray-500 font-medium mb-1">📖 Meaning</p>
+                      <p className="text-gray-700 text-sm">{word.meaning}</p>
+                    </div>
+                    
+                    <div className="p-3 bg-white rounded-lg">
+                      <p className="text-xs text-gray-500 font-medium mb-1">💡 Why it matters</p>
+                      <p className="text-gray-700 text-sm">{word.importance}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <button
