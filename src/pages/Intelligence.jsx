@@ -129,6 +129,13 @@ const CATEGORIES = {
     gradient: "from-cyan-500 to-blue-500",
     items: ["Arithmetic", "Algebra", "Geometry", "Trigonometry", "Calculus", "Analysis", "Number Theory", "Topology", "Discrete Mathematics", "Logic", "Set Theory", "Probability", "Statistics", "Applied Mathematics", "Mathematical Physics", "Computational Mathematics", "Differential Equations", "Mathematical Modeling"]
   },
+  Biology: {
+    name: "Biology",
+    icon: Atom,
+    color: "#14B8A6",
+    gradient: "from-teal-500 to-emerald-500",
+    items: ["Cell Biology", "Molecular Biology", "Genetics", "Evolutionary Biology", "Ecology", "Physiology", "Anatomy", "Microbiology", "Botany", "Zoology", "Biochemistry", "Developmental Biology", "Marine Biology", "Environmental Biology", "Immunology", "Neuroscience", "Biotechnology"]
+  },
   Energy_Utilities: {
     name: "Energy & Utilities",
     icon: Zap,
