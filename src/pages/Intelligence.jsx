@@ -98,7 +98,7 @@ const CATEGORIES = {
     icon: Globe,
     color: "#3B82F6",
     gradient: "from-blue-500 to-cyan-500",
-    items: ["Earth", "Soil", "Water", "Air", "Fire", "Sunlight", "Moon", "Stars", "Sky", "Space", "Lightning", "Ice", "Climate", "Darkness", "Mountains", "Rivers", "Oceans", "Forests", "Deserts", "Islands", "Valleys", "Grasslands", "Polar Regions", "Caves", "Wetlands", "Plateaus", "Volcanoes", "Coral Reefs"]
+    items: ["Earth", "Soil", "Water", "Air", "Fire", "Sunlight", "Moon", "Stars", "Sky", "Space", "Lightning", "Ice", "Climate", "Darkness", "Mountains", "Rivers", "Oceans", "Forests", "Deserts", "Islands", "Valleys", "Grasslands", "Polar Regions", "Caves", "Wetlands", "Plateaus", "Volcanoes", "Coral Reefs", "Ecosystems", "Habitats", "Food Chains", "Photosynthesis", "Weathering", "Water Cycle", "Carbon Cycle", "Canyons", "Cliffs", "Dunes", "Glaciers", "Lakes", "Fjords", "Geysers", "Hot Springs", "Tundra", "Savannas", "Rainforests", "Taiga", "Mangroves", "Reefs", "Estuaries", "Wind", "Rain", "Snow", "Thunder", "Clouds", "Tides", "Waves", "Auroras", "Earthquakes", "Tsunamis", "Hurricanes", "Storms", "Erosion"]
   },
 
   Living_Things: {
