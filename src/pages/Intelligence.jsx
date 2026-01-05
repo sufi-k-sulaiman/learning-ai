@@ -143,6 +143,13 @@ const CATEGORIES = {
     gradient: "from-violet-500 to-purple-500",
     items: ["Organic", "Inorganic", "Physical", "Analytical", "Biochemical", "Theoretical", "Environmental", "Industrial", "Nuclear", "Materials", "Polymer", "Medicinal", "Computational", "Supramolecular", "Quantum", "Electrochemical", "Geochemical"]
   },
+  Physics: {
+    name: "Physics",
+    icon: Atom,
+    color: "#EF4444",
+    gradient: "from-red-500 to-orange-500",
+    items: ["Classical Mechanics", "Thermodynamics", "Electromagnetism", "Optics", "Quantum Mechanics", "Relativity", "Nuclear", "Particle", "Astrophysics", "Cosmology", "Condensed Matter", "Statistical", "Plasma", "Acoustics", "Geophysics", "Biophysics", "Computational", "Mathematical"]
+  },
   Energy_Utilities: {
     name: "Energy & Utilities",
     icon: Zap,
