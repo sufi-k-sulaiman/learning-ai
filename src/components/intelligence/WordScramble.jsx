@@ -105,14 +105,43 @@ export default function WordScramble({ item, category }) {
     return blanks;
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!userAnswer.trim() || gameState !== 'playing') return;
+  const handleInputChange = (index, value) => {
+    if (value.length > 1) value = value.slice(-1);
+    const newInputs = [...userInputs];
+    newInputs[index] = value.toUpperCase();
+    setUserInputs(newInputs);
 
-    const correctWord = words[currentWord].word.replace(/_/g, '').toLowerCase();
-    const userWord = userAnswer.trim().toLowerCase();
+    // Auto-focus next empty input
+    if (value && index < userInputs.length - 1) {
+      const nextEmptyIndex = newInputs.findIndex((v, i) => i > index && !v);
+      if (nextEmptyIndex !== -1 && inputRefs.current[nextEmptyIndex]) {
+        inputRefs.current[nextEmptyIndex].focus();
+      }
+    }
+  };
 
-    if (userWord === correctWord) {
+  const handleKeyDown = (index, e) => {
+    if (e.key === 'Backspace' && !userInputs[index] && index > 0) {
+      inputRefs.current[index - 1]?.focus();
+    }
+  };
+
+  const handleSubmit = () => {
+    if (gameState !== 'playing' || !words[currentWord]) return;
+
+    const correctWord = words[currentWord].word.toUpperCase().replace(/[^A-Z]/g, '');
+    const userWord = userInputs.join('');
+    const blanks = generateBlanks(words[currentWord].word);
+
+    // Check if user filled all blanks correctly
+    let isCorrect = true;
+    blanks.forEach((blank, i) => {
+      if (!blank.revealed && userInputs[i] !== blank.letter) {
+        isCorrect = false;
+      }
+    });
+
+    if (isCorrect || userWord === correctWord) {
       const points = showHint ? 5 : 10;
       setScore(score + points);
       setGameState('correct');
@@ -130,14 +159,16 @@ export default function WordScramble({ item, category }) {
 
   const handleNext = () => {
     if (currentWord < words.length - 1) {
-      setCurrentWord(currentWord + 1);
-      setUserAnswer('');
+      const nextIndex = currentWord + 1;
+      setCurrentWord(nextIndex);
+      const nextWordLength = words[nextIndex].word.replace(/[^a-zA-Z]/g, '').length;
+      setUserInputs(new Array(nextWordLength).fill(''));
       setShowHint(false);
       setGameState('playing');
     } else {
       setGameState('complete');
       
-      if (score >= 70) {
+      if (score >= 60) {
         confetti({
           particleCount: 150,
           spread: 80,
@@ -150,9 +181,9 @@ export default function WordScramble({ item, category }) {
   const handleRestart = () => {
     setCurrentWord(0);
     setScore(0);
-    setUserAnswer('');
     setShowHint(false);
     setHintsUsed(0);
+    setUserInputs([]);
     loadWords();
   };
 
