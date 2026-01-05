@@ -1,11 +1,11 @@
-import PrivacyPolicy from './pages/PrivacyPolicy';
 import Intelligence from './pages/Intelligence';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 import __Layout from './Layout.jsx';
 
 
 export const PAGES = {
-    "PrivacyPolicy": PrivacyPolicy,
     "Intelligence": Intelligence,
+    "PrivacyPolicy": PrivacyPolicy,
 }
 
 export const pagesConfig = {
