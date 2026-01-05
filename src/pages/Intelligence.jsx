@@ -122,13 +122,6 @@ const CATEGORIES = {
     gradient: "from-purple-500 to-indigo-500",
     items: ["Universe", "Galaxy", "Solar System", "Planets", "Asteroids", "Comets", "Black Holes", "Nebulae", "Constellations", "Exoplanets", "Supernovae", "Pulsars", "Quasars", "Dark Matter", "Dark Energy"]
   },
-  Mathematics: {
-    name: "Mathematics",
-    icon: Calculator,
-    color: "#06B6D4",
-    gradient: "from-cyan-500 to-blue-500",
-    items: ["Arithmetic", "Algebra", "Geometry", "Trigonometry", "Calculus", "Analysis", "Number Theory", "Topology", "Discrete Mathematics", "Logic", "Set Theory", "Probability", "Statistics", "Applied Mathematics", "Mathematical Physics", "Computational Mathematics", "Differential Equations", "Mathematical Modeling"]
-  },
   Energy_Utilities: {
     name: "Energy & Utilities",
     icon: Zap,
