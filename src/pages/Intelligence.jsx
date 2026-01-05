@@ -682,6 +682,9 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                     </div>
                 </div>
 
+                {/* Knowledge Challenge Game */}
+                <KnowledgeChallenge item={item} category={category} />
+
                 {/* Distribution Analysis - Apple Style */}
                 {data?.distributionData?.length > 0 &&
         <div>
@@ -1090,9 +1093,6 @@ function ItemDetailView({ item, category, onNavigateToTopic }) {
                         </div>
                     </div>
         }
-
-                {/* Knowledge Challenge Game */}
-                <KnowledgeChallenge item={item} category={category} />
 
                 {/* Future Outlook */}
                 {data?.futureOutlook &&
