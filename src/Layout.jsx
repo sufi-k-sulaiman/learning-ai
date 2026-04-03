@@ -127,8 +127,23 @@ export default function Layout({ children, currentPageName }) {
           display: none !important;
         }
         `}</style>
-        <div className="min-h-screen">
-        {children}
+        <div className="min-h-screen flex flex-col">
+        <div className="flex-1">{children}</div>
+        <footer className="border-t border-gray-200 py-6 px-4 mt-12">
+          <div className="max-w-6xl mx-auto text-center text-sm text-gray-600">
+            <p>
+              Copyright © 2026{' '}
+              <a href="https://1cplatform.com/" target="_blank" rel="noopener noreferrer" className="text-gray-900 font-medium hover:underline">
+                1cPlatform
+              </a>
+              . Developed by{' '}
+              <a href="https://sufikhan.com/" target="_blank" rel="noopener noreferrer" className="text-gray-900 font-medium hover:underline">
+                Sufi K Sulaiman
+              </a>
+              . All rights reserved.
+            </p>
+          </div>
+        </footer>
         </div>
         </HelmetProvider>
         );
