@@ -137,8 +137,8 @@ export default function Layout({ children, currentPageName }) {
                 1cPlatform
               </a>
               . Developed by{' '}
-              <a href="https://sufikhan.com/" target="_blank" rel="noopener noreferrer" className="text-gray-900 font-medium hover:underline">
-                Sufi K Sulaiman
+              <a href="https://sufikhan.com/" target="_blank" rel="noopener noreferrer" title="Sufi Khan Sulaiman — 20+ years of building scalable Ecommerce solutions" className="text-gray-900 font-medium hover:underline">
+                Sufi Khan Sulaiman
               </a>
               . All rights reserved.
             </p>
